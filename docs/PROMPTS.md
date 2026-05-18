@@ -2,18 +2,18 @@
 
 ## 1. Thông tin chung
 
-| Thông tin | Nội dung |
-|---|---|
-| Môn học |  |
-| Mã môn học |  |
-| Lớp |  |
-| Học kỳ |  |
-| Tên bài tập / Project |  |
-| Tên sinh viên / Nhóm |  |
-| MSSV / Danh sách MSSV |  |
-| Giảng viên hướng dẫn |  |
-| Ngày bắt đầu |  |
-| Ngày cập nhật gần nhất |  |
+| Thông tin               | Nội dung                                                            |
+|-------------------------|---------------------------------------------------------------------|
+| Môn học                 | Building Cross-Platform Back-End Application With .NET              |
+| Mã môn học              | PRN232                                                              |
+| Lớp                     | SE18D05                                                             |
+| Học kỳ                  | SU26                                                                |
+| Tên bài tập / Project   | Group Project                                                       |
+| Tên sinh viên / Nhóm    | Group 2                                                             |
+| MSSV / Danh sách MSSV   | DE180158                                                            |
+| Giảng viên hướng dẫn    | Lê Thiện Nhật Quang                                                 |
+| Ngày bắt đầu            | 2026-05-18                                                          |
+| Ngày hoàn thành         |                                                                     |
 
 ---
 
@@ -36,12 +36,12 @@ Sinh viên/nhóm cần ghi lại:
 
 Đánh dấu các công cụ AI đã sử dụng.
 
-- [ ] ChatGPT
-- [ ] Gemini
+- [X] ChatGPT
+- [X] Gemini
 - [ ] Claude
-- [ ] GitHub Copilot
+- [X] GitHub Copilot
 - [ ] Cursor
-- [ ] Antigravity
+- [X] Antigravity
 - [ ] Microsoft Copilot
 - [ ] Perplexity
 - [ ] Công cụ khác: ....................................
@@ -71,20 +71,19 @@ Sinh viên/nhóm cần ghi lại:
 
 ---
 
-### Prompt số 1
+### Prompt-01
 
-| Nội dung | Thông tin |
-|---|---|
-| Ngày sử dụng |  |
-| Công cụ AI | ChatGPT / Gemini / Claude / GitHub Copilot / Cursor / Antigravity / Khác |
-| Mục đích |  |
-| Phần việc liên quan | Requirement / Design / Database / Coding / Testing / Debug / Report / Presentation / Other |
-| Mức độ sử dụng | Hỏi ý tưởng / Hỏi giải thích / Hỏi review / Hỏi debug / Hỏi sinh code / Hỏi tối ưu |
-
+| Nội dung                    | Thông tin                                                         |
+|-----------------------------|-------------------------------------------------------------------|
+| Ngày sử dụng                | 17/05/2026                                                        |
+| Công cụ AI                  | ChatGPT / Gemini / Antigravity                                    |
+| Mục đích sử dụng            | Generate project screen design and suggest models                 |
+| Phần việc liên quan         | Requirement / Design / Database                                   |
+| Mức độ sử dụng              | Hỗ trợ một phần                                                   |
 #### 5.1. Prompt nguyên văn
 
 ```text
-Dán nguyên văn prompt đã hỏi AI tại đây.
+Liệt kê ra tất cả các màn hình cần thiết, đảm bảo bao quát được hết tất cả các chức năng.Lưu ý, tên màn hình bằng tiếng anh và trả lời một cách ngắn gọn.
 ```
 
 #### 5.2. Bối cảnh khi viết prompt
@@ -92,7 +91,7 @@ Dán nguyên văn prompt đã hỏi AI tại đây.
 Mô tả ngắn gọn vì sao sinh viên/nhóm cần dùng prompt này.
 
 ```text
-Viết tại đây...
+Khi bắt đầu thực hiện dự án nhóm cho môn học PRN232 (.NET Back-End), nhóm cần phải xác định rõ phạm vi (scope) của dự án và các màn hình cần xây dựng để phục vụ cho các phân hệ người dùng (Khách du lịch, Admin/Nhân viên, Hướng dẫn viên). Do dự án quản lý tour du lịch có quy mô tương đối lớn và nhiều nghiệp vụ phức tạp, nhóm đã sử dụng prompt này để nhờ AI gợi ý một danh sách tổng thể các màn hình cần thiết nhằm có cái nhìn toàn diện và tránh bỏ sót các tính năng cốt lõi.
 ```
 
 #### 5.3. Kết quả AI trả về
@@ -100,7 +99,14 @@ Viết tại đây...
 Tóm tắt nội dung AI đã trả lời hoặc gợi ý.
 
 ```text
-Viết tại đây...
+Reference: AI_AUDIT_LOG.md #### 4.2. Kết quả AI gợi ý
+
+AI đã đề xuất một danh sách rất chi tiết gồm 59 màn hình khác nhau, được phân loại rõ ràng thành 5 nhóm chính:
+1. Public / Customer Screens (20 màn hình): Trang chủ, danh sách tour, chi tiết tour, đặt tour, thanh toán, quản lý đặt chỗ, hồ sơ cá nhân, làm quiz gợi ý travel style,...
+2. Admin / Staff Screens (18 màn hình): Dashboard, quản lý tour, quản lý giá theo mùa, quản lý khuyến mãi, quản lý booking, phê duyệt hủy đặt tour, quản lý khách hàng, quản lý feedback,...
+3. Guide / Operation Screens (9 màn hình): Quản lý danh sách guide, phân công guide, lịch làm việc của guide, cổng thông tin guide (Guide Portal) để xem/từ chối tour được phân công,...
+4. System / Account Screens (8 màn hình): Đăng nhập, đăng ký, xác thực SMS, quản lý tài khoản, phân quyền vai trò (Role Permission),...
+5. Report / Statistic Screens (4 màn hình): Thống kê doanh thu, thống kê đặt tour hàng tháng, thống kê tour đang mở, xếp hạng hướng dẫn viên,...
 ```
 
 #### 5.4. Kết quả đã áp dụng vào bài
@@ -108,7 +114,7 @@ Viết tại đây...
 Mô tả phần nào từ kết quả AI đã được sử dụng vào bài tập/project.
 
 ```text
-Viết tại đây...
+Nhóm đã sử dụng toàn bộ khung phân loại màn hình theo 5 nhóm do AI đề xuất. Cụ thể, nhóm đã giữ lại các tính năng cốt lõi như luồng tìm kiếm và đặt tour của khách hàng, các màn hình quản trị của Admin/Staff (đặc biệt là phần quản lý lịch trình, giá tour, khuyến mãi và phê duyệt hủy đặt tour), phân hệ Guide Portal cho hướng dẫn viên, cùng các chức năng hệ thống như phân quyền vai trò (Customer, Staff, Admin, Guide).
 ```
 
 #### 5.5. Phần sinh viên/nhóm đã chỉnh sửa hoặc cải tiến
@@ -116,7 +122,14 @@ Viết tại đây...
 Mô tả sinh viên/nhóm đã thay đổi, kiểm tra, sửa lỗi hoặc cải tiến gì so với kết quả AI trả về.
 
 ```text
-Viết tại đây...
+Nhóm đã tiến hành tối ưu hóa và tinh chỉnh lại danh sách của AI để phù hợp với giới hạn thời gian và thực tế triển khai:
+1. Gộp các màn hình đơn lẻ có chức năng tương đồng: Thay vì chia nhỏ thành nhiều màn hình riêng biệt như gợi ý của AI (ví dụ: tách riêng Tour Detail, Tour Reviews, Tour Booking Form thành các màn hình khác nhau), nhóm đã gộp chúng lại thành các tab/component trong một màn hình lớn để tối ưu hóa trải nghiệm người dùng (UX) và giảm số lượng view cần viết.
+2. Rút gọn số lượng màn hình: Giảm tổng số màn hình từ 59 xuống còn 38 màn hình tối ưu hơn.
+3. Bổ sung chi tiết nghiệp vụ cụ thể cho từng màn hình:
+   - Thêm phần quản lý thanh toán đặt cọc (deposit payment) và thanh toán nốt phần còn lại (remaining payment).
+   - Thêm tính năng gửi thông báo tự động bằng SignalR/Email khi tour bị hủy.
+   - Thêm tính năng cho phép Guide cập nhật trạng thái tour từ "Confirmed" sang "Finished".
+   - Tích hợp SignalR vào hệ thống thông báo thời gian thực.
 ```
 
 #### 5.6. Đánh giá chất lượng prompt
@@ -126,7 +139,7 @@ Viết tại đây...
 - [ ] Prompt rõ ràng
 - [ ] Prompt có đủ bối cảnh
 - [ ] Prompt còn thiếu thông tin
-- [ ] Prompt tạo ra kết quả tốt
+- [X] Prompt tạo ra kết quả tốt
 - [ ] Prompt tạo ra kết quả chưa phù hợp
 - [ ] Cần hỏi lại AI nhiều lần
 - [ ] Cần tự kiểm tra và chỉnh sửa nhiều

@@ -2,18 +2,18 @@
 
 ## 1. Thông tin chung
 
-| Thông tin | Nội dung |
-|---|---|
-| Môn học |  |
-| Mã môn học |  |
-| Lớp |  |
-| Học kỳ |  |
-| Tên bài tập / Project |  |
-| Tên sinh viên / Nhóm |  |
-| MSSV / Danh sách MSSV |  |
-| Giảng viên hướng dẫn |  |
-| Ngày bắt đầu |  |
-| Ngày hoàn thành |  |
+| Thông tin               | Nội dung                                                            |
+|-------------------------|---------------------------------------------------------------------|
+| Môn học                 | Building Cross-Platform Back-End Application With .NET              |
+| Mã môn học              | PRN232                                                              |
+| Lớp                     | SE18D05                                                             |
+| Học kỳ                  | SU26                                                                |
+| Tên bài tập / Project   | Group Project                                                       |
+| Tên sinh viên / Nhóm    | Group 2                                                             |
+| MSSV / Danh sách MSSV   | DE180158                                                            |
+| Giảng viên hướng dẫn    | Lê Thiện Nhật Quang                                                 |
+| Ngày bắt đầu            | 2026-05-12                                                          |
+| Ngày hoàn thành         |                                                                     |
 
 ---
 
@@ -21,12 +21,12 @@
 
 Đánh dấu các công cụ AI đã sử dụng trong quá trình thực hiện bài tập/project.
 
-- [ ] ChatGPT
-- [ ] Gemini
+- [X] ChatGPT
+- [X] Gemini
 - [ ] Claude
-- [ ] GitHub Copilot
+- [X] GitHub Copilot
 - [ ] Cursor
-- [ ] Antigravity
+- [X] Antigravity
 - [ ] Perplexity
 - [ ] Microsoft Copilot
 - [ ] Công cụ khác: ....................................
@@ -54,73 +54,259 @@ Ví dụ:
 
 ### Mô tả mục tiêu sử dụng AI
 
-```text
-Viết tại đây...
-
-## 4. Nhật ký sử dụng AI chi tiết
-
-> Mỗi lần sử dụng AI cho một phần quan trọng của bài tập/project, sinh viên cần ghi lại theo mẫu bên dưới.  
-> Sinh viên/nhóm có thể nhân bản mẫu “Lần sử dụng AI” nhiều lần tùy theo số lần sử dụng AI thực tế.
-
----
-
 ### Lần sử dụng AI số 1
 
-| Nội dung | Thông tin |
-|---|---|
-| Ngày sử dụng |  |
-| Công cụ AI | ChatGPT / Gemini / Claude / GitHub Copilot / Cursor / Antigravity / Khác |
-| Mục đích sử dụng |  |
-| Phần việc liên quan | Requirement / Design / Database / Frontend / Backend / Testing / Debug / Report / Presentation / Other |
-| Mức độ sử dụng | Hỗ trợ ý tưởng / Hỗ trợ một phần / Hỗ trợ nhiều / Sinh chính nội dung |
+| Nội dung                    | Thông tin                                                         |
+|-----------------------------|-------------------------------------------------------------------|
+| Ngày sử dụng                | 17/05/2026                                                        |
+| Công cụ AI                  | ChatGPT / Gemini / Antigravity                                    |
+| Mục đích sử dụng            | Generate project screen design and suggest models                 |
+| Phần việc liên quan         | Requirement / Design / Database                                   |
+| Mức độ sử dụng              | Hỗ trợ một phần                                                   |
 
 #### 4.1. Prompt đã sử dụng
 
 ```text
-Dán nguyên văn prompt đã hỏi AI tại đây.
+PROMPTS.md #Prompt-01
 ```
 
 #### 4.2. Kết quả AI gợi ý
 
-Tóm tắt nội dung AI đã trả lời hoặc gợi ý.
-
 ```text
-Viết tại đây...
+1. Public / Customer Screens
+    1.	Home Screen 
+    2.	Tour List Screen 
+    3.	Tour Detail Screen 
+    4.	Tour Schedule Detail Screen 
+    5.	Tour Booking Screen 
+    6.	Booking Confirmation Screen 
+    7.	Payment Screen 
+    8.	Invoice / Booking Receipt Screen 
+    9.	My Bookings Screen 
+    10.	Booking Detail Screen 
+    11.	Cancel Booking Request Screen 
+    12.	Customer Profile Screen 
+    13.	Edit Profile Screen 
+    14.	Travel Companions Screen 
+    15.	Special Request Screen 
+    16.	My Special Requests Screen 
+    17.	Tour Review Screen 
+    18.	Tour Reviews Screen 
+    19.	Travel Style Quiz Screen 
+    20.	Recommended Tours Screen 
+2. Admin / Staff Screens
+    21.	Admin Dashboard Screen 
+    22.	Tour Management Screen 
+    23.	Create Tour Screen 
+    24.	Edit Tour Screen 
+    25.	Tour Pricing Management Screen 
+    26.	Seasonal Pricing Screen 
+    27.	Promotion Management Screen 
+    28.	Tour Itinerary Management Screen 
+    29.	Tour Schedule Management Screen 
+    30.	Booking Management Screen 
+    31.	Create Booking Screen 
+    32.	Edit Booking Screen 
+    33.	Booking Status Management Screen 
+    34.	Cancel Booking Approval Screen 
+    35.	Payment Management Screen 
+    36.	Customer Management Screen 
+    37.	Special Request Management Screen 
+    38.	Review Management Screen 
+3. Guide / Operation Screens
+    39.	Guide Management Screen 
+    40.	Create Guide Screen 
+    41.	Edit Guide Profile Screen 
+    42.	Guide Assignment Screen 
+    43.	Guide Schedule Screen 
+    44.	Guide Portal Screen 
+    45.	Assigned Tour Detail Screen 
+    46.	Reject Assigned Tour Screen 
+    47.	Guide Status Management Screen 
+4. System / Account Screens
+    48.	Login Screen 
+    49.	Register Screen 
+    50.	SMS Verification Screen 
+    51.	Forgot Password Screen 
+    52.	Account Management Screen 
+    53.	Role Permission Management Screen 
+    54.	Account Lock / Unlock Screen 
+    55.	Notification Management Screen 
+5. Report / Statistic Screens
+    56.	Revenue Statistics Screen 
+    57.	Monthly Booking Statistics Screen 
+    58.	Open Tour Statistics Screen 
+    59.	Top Guide Ranking Screen
+
 ```
 
 #### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
 
-Mô tả rõ phần nào được sử dụng lại từ gợi ý của AI.
-
 ```text
-Viết tại đây...
+Sử dụng danh sách các screen gợi ý bởi AI để có thể sơ lược và tiến hành một danh sách UI sát với yêu cầu của dự án.
 ```
 
 #### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
 
-Mô tả sinh viên/nhóm đã thay đổi, kiểm tra, sửa lỗi hoặc cải tiến gì so với gợi ý ban đầu của AI.
-
 ```text
-Viết tại đây...
+1. Public / Customer Screens
+    1.	Home Screen 
+    2.	Tour List Screen 
+    3.	Tour Detail Screen 
+        •Tour schedule detail 
+        •Tour price / promotion 
+        •Tour reviews 
+        •Tour booking form 
+    4.	Booking Confirmation Screen 
+    5.	Payment Screen 
+        •Full payment 
+        •Deposit payment 
+        •Remaining amount 
+    6.	Invoice / Booking Receipt Screen 
+    7.	My Bookings Screen 
+    8.	Booking Detail Screen 
+        •Booking status tracking 
+        •Cancel booking request 
+        •Payment information 
+    9.	Customer Profile Screen 
+        •View profile 
+        •Edit profile 
+    10.	Travel Companions Screen 
+        •Add companion 
+        •Edit companion 
+        •Delete companion 
+    11.	Special Requests Screen 
+        •Create special request 
+        •View request list 
+        •Track request status 
+    12.	Tour Review Screen 
+        •Submit rating and feedback 
+        •View submitted reviews 
+    13.	Travel Style Quiz Screen 
+        •Answer quiz 
+        •Save quiz result 
+    14.	Recommended Tours Screen 
+        •Recommended by quiz 
+        •Filter by budget, destination, type 
+        •Random tour 
+
+2. Admin / Staff Screens
+    15.	Admin Dashboard Screen 
+        •Open tour statistics 
+        •Monthly booking statistics 
+        •Expected revenue 
+        •Top guide ranking 
+    16.	Tour Management Screen 
+        •View tour list 
+        •Search / filter tours 
+        •Lock / unlock tour 
+        •Hide / delete tour 
+    17.	Tour Form Screen 
+        •Create tour 
+        •Edit tour 
+        •Basic tour information 
+    18.	Tour Detail Management Screen 
+        •Manage itinerary 
+        •Manage tour schedule 
+        •Change itinerary order 
+    19.	Tour Pricing Management Screen 
+        •Basic price 
+        •Seasonal price 
+        •Promotion / discount 
+    20.	Booking Management Screen 
+        •View booking list 
+        •Search / filter booking 
+        •Create booking 
+        •Edit booking 
+        •Link booking with tour schedule 
+    21.	Booking Detail Management Screen 
+        •Update booking status 
+        •View status history 
+        •View payment information 
+        •Send notification when tour is cancelled 
+    22.	Cancel Booking Approval Screen 
+        •View cancel requests 
+        •Approve / reject request 
+        •Save cancellation reason 
+    23.	Payment Management Screen 
+        •Check payment method 
+        •Track deposit / remaining payment 
+        •Export invoice / booking receipt 
+    24.	Customer Management Screen 
+        •View customer list 
+        •View customer profile 
+        •View customer bookings 
+    25.	Special Request Management Screen 
+        •View customer service requests 
+        •Update request status 
+        •Filter requests by status 
+    26.	Review Management Screen 
+        •View customer reviews 
+        •Manage review list 
+
+3. Guide / Operation Screens
+    27.	Guide Management Screen 
+        •View guide list 
+        •Add guide 
+        •Edit guide information 
+        •Update language, area, experience 
+        •Update guide status 
+    28.	Guide Assignment Screen 
+        •Assign guide to tour 
+        •Change assigned guide 
+        •Check guide availability 
+    29.	Guide Schedule Screen 
+        •View guide work schedule 
+        •View busy / available status 
+    30.	Guide Portal Screen 
+        •View assigned tours 
+        •View tour details 
+        •Reject assigned tour 
+        •Update tour status from confirmed to finished 
+    31.	Assigned Tour Detail Screen 
+        •Tour information 
+        •Customer list 
+        •Schedule detail 
+        •Special requests 
+
+4. System / Account Screens
+    32.	Login Screen 
+    33.	Register Screen 
+    34.	SMS Verification Screen 
+    35.	Forgot Password Screen 
+    36.	Account Management Screen 
+        •View account list 
+        •Lock / unlock account 
+        •Manage account status 
+    37.	Role Permission Management Screen 
+        •Manage Customer role 
+        •Manage Staff role 
+        •Manage Admin role 
+        •Manage Guide role 
+    38.	Notification Management Screen 
+        •View sent notifications 
+        •Manage email / SignalR notifications
+
 ```
 
 #### 4.5. Minh chứng
 
-| Loại minh chứng | Nội dung |
-|---|---|
-| Link commit |  |
-| File liên quan |  |
-| Screenshot |  |
-| Kết quả chạy/test |  |
-| Link video demo |  |
-| Ghi chú khác |  |
+| Loại minh chứng         | Nội dung                                                                     |
+|-------------------------|------------------------------------------------------------------------------|
+| Link commit             |                                                                              |
+| File liên quan          |                                                                              |
+| Screenshot              | ../img/AI_AUDIT_LOG/prompt1_proof1.png                                       |
+| Kết quả chạy/test       |                                                                              |
+| Link video demo         |                                                                              |
+| Ghi chú khác            |                                                                              |
 
 #### 4.6. Nhận xét cá nhân/nhóm
 
-Sinh viên/nhóm học được gì sau lần sử dụng AI này?
-
 ```text
-Viết tại đây...
+Sau lần sử dụng AI đầu tiên này để phác thảo danh sách màn hình của hệ thống, nhóm đã rút ra được một số bài học kinh nghiệm quý giá:
+
+1. AI chỉ là 1 công cụ để trực quan hóa các yêu cầu ban đầu của nhóm, còn việc thiết kế và phát triển vẫn cần nhóm xem lại và chỉnh sửa cho phù hợp với yêu cầu thực tế.
+ 
 ```
 
 ---
