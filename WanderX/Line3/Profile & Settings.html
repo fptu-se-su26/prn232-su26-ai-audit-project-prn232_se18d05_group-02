@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Customer Profile | WanderX</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#d8e2ff",
+                        "primary": "#003d9b",
+                        "on-tertiary-fixed": "#001f27",
+                        "on-primary-fixed": "#001848",
+                        "on-surface": "#051a3e",
+                        "surface-tint": "#0c56d0",
+                        "surface-container-highest": "#d8e2ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#434654",
+                        "on-secondary-container": "#640f00",
+                        "outline-variant": "#c3c6d6",
+                        "surface-container-low": "#f1f3ff",
+                        "secondary-container": "#fd6a49",
+                        "secondary-fixed": "#ffdad2",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#faf9ff",
+                        "secondary-fixed-dim": "#ffb4a3",
+                        "inverse-on-surface": "#edf0ff",
+                        "background": "#faf9ff",
+                        "surface-container": "#e9edff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#dae2ff",
+                        "inverse-primary": "#b2c5ff",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e1e8ff",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-background": "#051a3e",
+                        "primary-container": "#0052cc",
+                        "outline": "#737685",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#48d7f9",
+                        "tertiary-fixed": "#afecff",
+                        "tertiary": "#004b59",
+                        "on-tertiary-container": "#76e2ff",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-primary-container": "#c4d2ff",
+                        "surface-dim": "#ccdaff",
+                        "surface": "#faf9ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#8c1900",
+                        "inverse-surface": "#1d3054",
+                        "on-secondary-fixed": "#3d0600",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "tertiary-container": "#006477",
+                        "secondary": "#ae3115"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding-desktop": "48px",
+                        "gutter": "24px",
+                        "container-padding-mobile": "16px",
+                        "section-gap": "80px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .card-hover-effect {
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+            .card-hover-effect:hover {
+                transform: scale(1.02);
+                background-color: var(--tw-bg-opacity, 1) rgb(241 243 255 / var(--tw-bg-opacity));
+            }
+
+        .btn-hover-effect {
+            transition: transform 0.3s ease-in-out;
+        }
+
+            .btn-hover-effect:hover {
+                transform: scale(1.05);
+            }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md animate-[fadeIn_0.5s_ease-in-out]">
+    <!-- TopNavBar -->
+    <header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md docked full-width top-0 sticky z-50 shadow-sm">
+        <div class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16 max-w-7xl mx-auto">
+            <div class="font-display-lg text-headline-md font-bold text-primary dark:text-primary-fixed-dim">WanderX</div>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">Explore</a>
+                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">My Trips</a>
+                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">Concierge</a>
+                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="#">Support</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full hover:bg-surface-container-low/50 transition-all duration-200">
+                    <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+                </button>
+                <button class="p-2 rounded-full hover:bg-surface-container-low/50 transition-all duration-200">
+                    <span class="material-symbols-outlined text-on-surface-variant">settings</span>
+                </button>
+                <div class="w-10 h-10 rounded-full border-2 border-primary-container overflow-hidden">
+                    <img alt="Customer profile avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a sophisticated male traveler in his late 30s, wearing a light linen shirt against a blurred coastal Mediterranean background. The lighting is bright and warm, reflecting a premium concierge service aesthetic with soft focus and high-key color grading. The mood is confident and relaxed, matching a high-end travel brand palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgQYLqrXRsGK2PPjU2wPN4vgvrVLe_V6re31700pNLDVCUWbf1sUtcRNArzD2BWfwWoMejkLSS2gHLmuVjdnFBgScNY2mJqO0FUsOovaKiejCw4RnOBwYH9fnVgpkydYeX8cZbJfcJqicMiF0H_sCcC08USvFFwOactMkil_Q6a-FDxDeBrYhI8b504C3K_fzTUuXuaa9BSXVsbzdiRgL-g0hiN0f2JWVahBasXn1glQrb60Aq14bwDQ8VXEbewpOs5rhuGTyFjQ" />
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop py-12 md:py-20">
+        <!-- Profile Header -->
+        <section class="mb-16">
+            <div class="flex flex-col md:flex-row items-center md:items-end gap-8">
+                <div class="relative group">
+                    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden ring-4 ring-primary/5">
+                        <img alt="Customer profile avatar" class="w-full h-full object-cover" data-alt="A close-up portrait of a refined man with a friendly expression, set in a bright, airy environment with hints of modern architectural details in the background. The style is crisp and editorial, using a light color palette with subtle azure blue highlights. Soft natural sunlight illuminates the subject, creating a high-fidelity and trustworthy visual presence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkTmokAQgPoZrec3otPjLwoGGrvPPt0vf9V6VkwB6LTI7SK12zH_jZKAgdV750xzZeoXk45n898ZAfkhGhvydLZwjzwXkjPmjafvSJJQVMclhIke7D5lt2k7rJ-UX3RRlX71xSyIpNdqA9ljHFkCyZ7qvHhJnKKKJDZBMOxSG-lAXprZf_Nt7ocjAdxPRVSxS1pbc1WRZsy1XHb8XbKSewHh4IKhgkJPeuYHyA3OLgbVRBQnjKaRRasWMZet8pWkAkKgCgkFzbIQ" />
+                    </div>
+                    <button class="absolute bottom-2 right-2 bg-secondary text-on-secondary p-2 rounded-full shadow-lg hover:scale-105 transition-transform btn-hover-effect">
+                        <span class="material-symbols-outlined text-[20px]">photo_camera</span>
+                    </button>
+                </div>
+                <div class="text-center md:text-left flex-1">
+                    <h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface">Julian Alexander</h1>
+                    <p class="font-body-lg text-on-surface-variant mt-2 flex items-center justify-center md:justify-start gap-2">
+                        <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+                        Premium Concierge Member since 2022
+                    </p>
+                </div>
+                <div class="flex gap-4">
+                    <button class="px-6 py-3 bg-secondary text-on-secondary rounded-full font-label-md flex items-center gap-2 hover:shadow-lg transition-all active:scale-95 btn-hover-effect">
+                        <span class="material-symbols-outlined">edit</span>
+                        Edit Profile
+                    </button>
+                </div>
+            </div>
+        </section>
+        <!-- Bento Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+            <!-- Personal Information -->
+            <section class="lg:col-span-8 glass-card border border-outline-variant/30 rounded-xl p-8 shadow-sm card-hover-effect">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="font-headline-md text-on-surface flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">person_outline</span>
+                        Personal Information
+                    </h2>
+                    <button class="text-primary font-label-md hover:underline btn-hover-effect">Edit Info</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
+                    <div class="space-y-1">
+                        <label class="font-label-sm text-outline uppercase tracking-wider">Full Name</label>
+                        <p class="font-body-lg text-on-surface">Julian Alexander</p>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-label-sm text-outline uppercase tracking-wider">Email Address</label>
+                        <p class="font-body-lg text-on-surface">julian.a@concierge-x.com</p>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-label-sm text-outline uppercase tracking-wider">Phone Number</label>
+                        <p class="font-body-lg text-on-surface">+1 (555) 234-8901</p>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-label-sm text-outline uppercase tracking-wider">Nationality</label>
+                        <p class="font-body-lg text-on-surface">United Kingdom</p>
+                    </div>
+                    <div class="space-y-1 md:col-span-2">
+                        <label class="font-label-sm text-outline uppercase tracking-wider">Primary Residence</label>
+                        <p class="font-body-lg text-on-surface">London, Kensington</p>
+                    </div>
+                </div>
+            </section>
+            <!-- Quick Stats/Level -->
+            <section class="lg:col-span-4 bg-primary text-on-primary rounded-xl p-8 flex flex-col justify-between shadow-xl overflow-hidden relative">
+                <div class="relative z-10">
+                    <span class="font-label-sm text-on-primary-container bg-primary-container px-3 py-1 rounded-full uppercase">Titanium Tier</span>
+                    <h3 class="font-headline-md mt-6">Travel Miles</h3>
+                    <div class="text-[48px] font-bold mt-2">124,500</div>
+                </div>
+                <div class="relative z-10 mt-8">
+                    <div class="w-full bg-on-primary/20 h-2 rounded-full overflow-hidden">
+                        <div class="bg-secondary-container w-3/4 h-full rounded-full"></div>
+                    </div>
+                    <p class="font-label-sm mt-4 opacity-80 text-right">25,500 miles to next tier</p>
+                </div>
+                <!-- Abstract visual element -->
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+            </section>
+            <!-- Travel Preferences -->
+            <section class="lg:col-span-12 glass-card border border-outline-variant/30 rounded-xl p-8 shadow-sm card-hover-effect">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="font-headline-md text-on-surface flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">interests</span>
+                        Travel Preferences
+                    </h2>
+                    <button class="px-4 py-2 border border-primary text-primary rounded-full font-label-md hover:bg-primary/5 transition-colors btn-hover-effect">Retake Style Quiz</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/20">
+                        <span class="material-symbols-outlined text-secondary mb-4" style="font-variation-settings: 'FILL' 1;">landscape</span>
+                        <h4 class="font-headline-md text-on-surface mb-2">Adventure</h4>
+                        <p class="font-body-md text-on-surface-variant">High interest in hiking and remote exploration.</p>
+                    </div>
+                    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/20">
+                        <span class="material-symbols-outlined text-secondary mb-4" style="font-variation-settings: 'FILL' 1;">hotel</span>
+                        <h4 class="font-headline-md text-on-surface mb-2">Luxury</h4>
+                        <p class="font-body-md text-on-surface-variant">Prefers boutique hotels and private transfers.</p>
+                    </div>
+                    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/20">
+                        <span class="material-symbols-outlined text-secondary mb-4" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+                        <h4 class="font-headline-md text-on-surface mb-2">Culinary</h4>
+                        <p class="font-body-md text-on-surface-variant">Michelin-star dining and local wine tours.</p>
+                    </div>
+                    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/20">
+                        <span class="material-symbols-outlined text-secondary mb-4" style="font-variation-settings: 'FILL' 1;">spa</span>
+                        <h4 class="font-headline-md text-on-surface mb-2">Wellness</h4>
+                        <p class="font-body-md text-on-surface-variant">Regular requests for spa and meditation retreats.</p>
+                    </div>
+                </div>
+                <div class="mt-8 flex flex-wrap gap-2">
+                    <span class="bg-tertiary-fixed text-on-tertiary-fixed px-4 py-1.5 rounded-full font-label-md">Direct Flights Only</span>
+                    <span class="bg-tertiary-fixed text-on-tertiary-fixed px-4 py-1.5 rounded-full font-label-md">High Floor Preference</span>
+                    <span class="bg-tertiary-fixed text-on-tertiary-fixed px-4 py-1.5 rounded-full font-label-md">Window Seat</span>
+                    <span class="bg-tertiary-fixed text-on-tertiary-fixed px-4 py-1.5 rounded-full font-label-md">Vegan Meal Option</span>
+                </div>
+            </section>
+            <!-- Security Settings -->
+            <section class="lg:col-span-12 glass-card border border-outline-variant/30 rounded-xl p-8 shadow-sm card-hover-effect">
+                <h2 class="font-headline-md text-on-surface flex items-center gap-3 mb-8">
+                    <span class="material-symbols-outlined text-primary">security</span>
+                    Security &amp; Account
+                </h2>
+                <div class="divide-y divide-outline-variant/20">
+                    <div class="py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h4 class="font-headline-md text-on-surface text-base">Account Password</h4>
+                            <p class="font-body-md text-on-surface-variant">Last updated 3 months ago</p>
+                        </div>
+                        <button class="px-6 py-2 border border-outline text-on-surface rounded-full font-label-md hover:bg-surface-container transition-colors btn-hover-effect">Change Password</button>
+                    </div>
+                    <div class="py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h4 class="font-headline-md text-on-surface text-base">Two-Factor Authentication</h4>
+                            <p class="font-body-md text-on-surface-variant">Extra security layer via SMS or Authenticator App</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="font-label-md text-on-surface-variant">Enabled</span>
+                            <button class="w-12 h-6 bg-primary rounded-full relative flex items-center transition-all px-1 transition-all duration-300 ease-in-out focus:ring-2 focus:ring-primary/50 focus:outline-none">
+                                <div class="w-4 h-4 bg-white rounded-full ml-auto"></div>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h4 class="font-headline-md text-on-surface text-base">Trusted Devices</h4>
+                            <p class="font-body-md text-on-surface-variant">3 devices currently authorized</p>
+                        </div>
+                        <button class="text-primary font-label-md hover:underline btn-hover-effect">Manage Devices</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Dangerous Area -->
+            <section class="lg:col-span-12 mt-4">
+                <button class="flex items-center gap-2 text-error font-label-md hover:opacity-80 transition-opacity">
+                    <span class="material-symbols-outlined">delete</span>
+                    Deactivate Account
+                </button>
+            </section>
+        </div>
+    </main>
+    <!-- BottomNavBar (Mobile Only) -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 dark:bg-surface-container-lowest/90 backdrop-blur-lg border-t border-outline-variant/30 flex justify-around items-center py-3 pb-safe px-4 z-50">
+        <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1">
+            <span class="material-symbols-outlined">explore</span>
+            <span class="font-label-sm text-label-sm-mobile mt-1">Explore</span>
+        </button>
+        <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1">
+            <span class="material-symbols-outlined">travel</span>
+            <span class="font-label-sm text-label-sm-mobile mt-1">My Trips</span>
+        </button>
+        <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1">
+            <span class="material-symbols-outlined">support_agent</span>
+            <span class="font-label-sm text-label-sm-mobile mt-1">Concierge</span>
+        </button>
+        <button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+            <span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
+        </button>
+    </nav>
+    <!-- Spacer for fixed mobile bottom nav -->
+    <div class="h-24 md:hidden"></div>
+</body>
+</html>
