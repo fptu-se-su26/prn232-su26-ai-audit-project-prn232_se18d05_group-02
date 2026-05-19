@@ -1,0 +1,397 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WanderX - Secure Booking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#003d9b",
+                      "secondary-fixed-dim": "#ffb4a3",
+                      "on-primary-container": "#c4d2ff",
+                      "surface-container-highest": "#d8e2ff",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#004e5d",
+                      "on-tertiary-container": "#76e2ff",
+                      "tertiary-fixed": "#afecff",
+                      "surface-tint": "#0c56d0",
+                      "secondary-fixed": "#ffdad2",
+                      "on-surface-variant": "#434654",
+                      "secondary": "#ae3115",
+                      "inverse-surface": "#1d3054",
+                      "on-primary": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "inverse-primary": "#b2c5ff",
+                      "on-tertiary-fixed": "#001f27",
+                      "on-error": "#ffffff",
+                      "surface-variant": "#d8e2ff",
+                      "inverse-on-surface": "#edf0ff",
+                      "primary-fixed": "#dae2ff",
+                      "on-surface": "#051a3e",
+                      "on-secondary-fixed-variant": "#8c1900",
+                      "on-background": "#051a3e",
+                      "error": "#ba1a1a",
+                      "surface-bright": "#faf9ff",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "surface-container-high": "#e1e8ff",
+                      "surface": "#faf9ff",
+                      "secondary-container": "#fd6a49",
+                      "error-container": "#ffdad6",
+                      "background": "#faf9ff",
+                      "tertiary-container": "#006477",
+                      "on-error-container": "#93000a",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed": "#3d0600",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "on-primary-fixed": "#001848",
+                      "outline-variant": "#c3c6d6",
+                      "outline": "#737685",
+                      "primary-container": "#0052cc",
+                      "surface-container-low": "#f1f3ff",
+                      "tertiary-fixed-dim": "#48d7f9",
+                      "surface-dim": "#ccdaff",
+                      "surface-container": "#e9edff",
+                      "on-secondary-container": "#640f00",
+                      "tertiary": "#004b59"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "section-gap": "80px",
+                      "gutter": "24px",
+                      "container-padding-mobile": "16px",
+                      "base": "8px",
+                      "container-padding-desktop": "48px"
+              },
+              "fontFamily": {
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "display-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "56px",
+                              {
+                                      "lineHeight": "64px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Minimal Checkout Header (Suppressed standard nav due to transactional nature) -->
+<header class="w-full bg-surface-container-lowest border-b border-outline-variant/30 py-4 px-container-padding-mobile md:px-container-padding-desktop flex justify-between items-center sticky top-0 z-50">
+<a class="font-headline-md text-headline-md font-extrabold text-primary tracking-tight flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">travel_explore</span>
+            WanderX
+        </a>
+<div class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors cursor-pointer group">
+<span class="font-label-md text-label-md hidden md:block">Cancel Booking</span>
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">close</span>
+</div>
+</header>
+<main class="w-full pt-12 pb-section-gap px-container-padding-mobile md:px-container-padding-desktop max-w-7xl mx-auto">
+<!-- Progress Indicator -->
+<div class="w-full max-w-3xl mx-auto mb-12">
+<div class="relative flex items-center justify-between">
+<!-- Background track -->
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-surface-container rounded-full -z-10"></div>
+<!-- Active track -->
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-1 bg-primary rounded-full -z-10 transition-all duration-500"></div>
+<!-- Step 1: Details (Active) -->
+<div class="flex flex-col items-center gap-2 bg-background px-4">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-md text-label-md shadow-sm">
+<span class="material-symbols-outlined" style="font-size: 20px;">person</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Details</span>
+</div>
+<!-- Step 2: Payment (Inactive) -->
+<div class="flex flex-col items-center gap-2 bg-background px-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-md text-label-md border border-outline-variant/50">
+<span class="material-symbols-outlined" style="font-size: 20px;">credit_card</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Payment</span>
+</div>
+<!-- Step 3: Confirm (Inactive) -->
+<div class="flex flex-col items-center gap-2 bg-background px-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-md text-label-md border border-outline-variant/50">
+<span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Confirm</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- Left Column: Booking Form Canvas -->
+<div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-10">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Traveler Information</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Please provide the details for the lead traveler. This information will be used for tickets and vital communications.</p>
+</div>
+<!-- Form Section: Contact -->
+<section class="bg-surface-container-lowest p-6 md:p-8 rounded-xl border border-outline-variant/40 shadow-sm flex flex-col gap-6">
+<div class="flex items-center gap-3 border-b border-outline-variant/30 pb-4">
+<span class="material-symbols-outlined text-primary">contact_mail</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Contact Details</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" for="firstName">First Name</label>
+<input class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" id="firstName" placeholder="e.g. Eleanor" type="text">
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" for="lastName">Last Name</label>
+<input class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" id="lastName" placeholder="e.g. Vance" type="text">
+</div>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" for="email">Email Address</label>
+<input class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" id="email" placeholder="eleanor.vance@example.com" type="email">
+<p class="font-label-sm text-label-sm text-outline mt-1">We'll send your booking confirmation here.</p>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" for="phone">Phone Number</label>
+<div class="flex w-full">
+<select class="rounded-l-lg border-outline-variant border-r-0 bg-surface-container-low px-3 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+<option>+1 (US)</option>
+<option>+44 (UK)</option>
+<option>+61 (AU)</option>
+</select>
+<input class="w-full rounded-r-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors" id="phone" placeholder="(555) 123-4567" type="tel">
+</div>
+</div>
+</section>
+<!-- Form Section: Guests -->
+<section class="bg-surface-container-lowest p-6 md:p-8 rounded-xl border border-outline-variant/40 shadow-sm flex flex-col gap-6">
+<div class="flex items-center gap-3 border-b border-outline-variant/30 pb-4">
+<span class="material-symbols-outlined text-primary">groups</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Guest Selection</h2>
+</div>
+<div class="flex flex-col gap-6">
+<!-- Adult Selector -->
+<div class="flex items-center justify-between py-2">
+<div>
+<h3 class="font-body-lg text-body-lg text-on-surface font-medium">Adults</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Ages 18 and above</p>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low rounded-full px-2 py-1 border border-outline-variant/50">
+<button class="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface hover:text-primary transition-colors disabled:opacity-50" disabled="" type="button">
+<span class="material-symbols-outlined" style="font-size: 18px;">remove</span>
+</button>
+<span class="font-body-md text-body-md text-on-surface w-4 text-center font-medium">2</span>
+<button class="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface hover:text-primary transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+</button>
+</div>
+</div>
+<!-- Child Selector -->
+<div class="flex items-center justify-between py-2 border-t border-outline-variant/20 pt-6">
+<div>
+<h3 class="font-body-lg text-body-lg text-on-surface font-medium">Children</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Ages 2 to 17</p>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low rounded-full px-2 py-1 border border-outline-variant/50">
+<button class="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface hover:text-primary transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined" style="font-size: 18px;">remove</span>
+</button>
+<span class="font-body-md text-body-md text-on-surface w-4 text-center font-medium">0</span>
+<button class="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface hover:text-primary transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Form Section: Preferences -->
+<section class="bg-surface-container-lowest p-6 md:p-8 rounded-xl border border-outline-variant/40 shadow-sm flex flex-col gap-6">
+<div class="flex items-center gap-3 border-b border-outline-variant/30 pb-4">
+<span class="material-symbols-outlined text-primary">tune</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Preferences &amp; Requests</h2>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" for="language">Guide Language</label>
+<select class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors appearance-none cursor-pointer" id="language">
+<option>English (Default)</option>
+<option>Spanish - Español</option>
+<option>French - Français</option>
+<option>Japanese - 日本語</option>
+</select>
+<div class="pointer-events-none absolute right-12 mt-[38px] flex items-center px-2 text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-size: 20px;">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" for="requests">Special Requests (Optional)</label>
+<textarea class="w-full rounded-lg border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none" id="requests" placeholder="Dietary restrictions, accessibility needs, or special occasions..." rows="4"></textarea>
+</div>
+</section>
+<!-- Action Area -->
+<div class="flex items-center justify-end pt-4">
+<button class="bg-secondary text-on-secondary px-8 py-4 rounded-full font-label-md text-label-md hover:bg-secondary-container hover:text-on-secondary-container hover:-translate-y-1 transition-all duration-300 shadow-md flex items-center gap-2 group">
+                        Continue to Payment
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Tour Summary Card (Sticky) -->
+<div class="lg:col-span-5 xl:col-span-4 relative mt-10 lg:mt-0">
+<div class="sticky top-[100px] bg-surface-container-lowest/90 backdrop-blur-md rounded-xl border border-outline-variant/30 shadow-[0_8px_30px_rgb(0,61,155,0.06)] overflow-hidden flex flex-col">
+<!-- Card Image Header -->
+<div class="h-48 w-full relative">
+<img alt="Paris cityscape" class="w-full h-full object-cover" data-alt="A breathtaking, high-resolution photograph of a classic European cityscape at sunset, featuring iconic architecture bathed in golden hour light. The mood is romantic and premium, consistent with a high-end travel concierge aesthetic. The lighting creates soft, ambient shadows, enhancing the depth of the scene." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBen-wNPn1r1Z-ZRPGnenxOCYKfG0rD1bghOI9FOJ9DBTc1wmvPf47gauQDoWLipys62ck1007s_550E1sZJIiHXUoJwoP2FvhgQFDPBh7SDHowHnS3wDjcKxQQjlRTFfXGIwG8L-Bxxnh-kXmHweqcO0mcRB_EvCNrFj6stLdbO6fFjFBoORP_wVQYfIu7Y5xjNSYXznN91GZZgqUGu0x6OLeUzjaLwTdS7ijDfFGV2QcgRuUcTwph8KKZ43Rrls72KwIY-sAeNQ">
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-inverse-surface/20 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4 text-on-primary">
+<span class="bg-tertiary/90 text-on-tertiary px-2 py-1 rounded font-label-sm text-label-sm uppercase tracking-widest mb-2 inline-block backdrop-blur-sm">Exclusive Tour</span>
+<h3 class="font-headline-md text-headline-md font-bold leading-tight drop-shadow-md">Twilight Seine River Cruise &amp; Dinner</h3>
+</div>
+</div>
+<!-- Card Body: Details -->
+<div class="p-6 flex flex-col gap-6">
+<div class="flex flex-col gap-4">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">calendar_month</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Date &amp; Time</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">October 15, 2024 • 19:00</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">group</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Guests</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">2 Adults</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">location_on</span>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Meeting Point</p>
+<p class="font-body-md text-body-md text-on-surface font-medium">Port de la Bourdonnais, Paris</p>
+</div>
+</div>
+</div>
+<hr class="border-outline-variant/30">
+<!-- Price Breakdown -->
+<div class="flex flex-col gap-3">
+<h4 class="font-label-md text-label-md text-on-surface font-semibold mb-1">Price Summary</h4>
+<div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant">
+<span>Adult Ticket ($145.00 x 2)</span>
+<span>$290.00</span>
+</div>
+<div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant">
+<span>Taxes &amp; Fees</span>
+<span>$24.50</span>
+</div>
+<div class="flex justify-between items-center pt-3 mt-1 border-t border-outline-variant/20">
+<span class="font-headline-md text-headline-md text-on-surface font-bold">Total</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">$314.50</span>
+</div>
+<p class="font-label-sm text-label-sm text-outline text-right mt-1">All prices in USD</p>
+</div>
+<!-- Trust Signals -->
+<div class="bg-surface-container rounded-lg p-4 flex items-start gap-3 mt-2 border border-outline-variant/20">
+<span class="material-symbols-outlined text-tertiary">shield_lock</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Secure Booking</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Your information is encrypted and securely processed. Free cancellation up to 48 hours before.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
