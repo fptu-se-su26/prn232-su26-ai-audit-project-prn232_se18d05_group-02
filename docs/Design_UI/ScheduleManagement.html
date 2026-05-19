@@ -1,0 +1,369 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WanderX | Tour Detail Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#0c56d0",
+                        "outline-variant": "#c3c6d6",
+                        "surface": "#faf9ff",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "on-secondary-fixed": "#3d0600",
+                        "on-surface": "#051a3e",
+                        "surface-container": "#e9edff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#006477",
+                        "primary-container": "#0052cc",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#fd6a49",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#001848",
+                        "surface-container-high": "#e1e8ff",
+                        "on-background": "#051a3e",
+                        "surface-container-highest": "#d8e2ff",
+                        "inverse-on-surface": "#edf0ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "background": "#faf9ff",
+                        "tertiary": "#004b59",
+                        "secondary-fixed-dim": "#ffb4a3",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "secondary-fixed": "#ffdad2",
+                        "primary-fixed": "#dae2ff",
+                        "outline": "#737685",
+                        "tertiary-fixed-dim": "#48d7f9",
+                        "on-tertiary-fixed": "#001f27",
+                        "primary": "#003d9b",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#8c1900",
+                        "on-primary-container": "#c4d2ff",
+                        "surface-bright": "#faf9ff",
+                        "surface-dim": "#ccdaff",
+                        "inverse-primary": "#b2c5ff",
+                        "secondary": "#ae3115",
+                        "tertiary-fixed": "#afecff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#640f00",
+                        "surface-variant": "#d8e2ff",
+                        "on-surface-variant": "#434654",
+                        "surface-container-low": "#f1f3ff",
+                        "on-tertiary-container": "#76e2ff",
+                        "inverse-surface": "#1d3054"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "container-padding-desktop": "48px",
+                        "container-padding-mobile": "16px",
+                        "section-gap": "80px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex">
+<!-- SideNavBar (Authority: JSON) -->
+<aside class="hidden md:flex flex-col h-screen py-6 px-4 gap-2 bg-surface-container-low border-r border-outline-variant sticky top-0 w-64 z-50">
+<div class="mb-8 px-2">
+<h1 class="font-headline-md text-headline-md font-black text-primary">Admin Central</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Platform Manager</p>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-label-md text-label-md">Tours</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+<span class="font-label-md text-label-md">Bookings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-md text-label-md">Payments</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-2 pt-6 border-t border-outline-variant">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<button class="mt-4 w-full bg-secondary py-3 px-4 rounded-full text-on-secondary font-label-md text-label-md shadow-md hover:opacity-90 transition-all">
+                Generate Reports
+            </button>
+</div>
+</aside>
+<main class="flex-1 min-w-0">
+<!-- TopNavBar (Authority: JSON) -->
+<header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm sticky top-0 z-50 flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary">WanderX</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Destinations</a>
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary py-5" href="#">My Bookings</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Deals</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hidden md:block font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low px-4 py-2 rounded-lg transition-colors">Support</button>
+<button class="bg-primary px-6 py-2 rounded-full text-on-primary font-label-md text-label-md hover:bg-primary/90 transition-all">Travel Quiz</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-highest">
+<img alt="User Profile" data-alt="A professional headshot of a travel operations manager with a warm, confident expression. The lighting is bright and high-key, suggesting a modern office environment. The style is clean and corporate, aligned with a premium concierge travel brand's aesthetic. High detail and sharp focus on the facial features." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCSsQRtI44Tbz9PjWTqyYS2np2SXc23JxSCU8RGToeWclXIBSilBnnLRz_BIaavyONOY9O2wyZ5vJ4hPX6QoaGzEHEUSZwwvtlf3rqfSKknIRaHEOYTAb_E1OSBAVjNFh-SI3U-TWUmif4NJody-z_UwnZOLuOA_oXsMavw79xwZGDqqQ61WTEURbogt2GQT_miUz82_YIW2FnpOX2KzWegoFEpo7obwkzej6XKHmBw5Y_3Kuasue6q6E94oS76W1hfi4JKNxaAQ">
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<div class="p-container-padding-mobile md:p-container-padding-desktop space-y-gutter">
+<!-- Breadcrumbs & Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-section-gap/2">
+<div>
+<nav class="flex items-center gap-2 text-outline mb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Tours</span>
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">Logistics Management</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Amalfi Coast Luxury Escape</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Configuration of the 7-day high-end itinerary and availability scheduling for the upcoming summer season.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 border border-outline px-6 py-2.5 rounded-full font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+                        Preview Tour
+                    </button>
+<button class="bg-primary px-8 py-2.5 rounded-full text-on-primary font-label-md text-label-md shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                        Publish Changes
+                    </button>
+</div>
+</div>
+<!-- Management Grid -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Left: Itinerary Reordering (Bento Style) -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="reorder">reorder</span>
+                            Day-by-Day Itinerary
+                        </h3>
+<button class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                            Add New Day
+                        </button>
+</div>
+<!-- Draggable List Mockup -->
+<div class="space-y-4">
+<!-- Day 1 -->
+<div class="glass-panel border border-outline-variant p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow group">
+<div class="flex items-start gap-4">
+<div class="cursor-move text-outline-variant group-hover:text-primary transition-colors py-1">
+<span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex-1 space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-md font-label-sm text-label-sm uppercase">Day 01</span>
+<input class="border-none bg-transparent p-0 font-headline-md text-headline-md text-on-surface focus:ring-0 w-full" type="text" value="Arrival &amp; Sunset Spritz in Positano">
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="p-2 text-outline hover:text-error transition-colors"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+</div>
+</div>
+<textarea class="w-full border-none bg-surface-container-lowest p-4 rounded-lg text-body-md text-on-surface-variant focus:ring-1 focus:ring-primary h-24">Upon arrival at Naples airport, your private driver awaits for a scenic transfer to Positano. Settle into your boutique villa before enjoying an exclusive sunset welcome reception overlooking the Mediterranean.</textarea>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="restaurant">restaurant</span> Dinner
+                                        </span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="directions_car">directions_car</span> Private Transfer
+                                        </span>
+<button class="border border-dashed border-outline-variant px-3 py-1 rounded-full font-label-sm text-label-sm text-outline hover:border-primary hover:text-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Activity
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Day 2 -->
+<div class="glass-panel border border-outline-variant p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow group">
+<div class="flex items-start gap-4">
+<div class="cursor-move text-outline-variant group-hover:text-primary transition-colors py-1">
+<span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex-1 space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-md font-label-sm text-label-sm uppercase">Day 02</span>
+<input class="border-none bg-transparent p-0 font-headline-md text-headline-md text-on-surface focus:ring-0 w-full" type="text" value="Capri Private Boat Charter">
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="p-2 text-outline hover:text-error transition-colors"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+</div>
+</div>
+<textarea class="w-full border-none bg-surface-container-lowest p-4 rounded-lg text-body-md text-on-surface-variant focus:ring-1 focus:ring-primary h-24">Spend the day exploring the island of Capri from your own private Riva speedboat. Swim in the Emerald Grotto and enjoy lunch at a legendary beach club.</textarea>
+<div class="flex flex-wrap gap-2 pt-2">
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="sailing">sailing</span> Boat Tour
+                                        </span>
+<button class="border border-dashed border-outline-variant px-3 py-1 rounded-full font-label-sm text-label-sm text-outline hover:border-primary hover:text-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Activity
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Day 3 -->
+<div class="bg-surface-container border border-dashed border-outline-variant p-6 rounded-xl flex flex-col items-center justify-center gap-2 group cursor-pointer hover:border-primary transition-all">
+<span class="material-symbols-outlined text-4xl text-outline-variant group-hover:text-primary" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-primary">Insert next day activity</span>
+</div>
+</div>
+</div>
+<!-- Right: Schedule & Availability (Calendar Style) -->
+<aside class="col-span-12 lg:col-span-4 space-y-gutter">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="calendar_month">calendar_month</span>
+                            Available Dates
+                        </h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 bg-surface rounded-xl border border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">July 12 - July 19, 2024</span>
+<span class="font-label-sm text-label-sm text-primary">4 slots remaining</span>
+</div>
+<button class="text-error"><span class="material-symbols-outlined" data-icon="close">close</span></button>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface rounded-xl border border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Aug 05 - Aug 12, 2024</span>
+<span class="font-label-sm text-label-sm text-secondary">Waitlist only</span>
+</div>
+<button class="text-error"><span class="material-symbols-outlined" data-icon="close">close</span></button>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface rounded-xl border border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Sept 01 - Sept 08, 2024</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">8 slots remaining</span>
+</div>
+<button class="text-error"><span class="material-symbols-outlined" data-icon="close">close</span></button>
+</div>
+<button class="w-full py-3 border-2 border-dashed border-outline-variant rounded-xl text-on-surface-variant font-label-md text-label-md hover:border-primary hover:text-primary transition-all mt-4">
+                                + Add Tour Window
+                            </button>
+</div>
+</div>
+<!-- Tour Capacity Card -->
+<div class="bg-inverse-surface text-inverse-on-surface rounded-2xl p-6 shadow-xl">
+<h4 class="font-label-sm text-label-sm uppercase tracking-widest text-primary-fixed mb-4">Tour Capacity</h4>
+<div class="flex items-end gap-2 mb-6">
+<span class="font-display-lg text-display-lg leading-none">12</span>
+<span class="font-body-md text-body-md mb-2 opacity-70">Travelers max</span>
+</div>
+<div class="space-y-4">
+<div class="w-full bg-on-surface/20 h-2 rounded-full overflow-hidden">
+<div class="bg-primary-fixed-dim h-full w-3/4"></div>
+</div>
+<p class="font-label-sm text-label-sm opacity-80 italic">Average booking rate: 85% per season</p>
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-lg font-label-md text-label-md hover:bg-primary transition-all">
+                                Adjust Limits
+                            </button>
+</div>
+</div>
+<!-- Quick Map View -->
+<div class="relative rounded-2xl overflow-hidden h-48 group shadow-md border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A stylized, illustrative map of the Amalfi Coast in Italy, showing key landmarks like Positano, Amalfi, and Capri. The map uses a premium brand palette of Azure Blue and soft whites, with minimalist icons indicating tour stops. The lighting is bright and summery, evoking a sense of adventure and luxury travel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzE2tr8_Tupyv4iGkvaUMzmt439RjwjTzwPjpi6R2_J1NySLVE-dPAZURT0_YDPWMwlImk_yyF40Bp9pb8fbs6vGcIfmD46xRx_MZFBqbRrmHfA5SqC4EOWbJSalWexoGzf5oWeAB7dRDavrLJqNbuW5Q59G_KfXe7pTZTCgfM1gmcmccJJOs91_4KAx-zwElgonj5W67I6c3gnBaDtRsz67bWZUKpzdEVMEkQjtVqNxJhSKqk85UuXCEiV4ZnBpBqNaEVKagiNw">
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 to-transparent flex items-end p-4">
+<div class="flex justify-between items-center w-full">
+<span class="font-label-md text-label-md text-white">Route Overview</span>
+<span class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] text-white uppercase tracking-widest font-bold">Amalfi Coast</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+<!-- Footer (Authority: JSON) -->
+<footer class="w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-surface-container-highest mt-section-gap border-t border-outline-variant/30">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="font-headline-md text-headline-md text-primary font-bold">WanderX</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 WanderX Travel. All rights reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">About Us</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Become a Guide</a>
+</div>
+</footer>
+</main>
+<!-- BottomNavBar (Authority: JSON - Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full flex justify-around items-center py-3 px-4 bg-surface border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1 scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="explore" data-weight="fill" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-label-sm text-label-sm">Tours</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-sm text-label-sm">Schedule</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="font-label-sm text-label-sm">Status</span>
+</a>
+</nav>
+</body></html>
