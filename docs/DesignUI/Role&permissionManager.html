@@ -1,0 +1,345 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WanderX Admin - Role &amp; Permission Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed": "#ffdad2",
+                      "on-primary-container": "#c4d2ff",
+                      "tertiary-fixed": "#afecff",
+                      "surface-container": "#e9edff",
+                      "secondary": "#ae3115",
+                      "on-background": "#051a3e",
+                      "surface-container-low": "#f1f3ff",
+                      "surface-tint": "#0c56d0",
+                      "surface-container-high": "#e1e8ff",
+                      "inverse-surface": "#1d3054",
+                      "tertiary": "#004b59",
+                      "tertiary-container": "#006477",
+                      "primary-fixed": "#dae2ff",
+                      "primary-container": "#0052cc",
+                      "on-secondary": "#ffffff",
+                      "primary": "#003d9b",
+                      "on-tertiary-fixed-variant": "#004e5d",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#8c1900",
+                      "background": "#faf9ff",
+                      "on-secondary-container": "#640f00",
+                      "surface-bright": "#faf9ff",
+                      "surface-container-highest": "#d8e2ff",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "inverse-on-surface": "#edf0ff",
+                      "on-primary-fixed": "#001848",
+                      "surface-variant": "#d8e2ff",
+                      "secondary-fixed-dim": "#ffb4a3",
+                      "error": "#ba1a1a",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed": "#001f27",
+                      "surface-dim": "#ccdaff",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed-dim": "#48d7f9",
+                      "on-tertiary-container": "#76e2ff",
+                      "on-primary": "#ffffff",
+                      "secondary-container": "#fd6a49",
+                      "on-surface-variant": "#434654",
+                      "on-surface": "#051a3e",
+                      "on-secondary-fixed": "#3d0600",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "outline-variant": "#c3c6d6",
+                      "inverse-primary": "#b2c5ff",
+                      "surface": "#faf9ff",
+                      "outline": "#737685",
+                      "error-container": "#ffdad6",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-padding-mobile": "16px",
+                      "gutter": "24px",
+                      "section-gap": "80px",
+                      "container-padding-desktop": "48px",
+                      "base": "8px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "headline-lg-mobile": ["Hanken Grotesk"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "label-md": ["Inter"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(115, 118, 133, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation (Mandatory Shared Component) -->
+<aside class="h-screen w-72 flex flex-col sticky top-0 left-0 bg-surface-container-low dark:bg-inverse-surface shadow-sm dark:shadow-none py-base border-r border-outline-variant/20">
+<div class="px-6 py-8">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">WanderX Admin</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Operations Suite</p>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-md text-label-md">Tours</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-md text-label-md">Bookings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-md text-label-md">Payments</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person_pin_circle">person_pin_circle</span>
+<span class="font-label-md text-label-md">Guides</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary dark:text-primary-fixed-dim font-bold border-r-4 border-primary dark:border-primary-fixed-dim bg-primary-container/10" href="#">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="px-4 py-6 border-t border-outline-variant/20 mt-auto">
+<button class="w-full mb-4 bg-secondary-container text-on-secondary-container rounded-full py-3 px-6 font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                    New Tour
+                </button>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-label-md text-label-md">Support</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 relative pb-32">
+<!-- Header Section -->
+<header class="sticky top-0 z-40 bg-surface/80 backdrop-blur-md px-container-desktop h-20 flex justify-between items-center">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Role Permissions</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Configure granular access levels across the WanderX platform</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg focus:ring-2 focus:ring-primary w-64" placeholder="Search permissions..." type="text">
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-highest rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="WanderX Admin Profile" data-alt="Close up professional portrait of a tech executive in a brightly lit modern office setting, smiling confidently. The image has high-fidelity detail and soft bokeh background of a contemporary workspace with azure blue and warm coral highlights consistent with the WanderX brand palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXtDjXNtd8_8ikU2_1LqH_wE0k4ECRpdJonXorx6RXgyFQbsNnuq9O-qnFVN_9AAovn8RccPUhGAi0xeFPmMCPCTcJdz9DpE50RUOfWIKj4PZ-TTaGj-hd5qtx9HkL8j_NjRjqGqxms_QyBEqbjnq1Dy8u5PQjyoPpt9ZBEIQQYXLMLw-FtpVW1oqP-ubkCOx4ztcoxkSH7Cina0ACi3sXQeA_cIm6YPoWPQfxzNEgkxVAKlzMS01q8kSLIYD4_z2_6d4MCBA59w">
+</div>
+</div>
+</div>
+</header>
+<div class="px-container-desktop mt-8">
+<!-- Role Tabs -->
+<div class="flex gap-2 mb-8 p-1 bg-surface-container-low w-fit rounded-xl">
+<button class="px-8 py-2.5 rounded-lg font-label-md text-label-md transition-all bg-white shadow-sm text-primary font-semibold">Staff</button>
+<button class="px-8 py-2.5 rounded-lg font-label-md text-label-md transition-all text-on-surface-variant hover:text-primary">Admin</button>
+<button class="px-8 py-2.5 rounded-lg font-label-md text-label-md transition-all text-on-surface-variant hover:text-primary">Guide</button>
+<button class="px-8 py-2.5 rounded-lg font-label-md text-label-md transition-all text-on-surface-variant hover:text-primary">Customer</button>
+</div>
+<!-- Permission Matrix -->
+<div class="space-y-6">
+<!-- Category: Bookings -->
+<section class="glass-panel rounded-2xl overflow-hidden">
+<div class="px-6 py-4 bg-primary-container/5 border-b border-outline-variant/20 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="calendar_month">calendar_month</span>
+<h3 class="font-headline-md text-headline-md">Bookings Management</h3>
+</div>
+<span class="text-label-sm font-label-sm px-3 py-1 bg-primary-container text-on-primary-container rounded-full">Core Module</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-lowest">
+<tr>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant">PERMISSION ACTION</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">VIEW</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">CREATE</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">EDIT</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">DELETE</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">APPROVE</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-5">
+<p class="font-label-md text-label-md text-on-surface">Manage Guest Reservations</p>
+<p class="text-xs text-on-surface-variant">Ability to see and handle direct traveler bookings</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-5">
+<p class="font-label-md text-label-md text-on-surface">Cancel &amp; Refund Flow</p>
+<p class="text-xs text-on-surface-variant">Initiate booking cancellations and process credit back</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Category: Financials -->
+<section class="glass-panel rounded-2xl overflow-hidden">
+<div class="px-6 py-4 bg-primary-container/5 border-b border-outline-variant/20 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="payments">payments</span>
+<h3 class="font-headline-md text-headline-md">Financials &amp; Commission</h3>
+</div>
+<span class="text-label-sm font-label-sm px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full">High Sensitivity</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-lowest">
+<tr>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant">PERMISSION ACTION</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">VIEW</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">CREATE</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">EDIT</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">DELETE</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">APPROVE</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-5">
+<p class="font-label-md text-label-md text-on-surface">Revenue Reports</p>
+<p class="text-xs text-on-surface-variant">Access to global revenue dashboards and tour performance</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-5">
+<p class="font-label-md text-label-md text-on-surface">Guide Payout Settings</p>
+<p class="text-xs text-on-surface-variant">Configure commission percentages and payout schedules</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Category: Guides -->
+<section class="glass-panel rounded-2xl overflow-hidden">
+<div class="px-6 py-4 bg-primary-container/5 border-b border-outline-variant/20 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="person_pin_circle">person_pin_circle</span>
+<h3 class="font-headline-md text-headline-md">Guide Management</h3>
+</div>
+<span class="text-label-sm font-label-sm px-3 py-1 bg-tertiary-container text-on-tertiary-container rounded-full">Operations</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-lowest">
+<tr>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant">PERMISSION ACTION</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">VIEW</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">CREATE</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">EDIT</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">DELETE</th>
+<th class="px-4 py-4 text-center font-label-sm text-label-sm text-on-surface-variant">APPROVE</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-5">
+<p class="font-label-md text-label-md text-on-surface">Onboard New Guides</p>
+<p class="text-xs text-on-surface-variant">Verification process for new partner guides</p>
+</td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+<td class="px-4 py-5 text-center"><input checked="" class="w-5 h-5 rounded border-outline text-primary focus:ring-primary" type="checkbox"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</div>
+<!-- Sticky Footer Action -->
+<footer class="fixed bottom-0 right-0 left-72 bg-white/90 backdrop-blur-md border-t border-outline-variant/20 px-container-desktop py-6 flex justify-between items-center z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Unsaved changes detected</span>
+<p class="font-body-md text-body-md text-primary font-semibold">Editing Staff Role Permissions</p>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-3 rounded-full border border-outline text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-low transition-colors">Discard</button>
+<button class="px-10 py-3 rounded-full bg-secondary text-on-secondary font-label-md text-label-md shadow-lg shadow-secondary/20 hover:scale-105 active:scale-95 transition-all">Save Changes</button>
+</div>
+</footer>
+</main>
+</div>
+<!-- Background Decoration -->
+<div class="fixed top-0 right-0 -z-10 w-1/2 h-full opacity-5 pointer-events-none">
+<img class="w-full h-full object-cover" data-alt="A wide angle landscape of a luxury desert safari campsite at golden hour. Warm light hits the high-end canvas tents and rugged terrain. The style is premium editorial travel photography with soft textures and a sophisticated color palette of coral, sand, and azure blue sky, reflecting the WanderX high-end concierge aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-REmaCo8gMKenNiH59RASU5GdTn1eWoJoiLVJlkvgf7SYNViX06cWZtOD6UoTpiwit3RLug7YIstlpH2m_5z5lT9y7N0TRxkmVLrlTE0mzGY_3rP0xouDNXxwoAI33rkDGoFMq_DDYNYzsqSPhWRW9XdtinAoG9LcMy0LTBWcwWyYZWjlo6pBI1b_15B9PU226e_PGVgsb-D4yCbGx_6zy7DSMmzLkaXxXke_KHWz8CB8d0TZ-A43ZMrAGyjRiD_6kT2u6Lc3BQ">
+</div>
+</body></html>
