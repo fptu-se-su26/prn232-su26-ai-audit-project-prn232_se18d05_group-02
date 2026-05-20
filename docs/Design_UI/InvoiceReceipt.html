@@ -1,0 +1,321 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#d8e2ff",
+                        "primary": "#003d9b",
+                        "on-tertiary-fixed": "#001f27",
+                        "on-primary-fixed": "#001848",
+                        "on-surface": "#051a3e",
+                        "surface-tint": "#0c56d0",
+                        "surface-container-highest": "#d8e2ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#434654",
+                        "on-secondary-container": "#640f00",
+                        "outline-variant": "#c3c6d6",
+                        "surface-container-low": "#f1f3ff",
+                        "secondary-container": "#fd6a49",
+                        "secondary-fixed": "#ffdad2",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#faf9ff",
+                        "secondary-fixed-dim": "#ffb4a3",
+                        "inverse-on-surface": "#edf0ff",
+                        "background": "#faf9ff",
+                        "surface-container": "#e9edff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#dae2ff",
+                        "inverse-primary": "#b2c5ff",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e1e8ff",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-background": "#051a3e",
+                        "primary-container": "#0052cc",
+                        "outline": "#737685",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#48d7f9",
+                        "tertiary-fixed": "#afecff",
+                        "tertiary": "#004b59",
+                        "on-tertiary-container": "#76e2ff",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-primary-container": "#c4d2ff",
+                        "surface-dim": "#ccdaff",
+                        "surface": "#faf9ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#8c1900",
+                        "inverse-surface": "#1d3054",
+                        "on-secondary-fixed": "#3d0600",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "tertiary-container": "#006477",
+                        "secondary": "#ae3115"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding-desktop": "48px",
+                        "gutter": "24px",
+                        "container-padding-mobile": "16px",
+                        "section-gap": "80px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .invoice-bg-pattern {
+            background-image: radial-gradient(#003d9b08 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in {
+            animation: fadeIn 300ms ease-in-out forwards;
+        }
+        .animate-slide-up {
+            animation: slideUpFade 300ms ease-in-out forwards;
+            opacity: 0;
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+<nav class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16 max-w-7xl mx-auto">
+<div class="font-display-lg text-headline-md font-bold text-primary">WanderX</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Explore</a>
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1" href="#">My Trips</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Concierge</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-container-low/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="Customer profile avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a person with a friendly and approachable expression, set against a soft-focus urban background. The lighting is natural and bright, echoing a premium corporate aesthetic with soft shadows. The overall color temperature is warm yet clean, consistent with a high-end travel concierge service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLIVi0Pch-VukU72qIBY7BC-oduzats6Airi3I32xJnxhLmc7CCceG3U92fAwZmAXNExItMRTz1LdadKuiLL4NGuxtoY20ae_dTzpwLk0CwomDmI2axeVwAgu4Dc1sEE4WxiKbChXto6PQLi29LxTZiXPXxXcjxDp2ywKWGuDfEtbTJyYyqgdrexKH1n-tZZ7nmSDglX8ncsHUxfWz2S-_UNomNNadgzepVWuPya1nIbha_n-EtejHz47Ox-1FuyVKXw4ptN3ZXw">
+</div>
+</div>
+</nav>
+</header>
+<main class="max-w-4xl mx-auto px-container-padding-mobile md:px-0 py-12 md:py-16 invoice-bg-pattern animate-fade-in">
+<div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div>
+<nav class="flex items-center gap-2 mb-2">
+<a class="text-primary font-label-sm text-label-sm flex items-center gap-1 hover:underline" href="#">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+                        Back to Trips
+                    </a>
+</nav>
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Booking Receipt</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Receipt ID: #WX-8829-2024</p>
+</div>
+<button class="inline-flex items-center justify-center gap-2 bg-secondary-container text-on-secondary-container px-6 py-3 rounded-full font-label-md text-label-md hover:shadow-lg transition-all active:scale-95 hover:scale-105 duration-300 ease-in-out">
+<span class="material-symbols-outlined">download</span>
+                Download PDF
+            </button>
+</div>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden relative">
+<div class="absolute top-8 right-8 rotate-12 opacity-15 pointer-events-none">
+<div class="border-4 border-primary rounded-xl px-6 py-2 flex flex-col items-center">
+<span class="font-display-lg text-[40px] font-extrabold text-primary leading-none">PAID</span>
+<span class="font-label-sm text-primary tracking-widest">CONFIRMED</span>
+</div>
+</div>
+<div class="p-8 md:p-12">
+<div class="flex flex-col md:flex-row justify-between gap-12 mb-16 animate-slide-up">
+<div class="space-y-6">
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-2">From</p>
+<div class="font-headline-md text-headline-md text-primary mb-1">WanderX Ltd.</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                                42 Innovation Drive, Suite 200<br>
+                                London, EC2A 4NE<br>
+                                United Kingdom
+                            </p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-2">Contact</p>
+<p class="font-body-md text-body-md text-on-surface-variant">concierge@wanderx.com</p>
+<p class="font-body-md text-body-md text-on-surface-variant">+44 (0) 20 7946 0123</p>
+</div>
+</div>
+<div class="text-left md:text-right space-y-6">
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-2">Billed To</p>
+<div class="font-headline-md text-headline-md text-on-surface mb-1">Marcus Sterling</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                                750 Park Avenue, Apt 4C<br>
+                                New York, NY 10021<br>
+                                United States
+                            </p>
+</div>
+<div class="flex flex-col md:items-end">
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-2">Booking Details</p>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-body-md">calendar_month</span>
+<p class="font-body-md text-body-md text-on-surface">Oct 12 – Oct 19, 2024</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-body-md">location_on</span>
+<p class="font-body-md text-body-md text-on-surface">Amalfi Coast, Italy</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-12 animate-slide-up delay-100">
+<p class="font-label-md text-label-md text-on-surface border-b border-outline-variant pb-4 mb-4">Itemized Tour Costs</p>
+<div class="space-y-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold">Luxe Amalfi Coast Explorer</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">7 Nights Private Villa + Guided Boat Tour</p>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">$4,250.00</span>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold">Priority Concierge Service</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">24/7 Digital Assistant &amp; Itinerary Management</p>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">$349.00</span>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-body-lg text-body-lg text-on-surface font-semibold">Insurance &amp; Protection</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Comprehensive Travel Coverage</p>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface">$125.00</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low/50 rounded-xl p-6 md:p-8 space-y-3 animate-slide-up delay-200">
+<div class="flex justify-between text-on-surface-variant">
+<span class="font-body-md text-body-md">Subtotal</span>
+<span class="font-body-md text-body-md">$4,724.00</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span class="font-body-md text-body-md">Tax (VAT 22%)</span>
+<span class="font-body-md text-body-md">$1,039.28</span>
+</div>
+<div class="flex justify-between pt-4 border-t border-outline-variant">
+<span class="font-headline-md text-headline-md text-on-surface">Total Amount</span>
+<span class="font-headline-md text-headline-md text-primary">$5,763.28</span>
+</div>
+</div>
+<div class="mt-12 pt-8 border-t border-outline-variant border-dashed flex flex-col md:flex-row justify-between items-center gap-6 animate-slide-up delay-300">
+<div class="flex gap-4">
+<div class="bg-primary/5 p-4 rounded-xl flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-weight="fill">verified</span>
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider leading-none mb-1">Status</p>
+<p class="font-label-md text-label-md text-on-surface">Paid in Full</p>
+</div>
+</div>
+<div class="bg-primary/5 p-4 rounded-xl flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">credit_card</span>
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider leading-none mb-1">Payment</p>
+<p class="font-label-md text-label-md text-on-surface">Visa •••• 9901</p>
+</div>
+</div>
+</div>
+<div class="text-center md:text-right">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Transaction Date</p>
+<p class="font-body-md text-body-md text-on-surface">September 24, 2024 at 14:32 GMT</p>
+</div>
+</div>
+</div>
+<div class="bg-primary p-4 text-center">
+<p class="font-label-sm text-label-sm text-on-primary">WanderX Luxury Travel Concierge • wanderx.com • Thank you for your business</p>
+</div>
+</div>
+<div class="mt-8 text-center space-y-4">
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg mx-auto">
+                Need help with this booking? Our concierge is available 24/7 to assist with changes or special requests.
+            </p>
+<div class="flex justify-center gap-4">
+<a class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline" href="#">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+                    Chat Support
+                </a>
+<span class="text-outline-variant">|</span>
+<a class="text-primary font-label-md text-label-md flex items-center gap-1 hover:underline" href="#">
+<span class="material-symbols-outlined text-[20px]">help_center</span>
+                    FAQs
+                </a>
+</div>
+</div>
+</main>
+<footer class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center py-3 pb-safe px-4 bg-surface/90 dark:bg-surface-container-lowest/90 backdrop-blur-lg border-t border-outline-variant/30 z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-sm text-label-sm-mobile">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">travel</span>
+<span class="font-label-sm text-label-sm-mobile">My Trips</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+<span class="font-label-sm text-label-sm-mobile">Concierge</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm-mobile">Profile</span>
+</a>
+</footer>
+</body></html>
