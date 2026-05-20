@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>WanderX | Travel Companions</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-container": "#c4d2ff",
+                      "on-tertiary-fixed": "#001f27",
+                      "on-secondary-fixed": "#3d0600",
+                      "tertiary-fixed": "#afecff",
+                      "error-container": "#ffdad6",
+                      "surface-container": "#e9edff",
+                      "surface-variant": "#d8e2ff",
+                      "inverse-on-surface": "#edf0ff",
+                      "surface-container-low": "#f1f3ff",
+                      "on-primary": "#ffffff",
+                      "on-secondary-container": "#640f00",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "secondary-fixed": "#ffdad2",
+                      "inverse-primary": "#b2c5ff",
+                      "background": "#faf9ff",
+                      "surface-container-highest": "#d8e2ff",
+                      "primary-fixed": "#dae2ff",
+                      "primary": "#003d9b",
+                      "tertiary": "#004b59",
+                      "secondary": "#ae3115",
+                      "on-secondary": "#ffffff",
+                      "secondary-container": "#fd6a49",
+                      "inverse-surface": "#1d3054",
+                      "tertiary-fixed-dim": "#48d7f9",
+                      "on-tertiary-container": "#76e2ff",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#ccdaff",
+                      "outline": "#737685",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-secondary-fixed-variant": "#8c1900",
+                      "tertiary-container": "#006477",
+                      "surface": "#faf9ff",
+                      "outline-variant": "#c3c6d6",
+                      "surface-tint": "#0c56d0",
+                      "on-error": "#ffffff",
+                      "surface-bright": "#faf9ff",
+                      "on-surface-variant": "#434654",
+                      "surface-container-high": "#e1e8ff",
+                      "on-surface": "#051a3e",
+                      "primary-container": "#0052cc",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "error": "#ba1a1a",
+                      "secondary-fixed-dim": "#ffb4a3",
+                      "on-background": "#051a3e",
+                      "on-tertiary-fixed-variant": "#004e5d",
+                      "on-primary-fixed": "#001848"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "8px",
+                      "container-padding-mobile": "16px",
+                      "section-gap": "80px",
+                      "gutter": "24px",
+                      "container-padding-desktop": "48px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "headline-lg-mobile": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "label-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .backdrop-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md">
+    <!-- TopNavBar -->
+    <header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm docked full-width top-0 sticky z-50">
+        <div class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop py-4 max-w-7xl mx-auto">
+            <div class="font-headline-md text-headline-md font-extrabold text-primary tracking-tight">WanderX</div>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Explore</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Guides</a>
+                <a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md" href="#">My Trips</a>
+                <a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Concierge</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <button class="hidden md:block bg-secondary text-on-secondary px-6 py-2 rounded-full font-label-md text-label-md hover:opacity-90 transition-all duration-200 active:scale-95">Take Quiz</button>
+                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+                    <img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A professional and friendly portrait of a modern traveler in their late 20s, with warm outdoor lighting. The subject is smiling against a soft-focus urban background with blue and teal architectural elements. The image has a high-end, editorial feel, perfectly matching a premium concierge service aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAv9r-DpyiC5RR75M3H2GYcakCXPVZvT6wwMvMY6ESnvjUVG7RYV3oYl3LSJAeKQtokWYQFvc_dIZsTaqQAO4XqUA0UcIZI3oVV9ZrxIvZ8CRCP5GmMPRO-qj-h8wzZuVgBVHBiPhqCIfCKalKobk0uIL0ixtwWy1NttivOPWYhbSP2vzWQyEGh5RRLuJVYMDLxKjot5bS69ECTWt3-AO4UrX9kJRJLYMrWEwt_MfJz6caF8rkQYZMwRR-JxlVqaaj6ETh5LtLEeA">
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop py-12 md:py-16">
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div>
+                <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Travel Companions</h1>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Manage your inner circle of explorers. Seamlessly add frequent partners to expedite booking and documentation for your next global adventure.</p>
+            </div>
+            <button class="bg-secondary text-on-secondary flex items-center justify-center gap-2 px-8 py-4 rounded-full font-label-md text-label-md hover:shadow-lg transition-all active:scale-95 w-full md:w-auto">
+                <span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+                Add Companion
+            </button>
+        </div>
+        <!-- Companions Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            <!-- Companion Card 1 -->
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-[0_4px_20px_rgba(0,61,155,0.04)] hover:shadow-[0_8px_30px_rgba(0,61,155,0.08)] transition-all group">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden shadow-sm">
+                            <img class="w-full h-full object-cover" data-alt="A portrait of a cheerful woman with elegant features, photographed in a light-filled studio. The lighting is soft and airy, emphasizing a clean and professional look with a modern, high-key aesthetic. Her style is minimalist and sophisticated, consistent with a premium travel brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYaBf4AJVfmd797RX3jEyKxK9Y-1Ps3nbJrfhpuHsMpK6QatARK4cgapPKwtjlQU1WgCQSex5Db28YkCylOF5HKLNtfOp5rymlCOPtWHhpHx4mMTO2uMRyN5fwzYKa-5NKKfsYHX9xj8LYujh4NrVNGv5xM20mMsdC3VPZrYPpim1jXRMdwEve7ouTCLu1lH-wOf4l-SVGCGpBFHX_izDiqANkL1Bb1wf-tZNkj3qhcADDm8kSmLvw4yJ97Z_xgU8IAJ21LEhvkg">
+                        </div>
+                        <div>
+                            <h3 class="font-headline-md text-headline-md text-on-surface">Elena Rodriguez</h3>
+                            <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed mt-1">
+                                Partner
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-1">
+                        <button class="p-2 text-outline hover:text-primary hover:bg-primary-container/10 rounded-full transition-colors">
+                            <span class="material-symbols-outlined" data-icon="edit">edit</span>
+                        </button>
+                        <button class="p-2 text-outline hover:text-secondary hover:bg-secondary-container/10 rounded-full transition-colors">
+                            <span class="material-symbols-outlined" data-icon="delete">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-surface-container">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary" data-icon="passport">Password</span>
+                            <span class="font-label-md text-label-md text-on-surface-variant">Passport Status</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-green-600 font-label-sm">
+                            <span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            <span>VALID</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 border border-outline-variant/20 rounded-lg">
+                            <p class="text-label-sm font-label-sm text-outline uppercase">Trips Taken</p>
+                            <p class="font-headline-md text-headline-md text-primary mt-1">12</p>
+                        </div>
+                        <div class="p-3 border border-outline-variant/20 rounded-lg">
+                            <p class="text-label-sm font-label-sm text-outline uppercase">Loyalty Tier</p>
+                            <p class="font-headline-md text-headline-md text-tertiary mt-1">Gold</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Companion Card 2 -->
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-[0_4px_20px_rgba(0,61,155,0.04)] hover:shadow-[0_8px_30px_rgba(0,61,155,0.08)] transition-all group">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden shadow-sm">
+                            <img class="w-full h-full object-cover" data-alt="A sharp, cinematic portrait of a middle-aged man with a confident expression, set against a blurred background of a modern airport lounge. The cool blue tones and soft natural light create an atmosphere of luxury and precision travel. The overall style is corporate yet approachable." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-ude6O1Ng9Hpkh1m-YfNfAxCSrxGHYd0xDlcZtrRuvBxeV6rK3TGKd3ciPJovfYApM-XErfjUn0kMimXGx0eD8Mn-ZoT3v6zxW4LaMR9Pko4R_izn-jEn6GtWiquBMl6s7cpEetgT4vtk5LmKXNpDq6YQQOBLDZxXrqboUok23vl7DbfXA3CM15dXHHFoG8m53CGxNSST9lMLidzSIsEY8Grd-dqguGtFBzmDMmlh1XSLt2BK_2w-B2BL6tdy3RIJ9Czvz0d-IA">
+                        </div>
+                        <div>
+                            <h3 class="font-headline-md text-headline-md text-on-surface">Marcus Chen</h3>
+                            <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-primary-fixed text-on-primary-fixed mt-1">
+                                Colleague
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-1">
+                        <button class="p-2 text-outline hover:text-primary hover:bg-primary-container/10 rounded-full transition-colors">
+                            <span class="material-symbols-outlined" data-icon="edit">edit</span>
+                        </button>
+                        <button class="p-2 text-outline hover:text-secondary hover:bg-secondary-container/10 rounded-full transition-colors">
+                            <span class="material-symbols-outlined" data-icon="delete">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-high">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-secondary" data-icon="warning">warning</span>
+                            <span class="font-label-md text-label-md text-on-surface-variant">Passport Status</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-secondary font-label-sm">
+                            <span>EXPIRING SOON</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 border border-outline-variant/20 rounded-lg">
+                            <p class="text-label-sm font-label-sm text-outline uppercase">Trips Taken</p>
+                            <p class="font-headline-md text-headline-md text-primary mt-1">4</p>
+                        </div>
+                        <div class="p-3 border border-outline-variant/20 rounded-lg">
+                            <p class="text-label-sm font-label-sm text-outline uppercase">Loyalty Tier</p>
+                            <p class="font-headline-md text-headline-md text-tertiary mt-1">Silver</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Companion Card 3 -->
+            <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-[0_4px_20px_rgba(0,61,155,0.04)] hover:shadow-[0_8px_30px_rgba(0,61,155,0.08)] transition-all group">
+                <div class="flex items-start justify-between mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden shadow-sm">
+                            <img class="w-full h-full object-cover" data-alt="A portrait of a young woman with a vibrant and adventurous look, set against a softly blurred coastal landscape. The warm golden hour lighting and high-quality photography capture a sense of freedom and high-end exploration. The color palette features warm oranges and deep blues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgpTt7_g35hNxNFd_c4nHsgxu2EjoCpw5zNTc9yG3zuDollzepzZJ8bgpj_bF-JIae70OH9kfqOaFEWkF0qOSegyvk2m08tUidpN-c5I6ru3w7qXrIc_fyvqYvWFHKQjUeu75pdRgpD-hwd5cXOIGh5RzQ83FIy2hm_VwLasle70pdXuvXER2zgZqjb5yo7xlfa5W8sJ17yWclvZwGPAVRaNryAa1agEkjmck2F91zeBVKdMary5uLFkCoGr7Sw1Z1mjSFQR9KGQ">
+                        </div>
+                        <div>
+                            <h3 class="font-headline-md text-headline-md text-on-surface">Sofia Larsson</h3>
+                            <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed mt-1">
+                                Family
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-1">
+                        <button class="p-2 text-outline hover:text-primary hover:bg-primary-container/10 rounded-full transition-colors">
+                            <span class="material-symbols-outlined" data-icon="edit">edit</span>
+                        </button>
+                        <button class="p-2 text-outline hover:text-secondary hover:bg-secondary-container/10 rounded-full transition-colors">
+                            <span class="material-symbols-outlined" data-icon="delete">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-surface-container">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary" data-icon="passport">Password</span>
+                            <span class="font-label-md text-label-md text-on-surface-variant">Passport Status</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-green-600 font-label-sm">
+                            <span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            <span>VALID</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 border border-outline-variant/20 rounded-lg">
+                            <p class="text-label-sm font-label-sm text-outline uppercase">Trips Taken</p>
+                            <p class="font-headline-md text-headline-md text-primary mt-1">21</p>
+                        </div>
+                        <div class="p-3 border border-outline-variant/20 rounded-lg">
+                            <p class="text-label-sm font-label-sm text-outline uppercase">Loyalty Tier</p>
+                            <p class="font-headline-md text-headline-md text-tertiary mt-1">Platinum</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Empty State / Add New Placeholder -->
+            <div class="border-2 border-dashed border-outline-variant/50 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-surface-container-low hover:border-primary/50 transition-all cursor-pointer group">
+                <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-outline group-hover:bg-primary group-hover:text-on-primary transition-all mb-4">
+                    <span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-on-surface-variant group-hover:text-primary transition-colors">Add New Companion</h3>
+                <p class="font-body-md text-body-md text-outline mt-1 px-4">Keep your favorites close for faster bookings.</p>
+            </div>
+        </div>
+        <!-- Smart Concierge Insight -->
+        <section class="mt-section-gap">
+            <div class="backdrop-glass border border-primary/20 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8 shadow-lg">
+                <div class="w-full md:w-1/3 aspect-video rounded-xl overflow-hidden shadow-inner">
+                    <img class="w-full h-full object-cover" data-alt="A futuristic, high-tech map of the world glowing with data points and connections in various shades of azure and cyan. The image signifies global connectivity and the precision of a modern travel concierge. Soft ambient lighting and a shallow depth of field provide a premium, technological feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA03MhiSZSvuAJ_uoQFB0c7J50cbWp9LcqXFEojAP-ugLXF1L-vbecHAgY2nZHB3iteYuF4DHTz_qqgvRp7XpgsgT9A6Z_MAZBA6kNW3nJpNP96OGU_j6Ki7zleeZpujOQiWTcxeS36ViUBqnmWxznTaH9qy2s9q-gQtgkwyjWirvbGa_9ltOWIhCJNCvGVzxyKNktevfBTg_pZtE-5QhRYUjj5p44Hx6VeMWXxUw1TH2x9Z8eN1OgKzIEACTFzZnNuTWZqnCSoUg">
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 text-primary mb-3">
+                        <span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+                        <span class="font-label-sm text-label-sm uppercase tracking-wider">Concierge Insight</span>
+                    </div>
+                    <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Intelligent Document Auditing</h2>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant mb-6">WanderX AI has detected that <strong>Marcus Chen</strong> has a passport expiring in 90 days. We recommend initiating a renewal soon to avoid complications for your upcoming trip to <strong>Tokyo</strong>.</p>
+                    <div class="flex gap-4">
+                        <button class="bg-primary text-on-primary px-6 py-3 rounded-full font-label-md text-label-md hover:opacity-90 transition-all active:scale-95">Send Renewal Reminder</button>
+                        <button class="text-primary font-label-md text-label-md px-6 py-3 rounded-full border border-primary/20 hover:bg-primary/5 transition-all">Dismiss</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-surface-container-lowest border-t border-outline-variant w-full mt-section-gap">
+        <div class="flex flex-col md:flex-row justify-between items-center w-full px-container-padding-desktop py-12 max-w-7xl mx-auto gap-gutter">
+            <div>
+                <div class="font-headline-md text-headline-md font-bold text-primary mb-2">WanderX</div>
+                <p class="font-body-md text-body-md text-on-surface-variant">© 2024 WanderX. Precision travel for the modern explorer.</p>
+            </div>
+            <div class="flex gap-8">
+                <a class="text-on-surface-variant hover:text-secondary transition-colors font-body-md text-body-md" href="#">Privacy Policy</a>
+                <a class="text-on-surface-variant hover:text-secondary transition-colors font-body-md text-body-md" href="#">Terms of Service</a>
+                <a class="text-on-surface-variant hover:text-secondary transition-colors font-body-md text-body-md" href="#">Guide Portal</a>
+                <a class="text-on-surface-variant hover:text-secondary transition-colors font-body-md text-body-md" href="#">Help Center</a>
+            </div>
+        </div>
+    </footer>
+    <!-- BottomNavBar (Mobile Only) -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-lg border-t border-outline-variant/20 shadow-lg flex justify-around items-center px-4 py-2 pb-safe z-50 rounded-t-xl">
+        <div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1">
+            <span class="material-symbols-outlined" data-icon="explore">explore</span>
+            <span class="font-label-sm text-label-sm-mobile">Explore</span>
+        </div>
+        <div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1">
+            <span class="material-symbols-outlined" data-icon="group">group</span>
+            <span class="font-label-sm text-label-sm-mobile">Guides</span>
+        </div>
+        <div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1">
+            <span class="material-symbols-outlined" data-icon="travel_explore" style="font-variation-settings: 'FILL' 1;">travel_explore</span>
+            <span class="font-label-sm text-label-sm-mobile">Trips</span>
+        </div>
+        <div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors px-4 py-1">
+            <span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+            <span class="font-label-sm text-label-sm-mobile">Concierge</span>
+        </div>
+    </nav>
+</body>
+</html>
