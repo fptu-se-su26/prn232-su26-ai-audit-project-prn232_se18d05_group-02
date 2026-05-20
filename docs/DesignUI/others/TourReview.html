@@ -1,0 +1,333 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-container": "#c4d2ff",
+                    "on-tertiary-fixed": "#001f27",
+                    "on-secondary-fixed": "#3d0600",
+                    "tertiary-fixed": "#afecff",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#e9edff",
+                    "surface-variant": "#d8e2ff",
+                    "inverse-on-surface": "#edf0ff",
+                    "surface-container-low": "#f1f3ff",
+                    "on-primary": "#ffffff",
+                    "on-secondary-container": "#640f00",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "secondary-fixed": "#ffdad2",
+                    "inverse-primary": "#b2c5ff",
+                    "background": "#faf9ff",
+                    "surface-container-highest": "#d8e2ff",
+                    "primary-fixed": "#dae2ff",
+                    "primary": "#003d9b",
+                    "tertiary": "#004b59",
+                    "secondary": "#ae3115",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#fd6a49",
+                    "inverse-surface": "#1d3054",
+                    "tertiary-fixed-dim": "#48d7f9",
+                    "on-tertiary-container": "#76e2ff",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#ccdaff",
+                    "outline": "#737685",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#8c1900",
+                    "tertiary-container": "#006477",
+                    "surface": "#faf9ff",
+                    "outline-variant": "#c3c6d6",
+                    "surface-tint": "#0c56d0",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#faf9ff",
+                    "on-surface-variant": "#434654",
+                    "surface-container-high": "#e1e8ff",
+                    "on-surface": "#051a3e",
+                    "primary-container": "#0052cc",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#ffb4a3",
+                    "on-background": "#051a3e",
+                    "on-tertiary-fixed-variant": "#004e5d",
+                    "on-primary-fixed": "#001848"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "container-padding-mobile": "16px",
+                    "section-gap": "80px",
+                    "gutter": "24px",
+                    "container-padding-desktop": "48px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "label-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  .card-hover-effect {
+    transition: transform 300ms ease-in-out;
+  }
+  .card-hover-effect:hover {
+    transform: scale(1.02);
+  }
+  .star-transition {
+    transition: color 300ms ease-in-out, font-variation-settings 300ms ease-in-out;
+  }
+</style></head>
+<body class="bg-background text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container animate-fade-in">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30 dark:border-outline/20 shadow-sm dark:shadow-none docked full-width top-0 sticky z-50">
+<nav class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop py-4 max-w-7xl mx-auto">
+<a class="contents" href="../SystemAccount/Homepage.html"><div class="font-headline-md text-headline-md font-extrabold text-primary dark:text-inverse-primary tracking-tight">WanderX</div></a>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./ScheduleManagement.html">Explore</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="../GuideOperation/GuideManagement.html">Guides</a>
+<a class="text-primary dark:text-inverse-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md" href="./BookingManagement.html">My Trips</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="../PublicCustomer/Special%20Request.html">Concierge</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:block bg-secondary text-on-secondary px-6 py-2 rounded-full font-label-md text-label-md hover:opacity-90 transition-all duration-200 active:scale-95">Take Quiz</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A professional and friendly male user profile avatar. The man has a warm smile, neat hair, and is wearing a modern blue business-casual shirt. The background is a clean, out-of-focus high-end office environment with soft natural lighting, maintaining the WanderX premium concierge aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAm4sDXIApFDGkX8UJDOSUBT3zLENtTupQRc6wS-lt19_71zAxi0H0OAd-IP3_hWtqGQx923IjCKnXkI8E39u_iSO0rtBWq3soIebD89tUe0fHKp4JfnSv4AhdQ5AOmd4GX4ar3ZJsIgXVVEGEHrBlv7pIF4G7wOPsed70tdXu6IobGHykKhimz2TnSU-AaKOLX2mCGhQpsJvREkPMsyup5uJZnmyeE7U24XCktVfuM-Bq6OLSmycWUzV97Nisk4lLRdBSKZfYhXw">
+</div>
+</div>
+</nav>
+</header>
+<main class="max-w-4xl mx-auto px-container-padding-mobile md:px-container-padding-desktop py-12">
+<!-- Hero Header -->
+<section class="mb-12 text-center">
+<div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed mb-4">
+<span class="material-symbols-outlined text-[18px] star-transition">verified</span>
+<span class="font-label-sm text-label-sm">Trip Completed</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg md:text-display-lg text-on-surface mb-4">How was your journey?</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Your feedback helps us curate the perfect experiences for the WanderX community. Share your thoughts on the Amalfi Coast Sunset Sailing tour.</p>
+</section>
+<!-- Feedback Form -->
+<div class="glass-panel border border-outline-variant/30 rounded-xl p-6 md:p-10 shadow-lg">
+<form class="space-y-10">
+<!-- Tour Experience Rating -->
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md uppercase tracking-wider text-outline">Overall Experience</label>
+<span class="text-primary font-bold">Excellent</span>
+</div>
+<div class="flex gap-2">
+<button class="group focus:outline-none" type="button"><span class="material-symbols-outlined text-4xl text-secondary star-transition" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="group focus:outline-none" type="button"><span class="material-symbols-outlined text-4xl text-secondary star-transition" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="group focus:outline-none" type="button"><span class="material-symbols-outlined text-4xl text-secondary star-transition" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="group focus:outline-none" type="button"><span class="material-symbols-outlined text-4xl text-secondary star-transition" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="group focus:outline-none" type="button"><span class="material-symbols-outlined text-4xl text-secondary star-transition" style="font-variation-settings: 'FILL' 1;">star</span></button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Guide Rating -->
+<div class="space-y-4 p-6 bg-surface-container-low rounded-xl card-hover-effect">
+<div class="flex items-center gap-3 mb-2">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Close up portrait of a professional local guide in Italy, middle aged with kind eyes and sun-kissed skin, wearing a WanderX branded polo shirt. Soft coastal Mediterranean sunlight illuminates his face, evoking a sense of trust and expertise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzBMP-QyXJHc_H_NZNj9THFv3dEm1osVXUoDXqsts2-1g-ls477LCEeUnwXaxf2UOY4fZ1Bbv6bPmHnwj6eIGMUTZRRKgdEUNX98_G_hE_1buSE0sJp8V_oXa6WNbJFLN3rZhgQ_vXQ4DtcBhMaauWfIdU-9fOh7GJQLsvXWS3wEK3E7j0uvFVJR3hpWpmK6i_zVq_-fke7qFoyTbWrKFXutO7JiNPEHev6YfSKGhi_8Xr0vq2bS-97ObThmsZ4FNYi5ovr8LxRg">
+<div>
+<h4 class="font-label-md text-label-md">Guide: Marco Rossi</h4>
+<p class="text-xs text-outline">Expert Historian</p>
+</div>
+</div>
+<label class="block font-label-sm text-label-sm uppercase tracking-wider text-outline">Guide Knowledge &amp; Service</label>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-2xl text-primary star-transition" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-2xl text-primary star-transition" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-2xl text-primary star-transition" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-2xl text-primary star-transition" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-2xl text-outline-variant star-transition">star</span>
+</div>
+</div>
+<!-- Value Rating -->
+<div class="space-y-4 p-6 bg-surface-container-low rounded-xl card-hover-effect">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container star-transition">payments</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md">Value for Money</h4>
+<p class="text-xs text-outline">Precision Pricing</p>
+</div>
+</div>
+<label class="block font-label-sm text-label-sm uppercase tracking-wider text-outline">Worth the Investment</label>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-2xl text-primary star-transition" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-2xl text-primary star-transition" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-2xl text-primary star-transition" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-2xl text-primary star-transition" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-2xl text-primary star-transition" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+</div>
+<!-- Written Feedback -->
+<div class="space-y-4">
+<label class="block font-label-md text-label-md uppercase tracking-wider text-outline">Tell us about your experience</label>
+<textarea class="w-full min-h-[160px] p-4 bg-surface rounded-xl border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-body-md text-body-md placeholder:text-outline-variant" placeholder="The sunset was breathtaking, and Marco's stories about the Amalfi Coast were fascinating..."></textarea>
+</div>
+<!-- Image Upload -->
+<div class="space-y-4">
+<label class="block font-label-md text-label-md uppercase tracking-wider text-outline">Share your highlights (Optional)</label>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<button class="aspect-square border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center gap-2 text-outline-variant hover:border-primary hover:text-primary transition-colors bg-surface-container-lowest" type="button">
+<span class="material-symbols-outlined text-3xl star-transition">add_a_photo</span>
+<span class="font-label-sm text-label-sm">Upload</span>
+</button>
+<!-- Sample placeholder for uploaded images -->
+<div class="relative aspect-square rounded-xl overflow-hidden group">
+<img class="w-full h-full object-cover" data-alt="A stunning captured moment of the Amalfi Coast at golden hour, with the sun dipping below the turquoise horizon and colorful clifftop houses reflecting the orange sky. This traveler photo has a soft, nostalgic high-end filter, matching the WanderX premium aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoGn81JaqDjfLpNgKeGYCgPnJ0FM3CM-9bOlxne_t7-5grhRkKy4WtmcBUvafBNQW8lcCLJGpJ2Lt-jlAgZTqUiygInfy0di_U4GD_2noM7Gfq9YB7Ugei6NkkgQtKduh69VPsOfucTGekI5tZj6OgzzykPdZKSvvqMrTDVEqRTzKNlkUya3yYwOu2n8AZYtd22QHY3F1dWVtfBj3UWMFhgy6P_iLj6szYyEvCH_BoAv1iubtWf0Tvj7eM96KNo88zQzIXp64v5A">
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<button class="text-white" type="button"><span class="material-symbols-outlined star-transition">delete</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="pt-6 border-t border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-gutter">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary star-transition">security</span>
+<span class="font-body-md text-body-md">Your review will be shared with our community.</span>
+</div>
+<div class="flex gap-4 w-full md:w-auto">
+<button class="flex-1 md:flex-none px-8 py-3 rounded-full border border-outline text-outline font-label-md text-label-md hover:bg-surface-variant transition-colors" type="button">Save Draft</button>
+<button class="flex-1 md:flex-none px-12 py-3 rounded-full bg-secondary text-on-secondary font-label-md text-label-md shadow-lg shadow-secondary/20 hover:opacity-90 active:scale-95 transition-all hover:scale-[1.05] transition-transform duration-300 ease-in-out" type="submit">Submit Review</button>
+</div>
+</div>
+</form>
+</div>
+<!-- Recommendations Post-Review -->
+<section class="mt-section-gap">
+<h3 class="font-headline-md text-headline-md mb-6">Inspired for your next trip?</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Trip Card -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30 hover:shadow-xl transition-shadow group card-hover-effect">
+<div class="h-48 overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="An ultra-luxury tropical beach resort at twilight. The scene features minimalist modern villas with glowing pools, pristine white sand, and leaning palm trees under a deep indigo sky. The lighting is ethereal and premium, emphasizing high-end concierge travel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB57g55PJJgY1Xa8rFDH7swyRw7s-Nosm3SefEADMzcI9GdBMlxkL1ps4dSKg0X6fJ7bcHniBdVRT4k6HScLh53PPwdLcJDmJqOX1kIc-rAFen80s3dqiqi9vLZe9_mS8FHZFILuAmi0x6yIFZG7qhl6U1esWaIj3QqWm2cYPI_2VuhxBjWMM6UkWDjfkhcxG3nEQXCg6ZFZ5bnm3DoFVFmY3-52pxO18xmsy8G0AmsvE_T4xHzFR_s8W8c3zBHki-27SRM_wHUuA">
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-primary font-bold text-xs">9.8 Rating</div>
+</div>
+<div class="p-6">
+<span class="font-label-sm text-label-sm text-tertiary uppercase tracking-widest">Adventure</span>
+<h4 class="font-headline-md text-headline-md mt-1 mb-2">Santorini Yacht Expedition</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">A personalized 5-day voyage through the Cyclades with private dining.</p>
+<div class="flex items-center justify-between">
+<span class="text-primary font-bold">From $2,400</span>
+<button class="text-secondary font-bold flex items-center gap-1 group">
+                                Explore <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform star-transition">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Trip Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30 hover:shadow-xl transition-shadow group card-hover-effect">
+<div class="h-48 overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Modern Japanese architecture in Kyoto during the cherry blossom season. The image captures a clean, contemporary building design blended with traditional floral elements. Soft morning light creates a peaceful, sophisticated aesthetic typical of WanderX travel guides." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7qhcGsA-3z9ctxpisFcyVFeuOYeXmof2O2SicZBQtxQqgY0ok6O1EJ9dcC66sghoJlUwbfKsEOKnBjemCRDroPL4kpxbUnjfovNmyvdLtrYL6NRKs42S6phMMMrkg6gAfHD4-MQmrGCwAMB_ZsdwVqQc0FapyPY7cQbs4aPTJX9GfXO6S69_1zR9svclt0rURg1H4A3au_3Ck5gA5snY1nwk7s_lbSXlZO7kgd_HwwHCKV9zlPQs8_cFP4iSSSQQYdSAhoYsTFg">
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-primary font-bold text-xs">9.5 Rating</div>
+</div>
+<div class="p-6">
+<span class="font-label-sm text-label-sm text-tertiary uppercase tracking-widest">Cultural</span>
+<h4 class="font-headline-md text-headline-md mt-1 mb-2">Kyoto Zen Retreat</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Deep immersion into Japanese traditions with artisan-led workshops.</p>
+<div class="flex items-center justify-between">
+<span class="text-primary font-bold">From $1,850</span>
+<button class="text-secondary font-bold flex items-center gap-1 group">
+                                Explore <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform star-transition">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-dim border-t border-outline-variant w-full mt-section-gap">
+<a class="contents" href="../SystemAccount/Homepage.html"><div class="flex flex-col md:flex-row justify-between items-center w-full px-container-padding-desktop py-12 max-w-7xl mx-auto gap-gutter">
+<div class="flex flex-col gap-4">
+<div class="font-headline-md text-headline-md font-bold text-primary">WanderX</div></a>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xs">© 2024 WanderX. Precision travel for the modern explorer.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors hover:underline" href="../SystemAccount/Homepage.html">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors hover:underline" href="../SystemAccount/Homepage.html">Terms of Service</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors hover:underline" href="../GuideOperation/Guide%20Portal.html">Guide Portal</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors hover:underline" href="../PublicCustomer/Special%20Request.html">Help Center</a>
+</div>
+<div class="flex gap-4">
+<button class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined star-transition">share</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined star-transition">mail</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- Mobile Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 dark:bg-inverse-surface/90 backdrop-blur-lg border-t border-outline-variant/20 shadow-lg flex justify-around items-center px-4 py-2 pb-safe z-50 rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:scale-95 duration-150" href="./ScheduleManagement.html">
+<span class="material-symbols-outlined star-transition">explore</span>
+<span class="font-label-sm text-[10px]">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:scale-95 duration-150" href="../GuideOperation/GuideManagement.html">
+<span class="material-symbols-outlined star-transition">group</span>
+<span class="font-label-sm text-[10px]">Guides</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 active:scale-95 duration-150" href="./ScheduleManagement.html">
+<span class="material-symbols-outlined star-transition" style="font-variation-settings: 'FILL' 1;">travel_explore</span>
+<span class="font-label-sm text-[10px]">Trips</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant active:scale-95 duration-150" href="./NotificationManagement.html">
+<span class="material-symbols-outlined star-transition">support_agent</span>
+<span class="font-label-sm text-[10px]">Concierge</span>
+</a>
+</nav>
+</body></html>

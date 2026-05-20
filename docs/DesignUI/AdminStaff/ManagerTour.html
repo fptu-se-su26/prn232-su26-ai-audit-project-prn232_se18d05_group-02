@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>WanderX Admin - Tour Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#0c56d0",
+                        "outline-variant": "#c3c6d6",
+                        "surface": "#faf9ff",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "on-secondary-fixed": "#3d0600",
+                        "on-surface": "#051a3e",
+                        "surface-container": "#e9edff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#006477",
+                        "primary-container": "#0052cc",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#fd6a49",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#001848",
+                        "surface-container-high": "#e1e8ff",
+                        "on-background": "#051a3e",
+                        "surface-container-highest": "#d8e2ff",
+                        "inverse-on-surface": "#edf0ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "background": "#faf9ff",
+                        "tertiary": "#004b59",
+                        "secondary-fixed-dim": "#ffb4a3",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "secondary-fixed": "#ffdad2",
+                        "primary-fixed": "#dae2ff",
+                        "outline": "#737685",
+                        "tertiary-fixed-dim": "#48d7f9",
+                        "on-tertiary-fixed": "#001f27",
+                        "primary": "#003d9b",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#8c1900",
+                        "on-primary-container": "#c4d2ff",
+                        "surface-bright": "#faf9ff",
+                        "surface-dim": "#ccdaff",
+                        "inverse-primary": "#b2c5ff",
+                        "secondary": "#ae3115",
+                        "tertiary-fixed": "#afecff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#640f00",
+                        "surface-variant": "#d8e2ff",
+                        "on-surface-variant": "#434654",
+                        "surface-container-low": "#f1f3ff",
+                        "on-tertiary-container": "#76e2ff",
+                        "inverse-surface": "#1d3054"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "container-padding-desktop": "48px",
+                        "container-padding-mobile": "16px",
+                        "section-gap": "80px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex">
+    <!-- SideNavBar (Shared Component) -->
+    <aside class="hidden md:flex flex-col h-full py-6 px-4 gap-2 bg-surface-container-low border-r border-outline-variant fixed left-0 w-64 z-50">
+        <div class="px-2 mb-8">
+            <a class="contents" href="../SystemAccount/Homepage.html"><h1 class="font-headline-md text-headline-md font-black text-primary">Admin Central</h1></a>
+            <p class="font-label-md text-label-md text-on-surface-variant">Platform Manager</p>
+        </div>
+        <nav class="flex-grow flex flex-col gap-1">
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-150" href="./Admin%20Dashboard.html">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="font-label-md text-label-md">Dashboard</span>
+            </a>
+            <!-- Active State Logic: Tours is the primary intent -->
+            <a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold translate-x-1" href="./ManagerTour.html">
+                <span class="material-symbols-outlined" data-icon="map" style="font-variation-settings: 'FILL' 1;">map</span>
+                <span class="font-label-md text-label-md">Tours</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-150" href="./Booking%20Management.html">
+                <span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+                <span class="font-label-md text-label-md">Bookings</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-150" href="./CustomerManagement.html">
+                <span class="material-symbols-outlined" data-icon="group">group</span>
+                <span class="font-label-md text-label-md">Customers</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-150" href="./PaymentManagement.html">
+                <span class="material-symbols-outlined" data-icon="payments">payments</span>
+                <span class="font-label-md text-label-md">Payments</span>
+            </a>
+        </nav>
+        <button class="mt-4 bg-secondary-container text-on-secondary-container px-4 py-3 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 shadow-sm hover:opacity-90 transition-all">
+            <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+            Generate Reports
+        </button>
+        <div class="mt-auto border-t border-outline-variant pt-4 flex flex-col gap-1">
+            <div class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-150 cursor-pointer">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                <span class="font-label-md text-label-md">Settings</span>
+            </div>
+            <div class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-150 cursor-pointer">
+                <span class="material-symbols-outlined" data-icon="badge">badge</span>
+                <span class="font-label-md text-label-md">Guides</span>
+            </div>
+        </div>
+    </aside>
+    <!-- Main Content Canvas -->
+    <main class="flex-grow md:ml-64 w-full min-h-screen">
+        <!-- TopAppBar (Contextual) -->
+        <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-40 h-16 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop border-b border-outline-variant/30">
+            <div class="flex items-center gap-4">
+                <span class="md:hidden material-symbols-outlined text-primary cursor-pointer" data-icon="menu">menu</span>
+                <h2 class="font-headline-md text-headline-md font-bold text-primary">Tours Management</h2>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex bg-surface-container-low border border-outline-variant rounded-full px-4 py-1.5 items-center gap-2 focus-within:ring-2 ring-primary ring-offset-2 transition-all">
+                    <span class="material-symbols-outlined text-outline text-sm" data-icon="search">search</span>
+                    <input class="bg-transparent border-none focus:ring-0 text-label-md w-64 p-0" placeholder="Search tours, locations..." type="text">
+                </div>
+                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+                    <img alt="User Profile" class="w-full h-full object-cover" data-alt="A professional close-up portrait of a corporate executive with a friendly expression. The lighting is bright and high-key, typical of a modern office environment. The background is softly blurred with hints of glass and azure blue tones. The overall aesthetic is clean, professional, and high-end, aligning with a premium concierge service identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI-GNFb6RdxcbvAJJL8M-eo066iV-xehNSy0gxhPUDHN4uxTeLAMA3rc1X7u_xsPGss-5gk_cMVd9EIN8RIiEwmn1XJODj3zvrRwm92oYDK6_8eI-Nw-CiWkCqoJlN0nL8S1C0PUIRXaozbbRWaFyM8pxtjKNmeetJCdTRfmmV3iXXjSv5txhZxkMalIMHPJcR6HRqGlHJmimDNTC3enDUjgQVFWaCBSZqox3f6XCu-HBNYp96vnP6L4sR8L1he_TDteqMap0oNw">
+                </div>
+            </div>
+        </header>
+        <!-- Content Body -->
+        <div class="p-container-padding-mobile md:p-container-padding-desktop space-y-base md:space-y-gutter">
+            <!-- Filters & Actions Bar -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                <div class="md:col-span-8 flex flex-wrap gap-3">
+                    <!-- Filter Chips -->
+                    <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full text-on-surface-variant border border-outline-variant/30">
+                        <span class="font-label-sm text-label-sm">Destination:</span>
+                        <select class="bg-transparent border-none p-0 text-label-sm font-bold text-primary focus:ring-0 cursor-pointer">
+                            <option>All Locations</option>
+                            <option>Europe</option>
+                            <option>Asia</option>
+                            <option>Americas</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full text-on-surface-variant border border-outline-variant/30">
+                        <span class="font-label-sm text-label-sm">Status:</span>
+                        <select class="bg-transparent border-none p-0 text-label-sm font-bold text-primary focus:ring-0 cursor-pointer">
+                            <option>All Status</option>
+                            <option>Published</option>
+                            <option>Draft</option>
+                            <option>Archived</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full text-on-surface-variant border border-outline-variant/30">
+                        <span class="font-label-sm text-label-sm">Price Range:</span>
+                        <select class="bg-transparent border-none p-0 text-label-sm font-bold text-primary focus:ring-0 cursor-pointer">
+                            <option>Any Price</option>
+                            <option>$0 - $1,000</option>
+                            <option>$1,000 - $5,000</option>
+                            <option>$5,000+</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="md:col-span-4 flex justify-end">
+                    <button class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center gap-2 hover:shadow-lg transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                        <a href="../AdminStaff/TourForm.html">Create New Tour</a>
+                    </button>
+                </div>
+            </div>
+            <!-- Tours Table Container -->
+            <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/50 overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-surface-container-low border-b border-outline-variant">
+                                <th class="px-6 py-4 font-label-sm text-label-sm text-outline uppercase tracking-wider">Tour Details</th>
+                                <th class="px-6 py-4 font-label-sm text-label-sm text-outline uppercase tracking-wider">Destination</th>
+                                <th class="px-6 py-4 font-label-sm text-label-sm text-outline uppercase tracking-wider">Price</th>
+                                <th class="px-6 py-4 font-label-sm text-label-sm text-outline uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 font-label-sm text-label-sm text-outline uppercase tracking-wider text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant/20">
+                            <!-- Row 1 -->
+                            <tr class="hover:bg-surface-container-low transition-colors group">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-highest">
+                                            <img alt="Tour Image" class="w-full h-full object-cover" data-alt="An ethereal wide shot of the Swiss Alps at sunrise, with jagged peaks covered in pristine white snow under a soft lavender and coral sky. The lighting is cold yet welcoming, reflecting a high-end adventure aesthetic. The visual style is crisp and editorial, evoking a premium travel magazine feel with vibrant yet natural saturation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDduxLkvpYW97qrmtllNsbVntmONIRC_LPAmrvcEAA0Avg51Fr20EtoHCW7ltzaWTL4nceknx_sWklJyujgiANtr5uoO5jqYB5S3ETgYC0NEtU7UMUmKXPc9Pjpam7D5EuxPp208RtnnNRm_Hzaev1TMLogaiUt-uCzTKqyWxFrfPks7ICtpj5r0mJJ6NfiNU-D1-JIRSkzvhuXh5WwHU4-6LT-c16wRsn9bSYi1zS4NXVBqNV3amWEX3MBXtriZI9IusVusWR8HQ">
+                                        </div>
+                                        <div>
+                                            <div class="font-label-md text-label-md font-bold text-on-surface">Alpine Peaks Expedition</div>
+                                            <div class="text-xs text-outline">ID: TRX-88219</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+                                        <span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+                                        Switzerland
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-label-md text-label-md font-bold text-secondary">$3,450.00</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-tertiary/10 text-tertiary">
+                                        Published
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                                        <button class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant" title="Lock Tour">
+                                            <span class="material-symbols-outlined text-[20px]" data-icon="lock_open">lock_open</span>
+                                        </button>
+                                        <button class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant" title="Hide Tour">
+                                            <span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+                                        </button>
+                                        <button class="p-2 hover:bg-error-container/20 rounded-lg transition-colors text-error" title="Delete Tour">
+                                            <span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr class="hover:bg-surface-container-low transition-colors group">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-highest">
+                                            <img alt="Tour Image" class="w-full h-full object-cover" data-alt="A lush, cinematic view of a tropical rainforest in Bali during a light morning mist. Sunlight filters through massive fern leaves and emerald green canopy, creating golden rays of light. The atmosphere is humid, serene, and deeply immersive. The color palette is dominated by rich greens and earthy browns with warm golden highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxJCKOTFcK1F8Gu9nAVNOt2dR4_v2hYf4xdA3otKbVSfBeTtRukGVqBjqefzr118-i9RdyqkweJc8oT81kj44omUZyROqv1aCZlOtlGBLBQFAZUZ8emHhYx4P2CDc4Ni1ZKO-ZgpgM-AX_Ppkt85RsEFhkWuaLWTaVQKwIJthzAu974LCfbehDxqnbLpG_c4Bd3776rxwW9Thl4dOtytVeSrmMZasrb90C2-kirK1T2MKGN72Y9siZzgLz0iGWVVtS9iQPelCzXA">
+                                        </div>
+                                        <div>
+                                            <div class="font-label-md text-label-md font-bold text-on-surface">Bali Zen Retreat</div>
+                                            <div class="text-xs text-outline">ID: TRX-44102</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+                                        <span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+                                        Indonesia
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-label-md text-label-md font-bold text-secondary">$1,299.00</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-variant text-on-surface-variant">
+                                        Draft
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                                        <button class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-primary" title="Lock Tour">
+                                            <span class="material-symbols-outlined text-[20px]" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+                                        </button>
+                                        <button class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant" title="Show Tour">
+                                            <span class="material-symbols-outlined text-[20px]" data-icon="visibility_off">visibility_off</span>
+                                        </button>
+                                        <button class="p-2 hover:bg-error-container/20 rounded-lg transition-colors text-error" title="Delete Tour">
+                                            <span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 3 -->
+                            <tr class="hover:bg-surface-container-low transition-colors group">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-16 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-highest">
+                                            <img alt="Tour Image" class="w-full h-full object-cover" data-alt="An iconic view of Venice's Grand Canal at twilight, with historic gondolas gently rocking on the shimmering azure water. The surrounding architecture is illuminated with warm, amber lights reflecting on the water's surface. The mood is romantic and sophisticated, capturing a classic luxury European travel experience with high-fidelity detail and a rich, warm glow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOz67ATdeT-BC3v7WVR_ZMeda5Gl6YlbLPPRbxTXQZ6ysj1n3LrR3S82EvcoIKMhxQZPzwXM6uiMZ8gyX7MH5VXqV2KBY2UW4qPEIEbTgrFLsRDmVjE0pBL28Wt2Dwc3oMdtNmtuH4OVmYrnnPdOt8CoggeWBS8A3ATAery-s8xHJBrbm3CQPh1vg8-VkUV-TKdIin7Vdz2QjQFOa6mJrLn9ECueJo6GjYn6b4eC8AYDuH4g6Barlz3uFhy2OBoko_UQWgSO1edQ">
+                                        </div>
+                                        <div>
+                                            <div class="font-label-md text-label-md font-bold text-on-surface">Venetian Canal Cruise</div>
+                                            <div class="text-xs text-outline">ID: TRX-11928</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+                                        <span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+                                        Italy
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-label-md text-label-md font-bold text-secondary">$2,800.00</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-tertiary/10 text-tertiary">
+                                        Published
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                                        <button class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant" title="Lock Tour">
+                                            <span class="material-symbols-outlined text-[20px]" data-icon="lock_open">lock_open</span>
+                                        </button>
+                                        <button class="p-2 hover:bg-surface-container-highest rounded-lg transition-colors text-on-surface-variant" title="Hide Tour">
+                                            <span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+                                        </button>
+                                        <button class="p-2 hover:bg-error-container/20 rounded-lg transition-colors text-error" title="Delete Tour">
+                                            <span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination Footer -->
+                <div class="px-6 py-4 flex justify-between items-center bg-surface-container-low border-t border-outline-variant/30">
+                    <span class="text-label-sm text-outline">Showing 1 to 3 of 24 Tours</span>
+                    <div class="flex gap-2">
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant text-outline hover:bg-surface transition-colors">
+                            <span class="material-symbols-outlined text-[20px]" data-icon="chevron_left">chevron_left</span>
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-on-primary text-label-sm font-bold">1</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface transition-colors text-label-sm">2</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface transition-colors text-label-sm">3</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant text-outline hover:bg-surface transition-colors">
+                            <span class="material-symbols-outlined text-[20px]" data-icon="chevron_right">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Dashboard Metric Overlay (Bento-style snippet) -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+                <div class="bg-primary-container/10 p-5 rounded-2xl border border-primary-container/20 glass-panel">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-primary material-symbols-outlined" data-icon="trending_up">trending_up</span>
+                        <span class="text-xs font-bold text-tertiary bg-tertiary-fixed px-2 py-0.5 rounded-full">+12%</span>
+                    </div>
+                    <div class="text-headline-md font-bold text-primary">128</div>
+                    <div class="text-label-sm text-on-surface-variant">Active Tours</div>
+                </div>
+                <div class="bg-secondary-container/5 p-5 rounded-2xl border border-secondary-container/10 glass-panel">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-secondary material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+                    </div>
+                    <div class="text-headline-md font-bold text-secondary">$42.4K</div>
+                    <div class="text-label-sm text-on-surface-variant">Month Revenue</div>
+                </div>
+                <div class="bg-surface-container-high p-5 rounded-2xl border border-outline-variant/30">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-outline material-symbols-outlined" data-icon="visibility">visibility</span>
+                    </div>
+                    <div class="text-headline-md font-bold text-on-surface">15.2K</div>
+                    <div class="text-label-sm text-on-surface-variant">Total Views</div>
+                </div>
+                <div class="bg-surface-container-high p-5 rounded-2xl border border-outline-variant/30">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-outline material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                    </div>
+                    <div class="text-headline-md font-bold text-on-surface">4.8</div>
+                    <div class="text-label-sm text-on-surface-variant">Avg. Rating</div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer (Shared Component) -->
+        <footer class="w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-surface-container-highest mt-section-gap">
+            <div class="flex flex-col items-center md:items-start gap-2">
+                <a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md text-primary font-bold">WanderX</span></a>
+                <span class="font-label-sm text-label-sm text-on-surface-variant">© 2024 WanderX Travel. All rights reserved.</span>
+            </div>
+            <div class="flex flex-wrap justify-center gap-6">
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="./Admin%20Dashboard.html">About Us</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="./Admin%20Dashboard.html">Privacy Policy</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="./Admin%20Dashboard.html">Terms of Service</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-all" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
+            </div>
+        </footer>
+    </main>
+    <!-- Mobile Nav Bar (Shared Component) -->
+    <nav class="fixed md:hidden bottom-0 w-full flex justify-around items-center py-3 px-4 bg-surface border-t border-outline-variant shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-50">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant" href="./Admin%20Dashboard.html">
+            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            <span class="font-label-sm text-label-sm">Dashboard</span>
+        </a>
+        <a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1" href="./ManagerTour.html">
+            <span class="material-symbols-outlined" data-icon="explore" style="font-variation-settings: 'FILL' 1;">explore</span>
+            <span class="font-label-sm text-label-sm">Tours</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant" href="./Booking%20Management.html">
+            <span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+            <span class="font-label-sm text-label-sm">Schedule</span>
+        </a>
+    </nav>
+</body>
+</html>

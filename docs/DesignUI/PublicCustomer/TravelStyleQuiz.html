@@ -1,0 +1,176 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WanderX - Travel Style Quiz</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e1e8ff",
+                        "on-secondary-container": "#640f00",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "tertiary-fixed-dim": "#48d7f9",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#3d0600",
+                        "primary-container": "#0052cc",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#001f27",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#faf9ff",
+                        "inverse-on-surface": "#edf0ff",
+                        "on-surface": "#051a3e",
+                        "surface-container-highest": "#d8e2ff",
+                        "surface-dim": "#ccdaff",
+                        "surface-tint": "#0c56d0",
+                        "secondary": "#ae3115",
+                        "on-surface-variant": "#434654",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#006477",
+                        "surface": "#faf9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#ffb4a3",
+                        "outline-variant": "#c3c6d6",
+                        "on-primary-container": "#c4d2ff",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "secondary-fixed": "#ffdad2",
+                        "on-error-container": "#93000a",
+                        "primary": "#003d9b",
+                        "tertiary-fixed": "#afecff",
+                        "background": "#faf9ff",
+                        "on-background": "#051a3e",
+                        "surface-container": "#e9edff",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "inverse-primary": "#b2c5ff",
+                        "on-primary-fixed": "#001848",
+                        "on-secondary-fixed-variant": "#8c1900",
+                        "inverse-surface": "#1d3054",
+                        "outline": "#737685",
+                        "on-tertiary-container": "#76e2ff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#dae2ff",
+                        "tertiary": "#004b59",
+                        "secondary-container": "#fd6a49",
+                        "surface-container-low": "#f1f3ff",
+                        "surface-variant": "#d8e2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "section-gap": "80px",
+                        "base": "8px",
+                        "container-padding-desktop": "48px",
+                        "container-padding-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-sans antialiased">
+<!-- Minimalist Header for Linear Flow -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
+<a class="contents" href="../SystemAccount/Homepage.html"><div class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16">
+<div class="font-headline-md text-headline-md font-bold text-primary">
+                WanderX
+            </div></a>
+<a aria-label="Close Quiz" class="p-2 rounded-full hover:bg-surface-container-low transition-colors duration-200 text-on-surface-variant group" href="./HomeScreen.html">
+<span class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">close</span>
+</a>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-surface-container-high">
+<div class="h-full bg-primary w-3/4 rounded-r-full transition-all duration-500 ease-out"></div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center pt-32 pb-section-gap px-container-padding-mobile md:px-container-padding-desktop max-w-7xl mx-auto w-full">
+<div class="w-full max-w-4xl text-center mb-16">
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-4 block">Question 4 of 5</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-display-lg md:text-display-lg text-on-surface">What's your ideal morning?</h1>
+</div>
+<!-- Visual Options Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter w-full max-w-5xl">
+<!-- Option 1: Selected State -->
+<button class="group relative flex flex-col rounded-xl overflow-hidden bg-surface text-left transition-all duration-300 shadow-sm hover:shadow-md border-2 border-primary translate-y-[-4px]">
+<div class="relative h-64 w-full overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A high-quality, professional photograph of a quiet morning at a Parisian cafe. A steaming cup of coffee sits on a small round table next to a fresh croissant. The lighting is soft, natural morning sunlight filtering through trees. The overall mood is peaceful and sophisticated, aligning with a premium travel aesthetic featuring soft blues and warm natural tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkLsHuTOYfU9_EphMxEjbwzETWGtBC7qkYulpsJ-gmNBg5xFg0LNWmD02DZHidsumKFR8xBLpp2yN-dNTUCl1pfxRdGAarTxc8_J8qmonJ9Q2w2beoPRadEHyJIcgN0chTABW-7j2RFGlDKR4mTphySVIe5uqctuBTeRZEFAqtL6y3ZsuT4C9M1oisU3L43nZ1o4Buws2hgaRS6GoxwKI9haeswiHpS5FayFUG9sCpyOsNECHRdUzkQuR7cfUJDYpYRLpuoilPbg">
+<!-- Selection Indicator -->
+<div class="absolute top-4 right-4 bg-primary text-on-primary rounded-full p-1 shadow-sm">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="p-6 bg-surface">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Coffee in a quiet cafe</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Starting slow, watching the city wake up.</p>
+</div>
+</button>
+<!-- Option 2: Unselected State -->
+<button class="group relative flex flex-col rounded-xl overflow-hidden bg-surface text-left transition-all duration-300 shadow-sm hover:shadow-md border-2 border-transparent hover:border-primary-fixed-dim">
+<div class="relative h-64 w-full overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A stunning, high-fidelity landscape photograph of a hiker standing on a mountain peak at sunrise. The sky is filled with vibrant coral and azure blue colors. The lighting is dramatic and inspiring. The scene conveys a sense of adventure, achievement, and premium outdoor exploration, shot in a bright, modern light-mode style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBL0bK5j7y8QiM21ZxWMrm0oqWyFTcG0aPGegzeiFnFvxCUfIjFciyNj_IRxKvuBaqesZmYyNrfnKu75W_LpepqMMhl0eEFH9hp25JD8ZQPg48PbJYM17vKawRtqmqXQpSf03p94PoC0vYfXfCtc6zKVCHNbrmnBlSOjtnYYVepz5TE44eqCxuEIsk9iE_QSW3JhNUw1vpRQn9kh3WWhSFhANw-L4SqEDqNFuY88eEEA1lBoVCnuozoYsruEfHhhJBQfr_H9WSgkQ">
+</div>
+<div class="p-6 bg-surface">
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Hiking to a sunrise peak</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Active, fresh air, and rewarding views.</p>
+</div>
+</button>
+<!-- Option 3: Unselected State -->
+<button class="group relative flex flex-col rounded-xl overflow-hidden bg-surface text-left transition-all duration-300 shadow-sm hover:shadow-md border-2 border-transparent hover:border-primary-fixed-dim">
+<div class="relative h-64 w-full overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A vibrant, beautifully composed photograph of a bustling local food market in Asia during the early morning. Colorful fresh fruits and steaming street food stalls are visible. The lighting is warm and energetic. The image feels authentic, dynamic, and rich in cultural detail, fitting a high-end travel documentary aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBF9ZiOB1r_etcvLDkWg6OzdM8XLU-Z3N8ZU0uiRJSAq_izjAlkIzAjIuSjQbOyskY0k7ml6r56Deoe5QP7Gohp9vUYYKHNmKyQRK3JJVSKLp6wJG0xcF8xHpFVOve2yNtFq7FtP1sPbMZIT3NR5o8aWPrXo3R6VlePc_XI9IMPOxvgtfgmxzU6TGiGHYCUmPyc6RkHsQP2xnB5qrrpqROkSmK5UzkbGBBuAvBIhjOsyd6ySnIqpNDYYnikihw03sjPYUKH5V8dzw">
+</div>
+<div class="p-6 bg-surface">
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Local market breakfast</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Diving straight into the local culture.</p>
+</div>
+</button>
+</div>
+<!-- Call to Action -->
+<div class="mt-section-gap flex flex-col items-center">
+<a class="bg-secondary hover:bg-[#992a12] text-on-secondary font-label-md text-label-md rounded-full px-8 py-4 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-1 flex items-center gap-2" href="../others/RecommendedTours.html">
+                Find My Perfect Tour
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+<a class="mt-6 text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors" href="./TourDiscovery.html">
+                Skip to Results
+            </a>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WanderX Admin - Cancel Booking Approval</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001848",
+                        "primary-container": "#0052cc",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#b2c5ff",
+                        "on-secondary-container": "#640f00",
+                        "inverse-surface": "#1d3054",
+                        "surface": "#faf9ff",
+                        "secondary-fixed": "#ffdad2",
+                        "secondary-container": "#fd6a49",
+                        "secondary": "#ae3115",
+                        "on-tertiary-container": "#76e2ff",
+                        "error-container": "#ffdad6",
+                        "background": "#faf9ff",
+                        "on-background": "#051a3e",
+                        "outline-variant": "#c3c6d6",
+                        "surface-bright": "#faf9ff",
+                        "surface-variant": "#d8e2ff",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e1e8ff",
+                        "outline": "#737685",
+                        "on-secondary-fixed": "#3d0600",
+                        "tertiary-fixed": "#afecff",
+                        "tertiary-fixed-dim": "#48d7f9",
+                        "surface-container": "#e9edff",
+                        "secondary-fixed-dim": "#ffb4a3",
+                        "surface-tint": "#0c56d0",
+                        "primary-fixed": "#dae2ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#d8e2ff",
+                        "on-secondary": "#ffffff",
+                        "primary": "#003d9b",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#c4d2ff",
+                        "on-tertiary-fixed": "#001f27",
+                        "surface-container-low": "#f1f3ff",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "tertiary-container": "#006477",
+                        "tertiary": "#004b59",
+                        "surface-dim": "#ccdaff",
+                        "on-secondary-fixed-variant": "#8c1900",
+                        "on-surface-variant": "#434654",
+                        "on-surface": "#051a3e",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "inverse-on-surface": "#edf0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding-mobile": "16px",
+                        "section-gap": "80px",
+                        "gutter": "24px",
+                        "container-padding-desktop": "48px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm docked full-width top-0 sticky z-50">
+<a class="contents" href="../SystemAccount/Homepage.html"><div class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16 max-w-7xl mx-auto">
+<div class="font-display-lg text-headline-md font-bold text-primary dark:text-primary-fixed-dim">WanderX</div></a>
+<nav class="hidden md:flex items-center gap-8">
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors" href="./ManagerTour.html">Explore</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors" href="./Booking%20Management.html">My Trips</a>
+<a class="font-label-md text-label-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1" href="./SpecialRequests.html">Concierge</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors" href="./SpecialRequests.html">Support</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-low/50 rounded-full transition-all">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-low/50 rounded-full transition-all">settings</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Customer profile avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a corporate administrator in a clean, high-key office environment. The lighting is soft and flattering, emphasizing a trustworthy and efficient persona. The background is a blurred modern workspace with hints of tech and glass partitions. The overall aesthetic is professional, modern, and aligned with a premium concierge service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCemQjjXJe_RJUTfufQjOMnvCn-lA0L6uOUXcs-cG6COFoaq0u-cmzHHi1I2FLODezef8nh1BuvMm-Z9b5BkUFKdk4sTfRp6-TVMN7h0bKzMHTgA11RQIEtbh1RrjRPYOmxuC8OAxPjZZ6tCyYVZLe9X_BJNFWw9sRBUel47L4R0vFNHBOS6lMXFDZra8TloMpGg1IazOAr4O0bThYDG1iV_SSQ-ygZAajyDBm_GQ-9G9GXN5YEges4JnfdzekutEQpCLKPJ2fyew">
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop py-12">
+<!-- Breadcrumbs & Header -->
+<div class="mb-8">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md mb-2">
+<span>Admin</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span>Bookings</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-primary font-bold">Cancellation Approvals</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-background">Pending Cancellation Requests</h1>
+<p class="text-on-surface-variant mt-2 font-body-md text-body-md">Review and process refund eligibility for incoming cancellation requests.</p>
+</div>
+<!-- Bento Grid Layout for Requests -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Sidebar Stats/Filters -->
+<aside class="lg:col-span-3 space-y-6">
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/30">
+<h3 class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant mb-4">Quick Stats</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant text-body-md">Pending</span>
+<span class="font-bold text-primary">12</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant text-body-md">Urgent (&lt; 24h)</span>
+<span class="font-bold text-secondary">4</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant text-body-md">Avg. Response</span>
+<span class="font-bold text-on-surface">1.2h</span>
+</div>
+</div>
+</div>
+<div class="bg-primary-container text-on-primary-container p-6 rounded-xl shadow-lg">
+<span class="material-symbols-outlined text-4xl mb-4" data-weight="fill">verified_user</span>
+<h4 class="font-headline-md text-headline-md mb-2">Policy Guard</h4>
+<p class="text-sm opacity-90">Automated refund calculations are active based on the 48-hour standard window.</p>
+</div>
+</aside>
+<!-- Main Request List -->
+<div class="lg:col-span-9 space-y-6">
+<!-- Request Card 1 -->
+<div class="glass-panel border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="p-6 md:p-8">
+<div class="flex flex-col md:flex-row justify-between items-start gap-6">
+<!-- Customer & Tour Info -->
+<div class="flex-1 space-y-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold">
+                                        JD
+                                    </div>
+<div>
+<h2 class="font-headline-md text-headline-md">Jane Doe</h2>
+<p class="text-on-surface-variant font-label-md text-label-md">Booking ID: #WX-99281</p>
+</div>
+<span class="bg-error-container text-on-error-container px-3 py-1 rounded-full text-label-sm font-label-sm uppercase">Urgent</span>
+</div>
+<div class="flex flex-wrap gap-4">
+<div class="flex items-center gap-2 bg-surface-container px-3 py-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">map</span>
+<span class="font-body-md text-body-md text-on-surface">Amalfi Coast Private Yacht</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container px-3 py-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">calendar_today</span>
+<span class="font-body-md text-body-md text-on-surface">Oct 12 - Oct 15, 2023</span>
+</div>
+</div>
+<div class="space-y-2">
+<h4 class="font-label-md text-label-md uppercase text-on-surface-variant">Cancellation Reason</h4>
+<p class="text-on-background font-body-md italic border-l-4 border-outline-variant pl-4 py-1">
+                                        "Unexpected medical emergency in the family. We are unable to travel during these dates and would appreciate a flexible refund policy if possible."
+                                    </p>
+</div>
+</div>
+<!-- Refund & Status Sidebar -->
+<div class="w-full md:w-64 bg-surface-container-low p-6 rounded-xl border border-outline-variant/20">
+<h4 class="font-label-md text-label-md uppercase text-on-surface-variant mb-3">Eligibility</h4>
+<div class="mb-4">
+<span class="text-display-lg text-headline-md font-bold text-secondary">80%</span>
+<span class="text-on-surface-variant text-label-sm">Refund Estimated</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4">Calculated: 72 hours before departure (Standard Policy).</p>
+<div class="flex flex-col gap-2">
+<span class="flex items-center gap-2 text-label-sm text-green-700">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                        Verified Emergency
+                                    </span>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="mt-8 pt-6 border-t border-outline-variant/30">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+<div class="md:col-span-2">
+<label class="block font-label-sm text-label-sm text-on-surface-variant uppercase mb-2">Internal Cancellation Notes</label>
+<textarea class="w-full h-24 bg-surface border border-outline-variant rounded-lg p-3 text-body-md focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Provide specific reasons for approval or rejection (visible to admins only)..."></textarea>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full bg-secondary text-on-secondary font-label-md text-label-md py-3 rounded-full hover:shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">check_circle</span>
+                                        Approve Refund
+                                    </button>
+<button class="w-full bg-transparent border-2 border-outline text-outline font-label-md text-label-md py-3 rounded-full hover:bg-surface-container-highest transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">cancel</span>
+                                        Reject Request
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Request Card 2 (Minimal Example) -->
+<div class="glass-panel border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm opacity-90">
+<div class="p-6">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container font-bold">
+                                    MK
+                                </div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Mark Koven</h3>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Tokyo Cyberpunk Night Walk • #WX-88210</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="text-label-sm text-on-surface-variant uppercase">Refund</p>
+<p class="font-bold text-on-surface">0% (Policy Limit)</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-md hover:bg-primary-container transition-colors">Review</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center py-3 pb-safe px-4 bg-surface/90 backdrop-blur-lg border-t border-outline-variant/30 shadow-[0_-4px_12px_rgba(0,61,155,0.08)] z-50 rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="./ManagerTour.html">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-sm text-label-sm-mobile">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="./Booking%20Management.html">
+<span class="material-symbols-outlined">travel</span>
+<span class="font-label-sm text-label-sm-mobile">My Trips</span>
+</a>
+<div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1">
+<span class="material-symbols-outlined">support_agent</span>
+<span class="font-label-sm text-label-sm-mobile">Concierge</span>
+</div>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="./CustomerManagement.html">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm-mobile">Profile</span>
+</a>
+</nav>
+<!-- Background Decoration for Glassmorphism depth -->
+<div class="fixed top-0 right-0 -z-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="fixed bottom-0 left-0 -z-10 w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+</body></html>

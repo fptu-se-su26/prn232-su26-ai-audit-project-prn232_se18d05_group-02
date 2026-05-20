@@ -1,0 +1,271 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WanderX - Kyoto Cultural Immersion</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#003d9b",
+                        "secondary-fixed-dim": "#ffb4a3",
+                        "on-primary-container": "#c4d2ff",
+                        "surface-container-highest": "#d8e2ff",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004e5d",
+                        "on-tertiary-container": "#76e2ff",
+                        "tertiary-fixed": "#afecff",
+                        "surface-tint": "#0c56d0",
+                        "secondary-fixed": "#ffdad2",
+                        "on-surface-variant": "#434654",
+                        "secondary": "#ae3115",
+                        "inverse-surface": "#1d3054",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#b2c5ff",
+                        "on-tertiary-fixed": "#001f27",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#d8e2ff",
+                        "inverse-on-surface": "#edf0ff",
+                        "primary-fixed": "#dae2ff",
+                        "on-surface": "#051a3e",
+                        "on-secondary-fixed-variant": "#8c1900",
+                        "on-background": "#051a3e",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#faf9ff",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "surface-container-high": "#e1e8ff",
+                        "surface": "#faf9ff",
+                        "secondary-container": "#fd6a49",
+                        "error-container": "#ffdad6",
+                        "background": "#faf9ff",
+                        "tertiary-container": "#006477",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#3d0600",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-primary-fixed": "#001848",
+                        "outline-variant": "#c3c6d6",
+                        "outline": "#737685",
+                        "primary-container": "#0052cc",
+                        "surface-container-low": "#f1f3ff",
+                        "tertiary-fixed-dim": "#48d7f9",
+                        "surface-dim": "#ccdaff",
+                        "surface-container": "#e9edff",
+                        "on-secondary-container": "#640f00",
+                        "tertiary": "#004b59"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "section-gap": "80px",
+                        "gutter": "24px",
+                        "container-padding-mobile": "16px",
+                        "base": "8px",
+                        "container-padding-desktop": "48px"
+                    },
+                    fontFamily: {
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "500" }],
+                        "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "headline-lg-mobile": ["28px", { lineHeight: "36px", fontWeight: "600" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "display-lg": ["56px", { lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen relative pb-24 md:pb-0">
+<!-- TopNavBar (Hidden on Mobile) -->
+<nav class="hidden md:flex bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md full-width top-0 sticky z-50 border-b border-outline-variant/30 dark:border-outline/20 shadow-sm dark:shadow-none">
+<a class="contents" href="../SystemAccount/Homepage.html"><div class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop py-4 max-w-7xl mx-auto">
+<div class="font-headline-md text-headline-md font-extrabold text-primary dark:text-inverse-primary tracking-tight">
+                WanderX
+            </div></a>
+<div class="flex gap-8 items-center">
+<a class="text-primary dark:text-inverse-primary font-bold border-b-2 border-primary pb-1 font-label-md text-label-md hover:opacity-90 transition-all duration-200 scale-95 active:scale-90" href="../PublicCustomer/TourDiscovery.html">Explore</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors font-label-md text-label-md hover:opacity-90 transition-all duration-200 scale-95 active:scale-90" href="../GuideOperation/Guide%20Portal.html">Guides</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors font-label-md text-label-md hover:opacity-90 transition-all duration-200 scale-95 active:scale-90" href="../PublicCustomer/My%20Bookings.html">My Trips</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary transition-colors font-label-md text-label-md hover:opacity-90 transition-all duration-200 scale-95 active:scale-90" href="../PublicCustomer/Special%20Request.html">Concierge</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-label-md text-label-md bg-secondary text-on-secondary px-6 py-2 rounded-full hover:opacity-90 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">Take Quiz</button>
+<img alt="User profile avatar" class="w-10 h-10 rounded-full border border-outline-variant/50 object-cover" data-alt="A close-up studio portrait of a confident young professional woman with a warm, welcoming smile. She is set against a clean, softly lit, neutral background to emphasize a modern, premium aesthetic. The lighting is crisp and even, highlighting her features and creating a trustworthy, approachable atmosphere suitable for a high-end concierge service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzetXCaJ92nN-UVu6MGYcfWAIo3bpjAetW9ibhQnPeE4ud6fiPHEsXbvogumifc3jFNMj7aLUn8M2tHUDqFpT1eI0wErxNmLCHhBGSADJ0zQAJINNgTMiAT0Dvpgvf9NjzHvqp5jcgb5SripE6xqZpI4UmbQFbvgayClTANErMLsDd__uCU-XUW2oShzcN-36ftNLM6PeSMSEdEZ_7DW3MNezQRHRNuF0msPwq0kxbwBPcOsGPo4rqWHZWGUkZaRj4yzYyWxn-fA">
+</div>
+</div>
+</nav>
+<main class="flex-grow w-full max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop pt-8 pb-section-gap">
+<!-- Hero Gallery -->
+<div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[400px] md:h-[500px] rounded-xl overflow-hidden mb-8">
+<div class="md:col-span-2 row-span-2 relative h-full">
+<img class="w-full h-full object-cover" data-alt="A breathtaking, wide-angle shot of the iconic Fushimi Inari Taisha shrine in Kyoto, Japan. Vibrant vermilion torii gates line a winding path up a lush, deeply forested mountain. Sunlight filters through the dense canopy, casting dappled light on the path and creating an atmosphere of serene, ancient mystique. The image embodies a premium, immersive travel experience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9bIMIK37peesKphN89fn5Aa_GJh__KACyEaiALfC8AZyjAZlgEv0Y9XjaMJk95FHF-tIghDpe2bK3h-NsxjbR6gRwsKWqlTNtuuAhp9EpgIQ_dWFrxLXT3JWE5pF2dJY-LZ2HvahN2kRs45BhzEB7E0_y4htcT1QHiA071MrpLpnXRzhfTDPH43nvvC233Lm0wPDjEK7zGZbrkiGB-xx2Mxku_UdZewhRD0LuqbKyv04YAYaZ7ifQ_thRWJxyuuvxwWthf6pP-g">
+</div>
+<div class="hidden md:block col-span-1 row-span-1 relative h-full">
+<img class="w-full h-full object-cover" data-alt="A detailed, close-up shot of a beautifully adorned geisha walking through a historic, cobblestone alleyway in the Gion district of Kyoto at dusk. Soft, warm light spills from traditional wooden machiya townhouses, illuminating her intricate kimono and hair ornaments. The mood is authentic, elegant, and culturally rich, fitting perfectly with a high-end travel aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCX-YeSYN5fqpauCYh8-hTIFTjM9-mH8zse1bRxwZUX8pJoUz1HZ_CK40KaZlA_UBu3Quuzv7zJK-BVK41JkA4FrHpg6D8_6Qyd_MX9zDQa6iTmQTHD67GQZyifM1dwwcGYFrrOwy1cR-Zakyciwym4TPOllwFPFNjOuNJB8lZowWA6su9uRV2HxNhh4J4ndyauY8TGvDO16d7UiSipySCTorEtfQGu22gjG2p9HkWzhojxo_NCJanKkeavcy2xo0KosAMmuddd1w">
+</div>
+<div class="hidden md:block col-span-1 row-span-1 relative h-full">
+<img class="w-full h-full object-cover" data-alt="A serene, minimalist view of a traditional Japanese rock garden in Kyoto, meticulously raked to perfection. The garden is surrounded by lush green foliage and viewed from the polished wooden veranda of an ancient temple. The scene evokes a deep sense of peace, mindfulness, and the refined elegance of Japanese Zen culture, aligned with a premium, relaxing journey." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxmMx0An1V8GDi30khDFxexa0h9MnA0TA98qs0P0mNmQ2OTUzzD1emSd2cz9TaXRkLn7b5uF1fxMNxziMqhIk6PgxhrO9F8lmeO7RsC0sKyjdlD44mWfNjskPvwvJlJCTmWDQrluUa0WjgBbIH_4nZxmoLIkkV_EZKvhPe-zyZxsMsDI2TH47OSRx29BAX00Kq1-Aq3Iu_WN0aA2t-UdBoJojNzTB3OcwwhVc3fSQH4mFWjNdoFqoGSF4zzd23MISsXrG3oskcbg">
+</div>
+<div class="hidden md:block col-span-2 row-span-1 relative h-full">
+<img class="w-full h-full object-cover" data-alt="A vibrant, bustling night scene in a narrow Kyoto street, illuminated by rows of glowing red paper lanterns outside cozy izakayas and traditional restaurants. The wet cobblestones reflect the warm, inviting light, creating a dynamic and appetizing atmosphere that suggests culinary exploration and exciting nighttime discoveries in a historic setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCePYqoh42eQD9kvcpJw1sQuRPuT-3GbiI9gp8gQkvXvZLZjhv2H9of8TEvnmP8QG_1L72WbDiFUcQJFfmLplEZH_dkGa31P2zpF_WEku09MBtP5U-n61FqKy-ekatVfrIg6cjO8VTWmspgqGQx4ooKXVVo0Q6WGVDVEdnS5QV8JkIhdtpRSL1SLzFwANmLPtj-Pa2t-9ugahR1yZmSOZk0r-UxJgqy5wqYtee2sJKZTY8ZMxKmXlE42y_IsMyKXipw1NGRZWyIlA">
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter relative items-start">
+<!-- Main Content Area -->
+<div class="md:col-span-2 flex flex-col gap-12">
+<!-- Header Info -->
+<div>
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-primary-container/20 text-primary font-label-sm text-label-sm px-3 py-1 rounded-full uppercase">Cultural Immersion</span>
+<span class="bg-tertiary-container/20 text-tertiary font-label-sm text-label-sm px-3 py-1 rounded-full uppercase">8 Days</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-background mb-4">Kyoto Cultural Immersion</h1>
+<div class="flex flex-wrap items-center gap-6 font-body-md text-body-md text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined icon-fill text-secondary text-xl" data-icon="star">star</span>
+<span class="font-bold text-on-background">4.9</span>
+<span>(128 Reviews)</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-xl" data-icon="location_on">location_on</span>
+<span>Kyoto, Japan</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-xl" data-icon="group">group</span>
+<span>Max 8 people</span>
+</div>
+</div>
+</div>
+<div class="border-t border-outline-variant/30 w-full"></div>
+<!-- Itinerary -->
+<section>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-6">Day-by-Day Itinerary</h2>
+<div class="flex flex-col gap-6 relative before:absolute before:inset-y-0 before:left-5 before:w-px before:bg-outline-variant/50">
+<div class="relative pl-12">
+<div class="absolute left-2.5 top-0 w-6 h-6 bg-surface border-2 border-primary rounded-full z-10 flex items-center justify-center -translate-x-1/2">
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-background mb-2">Day 1: Arrival &amp; Welcome Dinner</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Settle into your premium machiya accommodation. Evening welcome dinner in Gion, featuring seasonal kaiseki cuisine and an introduction to geisha culture.</p>
+</div>
+<div class="relative pl-12">
+<div class="absolute left-2.5 top-0 w-6 h-6 bg-surface border-2 border-outline-variant rounded-full z-10 flex items-center justify-center -translate-x-1/2"></div>
+<h3 class="font-headline-md text-headline-md text-on-background mb-2">Day 2: Temples &amp; Zen Gardens</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Morning meditation at a private Zen temple guided by a resident monk. Afternoon exploration of the iconic Kinkaku-ji (Golden Pavilion) and Ryoan-ji rock garden.</p>
+</div>
+</div>
+</section>
+<div class="border-t border-outline-variant/30 w-full"></div>
+<!-- Smart Guide Section -->
+<section>
+<h2 class="font-headline-md text-headline-md text-on-background mb-6">Your Recommended Guides</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 flex gap-4 items-center shadow-sm hover:shadow-md transition-shadow">
+<img alt="Guide Avatar" class="w-16 h-16 rounded-full object-cover" data-alt="A friendly, professional portrait of a male tour guide standing in a soft-lit outdoor setting. He wears a smart-casual collared shirt, exuding approachability and deep local knowledge. The background is softly blurred to keep focus on his confident, welcoming expression, suitable for a premium travel service platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACN9MqfiHclWAt8yphPmMjlwZw2wTRgCIflJZIA8rYCDKBKFCowNZr65uMOCip04d6k_ZKyR-bk0NM0wDzXe5WLM_k0v7SASrXkiFmv8tnORz3oasw_U3IcG-94071pSVf8yFkKUY4rLUI1cO2EFqF5_dDwllMVdnyWl4yGvpY81KW_uLRcKNOvhnA4G4Dh2dfnfJwyUqprTGYZqKj8yFPku7S_5T_AsCBAN_5ZW9FfTWZpk1SD3ToKs9SQ6C8NtezLLNdvxETYw">
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-background">Kenji Tanaka</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Historian &amp; Tea Master</p>
+<div class="flex items-center gap-1 text-secondary text-sm">
+<span class="material-symbols-outlined icon-fill text-sm" data-icon="star">star</span>
+<span class="font-bold">5.0</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sticky Sidebar -->
+<div class="md:col-span-1 relative">
+<div class="sticky top-28 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,61,155,0.05)] flex flex-col gap-6">
+<div>
+<span class="font-display-lg text-headline-lg text-on-background">$3,250</span>
+<span class="font-body-md text-body-md text-on-surface-variant">/ person</span>
+</div>
+<div class="flex flex-col gap-4">
+<div class="border border-outline-variant/50 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-1">Select Dates</label>
+<div class="font-label-md text-label-md text-on-background font-medium">Oct 15 - Oct 22, 2024</div>
+</div>
+<div class="border border-outline-variant/50 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-1">Guests</label>
+<div class="font-label-md text-label-md text-on-background font-medium">2 Adults</div>
+</div>
+</div>
+<a class="w-full bg-secondary text-on-secondary font-label-md text-label-md font-bold py-4 rounded-full shadow-md hover:shadow-lg hover:opacity-90 transform hover:-translate-y-0.5 transition-all duration-200 block text-center" href="../PublicCustomer/BookingForm.html">
+                        Reserve Now
+                    </a>
+<p class="font-label-sm text-label-sm text-center text-on-surface-variant">You won't be charged yet.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface/90 dark:bg-inverse-surface/90 backdrop-blur-lg fixed bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/20 shadow-[-5px_0_20px_rgba(0,61,155,0.05)] shadow-lg flex justify-around items-center px-4 py-2 pb-safe">
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 hover:bg-surface-container-high transition-colors active:scale-95 duration-150" href="../PublicCustomer/TourDiscovery.html">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-sm text-label-sm-mobile">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150 rounded-full px-4 py-1" href="../GuideOperation/Guide%20Portal.html">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-sm text-label-sm-mobile">Guides</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150 rounded-full px-4 py-1" href="../PublicCustomer/TourDiscovery.html">
+<span class="material-symbols-outlined" data-icon="travel_explore">travel_explore</span>
+<span class="font-label-sm text-label-sm-mobile">Trips</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150 rounded-full px-4 py-1" href="../PublicCustomer/Special%20Request.html">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-label-sm text-label-sm-mobile">Concierge</span>
+</a>
+</nav>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-dim w-full mt-section-gap border-t border-outline-variant">
+<a class="contents" href="../SystemAccount/Homepage.html"><div class="flex flex-col md:flex-row justify-between items-center w-full px-container-padding-desktop py-12 max-w-7xl mx-auto gap-gutter">
+<div class="font-headline-md text-headline-md font-bold text-primary">WanderX</div></a>
+<div class="flex gap-6">
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-body-md text-body-md hover:underline" href="../PublicCustomer/HomeScreen.html">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-body-md text-body-md hover:underline" href="../PublicCustomer/HomeScreen.html">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-body-md text-body-md hover:underline" href="../GuideOperation/Guide%20Portal.html">Guide Portal</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors font-body-md text-body-md hover:underline" href="../PublicCustomer/Special%20Request.html">Help Center</a>
+</div>
+<div class="text-on-surface-variant font-body-md text-body-md">
+                © 2024 WanderX. Precision travel for the modern explorer.
+            </div>
+</div>
+</footer>
+</body></html>

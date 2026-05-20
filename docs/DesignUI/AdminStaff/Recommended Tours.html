@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-container": "#c4d2ff",
+                    "on-tertiary-fixed": "#001f27",
+                    "on-secondary-fixed": "#3d0600",
+                    "tertiary-fixed": "#afecff",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#e9edff",
+                    "surface-variant": "#d8e2ff",
+                    "inverse-on-surface": "#edf0ff",
+                    "surface-container-low": "#f1f3ff",
+                    "on-primary": "#ffffff",
+                    "on-secondary-container": "#640f00",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "secondary-fixed": "#ffdad2",
+                    "inverse-primary": "#b2c5ff",
+                    "background": "#faf9ff",
+                    "surface-container-highest": "#d8e2ff",
+                    "primary-fixed": "#dae2ff",
+                    "primary": "#003d9b",
+                    "tertiary": "#004b59",
+                    "secondary": "#ae3115",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#fd6a49",
+                    "inverse-surface": "#1d3054",
+                    "tertiary-fixed-dim": "#48d7f9",
+                    "on-tertiary-container": "#76e2ff",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#ccdaff",
+                    "outline": "#737685",
+                    "surface-variant": "#d8e2ff",
+                    "surface-tint": "#0c56d0",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#faf9ff",
+                    "on-surface-variant": "#434654",
+                    "surface-container-high": "#e1e8ff",
+                    "on-surface": "#051a3e",
+                    "primary-container": "#0052cc",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#ffb4a3",
+                    "on-background": "#051a3e",
+                    "on-tertiary-fixed-variant": "#004e5d",
+                    "on-primary-fixed": "#001848"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "container-padding-mobile": "16px",
+                    "section-gap": "80px",
+                    "gutter": "24px",
+                    "container-padding-desktop": "48px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "label-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .backdrop-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .text-gradient-primary {
+            background: linear-gradient(135deg, #003d9b 0%, #0052cc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased">
+    <!-- TopNavBar -->
+    <header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm fixed top-0 w-full z-50">
+        <div class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop py-4 max-w-7xl mx-auto">
+            <div class="flex items-center gap-base">
+                <a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-extrabold text-primary tracking-tight">WanderX</span></a>
+            </div>
+            <nav class="hidden md:flex gap-gutter items-center">
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="../PublicCustomer/TourDiscovery.html">Explore</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="../GuideOperation/Guide%20Portal.html">Guides</a>
+                <a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1" href="../PublicCustomer/My%20Bookings.html">My Trips</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="../PublicCustomer/Special%20Request.html">Concierge</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <button class="hidden md:block bg-secondary text-on-secondary px-6 py-2 rounded-full font-label-md text-label-md hover:opacity-90 transition-all active:scale-95">Take Quiz</button>
+                <img alt="User Profile" class="w-10 h-10 rounded-full border-2 border-primary/10 object-cover" data-alt="A professional studio headshot of a smiling man in his 30s with short hair, captured with warm, natural side lighting. The background is a soft, out-of-focus cream color, maintaining the premium and clean aesthetic of the WanderX brand. High-resolution photography that exudes confidence and modern professionalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs7qM2idykT8gW0Kmi2KE2r15_oPw0udZu27tWYiGdz_g_4W4TY-FvGwH1apKZxdzG_l4YIDFFh2f9CpyzCN7z5yhWmxbJMzHWC_lhmh6eQQmYmemUCLjL-3OPDoUPqzhErBKIiVoEJYsBQhlgJZoL1rKDYWnMI91efQ2V-dwganRsL5zZWeoBJ5E9Vynna0UcFRcQaCs8E7mMFVzUWL134G5grZUy7d8our7PwC_dnSN2TQe2mv3IoHUQViPhYzQdDPIoZH8hIw">
+            </div>
+        </div>
+    </header>
+    <main class="pt-24 pb-20">
+        <!-- Hero Section: Top Match -->
+        <section class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop mb-section-gap">
+            <div class="flex flex-col gap-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                    <div>
+                        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-2 block">Algorithm Result</span>
+                        <h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface">Your Top Match</h1>
+                    </div>
+                    <button class="flex items-center gap-2 text-primary font-label-md text-label-md hover:underline decoration-2 underline-offset-4">
+                        <span class="material-symbols-outlined">refresh</span>
+                        Retake Quiz
+                    </button>
+                </div>
+                <div class="relative overflow-hidden rounded-xl bg-surface-container-highest shadow-xl border border-outline-variant/30">
+                    <div class="grid grid-cols-1 md:grid-cols-2">
+                        <div class="relative h-64 md:h-[500px]">
+                            <img alt="Amalfi Coast" class="w-full h-full object-cover" data-alt="A breathtaking wide-angle view of the Amalfi Coast in Italy during the golden hour. The vibrant multi-colored buildings of Positano cling to the steep cliffs overlooking the shimmering azure Mediterranean Sea. The lighting is warm and ethereal, with soft shadows and a high-end editorial feel that emphasizes luxury and adventure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuASrp6TDAHsJg8N9SKqh4KLLL-AZcGABz4buNt_DY3wSPcpubX5Ogz-kRBRk1ADk6KiEC9Xgau10SpcJKxTcAFcQX5pUd99h7RTj6RP_4l1mkage32jaiDemsUDMZpU3ZSg2q73d_KrzqREO3YwCYj0xy5NqaHBM0Pkv9zyAnY3jfA9uBe3Yy868O-M-keeUQg8RgZLxJgHReAqKg2ARsHWI4FSsA7JwxgkRnO1cPf2nyLh9MIUYLLHRiRaPm6d3HKtszMbRSIpIA">
+                            <div class="absolute top-6 left-6 backdrop-glass px-4 py-2 rounded-full border border-white/20 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">stars</span>
+                                <span class="font-label-md text-label-md text-on-surface">98% Match Score</span>
+                            </div>
+                        </div>
+                        <div class="p-8 md:p-12 flex flex-col justify-center bg-white">
+                            <div class="flex gap-2 mb-4">
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full font-label-sm text-label-sm">Luxury Boutique</span>
+                                <span class="bg-tertiary/10 text-tertiary px-3 py-1 rounded-full font-label-sm text-label-sm">Coastal Exploration</span>
+                            </div>
+                            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-4">Amalfi Coast: The Ultimate Mediterranean Escape</h2>
+                            <p class="font-body-lg text-body-lg text-on-surface-variant mb-8">Based on your preference for artisanal dining, private boat tours, and architectural history, we've curated an 8-day journey through Ravello, Positano, and Capri.</p>
+                            <div class="grid grid-cols-2 gap-gutter mb-8">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary">calendar_today</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-label-sm text-label-sm text-outline">Duration</p>
+                                        <p class="font-label-md text-label-md">8 Days</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary">payments</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-label-sm text-label-sm text-outline">From</p>
+                                        <p class="font-label-md text-label-md">$4,250 pp</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="w-full md:w-max bg-primary text-on-primary px-10 py-4 rounded-full font-label-md text-label-md hover:opacity-90 transition-all shadow-lg shadow-primary/20 active:scale-95">View Personal Itinerary</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Filters Section -->
+        <section class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop mb-12">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 p-6 bg-surface-container-low rounded-xl border border-outline-variant/20">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <span class="font-label-md text-label-md text-on-surface">Filters:</span>
+                    <div class="relative">
+                        <select class="appearance-none bg-white border border-outline-variant rounded-lg px-4 py-2 pr-10 font-label-md text-label-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                            <option>Destination: All</option>
+                            <option>Europe</option>
+                            <option>Asia</option>
+                            <option>Americas</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-outline">expand_more</span>
+                    </div>
+                    <div class="relative">
+                        <select class="appearance-none bg-white border border-outline-variant rounded-lg px-4 py-2 pr-10 font-label-md text-label-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                            <option>Price Range</option>
+                            <option>$1,000 - $3,000</option>
+                            <option>$3,000 - $6,000</option>
+                            <option>$6,000+</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-outline">expand_more</span>
+                    </div>
+                    <div class="relative">
+                        <select class="appearance-none bg-white border border-outline-variant rounded-lg px-4 py-2 pr-10 font-label-md text-label-md focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                            <option>Style: Adventure</option>
+                            <option>Wellness</option>
+                            <option>Culture</option>
+                            <option>Culinary</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-outline">expand_more</span>
+                    </div>
+                </div>
+                <p class="font-label-md text-label-md text-on-surface-variant">Showing <span class="font-bold text-primary">12</span> highly compatible tours</p>
+            </div>
+        </section>
+        <!-- Recommended Grid -->
+        <section class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+                <!-- Card 1 -->
+                <div class="group bg-white rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="relative h-64">
+                        <img alt="Kyoto Temple" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A serene morning at a traditional wooden temple in Kyoto, Japan, surrounded by vibrant red maple trees during autumn. Soft, diffused daylight filters through the branches, casting gentle shadows on the stone path. The image captures a peaceful, meditative atmosphere with a focus on zen-like tranquility and cultural richness." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMbZvSwu-T-hf2BtPxWC0Qgpl2gnRKE4ZCfhj4m37eSHiVSj3RioqcO1_124v8OvNmzlRdBC1czkvBXGLPqJB0DAdrfDshIt0Qv9_koz0wOJ3AqsSdgiks27nabiYXIvJRfxqvsEqE-iL4gugkNdeETv75EFcbs0d1lqyhrlsUi7oI1YF5xznudei9JSIkd438wM_fHww4L1cEISqvESiTOhrdIRZSkQi_iut7C6AvTo6g6kHufoy-O6kX2H5Ec-M1RM0u7r1hcg">
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full font-label-sm text-label-sm text-primary flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                            92% Match
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-headline-md text-headline-md text-on-surface">Kyoto Zen Retreat</h3>
+                            <p class="font-label-md text-label-md text-primary">$3,150</p>
+                        </div>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Immerse yourself in traditional tea ceremonies, private temple access, and mountain hiking.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">schedule</span> 10 Days
+                            </span>
+                            <button class="text-secondary font-label-md text-label-md font-bold hover:underline">Explore Plan</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="group bg-white rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="relative h-64">
+                        <img alt="Santorini" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A panoramic view of Oia, Santorini, with its iconic white-washed buildings and blue-domed churches against a deep blue Aegean Sea at dusk. The sky is a gradient of violet and orange, and the town's lights begin to twinkle, creating a romantic and high-end travel aesthetic typical of a premium concierge service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwkzSK-F_8Qw8__2icGDKrm8lmpgooJIBpa-SBEo6sfwC6XoN1wLTZWmIcpPOIfU1Ch-yaKxaz2NJ6NLEC4OIYqcLklem0aYjz6wJaJ0Q1-qIK59fL8975o8g9fmc_ij_-WUj1XeB4x50Cc0rleRID2ET5YOddWbpEjRkINmnhq9hqGlgd-KfkpTls7cmH--pams35DekTcC-Jz4fv48hs2NzxGHi1F-J3krFM_JC-Lmuc8S3I4w2YpSigNyIWHLV-3-cq-jtc3w">
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full font-label-sm text-label-sm text-primary flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                            88% Match
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-headline-md text-headline-md text-on-surface">Santorini Sunset Sail</h3>
+                            <p class="font-label-md text-label-md text-primary">$2,800</p>
+                        </div>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Catamaran voyages, cliffside dining, and volcanic vineyard tours for the curious traveler.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">schedule</span> 6 Days
+                            </span>
+                            <button class="text-secondary font-label-md text-label-md font-bold hover:underline">Explore Plan</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="group bg-white rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="relative h-64">
+                        <img alt="Vietnam Rice Fields" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Stunning emerald-green terraced rice fields in Sapa, Vietnam, during the monsoon season. Mist rolls over the lush mountains in the background, creating a mystical and adventurous atmosphere. The lighting is soft and moody, emphasizing the vibrant greens and the raw beauty of the natural landscape." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1456NbMgvNyqSPMDrlvZg0NHYCGwMzBM2BKzrx7H2kU6c8-1G4abiIZaw1ogZJCoG8Qm_8V7__T-JkY6mRqYob1JscAvyY8hPsayc1KUta7CJAi6jkH58wc3IUrwxV4jbq1WQs9IuHEkH8ofRp6bje4ZbngEA0x_r2ks5etqXZs3wwsCsulsFUfdJbdjqJ4g5gqAfJaOGyLZM20ns81cW4G_FiYGWsCSG8YvHTof5imiypT6Jw2grFmltemKfULYNQp7B0g-9VQ">
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full font-label-sm text-label-sm text-primary flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                            85% Match
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-headline-md text-headline-md text-on-surface">Northern Vietnam Trek</h3>
+                            <p class="font-label-md text-label-md text-primary">$1,950</p>
+                        </div>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Off-the-beaten-path trekking through Sapa's terraced fields and local homestay experiences.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">schedule</span> 12 Days
+                            </span>
+                            <button class="text-secondary font-label-md text-label-md font-bold hover:underline">Explore Plan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 flex justify-center">
+                <button class="border-2 border-primary text-primary px-8 py-3 rounded-full font-label-md text-label-md hover:bg-primary/5 transition-colors">Load More Recommendations</button>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-surface-container-lowest border-t border-outline-variant w-full mt-section-gap">
+        <div class="flex flex-col md:flex-row justify-between items-center w-full px-container-padding-desktop py-12 max-w-7xl mx-auto gap-gutter">
+            <div class="flex flex-col gap-4 text-center md:text-left">
+                <a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary">WanderX</span></a>
+                <p class="font-body-md text-body-md text-on-surface-variant max-w-sm">� 2024 WanderX. Precision travel for the modern explorer.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-8">
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary hover:underline transition-colors" href="../PublicCustomer/HomeScreen.html">Privacy Policy</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary hover:underline transition-colors" href="../PublicCustomer/HomeScreen.html">Terms of Service</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary hover:underline transition-colors" href="../GuideOperation/Guide%20Portal.html">Guide Portal</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary hover:underline transition-colors" href="../PublicCustomer/Special%20Request.html">Help Center</a>
+            </div>
+        </div>
+    </footer>
+    <!-- BottomNavBar (Mobile) -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-lg border-t border-outline-variant/20 shadow-lg flex justify-around items-center px-4 py-2 pb-safe z-50 rounded-t-xl">
+        <a class="flex flex-col items-center justify-center text-on-surface-variant" href="../PublicCustomer/TourDiscovery.html">
+            <span class="material-symbols-outlined">explore</span>
+            <span class="font-label-sm text-label-sm">Explore</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant" href="../GuideOperation/Guide%20Portal.html">
+            <span class="material-symbols-outlined">group</span>
+            <span class="font-label-sm text-label-sm">Guides</span>
+        </a>
+        <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1" href="../PublicCustomer/TourDiscovery.html">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">travel_explore</span>
+            <span class="font-label-sm text-label-sm">Trips</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant" href="../PublicCustomer/Special%20Request.html">
+            <span class="material-symbols-outlined">support_agent</span>
+            <span class="font-label-sm text-label-sm">Concierge</span>
+        </a>
+    </nav>
+</body>
+</html>
