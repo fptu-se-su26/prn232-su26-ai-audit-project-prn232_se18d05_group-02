@@ -102,7 +102,7 @@
         h1, h2, h3, h4, h5, h6, .display-font { font-family: 'Hanken Grotesk', sans-serif; }
     </style>
 </head>
-<body class="bg-background text-on-background min-h-screen antialiased flex flex-col">
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-x-hidden min-h-screen flex flex-col">
 <!-- TopNavBar Suppressed: Transactional/Success Screen -->
 <main class="flex-grow flex flex-col items-center justify-center px-container-padding-mobile md:px-container-padding-desktop py-section-gap w-full max-w-7xl mx-auto">
 <!-- Celebration Hero -->
@@ -192,18 +192,16 @@
 </section>
 </main>
 <!-- Footer -->
-<footer class="bg-surface-container-lowest dark:bg-surface-dim text-primary dark:text-inverse-primary font-body-md text-body-md w-full mt-section-gap border-t border-outline-variant flex flex-col md:flex-row justify-between items-center px-container-padding-desktop py-12 max-w-7xl mx-auto gap-gutter">
-<a class="contents" href="../SystemAccount/Homepage.html"><div class="font-headline-md text-headline-md font-bold text-primary">
-            WanderX
-        </div></a>
-<div class="text-on-surface-variant">
-            © 2024 WanderX. Precision travel for the modern explorer.
-        </div>
-<div class="flex gap-6">
-<a class="text-on-surface-variant hover:text-secondary transition-colors hover:underline" href="./HomeScreen.html">Privacy Policy</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors hover:underline" href="./HomeScreen.html">Terms of Service</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors hover:underline" href="../GuideOperation/Guide%20Portal.html">Guide Portal</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors hover:underline" href="./Special%20Request.html">Help Center</a>
+<footer class="bg-surface-container-highest dark:bg-inverse-surface mt-section-gap flat w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col items-center md:items-start gap-4">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md text-primary">WanderX</span></a>
+<span class="text-on-surface-variant font-label-sm text-label-sm">© 2024 WanderX Travel. All rights reserved.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">About Us</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
 </div>
 </footer>
 <!-- BottomNavBar Suppressed: Transactional/Success Screen -->

@@ -7,15 +7,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
         .glass-panel {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
-    </style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      </style>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -108,89 +110,77 @@
         }
     </script>
 </head>
-<body class="bg-background font-body-md text-on-background min-h-screen flex">
-<!-- SideNavBar (Authority: JSON) -->
-<aside class="hidden md:flex flex-col h-screen py-6 px-4 gap-2 bg-surface-container-low border-r border-outline-variant sticky top-0 w-64 z-50">
-<div class="mb-8 px-2">
-<a class="contents" href="../SystemAccount/Homepage.html"><h1 class="font-headline-md text-headline-md font-black text-primary">Admin Central</h1></a>
-<p class="font-label-md text-label-md text-on-surface-variant">Platform Manager</p>
-</div>
-<nav class="flex-1 flex flex-col gap-2">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="../AdminStaff/Admin%20Dashboard.html">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-label-md text-label-md">Dashboard</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold translate-x-1" href="./ScheduleManagement.html">
-<span class="material-symbols-outlined" data-icon="map">map</span>
-<span class="font-label-md text-label-md">Tours</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="./BookingManagement.html">
-<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
-<span class="font-label-md text-label-md">Bookings</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="../AdminStaff/CustomerManagement.html">
-<span class="material-symbols-outlined" data-icon="group">group</span>
-<span class="font-label-md text-label-md">Customers</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="../AdminStaff/PaymentManagement.html">
-<span class="material-symbols-outlined" data-icon="payments">payments</span>
-<span class="font-label-md text-label-md">Payments</span>
-</a>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm dark:shadow-none docked full-width top-0 sticky border-b border-outline-variant/30 dark:border-outline/20 flex justify-between items-center w-full px-container-padding-desktop py-4 z-50">
+<div class="flex items-center gap-8">
+<a class="contents" href="../SystemAccount/Homepage.html"><h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">WanderX</h1></a>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-primary-container/10 dark:hover:bg-primary-fixed-dim/10 transition-colors px-2 py-1 font-label-md text-label-md" href="./Guide%20Portal.html">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-primary-container/10 dark:hover:bg-primary-fixed-dim/10 transition-colors px-2 py-1 font-label-md text-label-md" href="./Admin%20Dashboard.html">Admin</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-primary-container/10 dark:hover:bg-primary-fixed-dim/10 transition-colors px-2 py-1 font-label-md text-label-md" href="./ManagerTour.html">Tours</a>
 </nav>
-<div class="mt-auto flex flex-col gap-2 pt-6 border-t border-outline-variant">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="./NotificationManagement.html">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="font-label-md text-label-md">Settings</span>
-</a>
-<button class="mt-4 w-full bg-secondary py-3 px-4 rounded-full text-on-secondary font-label-md text-label-md shadow-md hover:opacity-90 transition-all">
-                Generate Reports
-            </button>
 </div>
-</aside>
-<main class="flex-1 min-w-0">
-<!-- TopNavBar (Authority: JSON) -->
-<header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm sticky top-0 z-50 flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16">
 <div class="flex items-center gap-4">
-<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary">WanderX</span></a>
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-label-md focus:ring-2 focus:ring-primary w-64" placeholder="Search guides or tours..." type="text">
 </div>
-<nav class="hidden md:flex items-center gap-8">
-<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="./ScheduleManagement.html">Destinations</a>
-<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary py-5" href="./BookingManagement.html">My Bookings</a>
-<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="./ScheduleManagement.html">Deals</a>
-</nav>
-<div class="flex items-center gap-4">
-<button class="hidden md:block font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low px-4 py-2 rounded-lg transition-colors">Support</button>
-<button class="bg-primary px-6 py-2 rounded-full text-on-primary font-label-md text-label-md hover:bg-primary/90 transition-all">Travel Quiz</button>
-<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-highest">
-<img alt="User Profile" data-alt="A professional headshot of a travel operations manager with a warm, confident expression. The lighting is bright and high-key, suggesting a modern office environment. The style is clean and corporate, aligned with a premium concierge travel brand's aesthetic. High detail and sharp focus on the facial features." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCSsQRtI44Tbz9PjWTqyYS2np2SXc23JxSCU8RGToeWclXIBSilBnnLRz_BIaavyONOY9O2wyZ5vJ4hPX6QoaGzEHEUSZwwvtlf3rqfSKknIRaHEOYTAb_E1OSBAVjNFh-SI3U-TWUmif4NJody-z_UwnZOLuOA_oXsMavw79xwZGDqqQ61WTEURbogt2GQT_miUz82_YIW2FnpOX2KzWegoFEpo7obwkzej6XKHmBw5Y_3Kuasue6q6E94oS76W1hfi4JKNxaAQ">
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant/50 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline-variant/30">
+<img alt="User profile" class="h-full w-full object-cover" data-alt="Close up portrait of a professional corporate administrator in a modern office. The lighting is soft and even, highlighting a clean, high-end tech environment. The image uses a cool palette with subtle blue and gray tones, reflecting a trustworthy and efficient personality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCARNk-5C-ZCSdzR2pKcAuGO2eoY8Do6DyfzyLqIl4AjutpNyUFOyvIvLZR0U4ho9DoaTA14j4S1VX-3ieF5JOWUbHn8pxvH4tm7XROymo9rbROOzojafvS_qLEu8eHqo45bjHhI_jaXrXQQcx5eNBGrIdtaX1lmVFZd1PdZVkqVvmTf-NCm9-4EfCGOe8tR-6PttdcQ6Y5EPj5AX9glLq-xH1dMeI-laqi8z_Wsf8sI8qF-3xF2fTO6pEY4OAsuVOChnn36WU5GA">
 </div>
 </div>
 </header>
-<!-- Main Content Canvas -->
-<div class="p-container-padding-mobile md:p-container-padding-desktop space-y-gutter">
-<!-- Breadcrumbs & Header -->
-<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-section-gap/2">
-<div>
-<nav class="flex items-center gap-2 text-outline mb-2">
-<span class="font-label-sm text-label-sm uppercase tracking-wider">Tours</span>
-<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
-<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">Logistics Management</span>
+<div class="flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-64 flex flex-col py-6 border-r border-outline-variant/30 bg-surface-container dark:bg-on-surface-variant z-40 pt-24 hidden lg:flex">
+<div class="px-6 mb-8">
+<h2 class="font-headline-md text-headline-md font-extrabold text-primary dark:text-primary-fixed-dim">Admin Suite</h2>
+<p class="font-label-sm text-label-sm text-outline">Manage Global Travel</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./Admin%20Dashboard.html">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container dark:bg-primary-fixed-dim dark:text-on-primary-fixed rounded-lg px-4 py-3 mx-2 font-label-md text-label-md scale-95 active:scale-100 transition-transform" href="./ManagerTour.html">
+<span class="material-symbols-outlined" data-icon="explore">explore</span> Tours
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./Booking%20Management.html">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span> Bookings
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./CustomerManagement.html">
+<span class="material-symbols-outlined" data-icon="group">group</span> Customers
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./Payment%20Management.html">
+<span class="material-symbols-outlined" data-icon="payments">payments</span> Payments
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./GuideManagement.html">
+<span class="material-symbols-outlined" data-icon="badge">badge</span> Guides
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="../SystemAccount/Role%26permissionManager.html">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+                </a>
 </nav>
-<h2 class="font-headline-lg text-headline-lg text-on-surface">Amalfi Coast Luxury Escape</h2>
-<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Configuration of the 7-day high-end itinerary and availability scheduling for the upcoming summer season.</p>
+<div class="mt-auto pt-6 border-t border-outline-variant/30">
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 mx-2 rounded-lg font-label-md text-label-md transition-colors hover:bg-surface-variant/50" href="./Guide%20Portal.html">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span> Support
+                </a>
+<a class="flex items-center gap-3 text-error px-4 py-3 mx-2 rounded-lg font-label-md text-label-md transition-colors hover:bg-error-container/20" href="../SystemAccount/Login.html">
+<span class="material-symbols-outlined" data-icon="logout">logout</span> Log Out
+                </a>
 </div>
-<div class="flex gap-3">
-<button class="flex items-center gap-2 border border-outline px-6 py-2.5 rounded-full font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-all">
-<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
-                        Preview Tour
-                    </button>
-<button class="bg-primary px-8 py-2.5 rounded-full text-on-primary font-label-md text-label-md shadow-lg shadow-primary/20 hover:scale-105 transition-all">
-                        Publish Changes
-                    </button>
-</div>
-</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 lg:ml-64 p-container-padding-mobile md:p-gutter lg:p-container-padding-desktop">
+<header class="mb-10">
+<h2 class="font-display-lg text-display-lg text-primary mb-2">Schedule Management</h2>
+<p class="font-body-lg text-body-lg text-outline">Configure tour availability and logistics scheduling.</p>
+</header>
 <!-- Management Grid -->
-<div class="grid grid-cols-12 gap-gutter">
+<div class="grid grid-cols-12 gap-6">
 <!-- Left: Itinerary Reordering (Bento Style) -->
 <div class="col-span-12 lg:col-span-8 space-y-6">
 <div class="flex items-center justify-between">
@@ -206,7 +196,7 @@
 <!-- Draggable List Mockup -->
 <div class="space-y-4">
 <!-- Day 1 -->
-<div class="glass-panel border border-outline-variant p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow group">
+<div class="glass-panel border border-outline-variant/40 rounded-xl p-6 shadow-sm hover:shadow-md transition-all group">
 <div class="flex items-start gap-4">
 <div class="cursor-move text-outline-variant group-hover:text-primary transition-colors py-1">
 <span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
@@ -238,7 +228,7 @@
 </div>
 </div>
 <!-- Day 2 -->
-<div class="glass-panel border border-outline-variant p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow group">
+<div class="glass-panel border border-outline-variant/40 rounded-xl p-6 shadow-sm hover:shadow-md transition-all group">
 <div class="flex items-start gap-4">
 <div class="cursor-move text-outline-variant group-hover:text-primary transition-colors py-1">
 <span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
@@ -274,8 +264,8 @@
 </div>
 </div>
 <!-- Right: Schedule & Availability (Calendar Style) -->
-<aside class="col-span-12 lg:col-span-4 space-y-gutter">
-<div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm">
+<aside class="col-span-12 lg:col-span-4 space-y-6">
+<div class="glass-panel border border-outline-variant/40 rounded-xl p-6 shadow-sm">
 <h3 class="font-headline-md text-headline-md text-on-surface mb-6 flex items-center gap-2">
 <span class="material-symbols-outlined text-primary" data-icon="calendar_month">calendar_month</span>
                             Available Dates
@@ -308,7 +298,7 @@
 </div>
 </div>
 <!-- Tour Capacity Card -->
-<div class="bg-inverse-surface text-inverse-on-surface rounded-2xl p-6 shadow-xl">
+<div class="glass-panel border border-outline-variant/40 rounded-xl p-6 shadow-sm bg-inverse-surface text-inverse-on-surface">
 <h4 class="font-label-sm text-label-sm uppercase tracking-widest text-primary-fixed mb-4">Tour Capacity</h4>
 <div class="flex items-end gap-2 mb-6">
 <span class="font-display-lg text-display-lg leading-none">12</span>
@@ -325,7 +315,7 @@
 </div>
 </div>
 <!-- Quick Map View -->
-<div class="relative rounded-2xl overflow-hidden h-48 group shadow-md border border-outline-variant">
+<div class="relative rounded-xl overflow-hidden h-48 group shadow-md border border-outline-variant">
 <img class="w-full h-full object-cover" data-alt="A stylized, illustrative map of the Amalfi Coast in Italy, showing key landmarks like Positano, Amalfi, and Capri. The map uses a premium brand palette of Azure Blue and soft whites, with minimalist icons indicating tour stops. The lighting is bright and summery, evoking a sense of adventure and luxury travel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzE2tr8_Tupyv4iGkvaUMzmt439RjwjTzwPjpi6R2_J1NySLVE-dPAZURT0_YDPWMwlImk_yyF40Bp9pb8fbs6vGcIfmD46xRx_MZFBqbRrmHfA5SqC4EOWbJSalWexoGzf5oWeAB7dRDavrLJqNbuW5Q59G_KfXe7pTZTCgfM1gmcmccJJOs91_4KAx-zwElgonj5W67I6c3gnBaDtRsz67bWZUKpzdEVMEkQjtVqNxJhSKqk85UuXCEiV4ZnBpBqNaEVKagiNw">
 <div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 to-transparent flex items-end p-4">
 <div class="flex justify-between items-center w-full">
@@ -336,34 +326,27 @@
 </div>
 </aside>
 </div>
-</div>
-<!-- Footer (Authority: JSON) -->
-<footer class="w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-surface-container-highest mt-section-gap border-t border-outline-variant/30">
-<div class="flex flex-col items-center md:items-start gap-2">
-<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md text-primary font-bold">WanderX</span></a>
-<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 WanderX Travel. All rights reserved.</p>
-</div>
-<div class="flex flex-wrap justify-center gap-8">
-<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="../SystemAccount/Homepage.html">About Us</a>
-<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="../SystemAccount/Homepage.html">Privacy Policy</a>
-<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="../SystemAccount/Homepage.html">Terms of Service</a>
-<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary underline transition-all" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
-</div>
-</footer>
 </main>
-<!-- BottomNavBar (Authority: JSON - Mobile Only) -->
-<nav class="md:hidden fixed bottom-0 w-full flex justify-around items-center py-3 px-4 bg-surface border-t border-outline-variant z-50">
-<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1 scale-90 transition-transform" href="./ScheduleManagement.html">
-<span class="material-symbols-outlined" data-icon="explore" data-weight="fill" style="font-variation-settings: 'FILL' 1;">explore</span>
+</div>
+<!-- Floating Action Button -->
+<button class="fixed bottom-8 right-8 bg-secondary-container text-on-secondary-container p-4 rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all z-50 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md pr-2">Quick Add</span>
+</button>
+<!-- Mobile Nav Bar -->
+<nav class="fixed md:hidden bottom-0 w-full flex justify-around items-center py-3 px-4 bg-surface border-t border-outline-variant shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="./Admin%20Dashboard.html">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="./ManagerTour.html">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
 <span class="font-label-sm text-label-sm">Tours</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="./BookingManagement.html">
-<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
-<span class="font-label-sm text-label-sm">Schedule</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="../SystemAccount/notificationManagerment.html">
-<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
-<span class="font-label-sm text-label-sm">Status</span>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1" href="./Booking%20Management.html">
+<span class="material-symbols-outlined" data-icon="calendar_today" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-label-sm text-label-sm">Bookings</span>
 </a>
 </nav>
-</body></html>
+</body>
+</html>

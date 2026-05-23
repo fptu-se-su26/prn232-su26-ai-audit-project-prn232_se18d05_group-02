@@ -100,136 +100,90 @@
     }
     </script>
     <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #c3c6d6;
-            border-radius: 10px;
-        }
-    </style>
-    <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideUpFade {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-page-fade {
-            animation: fadeIn 0.6s ease-out forwards;
-        }
-
-        .animate-metric {
-            animation: slideUpFade 0.8s ease-out forwards;
-        }
-
-        .card-hover-effect {
-            transition: all 0.3s ease;
-        }
-
-            .card-hover-effect:hover {
-                transform: scale(1.02);
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            }
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-background text-on-background font-body-md text-body-md overflow-hidden animate-page-fade">
-    <div class="flex h-screen w-full">
-        <!-- SideNavBar (Authority Source: JSON) -->
-        <aside class="hidden md:flex flex-col h-full py-6 px-4 gap-2 bg-surface-container-low border-r border-outline-variant w-64 shadow-md">
-            <div class="px-2 mb-8">
-                <a class="contents" href="../SystemAccount/Homepage.html"><h1 class="font-headline-md text-headline-md font-black text-primary">Admin Central</h1></a>
-                <p class="font-label-sm text-label-sm text-outline">Platform Manager</p>
-            </div>
-            <nav class="flex-1 space-y-1">
-                <a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-150 translate-x-1 transition-transform hover:scale-105" href="./Admin%20Dashboard.html">
-                    <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                    <span class="font-label-md text-label-md">Dashboard</span>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm dark:shadow-none docked full-width top-0 sticky border-b border-outline-variant/30 dark:border-outline/20 flex justify-between items-center w-full px-container-padding-desktop py-4 z-50">
+<div class="flex items-center gap-8">
+<a class="contents" href="../SystemAccount/Homepage.html"><h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">WanderX</h1></a>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-primary-container/10 dark:hover:bg-primary-fixed-dim/10 transition-colors px-2 py-1 font-label-md text-label-md" href="./Guide%20Portal.html">Dashboard</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary transition-colors px-2 py-1 font-label-md text-label-md" href="./Admin%20Dashboard.html">Admin</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-primary-container/10 dark:hover:bg-primary-fixed-dim/10 transition-colors px-2 py-1 font-label-md text-label-md" href="./ManagerTour.html">Tours</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-label-md focus:ring-2 focus:ring-primary w-64" placeholder="Search guides or tours..." type="text">
+</div>
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant/50 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline-variant/30">
+<img alt="User profile" class="h-full w-full object-cover" data-alt="Close up portrait of a professional corporate administrator in a modern office. The lighting is soft and even, highlighting a clean, high-end tech environment. The image uses a cool palette with subtle blue and gray tones, reflecting a trustworthy and efficient personality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCARNk-5C-ZCSdzR2pKcAuGO2eoY8Do6DyfzyLqIl4AjutpNyUFOyvIvLZR0U4ho9DoaTA14j4S1VX-3ieF5JOWUbHn8pxvH4tm7XROymo9rbROOzojafvS_qLEu8eHqo45bjHhI_jaXrXQQcx5eNBGrIdtaX1lmVFZd1PdZVkqVvmTf-NCm9-4EfCGOe8tR-6PttdcQ6Y5EPj5AX9glLq-xH1dMeI-laqi8z_Wsf8sI8qF-3xF2fTO6pEY4OAsuVOChnn36WU5GA">
+</div>
+</div>
+</header>
+<div class="flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-64 flex flex-col py-6 border-r border-outline-variant/30 bg-surface-container dark:bg-on-surface-variant z-40 pt-24 hidden lg:flex">
+<div class="px-6 mb-8">
+<h2 class="font-headline-md text-headline-md font-extrabold text-primary dark:text-primary-fixed-dim">Admin Suite</h2>
+<p class="font-label-sm text-label-sm text-outline">Manage Global Travel</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container dark:bg-primary-fixed-dim dark:text-on-primary-fixed rounded-lg px-4 py-3 mx-2 font-label-md text-label-md scale-95 active:scale-100 transition-transform" href="./Admin%20Dashboard.html">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg transition-transform hover:scale-105" href="./ManagerTour.html">
-                    <span class="material-symbols-outlined" data-icon="map">map</span>
-                    <span class="font-label-md text-label-md">Tours</span>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./ManagerTour.html">
+<span class="material-symbols-outlined" data-icon="explore">explore</span> Tours
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg transition-transform hover:scale-105" href="./Booking%20Management.html">
-                    <span class="material-symbols-outlined" data-icon="event_note">event_note</span>
-                    <span class="font-label-md text-label-md">Bookings</span>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./Booking%20Management.html">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span> Bookings
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg transition-transform hover:scale-105" href="./CustomerManagement.html">
-                    <span class="material-symbols-outlined" data-icon="group">group</span>
-                    <span class="font-label-md text-label-md">Customers</span>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./CustomerManagement.html">
+<span class="material-symbols-outlined" data-icon="group">group</span> Customers
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg transition-transform hover:scale-105" href="./PaymentManagement.html">
-                    <span class="material-symbols-outlined" data-icon="payments">payments</span>
-                    <span class="font-label-md text-label-md">Payments</span>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./Payment%20Management.html">
+<span class="material-symbols-outlined" data-icon="payments">payments</span> Payments
                 </a>
-            </nav>
-            <div class="mt-auto pt-6 border-t border-outline-variant/30 space-y-1">
-                <button class="w-full mb-4 py-3 px-4 bg-secondary text-on-secondary rounded-full font-label-md text-label-md shadow-lg hover:brightness-110 transition-all transition-transform hover:scale-105">
-                    Generate Reports
-                </button>
-                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="./Account%20Management.html">
-                    <span class="material-symbols-outlined" data-icon="settings">settings</span>
-                    <span class="font-label-md text-label-md">Settings</span>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./GuideManagement.html">
+<span class="material-symbols-outlined" data-icon="badge">badge</span> Guides
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="../GuideOperation/GuideManagement.html">
-                    <span class="material-symbols-outlined" data-icon="badge">badge</span>
-                    <span class="font-label-md text-label-md">Guides</span>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="../SystemAccount/Role%26permissionManager.html">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
                 </a>
-            </div>
-        </aside>
-        <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar">
-            <!-- Top Header -->
-            <header class="sticky top-0 z-40 h-16 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
-                <div class="flex items-center gap-4">
-                    <h2 class="font-headline-md text-headline-md font-bold text-primary">WanderX Dashboard</h2>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="relative hidden sm:block">
-                        <span class="absolute inset-y-0 left-3 flex items-center text-outline">
-                            <span class="material-symbols-outlined text-[20px]" data-icon="search">search</span>
-                        </span>
-                        <input class="pl-10 pr-4 py-1.5 bg-surface-container border-none rounded-full text-label-md w-64 focus:ring-2 focus:ring-primary" placeholder="Search data points..." type="text" />
-                    </div>
-                    <button class="p-2 rounded-full hover:bg-surface-container transition-colors relative">
-                        <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-                        <span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span>
-                    </button>
-                    <div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
-                        <img alt="Admin Avatar" class="w-full h-full object-cover" data-alt="A professional portrait of a senior platform manager in a modern, brightly lit office environment. The lighting is soft and high-key, reflecting a clean corporate aesthetic with blue and white tones. She has a confident expression, conveying trust and expertise in the premium travel concierge industry." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6tZZo78D3VJ1O-5Gx2rHV-XPd78rmB2IgCs1IAtd2Rk_bSCtfSjU1KJ8ucZt6velM6OlkPFrUExNEXh8qFDV486UJBLEpYOlv3JQq7mh6zyVMD8FrcOE3RQJq8aQlRaFCrZ_ON9IwrppDUr4W3wt6KFpnCmTVW2zyMGZ15lsT-u4pjD8JXbbVsXZZWtkRCOeu5QZEQ2S4m4FkgJUE_jpjm8UcjwqEmnc0Y13S_ESby1umBYOIkV8xGrxcoKhTEBfrwWdcIAfCWg" />
-                    </div>
-                </div>
-            </header>
-            <!-- Dashboard Content -->
-            <div class="p-container-padding-mobile md:p-container-padding-desktop">
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/30">
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 mx-2 rounded-lg font-label-md text-label-md transition-colors hover:bg-surface-variant/50" href="./Guide%20Portal.html">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span> Support
+                </a>
+<a class="flex items-center gap-3 text-error px-4 py-3 mx-2 rounded-lg font-label-md text-label-md transition-colors hover:bg-error-container/20" href="../SystemAccount/Login.html">
+<span class="material-symbols-outlined" data-icon="logout">logout</span> Log Out
+                </a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 lg:ml-64 p-container-padding-mobile md:p-gutter lg:p-container-padding-desktop">
+<header class="mb-10">
+<h2 class="font-display-lg text-display-lg text-primary mb-2">Admin Dashboard</h2>
+<p class="font-body-lg text-body-lg text-outline">Overview of platform operations and performance metrics.</p>
+</header>
                 <!-- Stats Row (Bento Style) -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm card-hover-effect">
+                    <div class="glass-panel border border-outline-variant/40 rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
                         <div class="flex justify-between items-start mb-4">
                             <div class="p-2 bg-primary-container/10 text-primary rounded-lg">
                                 <span class="material-symbols-outlined" data-icon="travel_explore">travel_explore</span>
@@ -239,7 +193,7 @@
                         <p class="text-on-surface-variant font-label-md text-label-md">Open Tours</p>
                         <h3 class="font-headline-lg text-headline-lg text-on-surface animate-metric">1,284</h3>
                     </div>
-                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm card-hover-effect">
+                    <div class="glass-panel border border-outline-variant/40 rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
                         <div class="flex justify-between items-start mb-4">
                             <div class="p-2 bg-tertiary-container/10 text-tertiary rounded-lg">
                                 <span class="material-symbols-outlined" data-icon="book_online">book_online</span>
@@ -247,9 +201,9 @@
                             <span class="text-secondary font-label-sm text-label-sm">+24%</span>
                         </div>
                         <p class="text-on-surface-variant font-label-md text-label-md">Monthly Bookings</p>
-                        <h3 class="font-headline-lg text-headline-lg text-on-surface animate-metric">8,492</h3>
+                        <h3 class="font-headline-lg text-headline-lg text-on-surface">8,492</h3>
                     </div>
-                    <div class="md:col-span-2 bg-primary text-on-primary p-6 rounded-xl shadow-lg relative overflow-hidden card-hover-effect">
+                    <div class="md:col-span-2 bg-primary text-on-primary p-6 rounded-xl shadow-lg relative overflow-hidden">
                         <div class="relative z-10">
                             <div class="flex justify-between items-start mb-4">
                                 <div class="p-2 bg-white/20 rounded-lg">
@@ -275,7 +229,7 @@
                 <!-- Charts & Rankings Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Revenue Chart (Visualization Component) -->
-                    <div class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 shadow-sm card-hover-effect">
+                    <div class="lg:col-span-2 glass-panel border border-outline-variant/40 rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
                         <div class="flex justify-between items-center mb-8">
                             <div>
                                 <h4 class="font-headline-md text-headline-md text-on-surface">Revenue Performance</h4>
@@ -317,7 +271,7 @@
                         </div>
                     </div>
                     <!-- Guide Ranking List (Authority Style: Premium Cards) -->
-                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm flex flex-col card-hover-effect">
+                    <div class="glass-panel border border-outline-variant/40 rounded-xl p-5 shadow-sm flex flex-col hover:shadow-md transition-all">
                         <div class="mb-6">
                             <h4 class="font-headline-md text-headline-md text-on-surface">Top Guides</h4>
                             <p class="text-on-surface-variant text-body-md">By rating &amp; tour volume</p>
@@ -384,7 +338,7 @@
                     </div>
                 </div>
                 <!-- Operations Hub -->
-                <div class="mt-8 bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden card-hover-effect">
+                <div class="mt-8 glass-panel border border-outline-variant/40 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all">
                     <div class="p-6 border-b border-outline-variant/30">
                         <h4 class="font-headline-md text-headline-md text-on-surface">Operations Hub</h4>
                         <p class="text-on-surface-variant text-body-md">Admin work areas</p>
@@ -409,7 +363,7 @@
                     </div>
                 </div>
                 <!-- Recent Activity / Transactions Section -->
-                <div class="mt-8 bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden card-hover-effect">
+                <div class="mt-8 glass-panel border border-outline-variant/40 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all">
                     <div class="p-6 border-b border-outline-variant/30 flex justify-between items-center">
                         <h4 class="font-headline-md text-headline-md text-on-surface">Recent Booking Activity</h4>
                         <div class="flex gap-2">
@@ -475,39 +429,12 @@
                     </div>
                 </div>
             </div>
-            <!-- Footer (Authority Source: JSON) -->
-            <footer class="w-full py-8 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-surface-container-highest mt-auto">
-                <div class="flex flex-col md:items-start items-center gap-2">
-                    <a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md text-primary">WanderX</span></a>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant">� 2024 WanderX Travel. All rights reserved.</p>
-                </div>
-                <div class="flex gap-8">
-                    <a class="text-on-surface-variant hover:text-primary underline transition-all font-label-sm text-label-sm transition-transform hover:scale-105" href="./Admin%20Dashboard.html">About Us</a>
-                    <a class="text-on-surface-variant hover:text-primary underline transition-all font-label-sm text-label-sm transition-transform hover:scale-105" href="./Admin%20Dashboard.html">Privacy Policy</a>
-                    <a class="text-on-surface-variant hover:text-primary underline transition-all font-label-sm text-label-sm transition-transform hover:scale-105" href="./Admin%20Dashboard.html">Terms of Service</a>
-                    <a class="text-on-surface-variant hover:text-primary underline transition-all font-label-sm text-label-sm transition-transform hover:scale-105" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
-                </div>
-            </footer>
-        </main>
-    </div>
-    <!-- Mobile Navigation (Authority Source: JSON) -->
-    <nav class="md:hidden fixed bottom-0 w-full flex justify-around items-center py-3 px-4 bg-surface border-t border-outline-variant z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-        <a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1 scale-90 transition-transform" href="./Admin%20Dashboard.html">
-            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-            <span class="font-label-sm text-label-sm">Home</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="./ManagerTour.html">
-            <span class="material-symbols-outlined" data-icon="explore">explore</span>
-            <span class="font-label-sm text-label-sm">Tours</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="./Booking%20Management.html">
-            <span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
-            <span class="font-label-sm text-label-sm">Schedule</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="../SystemAccount/notificationManagerment.html">
-            <span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
-            <span class="font-label-sm text-label-sm">Status</span>
-        </a>
-    </nav>
+</main>
+</div>
+<!-- Floating Action Button -->
+<button class="fixed bottom-8 right-8 bg-secondary-container text-on-secondary-container p-4 rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all z-50 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-md text-label-md pr-2">Generate Reports</span>
+</button>
 </body>
 </html>

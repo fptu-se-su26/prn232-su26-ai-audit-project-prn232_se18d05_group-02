@@ -130,21 +130,30 @@
 </head>
 <body class="bg-background text-on-background font-body-md text-body-md antialiased">
 <!-- TopNavBar -->
-<header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm fixed top-0 w-full z-50">
-<div class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop py-4 max-w-7xl mx-auto">
-<div class="flex items-center gap-base">
-<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-extrabold text-primary tracking-tight">WanderX</span></a>
+<header class="hidden md:flex bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-container-padding-desktop h-16">
+<div class="flex items-center gap-6">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">WanderX</span></a>
+<div class="flex items-center bg-surface-container-low rounded-full px-4 py-1.5 border border-outline-variant/50 focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none outline-none text-body-md font-body-md text-on-surface w-48 placeholder-on-surface-variant/70" placeholder="Search..." type="text">
 </div>
-<nav class="hidden md:flex gap-gutter items-center">
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="./ScheduleManagement.html">Explore</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="../GuideOperation/GuideManagement.html">Guides</a>
-<a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1" href="./BookingManagement.html">My Trips</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="../PublicCustomer/Special%20Request.html">Concierge</a>
+</div>
+<nav class="flex items-center gap-6">
+<nav class="flex items-center gap-6">
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./TourDiscovery.html">Destinations</a>
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./My%20Bookings.html">My Bookings</a>
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./My%20Bookings.html">Recommend Tour</a>
+</nav>
 </nav>
 <div class="flex items-center gap-4">
-<button class="hidden md:block bg-secondary text-on-secondary px-6 py-2 rounded-full font-label-md text-label-md hover:opacity-90 transition-all active:scale-95">Take Quiz</button>
-<img alt="User Profile" class="w-10 h-10 rounded-full border-2 border-primary/10 object-cover" data-alt="A professional studio headshot of a smiling man in his 30s with short hair, captured with warm, natural side lighting. The background is a soft, out-of-focus cream color, maintaining the premium and clean aesthetic of the WanderX brand. High-resolution photography that exudes confidence and modern professionalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs7qM2idykT8gW0Kmi2KE2r15_oPw0udZu27tWYiGdz_g_4W4TY-FvGwH1apKZxdzG_l4YIDFFh2f9CpyzCN7z5yhWmxbJMzHWC_lhmh6eQQmYmemUCLjL-3OPDoUPqzhErBKIiVoEJYsBQhlgJZoL1rKDYWnMI91efQ2V-dwganRsL5zZWeoBJ5E9Vynna0UcFRcQaCs8E7mMFVzUWL134G5grZUy7d8our7PwC_dnSN2TQe2mv3IoHUQViPhYzQdDPIoZH8hIw">
-</div>
+<button class="font-label-md text-label-md text-primary hover:bg-primary-container/20 px-4 py-2 rounded-full transition-colors border border-primary/20">Support</button>
+<a class="font-label-md text-label-md bg-secondary text-on-secondary px-6 py-2 rounded-full hover:-translate-y-0.5 transition-transform shadow-sm inline-block" href="./TravelStyleQuiz.html">Travel Quiz</a>
+<a class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant" href="./Profile%20&%20Settings.html">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsFAdSpe5_7bXXpZF9rKJM2JDAzpVLDIm9n2BVpZZVfl7Aib6qv6JNIEir2xoRcHmrvw7WAy4zpZVLQR0jTCi78raNbDJve0FN6oPXzm5BKFqnzDwhjiBuIJYFMRu9e8RtbWeveDpfK7Dgf7u1moDGshIALZVBEUR8kVYYVDsSZcz4sPJSmUfTGoai-VCFGTTbaYc3Agcsq6UN4AVli6iDgLY_7qCUuken4qF7Hib18KTRx_aw2TqddXBLeHD-YjQajFf1Lj3jFg">
+</a>
 </div>
 </header>
 <main class="pt-24 pb-20">
@@ -156,10 +165,10 @@
 <span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-2 block transition-all duration-300 ease-in-out">Algorithm Result</span>
 <h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface transition-all duration-300 ease-in-out">Your Top Match</h1>
 </div>
-<button class="flex items-center gap-2 text-primary font-label-md text-label-md hover:underline decoration-2 underline-offset-4 transition-all duration-300 ease-in-out">
+<a class="flex items-center gap-2 text-primary font-label-md text-label-md hover:underline decoration-2 underline-offset-4 transition-all duration-300 ease-in-out" href="./TravelStyleQuiz.html">
 <span class="material-symbols-outlined transition-all duration-300 ease-in-out">refresh</span>
                         Retake Quiz
-                    </button>
+</a>
 </div>
 <div class="relative overflow-hidden rounded-xl bg-surface-container-highest shadow-xl border border-outline-variant/30 transition-all duration-300 ease-in-out">
 <div class="grid grid-cols-1 md:grid-cols-2 transition-all duration-300 ease-in-out">

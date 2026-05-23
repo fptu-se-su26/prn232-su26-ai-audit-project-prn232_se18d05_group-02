@@ -97,148 +97,111 @@
         },
       }
     </script>
-<style>body {
-            background-color: #faf9ff;
-            font-family: 'Inter', sans-serif;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
+<style>
         .glass-panel {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
-        tr.hover-row {
-            transition: all 0.3s ease-in-out;
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        tr.hover-row:hover {
-            transform: scale(1.01);
-            background-color: rgba(0, 82, 204, 0.05);
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            z-index: 10;
-            position: relative;
-        }
-        .smooth-transition {
-            transition: all 0.3s ease-in-out;
-        }</style>
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      </style>
 </head>
-<body class="bg-background text-on-background">
-<!-- Sidebar Navigation -->
-<aside class="fixed left-0 top-0 h-screen w-64 flex flex-col py-6 border-r border-outline-variant/30 bg-surface-container z-50">
-<div class="px-6 mb-10">
-<a class="contents" href="../SystemAccount/Homepage.html"><h1 class="font-headline-md text-headline-md font-extrabold text-primary">WanderX</h1></a>
-<p class="text-[10px] uppercase tracking-widest text-outline mt-1 font-bold">Admin Suite</p>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all scale-95 active:scale-100" href="./Guide%20Portal.html">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-label-md text-label-md">Dashboard</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all scale-95 active:scale-100" href="./Assign_tour_detail.html">
-<span class="material-symbols-outlined" data-icon="explore">explore</span>
-<span class="font-label-md text-label-md">Tours</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all scale-95 active:scale-100" href="./Guide%20Schedule.html">
-<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
-<span class="font-label-md text-label-md">Bookings</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all scale-95 active:scale-100" href="./Assign_tour_detail.html">
-<span class="material-symbols-outlined" data-icon="group">group</span>
-<span class="font-label-md text-label-md">Customers</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all scale-95 active:scale-100" href="./Payment%20Management.html">
-<span class="material-symbols-outlined" data-icon="payments">payments</span>
-<span class="font-label-md text-label-md">Payments</span>
-</a>
-<!-- Active State for Guides -->
-<a class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-lg px-4 py-3 mx-2 shadow-sm transition-all scale-95 active:scale-100" href="./GuideManagement.html">
-<span class="material-symbols-outlined" data-icon="badge">badge</span>
-<span class="font-label-md text-label-md font-bold">Guides</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all scale-95 active:scale-100" href="../SystemAccount/Role%26permissionManager.html">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="font-label-md text-label-md">Settings</span>
-</a>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm dark:shadow-none docked full-width top-0 sticky border-b border-outline-variant/30 dark:border-outline/20 flex justify-between items-center w-full px-container-padding-desktop py-4 z-50">
+<div class="flex items-center gap-8">
+<a class="contents" href="../SystemAccount/Homepage.html"><h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">WanderX</h1></a>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-primary-container/10 dark:hover:bg-primary-fixed-dim/10 transition-colors px-2 py-1 font-label-md text-label-md" href="./Guide%20Portal.html">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-primary-container/10 dark:hover:bg-primary-fixed-dim/10 transition-colors px-2 py-1 font-label-md text-label-md" href="./Admin%20Dashboard.html">Admin</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-primary-container/10 dark:hover:bg-primary-fixed-dim/10 transition-colors px-2 py-1 font-label-md text-label-md" href="./ManagerTour.html">Tours</a>
 </nav>
-<div class="px-2 mt-auto border-t border-outline-variant/20 pt-4">
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 px-4 py-3 rounded-lg transition-all" href="./Guide%20Portal.html">
-<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
-<span class="font-label-md text-label-md">Support</span>
-</a>
-<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 px-4 py-3 rounded-lg transition-all" href="../SystemAccount/Login.html">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-label-md text-label-md">Log Out</span>
-</a>
 </div>
-</aside>
-<!-- Main Content Area -->
-<main class="ml-64 min-h-screen">
-<!-- Top Navigation -->
-<header class="bg-surface/80 backdrop-blur-md sticky top-0 z-40 border-b border-outline-variant/30 flex justify-between items-center w-full px-container-padding-desktop py-4 shadow-sm">
 <div class="flex items-center gap-4">
-<h2 class="font-headline-md text-headline-md text-primary font-bold">Manage Guides</h2>
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-label-md focus:ring-2 focus:ring-primary w-64" placeholder="Search guides or tours..." type="text">
 </div>
-<div class="flex items-center gap-6">
-<!-- Search Bar -->
-<div class="relative hidden lg:block w-72">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
-<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-label-md focus:outline-none focus:border-primary transition-colors" placeholder="Search guides, expertise..." type="text">
-</div>
-<div class="flex items-center gap-3">
-<button class="p-2 rounded-full hover:bg-primary-container/10 transition-colors text-on-surface-variant">
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant/50 rounded-full transition-colors">
 <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
 </button>
-<button class="p-2 rounded-full hover:bg-primary-container/10 transition-colors text-on-surface-variant">
-<span class="material-symbols-outlined" data-icon="help">help</span>
-</button>
-<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
-<img alt="User profile" data-alt="A close-up professional headshot of a travel operations manager for a premium concierge service. The man is in his late 30s, wearing a crisp white shirt against a soft-focus office background with high-key lighting. The image quality is extremely high, conveying trustworthiness, efficiency, and a modern corporate aesthetic with soft blue and white tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnJz-rtX3G7rCMbkpHpqGaYuzmtcWCeubIWwfg0mNa76ondA9vziXu5plFLLhNMPKa0bg7ckp9n3LM16odKjKB-gewPWYpgwrjpv55N6oI-vYI7J9L7NBQCTlPtjAPh6a6iAG264s74pRg5yx3hi-ZkkIaf2tPCtHBv-v_iQXnl_C8Jh2S2A-Rjq8iVfnoPoPqbjS08JV4q7DPnlX3AHD2giXuiST3ie-jhBJ39QFLdTc7Au_mvue_ahs3A9F9R6pVhehfhaqPJw">
-</div>
+<div class="h-10 w-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline-variant/30">
+<img alt="User profile" class="h-full w-full object-cover" data-alt="Close up portrait of a professional corporate administrator in a modern office. The lighting is soft and even, highlighting a clean, high-end tech environment. The image uses a cool palette with subtle blue and gray tones, reflecting a trustworthy and efficient personality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCARNk-5C-ZCSdzR2pKcAuGO2eoY8Do6DyfzyLqIl4AjutpNyUFOyvIvLZR0U4ho9DoaTA14j4S1VX-3ieF5JOWUbHn8pxvH4tm7XROymo9rbROOzojafvS_qLEu8eHqo45bjHhI_jaXrXQQcx5eNBGrIdtaX1lmVFZd1PdZVkqVvmTf-NCm9-4EfCGOe8tR-6PttdcQ6Y5EPj5AX9glLq-xH1dMeI-laqi8z_Wsf8sI8qF-3xF2fTO6pEY4OAsuVOChnn36WU5GA">
 </div>
 </div>
 </header>
-<!-- Content Canvas -->
-<div class="p-container-padding-desktop">
-<!-- Page Header Actions -->
-<div class="flex justify-between items-end mb-8">
-<div>
-<h3 class="font-headline-lg text-headline-lg text-on-surface">Guide Directory</h3>
-<p class="font-body-md text-body-md text-outline mt-2">Manage your global network of expert travel guides and their current availability.</p>
+<div class="flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-64 flex flex-col py-6 border-r border-outline-variant/30 bg-surface-container dark:bg-on-surface-variant z-40 pt-24 hidden lg:flex">
+<div class="px-6 mb-8">
+<h2 class="font-headline-md text-headline-md font-extrabold text-primary dark:text-primary-fixed-dim">Admin Suite</h2>
+<p class="font-label-sm text-label-sm text-outline">Manage Global Travel</p>
 </div>
-<button class="bg-secondary text-white px-6 py-3 rounded-full font-label-md text-label-md flex items-center gap-2 shadow-md hover:translate-y-[-2px] hover:shadow-lg transition-all active:scale-95">
-<span class="material-symbols-outlined" data-icon="add">add</span>
-                    Add New Guide
-                </button>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./Admin%20Dashboard.html">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./ManagerTour.html">
+<span class="material-symbols-outlined" data-icon="explore">explore</span> Tours
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./Booking%20Management.html">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span> Bookings
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./CustomerManagement.html">
+<span class="material-symbols-outlined" data-icon="group">group</span> Customers
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="./Payment%20Management.html">
+<span class="material-symbols-outlined" data-icon="payments">payments</span> Payments
+                </a>
+<a class="flex items-center gap-3 bg-primary-container text-on-primary-container dark:bg-primary-fixed-dim dark:text-on-primary-fixed rounded-lg px-4 py-3 mx-2 font-label-md text-label-md scale-95 active:scale-100 transition-transform" href="./GuideManagement.html">
+<span class="material-symbols-outlined" data-icon="badge">badge</span> Guides
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-variant/50 px-4 py-3 mx-2 rounded-lg transition-all font-label-md text-label-md" href="../SystemAccount/Role%26permissionManager.html">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+                </a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/30">
+<a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 mx-2 rounded-lg font-label-md text-label-md transition-colors hover:bg-surface-variant/50" href="./Guide%20Portal.html">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span> Support
+                </a>
+<a class="flex items-center gap-3 text-error px-4 py-3 mx-2 rounded-lg font-label-md text-label-md transition-colors hover:bg-error-container/20" href="../SystemAccount/Login.html">
+<span class="material-symbols-outlined" data-icon="logout">logout</span> Log Out
+                </a>
 </div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 lg:ml-64 p-container-padding-mobile md:p-gutter lg:p-container-padding-desktop">
+<header class="mb-10">
+<h2 class="font-display-lg text-display-lg text-primary mb-2">Guide Management</h2>
+<p class="font-body-lg text-body-lg text-outline">Manage your global network of expert travel guides and their current availability.</p>
+</header>
 <!-- Stats Overview - Bento Grid Lite -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-12">
-<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/30">
-<p class="text-label-sm text-outline uppercase font-bold tracking-tighter">Total Guides</p>
-<h4 class="text-display-lg font-display-lg text-primary mt-2">124</h4>
-<div class="flex items-center gap-1 text-on-tertiary-fixed-variant mt-2">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+<div class="glass-panel border border-outline-variant/40 rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
+<p class="font-label-sm text-label-sm text-outline uppercase font-bold tracking-tighter">Total Guides</p>
+<h4 class="font-display-lg text-display-lg text-primary mt-2">124</h4>
+<div class="flex items-center gap-1 text-tertiary mt-2">
 <span class="material-symbols-outlined text-[18px]" data-icon="trending_up">trending_up</span>
-<span class="text-label-sm">+5 this month</span>
+<span class="font-label-sm text-label-sm">+5 this month</span>
 </div>
 </div>
-<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/30">
-<p class="text-label-sm text-outline uppercase font-bold tracking-tighter">On Tour Now</p>
-<h4 class="text-display-lg font-display-lg text-secondary mt-2">42</h4>
-<p class="text-label-sm text-outline mt-2">Across 18 countries</p>
+<div class="glass-panel border border-outline-variant/40 rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
+<p class="font-label-sm text-label-sm text-outline uppercase font-bold tracking-tighter">On Tour Now</p>
+<h4 class="font-display-lg text-display-lg text-secondary mt-2">42</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2">Across 18 countries</p>
 </div>
-<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/30">
-<p class="text-label-sm text-outline uppercase font-bold tracking-tighter">Avg. Experience</p>
-<h4 class="text-display-lg font-display-lg text-on-surface mt-2">8.2</h4>
-<p class="text-label-sm text-outline mt-2">Years of expertise</p>
+<div class="glass-panel border border-outline-variant/40 rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
+<p class="font-label-sm text-label-sm text-outline uppercase font-bold tracking-tighter">Avg. Experience</p>
+<h4 class="font-display-lg text-display-lg text-on-surface mt-2">8.2</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2">Years of expertise</p>
 </div>
-<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/30">
-<p class="text-label-sm text-outline uppercase font-bold tracking-tighter">Satisfaction</p>
-<h4 class="text-display-lg font-display-lg text-on-tertiary-fixed-variant mt-2">4.9</h4>
+<div class="glass-panel border border-outline-variant/40 rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
+<p class="font-label-sm text-label-sm text-outline uppercase font-bold tracking-tighter">Satisfaction</p>
+<h4 class="font-display-lg text-display-lg text-on-tertiary-fixed-variant mt-2">4.9</h4>
 <div class="flex items-center gap-0.5 text-secondary mt-2">
 <span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
 <span class="material-symbols-outlined" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
@@ -249,7 +212,7 @@
 </div>
 </div>
 <!-- Guide Table Section -->
-<div class="glass-panel border border-outline-variant/30 rounded-2xl overflow-hidden shadow-sm">
+<div class="glass-panel border border-outline-variant/40 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all">
 <!-- Table Filters -->
 <div class="p-6 border-b border-outline-variant/30 flex items-center justify-between">
 <div class="flex gap-4">
@@ -280,9 +243,9 @@
 <th class="px-6 py-4 font-label-md text-label-md text-outline uppercase tracking-wider text-right">Actions</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-outline-variant/20">
+<tbody class="divide-y divide-outline-variant/10">
 <!-- Row 1 -->
-<tr class="hover:bg-primary-container/5 transition-colors hover-row">
+<tr class="hover:bg-surface-container-low transition-colors group">
 <td class="px-6 py-5">
 <div class="flex items-center gap-3">
 <div class="h-10 w-10 rounded-full overflow-hidden border border-outline-variant/30">
@@ -290,7 +253,7 @@
 </div>
 <div>
 <p class="font-label-md text-label-md text-on-surface font-bold">Elena Rodriguez</p>
-<p class="text-xs text-outline">ID: GD-9923</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">ID: GD-9923</p>
 </div>
 </div>
 </td>
@@ -302,33 +265,33 @@
 </div>
 </td>
 <td class="px-6 py-5">
-<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm smooth-transition">High-Altitude Trekking</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm">High-Altitude Trekking</span>
 </td>
 <td class="px-6 py-5">
-<p class="text-body-md text-on-surface-variant">12 Years</p>
+<p class="font-body-md text-body-md text-on-surface-variant">12 Years</p>
 </td>
 <td class="px-6 py-5">
-<div class="flex items-center gap-2 text-on-tertiary-fixed-variant smooth-transition">
+<div class="flex items-center gap-2 text-tertiary">
 <div class="h-2 w-2 rounded-full bg-[#10b981]"></div>
-<span class="text-label-md font-bold">Active</span>
+<span class="font-label-md text-label-md font-bold">Active</span>
 </div>
 </td>
 <td class="px-6 py-5 text-right">
-<div class="flex justify-end gap-2">
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition" title="Edit Guide">
+<div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant" title="Edit Guide">
 <span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
 </button>
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition" title="Message">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant" title="Message">
 <span class="material-symbols-outlined text-[20px]" data-icon="chat">chat</span>
 </button>
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition" title="More Options">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant" title="More Options">
 <span class="material-symbols-outlined text-[20px]" data-icon="more_vert">more_vert</span>
 </button>
 </div>
 </td>
 </tr>
 <!-- Row 2 -->
-<tr class="hover:bg-primary-container/5 transition-colors hover-row">
+<tr class="hover:bg-surface-container-low transition-colors group">
 <td class="px-6 py-5">
 <div class="flex items-center gap-3">
 <div class="h-10 w-10 rounded-full overflow-hidden border border-outline-variant/30">
@@ -336,7 +299,7 @@
 </div>
 <div>
 <p class="font-label-md text-label-md text-on-surface font-bold">Kenji Tanaka</p>
-<p class="text-xs text-outline">ID: GD-4451</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">ID: GD-4451</p>
 </div>
 </div>
 </td>
@@ -347,33 +310,33 @@
 </div>
 </td>
 <td class="px-6 py-5">
-<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm smooth-transition">Culinary Arts</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm">Culinary Arts</span>
 </td>
 <td class="px-6 py-5">
-<p class="text-body-md text-on-surface-variant">15 Years</p>
+<p class="font-body-md text-body-md text-on-surface-variant">15 Years</p>
 </td>
 <td class="px-6 py-5">
-<div class="flex items-center gap-2 text-secondary smooth-transition">
+<div class="flex items-center gap-2 text-secondary">
 <div class="h-2 w-2 rounded-full bg-secondary-container"></div>
-<span class="text-label-md font-bold">On Tour</span>
+<span class="font-label-md text-label-md font-bold">On Tour</span>
 </div>
 </td>
 <td class="px-6 py-5 text-right">
-<div class="flex justify-end gap-2">
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition">
+<div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant">
 <span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
 </button>
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant">
 <span class="material-symbols-outlined text-[20px]" data-icon="chat">chat</span>
 </button>
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant">
 <span class="material-symbols-outlined text-[20px]" data-icon="more_vert">more_vert</span>
 </button>
 </div>
 </td>
 </tr>
 <!-- Row 3 -->
-<tr class="hover:bg-primary-container/5 transition-colors hover-row">
+<tr class="hover:bg-surface-container-low transition-colors group">
 <td class="px-6 py-5">
 <div class="flex items-center gap-3">
 <div class="h-10 w-10 rounded-full overflow-hidden border border-outline-variant/30">
@@ -381,7 +344,7 @@
 </div>
 <div>
 <p class="font-label-md text-label-md text-on-surface font-bold">Zara Nkosi</p>
-<p class="text-xs text-outline">ID: GD-8210</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">ID: GD-8210</p>
 </div>
 </div>
 </td>
@@ -393,33 +356,33 @@
 </div>
 </td>
 <td class="px-6 py-5">
-<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm smooth-transition">Safari Wildlife</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm">Safari Wildlife</span>
 </td>
 <td class="px-6 py-5">
-<p class="text-body-md text-on-surface-variant">5 Years</p>
+<p class="font-body-md text-body-md text-on-surface-variant">5 Years</p>
 </td>
 <td class="px-6 py-5">
-<div class="flex items-center gap-2 text-on-tertiary-fixed-variant smooth-transition">
+<div class="flex items-center gap-2 text-tertiary">
 <div class="h-2 w-2 rounded-full bg-[#10b981]"></div>
-<span class="text-label-md font-bold">Active</span>
+<span class="font-label-md text-label-md font-bold">Active</span>
 </div>
 </td>
 <td class="px-6 py-5 text-right">
-<div class="flex justify-end gap-2">
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition">
+<div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant">
 <span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
 </button>
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant">
 <span class="material-symbols-outlined text-[20px]" data-icon="chat">chat</span>
 </button>
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant">
 <span class="material-symbols-outlined text-[20px]" data-icon="more_vert">more_vert</span>
 </button>
 </div>
 </td>
 </tr>
 <!-- Row 4 -->
-<tr class="hover:bg-primary-container/5 transition-colors hover-row">
+<tr class="hover:bg-surface-container-low transition-colors group">
 <td class="px-6 py-5">
 <div class="flex items-center gap-3">
 <div class="h-10 w-10 rounded-full overflow-hidden border border-outline-variant/30">
@@ -427,7 +390,7 @@
 </div>
 <div>
 <p class="font-label-md text-label-md text-on-surface font-bold">Marcus Vane</p>
-<p class="text-xs text-outline">ID: GD-1209</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">ID: GD-1209</p>
 </div>
 </div>
 </td>
@@ -438,26 +401,26 @@
 </div>
 </td>
 <td class="px-6 py-5">
-<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm smooth-transition">European History</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm">European History</span>
 </td>
 <td class="px-6 py-5">
-<p class="text-body-md text-on-surface-variant">22 Years</p>
+<p class="font-body-md text-body-md text-on-surface-variant">22 Years</p>
 </td>
 <td class="px-6 py-5">
-<div class="flex items-center gap-2 text-outline smooth-transition">
+<div class="flex items-center gap-2 text-on-surface-variant">
 <div class="h-2 w-2 rounded-full bg-outline"></div>
-<span class="text-label-md font-bold">Unavailable</span>
+<span class="font-label-md text-label-md font-bold">Unavailable</span>
 </div>
 </td>
 <td class="px-6 py-5 text-right">
-<div class="flex justify-end gap-2">
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition">
+<div class="flex justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant">
 <span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
 </button>
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant">
 <span class="material-symbols-outlined text-[20px]" data-icon="chat">chat</span>
 </button>
-<button class="p-2 hover:bg-surface-variant rounded-full transition-all text-on-surface-variant smooth-transition">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-all text-on-surface-variant">
 <span class="material-symbols-outlined text-[20px]" data-icon="more_vert">more_vert</span>
 </button>
 </div>
@@ -467,43 +430,41 @@
 </table>
 <!-- Pagination -->
 <div class="p-6 border-t border-outline-variant/30 flex items-center justify-between">
-<p class="text-label-sm text-outline">Showing 1 to 4 of 124 guides</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Showing 1 to 4 of 124 guides</p>
 <div class="flex gap-2">
-<button class="p-2 rounded-lg border border-outline-variant hover:bg-surface-variant/50 transition-all text-on-surface-variant disabled:opacity-30" disabled="">
+<button class="p-2 rounded-lg border border-outline-variant hover:bg-surface-container-highest transition-all text-on-surface-variant disabled:opacity-30" disabled="">
 <span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
 </button>
-<button class="h-10 w-10 rounded-lg bg-primary text-on-primary font-bold text-label-md shadow-sm">1</button>
-<button class="h-10 w-10 rounded-lg border border-outline-variant hover:bg-surface-variant/50 font-bold text-label-md text-on-surface-variant">2</button>
-<button class="h-10 w-10 rounded-lg border border-outline-variant hover:bg-surface-variant/50 font-bold text-label-md text-on-surface-variant">3</button>
-<button class="p-2 rounded-lg border border-outline-variant hover:bg-surface-variant/50 transition-all text-on-surface-variant">
+<button class="h-10 w-10 rounded-lg bg-primary text-on-primary font-bold text-label-md">1</button>
+<button class="h-10 w-10 rounded-lg border border-outline-variant hover:bg-surface-container-highest font-bold text-label-md text-on-surface-variant">2</button>
+<button class="h-10 w-10 rounded-lg border border-outline-variant hover:bg-surface-container-highest font-bold text-label-md text-on-surface-variant">3</button>
+<button class="p-2 rounded-lg border border-outline-variant hover:bg-surface-container-highest transition-all text-on-surface-variant">
 <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
 </button>
 </div>
 </div>
 </div>
-<!-- Quick Actions Secondary Section -->
-<div class="mt-section-gap grid grid-cols-1 md:grid-cols-2 gap-gutter">
-<div class="bg-primary-container p-8 rounded-2xl text-on-primary-container flex justify-between items-center overflow-hidden relative shadow-lg">
-<div class="relative z-10">
-<h5 class="font-headline-md text-headline-md font-bold">Recruit New Guides</h5>
-<p class="text-on-primary-container/80 mt-2 max-w-[280px]">Expand your network. Post new opportunities for specialized local guides.</p>
-<button class="mt-6 bg-white text-primary px-6 py-2 rounded-full font-label-md text-label-md font-bold hover:bg-on-primary-container hover:text-white transition-all">Start Campaign</button>
-</div>
-<span class="material-symbols-outlined text-[120px] opacity-10 absolute right-[-20px] bottom-[-20px]" data-icon="travel_explore">travel_explore</span>
-</div>
-<div class="bg-surface-container-highest p-8 rounded-2xl flex justify-between items-center overflow-hidden relative">
-<div class="relative z-10">
-<h5 class="font-headline-md text-headline-md font-bold text-on-surface">Compliance Review</h5>
-<p class="text-outline mt-2 max-w-[280px]">6 guides have certifications expiring in the next 30 days. Action required.</p>
-<button class="mt-6 border-2 border-primary text-primary px-6 py-2 rounded-full font-label-md text-label-md font-bold hover:bg-primary hover:text-white transition-all">View List</button>
-</div>
-<span class="material-symbols-outlined text-[120px] opacity-10 absolute right-[-20px] bottom-[-20px]" data-icon="verified_user">verified_user</span>
-</div>
-</div>
-</div>
 </main>
-<!-- FAB for quick guide adding on mobile/tablet if needed (contextual) -->
-<button class="md:hidden fixed bottom-8 right-8 bg-secondary text-white h-14 w-14 rounded-full shadow-2xl flex items-center justify-center z-50">
-<span class="material-symbols-outlined" data-icon="add">add</span>
+</div>
+<!-- Floating Action Button -->
+<button class="fixed bottom-8 right-8 bg-secondary-container text-on-secondary-container p-4 rounded-2xl shadow-xl hover:scale-110 active:scale-95 transition-all z-50 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-md text-label-md pr-2">Quick Add</span>
 </button>
-</body></html>
+<!-- Mobile Nav Bar -->
+<nav class="fixed md:hidden bottom-0 w-full flex justify-around items-center py-3 px-4 bg-surface border-t border-outline-variant shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="./Admin%20Dashboard.html">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="./ManagerTour.html">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-sm text-label-sm">Tours</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1" href="./Booking%20Management.html">
+<span class="material-symbols-outlined" data-icon="calendar_today" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-label-sm text-label-sm">Bookings</span>
+</a>
+</nav>
+</body>
+</html>

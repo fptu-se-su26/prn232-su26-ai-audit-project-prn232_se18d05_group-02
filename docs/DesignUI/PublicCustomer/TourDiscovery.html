@@ -107,39 +107,44 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-background font-body-md text-body-md antialiased pb-24 md:pb-0">
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-x-hidden min-h-screen flex flex-col">
 <!-- TopNavBar (Desktop) -->
-<header class="hidden md:flex bg-surface/80 border-b border-outline-variant/30 docked full-width top-0 sticky z-50 shadow-sm flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16 glass-panel">
-<a class="contents" href="../SystemAccount/Homepage.html"><div class="flex items-center gap-8">
-<div class="font-headline-md text-headline-md font-bold text-primary">WanderX</div></a>
-<nav class="flex gap-6">
-<!-- Active Nav Item -->
-<a class="text-primary font-bold border-b-2 border-primary py-4 px-2 font-label-md text-label-md" href="./TourDiscovery.html">Destinations</a>
-<!-- Inactive Nav Items -->
-<a class="text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors duration-200 py-4 px-2 font-label-md text-label-md" href="./My%20Bookings.html">My Bookings</a>
-<a class="text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors duration-200 py-4 px-2 font-label-md text-label-md" href="./TourDiscovery.html">Deals</a>
+<header class="hidden md:flex bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-container-padding-desktop h-16">
+<div class="flex items-center gap-6">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">WanderX</span></a>
+<div class="flex items-center bg-surface-container-low rounded-full px-4 py-1.5 border border-outline-variant/50 focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none outline-none text-body-md font-body-md text-on-surface w-48 placeholder-on-surface-variant/70" placeholder="Search..." type="text">
+</div>
+</div>
+<nav class="flex items-center gap-6">
+<nav class="flex items-center gap-6">
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./TourDiscovery.html">Destinations</a>
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./My%20Bookings.html">My Bookings</a>
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./RecommendedTours.html">Recommend Tour</a>
 </nav>
-</div>
+</nav>
 <div class="flex items-center gap-4">
-<button class="text-on-surface-variant hover:text-primary transition-colors">
-<span class="material-symbols-outlined">search</span>
-</button>
-<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Support</button>
-<button class="font-label-md text-label-md bg-secondary text-on-secondary px-4 py-2 rounded-full hover:shadow-md transition-shadow">Travel Quiz</button>
-<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden">
-<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsFAdSpe5_7bXXpZF9rKJM2JDAzpVLDIm9n2BVpZZVfl7Aib6qv6JNIEir2xoRcHmrvw7WAy4zpZVLQR0jTCi78raNbDJve0FN6oPXzm5BKFqnzDwhjiBuIJYFMRu9e8RtbWeveDpfK7Dgf7u1moDGshIALZVBEUR8kVYYVDsSZcz4sPJSmUfTGoai-VCFGTTbaYc3Agcsq6UN4AVli6iDgLY_7qCUuken4qF7Hib18KTRx_aw2TqddXBLeHD-YjQajFf1Lj3jFg"/>
-</div>
+<button class="font-label-md text-label-md text-primary hover:bg-primary-container/20 px-4 py-2 rounded-full transition-colors border border-primary/20">Support</button>
+<a class="font-label-md text-label-md bg-secondary text-on-secondary px-6 py-2 rounded-full hover:-translate-y-0.5 transition-transform shadow-sm inline-block" href="./TravelStyleQuiz.html">Travel Quiz</a>
+<a class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant" href="./Profile%20&%20Settings.html">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsFAdSpe5_7bXXpZF9rKJM2JDAzpVLDIm9n2BVpZZVfl7Aib6qv6JNIEir2xoRcHmrvw7WAy4zpZVLQR0jTCi78raNbDJve0FN6oPXzm5BKFqnzDwhjiBuIJYFMRu9e8RtbWeveDpfK7Dgf7u1moDGshIALZVBEUR8kVYYVDsSZcz4sPJSmUfTGoai-VCFGTTbaYc3Agcsq6UN4AVli6iDgLY_7qCUuken4qF7Hib18KTRx_aw2TqddXBLeHD-YjQajFf1Lj3jFg">
+</a>
 </div>
 </header>
-<!-- Top Mobile Header (Alternative to text links) -->
-<header class="md:hidden flex justify-between items-center bg-surface/80 backdrop-blur-md px-container-padding-mobile h-16 sticky top-0 z-40 shadow-sm border-b border-outline-variant/30">
-<a class="contents" href="../SystemAccount/Homepage.html"><div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">WanderX</div></a>
-<button class="text-on-surface-variant">
-<span class="material-symbols-outlined">search</span>
-</button>
+<!-- TopNavBar (Mobile) -->
+<header class="md:hidden bg-surface/80 dark:bg-surface/80 backdrop-blur-md shadow-sm full-width top-0 sticky z-50 flex justify-between items-center w-full px-container-padding-mobile h-16 border-none">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">WanderX</span></a>
+<a class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant" href="./Profile%20&%20Settings.html">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsFAdSpe5_7bXXpZF9rKJM2JDAzpVLDIm9n2BVpZZVfl7Aib6qv6JNIEir2xoRcHmrvw7WAy4zpZVLQR0jTCi78raNbDJve0FN6oPXzm5BKFqnzDwhjiBuIJYFMRu9e8RtbWeveDpfK7Dgf7u1moDGshIALZVBEUR8kVYYVDsSZcz4sPJSmUfTGoai-VCFGTTbaYc3Agcsq6UN4AVli6iDgLY_7qCUuken4qF7Hib18KTRx_aw2TqddXBLeHD-YjQajFf1Lj3jFg">
+</a>
 </header>
+<main class="flex-grow">
 <!-- Main Content -->
-<main class="max-w-[1440px] mx-auto px-container-padding-mobile md:px-container-padding-desktop py-8 md:py-12">
+<div class="px-container-padding-mobile md:px-container-padding-desktop py-8 md:py-12">
 <div class="mb-10">
 <h1 class="font-display-lg text-display-lg text-primary mb-2 hidden md:block">Explore Destinations</h1>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2 md:hidden">Explore Destinations</h1>
@@ -260,7 +265,7 @@
 <span class="font-label-sm text-label-sm text-on-surface-variant">From</span>
 <span class="font-headline-md text-headline-md text-primary font-bold">$2,400</span>
 </div>
-<a class="font-label-md text-label-md text-primary border border-primary/30 rounded-full px-4 py-2 hover:bg-primary hover:text-on-primary transition-colors" href="../AdminStaff/TourDetail.html">
+<a class="font-label-md text-label-md text-primary border border-primary/30 rounded-full px-4 py-2 hover:bg-primary hover:text-on-primary transition-colors" href="./TourDetail.html">
 Explore Plan
 </a>
 </div>
@@ -381,37 +386,19 @@ Explore Plan
 </div>
 </div>
 </div>
-</main>
-<!-- BottomNavBar (Mobile Only) -->
-<nav class="md:hidden bg-surface dark:bg-surface-container-lowest border-t border-outline-variant shadow-[0_-4px_10px_rgba(0,0,0,0.05)] docked full-width bottom-0 fixed z-50 fixed bottom-0 w-full flex justify-around items-center py-3 px-4">
-<!-- Active -->
-<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1 scale-90 transition-transform" href="./TourDiscovery.html">
-<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">explore</span>
-<span class="font-label-sm text-label-sm">Tours</span>
-</a>
-<!-- Inactive -->
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="./My%20Bookings.html">
-<span class="material-symbols-outlined mb-1">calendar_today</span>
-<span class="font-label-sm text-label-sm">Schedule</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="../SystemAccount/notificationManagerment.html">
-<span class="material-symbols-outlined mb-1">verified_user</span>
-<span class="font-label-sm text-label-sm">Status</span>
-</a>
-</nav>
-<!-- Footer -->
-<footer class="bg-surface-container-highest dark:bg-inverse-surface mt-section-gap w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6 flat">
-<a class="contents" href="../SystemAccount/Homepage.html"><div class="font-headline-md text-headline-md text-primary font-bold">
-            WanderX
-        </div></a>
-<div class="flex flex-wrap justify-center gap-6">
-<a class="text-on-surface-variant hover:text-primary underline transition-all font-body-md text-body-md" href="./HomeScreen.html">About Us</a>
-<a class="text-on-surface-variant hover:text-primary underline transition-all font-body-md text-body-md" href="./HomeScreen.html">Privacy Policy</a>
-<a class="text-on-surface-variant hover:text-primary underline transition-all font-body-md text-body-md" href="./HomeScreen.html">Terms of Service</a>
-<a class="text-on-surface-variant hover:text-primary underline transition-all font-body-md text-body-md" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
 </div>
-<div class="font-label-sm text-label-sm text-on-surface-variant">
-            © 2024 WanderX Travel. All rights reserved.
-        </div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface mt-section-gap flat w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col items-center md:items-start gap-4">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md text-primary">WanderX</span></a>
+<span class="text-on-surface-variant font-label-sm text-label-sm">© 2024 WanderX Travel. All rights reserved.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">About Us</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
+</div>
 </footer>
 </body></html>

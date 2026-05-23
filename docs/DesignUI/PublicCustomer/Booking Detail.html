@@ -111,27 +111,43 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-background font-body-md min-h-screen">
-    <!-- TopNavBar -->
-    <header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm docked full-width top-0 sticky z-50">
-        <a class="contents" href="../SystemAccount/Homepage.html"><div class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16 max-w-7xl mx-auto">
-            <div class="font-display-lg text-headline-md font-bold text-primary dark:text-primary-fixed-dim">WanderX</div></a>
-            <nav class="hidden md:flex items-center gap-8">
-                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="./TourDiscovery.html">Explore</a>
-                <a class="font-label-md text-label-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1" href="./My%20Bookings.html">My Trips</a>
-                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="./Special%20Request.html">Concierge</a>
-                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="./Special%20Request.html">Support</a>
-            </nav>
-            <div class="flex items-center gap-4">
-                <button class="material-symbols-outlined text-on-surface-variant p-2 rounded-full hover:bg-surface-container-low/50 transition-all">notifications</button>
-                <button class="material-symbols-outlined text-on-surface-variant p-2 rounded-full hover:bg-surface-container-low/50 transition-all">settings</button>
-                <div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden">
-                    <img alt="Customer profile avatar" class="w-full h-full object-cover" data-alt="A close-up portrait of a professional man in his 30s with a warm, confident smile, set against a blurred city skyline at dusk. The lighting is soft and cinematic, utilizing the warm hues of the golden hour to complement the premium WanderX brand aesthetic. High-fidelity digital photography with natural skin textures and elegant depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNdkz2XHAWwSplYH-r2d-ta5u1tgapATnHv9q0euS1hMMhtWg1zTbtWNc1yc4TtQndk6qrZ2V3bVEshzZxz2_5BTmYYyv135zmzIS3MKlt53gX1IovU6xryOgnGN4e-t-URk6Bqq2VeeuPv_-eCxR81_tRMs80eV5Ec1maa0_YozJcVmo_pdegN-SYOJ8VYZZ-irYjvlbwq2bjouDsMom5EOCRK8M1IRvohRyp_mK12t3OsU4F9sfWn1Iphym8vTbJnUYjQWE73w">
-                </div>
-            </div>
-        </div>
-    </header>
-    <main class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop py-8 md:py-12 mb-20 md:mb-0">
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-x-hidden min-h-screen flex flex-col">
+<!-- TopNavBar (Desktop) -->
+<header class="hidden md:flex bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-container-padding-desktop h-16">
+<div class="flex items-center gap-6">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">WanderX</span></a>
+<div class="flex items-center bg-surface-container-low rounded-full px-4 py-1.5 border border-outline-variant/50 focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none outline-none text-body-md font-body-md text-on-surface w-48 placeholder-on-surface-variant/70" placeholder="Search..." type="text">
+</div>
+</div>
+<nav class="flex items-center gap-6">
+<nav class="flex items-center gap-6">
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./TourDiscovery.html">Destinations</a>
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./My%20Bookings.html">My Bookings</a>
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                    href="./RecommendedTours.html">Recommend Tour</a>
+</nav>
+</nav>
+<div class="flex items-center gap-4">
+<button class="font-label-md text-label-md text-primary hover:bg-primary-container/20 px-4 py-2 rounded-full transition-colors border border-primary/20">Support</button>
+<a class="font-label-md text-label-md bg-secondary text-on-secondary px-6 py-2 rounded-full hover:-translate-y-0.5 transition-transform shadow-sm inline-block" href="./TravelStyleQuiz.html">Travel Quiz</a>
+<a class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant" href="./Profile%20&%20Settings.html">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNdkz2XHAWwSplYH-r2d-ta5u1tgapATnHv9q0euS1hMMhtWg1zTbtWNc1yc4TtQndk6qrZ2V3bVEshzZxz2_5BTmYYyv135zmzIS3MKlt53gX1IovU6xryOgnGN4e-t-URk6Bqq2VeeuPv_-eCxR81_tRMs80eV5Ec1maa0_YozJcVmo_pdegN-SYOJ8VYZZ-irYjvlbwq2bjouDsMom5EOCRK8M1IRvohRyp_mK12t3OsU4F9sfWn1Iphym8vTbJnUYjQWE73w">
+</a>
+</div>
+</header>
+<!-- TopNavBar (Mobile) -->
+<header class="md:hidden bg-surface/80 dark:bg-surface/80 backdrop-blur-md shadow-sm full-width top-0 sticky z-50 flex justify-between items-center w-full px-container-padding-mobile h-16 border-none">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">WanderX</span></a>
+<a class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant" href="./Profile%20&%20Settings.html">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNdkz2XHAWwSplYH-r2d-ta5u1tgapATnHv9q0euS1hMMhtWg1zTbtWNc1yc4TtQndk6qrZ2V3bVEshzZxz2_5BTmYYyv135zmzIS3MKlt53gX1IovU6xryOgnGN4e-t-URk6Bqq2VeeuPv_-eCxR81_tRMs80eV5Ec1maa0_YozJcVmo_pdegN-SYOJ8VYZZ-irYjvlbwq2bjouDsMom5EOCRK8M1IRvohRyp_mK12t3OsU4F9sfWn1Iphym8vTbJnUYjQWE73w">
+</a>
+</header>
+<main class="flex-grow">
+<div class="px-container-padding-mobile md:px-container-padding-desktop py-8 md:py-12">
         <!-- Page Header & Action -->
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
@@ -143,18 +159,32 @@
                 <p class="text-on-surface-variant mt-1">Booking ID: #WX-99201-ITA | Aug 12 � Aug 19, 2024</p>
             </div>
             <div class="flex gap-3">
-                <button class="px-6 py-2.5 rounded-full border border-outline text-primary font-label-md hover:bg-surface-container-low transition-all">Modify Dates</button>
-                <button class="px-6 py-2.5 rounded-full bg-primary text-on-primary font-label-md shadow-md hover:shadow-lg transition-all">Download Itinerary</button>
+                <button class="px-6 py-2.5 rounded-full border border-outline text-primary font-label-md hover:bg-surface-container-low transition-all">
+                    Modify Dates
+                </button>
+
+                <a href="./Special%20Request.html" class="px-6 py-2.5 rounded-full border border-outline text-primary font-label-md hover:bg-surface-container-low transition-all inline-flex items-center justify-center">
+                    Concierge Services
+                </a>
+
+                <a href="./Travel%20Companions.html" class="px-6 py-2.5 rounded-full border border-outline text-primary font-label-md hover:bg-surface-container-low transition-all inline-flex items-center justify-center">
+                    Travel Companions
+                </a>
+
+                <button class="px-6 py-2.5 rounded-full bg-primary text-on-primary font-label-md shadow-md hover:shadow-lg transition-all">
+                    Download Itinerary
+                </button>
             </div>
         </div>
         <!-- Status Tracker -->
-        <div class="mb-12">
+         <div class="mb-12">
             <div class="bg-surface-container-lowest border border-outline-variant p-6 md:p-8 rounded-xl shadow-sm">
                 <h3 class="font-headline-md text-headline-md mb-8">Reservation Status</h3>
                 <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-0">
                     <!-- Progress Bar (Desktop) -->
                     <div class="hidden md:block absolute top-[18px] left-[5%] right-[5%] h-0.5 bg-outline-variant z-0">
-                        <div class="h-full bg-primary w-[66%]"></div>
+                        <!-- updated to reflect 2 of 5 steps completed -> 40% -->
+                        <div class="h-full bg-primary w-[75%]"></div>
                     </div>
                     <!-- Steps -->
                     <div class="relative z-10 flex flex-row md:flex-col items-center gap-4 md:gap-2 md:w-1/4">
@@ -166,6 +196,25 @@
                             <p class="text-[11px] text-on-surface-variant uppercase tracking-wider">MAY 15, 2024</p>
                         </div>
                     </div>
+
+                    <!-- New Step: Payment Pending -->
+                    <div class="relative z-10 flex flex-row md:flex-col items-center gap-4 md:gap-2 md:w-1/4">
+                        <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">
+                                check_circle
+                            </span>
+                        </div>
+                        <div class="text-left md:text-center">
+                            <p class="font-label-md text-label-md text-primary">
+                                Processing Payment
+                            </p>
+
+                            <p class="text-[11px] text-on-surface-variant uppercase tracking-wider">
+                                AWAITING
+                            </p>
+                        </div>
+                    </div>
+
                     <div class="relative z-10 flex flex-row md:flex-col items-center gap-4 md:gap-2 md:w-1/4">
                         <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center">
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
@@ -309,25 +358,18 @@
                 </div>
             </div>
         </div>
-    </main>
-    <!-- BottomNavBar (Mobile only) -->
-    <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center py-3 pb-safe px-4 bg-surface/90 dark:bg-surface-container-lowest/90 backdrop-blur-lg border-t border-outline-variant/30 dark:border-outline/20 shadow-[0_-4px_12px_rgba(0,61,155,0.08)] md:hidden z-50 rounded-t-xl">
-        <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary transition-all" href="./TourDiscovery.html">
-            <span class="material-symbols-outlined">explore</span>
-            <span class="font-label-sm text-label-sm-mobile">Explore</span>
-        </a>
-        <a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-full px-4 py-1" href="./My%20Bookings.html">
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">travel</span>
-            <span class="font-label-sm text-label-sm-mobile">My Trips</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary transition-all" href="./Special%20Request.html">
-            <span class="material-symbols-outlined">support_agent</span>
-            <span class="font-label-sm text-label-sm-mobile">Concierge</span>
-        </a>
-        <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary transition-all" href="./Profile%20%26%20Settings.html">
-            <span class="material-symbols-outlined">person</span>
-            <span class="font-label-sm text-label-sm-mobile">Profile</span>
-        </a>
-    </nav>
-</body>
-</html>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface mt-section-gap flat w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col items-center md:items-start gap-4">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md text-primary">WanderX</span></a>
+<span class="text-on-surface-variant font-label-sm text-label-sm">© 2024 WanderX Travel. All rights reserved.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">About Us</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
+</div>
+</footer>
+</body></html>

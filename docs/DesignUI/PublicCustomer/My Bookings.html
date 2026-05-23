@@ -123,31 +123,43 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-background min-h-screen pb-24 md:pb-0 animate-[fadeIn_0.5s_ease-in-out]">
-    <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-        <nav class="flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16 max-w-7xl mx-auto">
-            <a class="contents" href="../SystemAccount/Homepage.html"><div class="font-display-lg text-headline-md font-bold text-primary dark:text-primary-fixed-dim">WanderX</div></a>
-            <div class="hidden md:flex items-center gap-8">
-                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors" href="./TourDiscovery.html">Explore</a>
-                <a class="font-label-md text-label-md text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1" href="./My%20Bookings.html">My Trips</a>
-                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors" href="./Special%20Request.html">Concierge</a>
-                <a class="font-label-md text-label-md text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors" href="./Special%20Request.html">Support</a>
-            </div>
-            <div class="flex items-center gap-4">
-                <button class="p-2 rounded-full hover:bg-surface-container-low/50 transition-all active:scale-95 duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high">
-                    <span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
-                </button>
-                <button class="p-2 rounded-full hover:bg-surface-container-low/50 transition-all active:scale-95 duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high">
-                    <span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
-                </button>
-                <div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
-                    <img alt="Customer profile avatar" data-alt="A professional and friendly headshot of a middle-aged traveler with a warm smile, set against a softly blurred urban sunset background. The lighting is golden and high-quality, reflecting a premium service aesthetic. The image uses a clean, high-fidelity photographic style with natural skin tones and a soft-focus background to emphasize the person's welcoming expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkPbcGccYBq90TflYfSXWiu95GhDowK2n4eiXD2jyzUmmBE96FKAVSe-q4hxp2k9wCbs76Q-2kZd8eC9Jvp7rk--m0wSfxkTRP_9qazSXFF49GLx5xul8k3OXVOGcRq4VlomaMhNK_qi7R542TMYuBI2uVPDHwHzY4oAruiPE0xJoZVCm1hHlrpMCN854R6M09ElkWsXByYvKmwpkn3jYJsEIyMeB1tqDhAayQnO1Gidaii1yL8ysN7WpZrvgO5Gumf0dmnlw88A" />
-                </div>
-            </div>
-        </nav>
-    </header>
-    <main class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop py-8 md:py-12">
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-x-hidden min-h-screen flex flex-col">
+<!-- TopNavBar (Desktop) -->
+<header class="hidden md:flex bg-surface/80 dark:bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-container-padding-desktop h-16">
+<div class="flex items-center gap-6">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">WanderX</span></a>
+<div class="flex items-center bg-surface-container-low rounded-full px-4 py-1.5 border border-outline-variant/50 focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none outline-none text-body-md font-body-md text-on-surface w-48 placeholder-on-surface-variant/70" placeholder="Search..." type="text">
+</div>
+</div>
+<nav class="flex items-center gap-6">
+<nav class="flex items-center gap-6">
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./TourDiscovery.html">Destinations</a>
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./My%20Bookings.html">My Bookings</a>
+                        <a class="nav-link-transition text-on-surface-variant dark:text-outline hover:text-primary hover:bg-surface-container-low py-2 px-3 rounded-md font-label-md text-label-md"
+                                href="./RecommendedTours.html">Recommend Tour</a>
+</nav>
+</nav>
+<div class="flex items-center gap-4">
+<button class="font-label-md text-label-md text-primary hover:bg-primary-container/20 px-4 py-2 rounded-full transition-colors border border-primary/20">Support</button>
+<a class="font-label-md text-label-md bg-secondary text-on-secondary px-6 py-2 rounded-full hover:-translate-y-0.5 transition-transform shadow-sm inline-block" href="./TravelStyleQuiz.html">Travel Quiz</a>
+<a class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant" href="./Profile%20&%20Settings.html">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkPbcGccYBq90TflYfSXWiu95GhDowK2n4eiXD2jyzUmmBE96FKAVSe-q4hxp2k9wCbs76Q-2kZd8eC9Jvp7rk--m0wSfxkTRP_9qazSXFF49GLx5xul8k3OXVOGcRq4VlomaMhNK_qi7R542TMYuBI2uVPDHwHzY4oAruiPE0xJoZVCm1hHlrpMCN854R6M09ElkWsXByYvKmwpkn3jYJsEIyMeB1tqDhAayQnO1Gidaii1yL8ysN7WpZrvgO5Gumf0dmnlw88A">
+</a>
+</div>
+</header>
+<!-- TopNavBar (Mobile) -->
+<header class="md:hidden bg-surface/80 dark:bg-surface/80 backdrop-blur-md shadow-sm full-width top-0 sticky z-50 flex justify-between items-center w-full px-container-padding-mobile h-16 border-none">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">WanderX</span></a>
+<a class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant" href="./Profile%20&%20Settings.html">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkPbcGccYBq90TflYfSXWiu95GhDowK2n4eiXD2jyzUmmBE96FKAVSe-q4hxp2k9wCbs76Q-2kZd8eC9Jvp7rk--m0wSfxkTRP_9qazSXFF49GLx5xul8k3OXVOGcRq4VlomaMhNK_qi7R542TMYuBI2uVPDHwHzY4oAruiPE0xJoZVCm1hHlrpMCN854R6M09ElkWsXByYvKmwpkn3jYJsEIyMeB1tqDhAayQnO1Gidaii1yL8ysN7WpZrvgO5Gumf0dmnlw88A">
+</a>
+</header>
+<main class="flex-grow">
+<div class="px-container-padding-mobile md:px-container-padding-desktop py-8 md:py-12">
         <div class="flex flex-col md:flex-row gap-gutter">
             <!-- Sidebar Filter (Desktop) -->
             <aside class="hidden md:block w-64 shrink-0">
@@ -215,11 +227,15 @@
                                 Experience the pinnacle of Italian coastal living with private boat tours, Michelin-starred dining, and sunset terraces.
                             </p>
                         </div>
-                        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                            <a class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95" href="./Booking%20Detail.html">View Details</a>
-                            <a class="border border-outline text-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-all active:scale-95 duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high" href="./Booking%20Detail.html">
-                                Manage Booking
+                        <div class="mt-6 flex flex-col sm:flex-row gap-3">   
+                            <a class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95" 
+                            href="./TourDetail.html">
+                                View Details
                             </a>
+                            <a class="border border-outline text-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-all active:scale-95 duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high" 
+                            href="./Booking%20Detail.html">
+                                Manage Booking
+                            </a>                        
                         </div>
                     </div>
                 </div>
@@ -255,7 +271,7 @@
                             </p>
                         </div>
                         <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                            <a class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95" href="./Booking%20Detail.html">View Details</a>
+                            <a class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95" href="./TourDetail.html">View Details</a>
                             <a class="border border-outline text-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-all active:scale-95 duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high" href="./SecurePayment.html">
                                 Complete Payment
                             </a>
@@ -297,30 +313,33 @@
                             <button class="border border-outline-variant text-on-surface-variant px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-all active:scale-95 duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high">
                                 Rebook This Tour
                             </button>
+                            <a class="border border-outline text-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-surface-container-low transition-all active:scale-95 duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high"
+                            href="./Tour%20Review.html">
+                                
+                                <span class="material-symbols-outlined text-[18px]">
+                                    rate_review
+                                </span>
+
+                                Leave Feedback
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
-    <!-- Bottom Navigation Bar (Mobile) -->
-    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 dark:bg-surface-container-lowest/90 backdrop-blur-lg flex justify-around items-center py-3 pb-safe px-4 border-t border-outline-variant/30 z-50 rounded-t-xl shadow-[0_-4px_12px_rgba(0,61,155,0.08)]">
-        <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary transition-all duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high">
-            <span class="material-symbols-outlined" data-icon="explore">explore</span>
-            <span class="font-label-sm text-label-sm-mobile mt-1">Explore</span>
-        </button>
-        <button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-full px-4 py-1 active:scale-90 duration-150 ease-in-out duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high">
-            <span class="material-symbols-outlined" data-icon="travel">travel</span>
-            <span class="font-label-sm text-label-sm-mobile mt-1">My Trips</span>
-        </button>
-        <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary transition-all duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high">
-            <span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
-            <span class="font-label-sm text-label-sm-mobile mt-1">Concierge</span>
-        </button>
-        <button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary transition-all duration-300 ease-in-out hover:scale-105 hover:bg-surface-container-high">
-            <span class="material-symbols-outlined" data-icon="person">person</span>
-            <span class="font-label-sm text-label-sm-mobile mt-1">Profile</span>
-        </button>
-    </nav>
-</body>
-</html>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface mt-section-gap flat w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col items-center md:items-start gap-4">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md text-primary">WanderX</span></a>
+<span class="text-on-surface-variant font-label-sm text-label-sm">© 2024 WanderX Travel. All rights reserved.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">About Us</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="./HomeScreen.html">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
+</div>
+</footer>
+</body></html>
