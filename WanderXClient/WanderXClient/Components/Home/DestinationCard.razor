@@ -1,0 +1,21 @@
+<a class="destination-card @CssClass" href="#experiences">
+    <img alt="@Title" src="@ImageUrl" />
+    <span class="destination-card__content">
+        <span class="destination-card__tag">@Tag</span>
+        <h3>@Title</h3>
+    </span>
+</a>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Tag { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string ImageUrl { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? CssClass { get; set; }
+}

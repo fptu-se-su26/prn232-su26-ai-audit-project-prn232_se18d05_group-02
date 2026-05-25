@@ -1,0 +1,130 @@
+@page "/register"
+@inject AuthApiClient AuthApi
+@inject NavigationManager Navigation
+
+<PageTitle>Create Account - WanderX</PageTitle>
+
+<AuthShell
+    Title="Create Account"
+    Subtitle="Enter your details to start your concierge experience."
+    BackgroundImage="https://lh3.googleusercontent.com/aida-public/AB6AXuC88zjE_thDSPs-sz4W3sAyKMeFuVhcpVMU6HI38G4-OVIlBQamD4K6QQNr2bpA7vaw3d6F6HiE717o4uOb5lE30BUIINqCwCpuaW45GXHL3Mc81wfy7ZorEqDeiGcPO1uhW6Rr5egZw08_HOobCd-oghS-nc4N5HGiFvCxotAfHMHn7EetLY6phfX21pjxCo7uVGRdxz3nwPLQWlMO9_V5U2qYzSZIEpYDsZ2PSqinF037P7WekgVMOiZBfMfFzuenawe0nhrzXA">
+    <EditForm Model="@_model" OnValidSubmit="@SubmitAsync" class="auth-form">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <AuthInput
+            Id="register-name"
+            Label="Full Name"
+            Icon="person"
+            AutoComplete="name"
+            Placeholder="John Doe"
+            @bind-Value="_model.FullName" />
+
+        <AuthInput
+            Id="register-email"
+            Label="Email Address"
+            Icon="mail"
+            Type="email"
+            AutoComplete="email"
+            Placeholder="name@example.com"
+            @bind-Value="_model.Email" />
+
+        <AuthInput
+            Id="register-phone"
+            Label="Phone Number"
+            Icon="call"
+            Type="tel"
+            AutoComplete="tel"
+            Placeholder="+1 (555) 000-0000"
+            @bind-Value="_model.PhoneNumber" />
+
+        <AuthInput
+            Id="register-password"
+            Label="Password"
+            Icon="lock"
+            Type="password"
+            AutoComplete="new-password"
+            Placeholder="********"
+            @bind-Value="_model.Password" />
+
+        <AuthInput
+            Id="register-confirm-password"
+            Label="Confirm Password"
+            Icon="lock_reset"
+            Type="password"
+            AutoComplete="new-password"
+            Placeholder="********"
+            @bind-Value="_model.ConfirmPassword" />
+
+        <label class="auth-check">
+            <InputCheckbox @bind-Value="_model.AcceptTerms" />
+            I agree to the Terms of Service and Privacy Policy.
+        </label>
+
+        <button class="wx-button wx-button--secondary" type="submit" disabled="@_isBusy">
+            @(_isBusy ? "Creating..." : "Create Account")
+            <MaterialIcon Name="arrow_forward" />
+        </button>
+
+        <AuthStatusMessage Message="@_message" IsError="@_isError" />
+
+        @if (!string.IsNullOrWhiteSpace(_verificationCode))
+        {
+            <div class="auth-alert auth-alert--success">
+                Development OTP: @_verificationCode
+            </div>
+        }
+
+        <p class="auth-note">
+            Already have an account?
+            <a class="auth-link" href="/login">Sign In</a>
+        </p>
+    </EditForm>
+</AuthShell>
+
+@code {
+    private readonly RegisterRequest _model = new();
+    private bool _isBusy;
+    private bool _isError;
+    private string? _message;
+    private string? _verificationCode;
+
+    private async Task SubmitAsync()
+    {
+        _isBusy = true;
+        _message = null;
+        _verificationCode = null;
+        _isError = false;
+
+        try
+        {
+            var response = await AuthApi.RegisterAsync(_model);
+            _verificationCode = response?.VerificationCode;
+            _message = response?.Message ?? "Account created. Check your phone for the verification code.";
+
+            if (response is not null)
+            {
+                var code = string.IsNullOrWhiteSpace(response.VerificationCode)
+                    ? string.Empty
+                    : $"&code={Uri.EscapeDataString(response.VerificationCode)}";
+                Navigation.NavigateTo($"/verify-account?email={Uri.EscapeDataString(response.Email)}{code}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isBusy = false;
+        }
+    }
+
+    private static string ToUserMessage(Exception exception)
+    {
+        return exception.Message.Contains('{')
+            ? "The account could not be created. Please check the form and try again."
+            : exception.Message;
+    }
+}

@@ -1,0 +1,107 @@
+@page "/login"
+@inject AuthApiClient AuthApi
+
+<PageTitle>Sign In - WanderX</PageTitle>
+
+<AuthShell
+    Title="Welcome Back"
+    Subtitle="Sign in to manage your world-class itineraries."
+    BackgroundImage="https://lh3.googleusercontent.com/aida-public/AB6AXuD6mmZhLrmOyAAYQ460Zgai8wrgefQ9WMciwZz0zPcYLJ4I1QxcLK8SYfD_6sm8AujNYguKOeHbu_cNtCBIQJRjCNR0f98_UfQZmbRhSQVR0woB7pKAstv5ZmNSzL81knkvwr6Ql3DoOA2f2qDV4wJY1IC-dGwSQ9bLCR4ifWZ2Fwh2JJ6jJtl6T1U-UlhgOnFyyQ-QjhrC_bssMXYq6YEiZh6lbG6qyPvJgeudlXB7WZt37odHFywpOmBOTpP65QJRj7avSLd_fA">
+    <EditForm Model="@_model" OnValidSubmit="@SubmitAsync" class="auth-form">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <AuthInput
+            Id="login-email"
+            Label="Email Address"
+            Icon="mail"
+            Type="email"
+            AutoComplete="username"
+            Placeholder="guide@wanderx.com"
+            @bind-Value="_model.Email" />
+
+        <div>
+            <div class="auth-row mb-2">
+                <label class="auth-input__label" for="login-password">Password</label>
+                <a class="auth-link" href="/forgot-password">Forgot Password?</a>
+            </div>
+            <AuthInput
+                Id="login-password"
+                Label="Password"
+                ShowLabel="false"
+                Icon="lock"
+                Type="password"
+                AutoComplete="current-password"
+                Placeholder="********"
+                @bind-Value="_model.Password" />
+        </div>
+
+        <label class="auth-check">
+            <InputCheckbox @bind-Value="_model.RememberMe" />
+            Keep me logged in
+        </label>
+
+        <button class="wx-button" type="submit" disabled="@_isBusy">
+            @(_isBusy ? "Signing In..." : "Sign In")
+            <MaterialIcon Name="arrow_forward" />
+        </button>
+
+        <AuthStatusMessage Message="@_message" IsError="@_isError" />
+
+        <div class="auth-divider">Or continue with</div>
+
+        <div class="social-grid">
+            <button class="social-button" type="button">
+                <MaterialIcon Name="travel_explore" />
+                Google
+            </button>
+            <button class="social-button" type="button">
+                <MaterialIcon Name="phone_iphone" />
+                Apple
+            </button>
+        </div>
+
+        <p class="auth-note">
+            New to the management portal?
+            <a class="auth-link" href="/register">Create an Account</a>
+        </p>
+    </EditForm>
+</AuthShell>
+
+@code {
+    private readonly LoginRequest _model = new();
+    private bool _isBusy;
+    private bool _isError;
+    private string? _message;
+
+    private async Task SubmitAsync()
+    {
+        _isBusy = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            var response = await AuthApi.LoginAsync(_model);
+            _message = response is null
+                ? "Signed in successfully."
+                : $"Signed in as {response.FullName}.";
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isBusy = false;
+        }
+    }
+
+    private static string ToUserMessage(Exception exception)
+    {
+        return exception.Message.Contains('{')
+            ? "The server rejected the request. Please check your details and try again."
+            : exception.Message;
+    }
+}

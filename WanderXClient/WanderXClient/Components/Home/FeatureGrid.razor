@@ -1,0 +1,34 @@
+<section class="section--band" id="why-wanderx">
+    <div class="wx-container">
+        <div class="section__header justify-content-center text-center">
+            <div>
+                <h2>The WanderX Difference</h2>
+                <p class="section__copy">Advanced matching, local expertise, and reliable travel operations in one polished flow.</p>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            @foreach (var feature in Features)
+            {
+                <article class="feature-item">
+                    <span class="feature-item__icon">
+                        <MaterialIcon Name="@feature.Icon" />
+                    </span>
+                    <h3>@feature.Title</h3>
+                    <p>@feature.Description</p>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    private static readonly FeatureItem[] Features =
+    [
+        new("model_training", "Smart Guide Matching", "Pair with local experts whose interests and communication style fit your trip."),
+        new("auto_awesome", "Dynamic Itineraries", "Plans adapt around weather, local events, and the pace you prefer."),
+        new("shield_locked", "Concierge Security", "Travel with secure booking, verified guides, and support when plans shift.")
+    ];
+
+    private sealed record FeatureItem(string Icon, string Title, string Description);
+}
