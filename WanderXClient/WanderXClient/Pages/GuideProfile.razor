@@ -1,0 +1,288 @@
+@page "/guide-profile"
+@using System.ComponentModel.DataAnnotations
+@inject GuideApiClient GuideApi
+
+<PageTitle>Guide Profile - WanderX</PageTitle>
+
+<div class="wx-page">
+    <AppHeader />
+
+    <main class="guide-self-page">
+        <section class="guide-self-hero">
+            <div class="wx-container guide-self-hero__inner">
+                <p class="guide-eyebrow">Guide Portal</p>
+                <h1>Update Your Guide Profile</h1>
+                <p>Keep your language specialties, operating region, and completed tour experience current for better assignments.</p>
+            </div>
+        </section>
+
+        <section class="wx-container guide-self-layout">
+            <div class="guide-self-panel">
+                <div class="guide-section-heading">
+                    <div>
+                        <p class="guide-eyebrow">Find profile</p>
+                        <h2>Load by guide email</h2>
+                    </div>
+                    <a class="wx-button wx-button--outline" href="/guides">
+                        <MaterialIcon Name="admin_panel_settings" />
+                        Admin
+                    </a>
+                </div>
+
+                <EditForm Model="@_lookup" OnValidSubmit="@LoadProfileAsync" class="guide-form guide-form--lookup">
+                    <DataAnnotationsValidator />
+
+                    <div class="guide-field">
+                        <label for="guide-profile-email">Guide email</label>
+                        <InputText id="guide-profile-email" class="guide-control" type="email" placeholder="elena.guide@wanderx.com" @bind-Value="_lookup.Email" />
+                        <ValidationMessage For="@(() => _lookup.Email)" />
+                    </div>
+
+                    <button class="wx-button" type="submit" disabled="@_isLoadingProfile">
+                        <MaterialIcon Name="manage_search" />
+                        @(_isLoadingProfile ? "Loading..." : "Load Profile")
+                    </button>
+                </EditForm>
+
+                @if (!string.IsNullOrWhiteSpace(_message))
+                {
+                    <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")">
+                        @_message
+                    </div>
+                }
+            </div>
+
+            @if (_profileLoaded)
+            {
+                <div class="guide-self-panel">
+                    <div class="guide-section-heading">
+                        <div>
+                            <p class="guide-eyebrow">Self update</p>
+                            <h2>@_model.FullName</h2>
+                        </div>
+                        <span class="@GetStatusClass(_status)">
+                            <span></span>
+                            @_status
+                        </span>
+                    </div>
+
+                    <EditForm Model="@_model" OnValidSubmit="@SaveProfileAsync" class="guide-form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="guide-form-grid">
+                            <div class="guide-field">
+                                <label for="self-full-name">Full name</label>
+                                <InputText id="self-full-name" class="guide-control" @bind-Value="_model.FullName" />
+                                <ValidationMessage For="@(() => _model.FullName)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="self-phone">Phone number</label>
+                                <InputText id="self-phone" class="guide-control" type="tel" @bind-Value="_model.PhoneNumber" />
+                                <ValidationMessage For="@(() => _model.PhoneNumber)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="self-languages">Languages</label>
+                                <InputText id="self-languages" class="guide-control" @bind-Value="_model.Languages" />
+                                <ValidationMessage For="@(() => _model.Languages)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="self-expertise">Expertise area</label>
+                                <InputText id="self-expertise" class="guide-control" @bind-Value="_model.ExpertiseArea" />
+                                <ValidationMessage For="@(() => _model.ExpertiseArea)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="self-region">Region</label>
+                                <InputText id="self-region" class="guide-control" @bind-Value="_model.Region" />
+                                <ValidationMessage For="@(() => _model.Region)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="self-tours">Completed tours</label>
+                                <InputNumber id="self-tours" class="guide-control" @bind-Value="_model.CompletedTours" />
+                                <ValidationMessage For="@(() => _model.CompletedTours)" />
+                            </div>
+                        </div>
+
+                        <div class="guide-field">
+                            <label for="self-bio">Profile note</label>
+                            <InputTextArea id="self-bio" class="guide-control guide-control--area" @bind-Value="_model.Bio" />
+                            <ValidationMessage For="@(() => _model.Bio)" />
+                        </div>
+
+                        <button class="wx-button wx-button--secondary" type="submit" disabled="@_isSaving">
+                            <MaterialIcon Name="save" />
+                            @(_isSaving ? "Saving..." : "Save My Profile")
+                        </button>
+                    </EditForm>
+                </div>
+            }
+        </section>
+    </main>
+
+    <AppFooter />
+    <MobileBottomNav />
+</div>
+
+@code {
+    private readonly LookupModel _lookup = new();
+    private SelfGuideFormModel _model = new();
+    private bool _isLoadingProfile;
+    private bool _isSaving;
+    private bool _profileLoaded;
+    private bool _isError;
+    private string _status = "Active";
+    private string? _message;
+
+    private async Task LoadProfileAsync()
+    {
+        _isLoadingProfile = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            var guide = await GuideApi.GetGuideByEmailAsync(_lookup.Email);
+
+            if (guide is null)
+            {
+                _isError = true;
+                _message = "Guide profile was not found.";
+                _profileLoaded = false;
+                return;
+            }
+
+            _model = SelfGuideFormModel.FromGuide(guide);
+            _status = guide.Status;
+            _profileLoaded = true;
+            _message = "Profile loaded.";
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+            _profileLoaded = false;
+        }
+        finally
+        {
+            _isLoadingProfile = false;
+        }
+    }
+
+    private async Task SaveProfileAsync()
+    {
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            var guide = await GuideApi.SelfUpdateGuideAsync(_model.ToRequest());
+            _message = "Your guide profile has been updated.";
+
+            if (guide is not null)
+            {
+                _model = SelfGuideFormModel.FromGuide(guide);
+                _status = guide.Status;
+            }
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private static string GetStatusClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "active" => "guide-status guide-status--active",
+            "on tour" => "guide-status guide-status--busy",
+            "unavailable" => "guide-status guide-status--muted",
+            _ => "guide-status"
+        };
+    }
+
+    private static string ToUserMessage(Exception exception)
+    {
+        return exception.Message.Contains('{')
+            ? "The guide profile could not be updated. Please check the form and try again."
+            : exception.Message;
+    }
+
+    private sealed class LookupModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    private sealed class SelfGuideFormModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Full name is required.")]
+        [StringLength(120, MinimumLength = 2, ErrorMessage = "Full name must be between 2 and 120 characters.")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        [Phone(ErrorMessage = "Enter a valid phone number.")]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Languages are required.")]
+        public string Languages { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Expertise area is required.")]
+        public string ExpertiseArea { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Region is required.")]
+        public string Region { get; set; } = string.Empty;
+
+        [Range(0, 10000, ErrorMessage = "Completed tours must be 0 or higher.")]
+        public int CompletedTours { get; set; }
+
+        [StringLength(600, ErrorMessage = "Profile note must be 600 characters or fewer.")]
+        public string Bio { get; set; } = string.Empty;
+
+        public static SelfGuideFormModel FromGuide(GuideResponse guide)
+        {
+            return new SelfGuideFormModel
+            {
+                Email = guide.Email,
+                FullName = guide.FullName,
+                PhoneNumber = guide.PhoneNumber,
+                Languages = guide.LanguagesText,
+                ExpertiseArea = guide.ExpertiseArea,
+                Region = guide.Region,
+                CompletedTours = guide.CompletedTours,
+                Bio = guide.Bio
+            };
+        }
+
+        public GuideSelfUpdateRequest ToRequest()
+        {
+            return new GuideSelfUpdateRequest
+            {
+                Email = Email,
+                FullName = FullName,
+                PhoneNumber = PhoneNumber,
+                Languages = Languages,
+                ExpertiseArea = ExpertiseArea,
+                Region = Region,
+                CompletedTours = CompletedTours,
+                Bio = Bio
+            };
+        }
+    }
+}

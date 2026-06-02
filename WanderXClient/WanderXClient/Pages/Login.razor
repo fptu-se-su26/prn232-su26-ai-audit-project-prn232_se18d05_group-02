@@ -1,5 +1,7 @@
 @page "/login"
 @inject AuthApiClient AuthApi
+@inject AuthSessionService AuthSession
+@inject NavigationManager Navigation
 
 <PageTitle>Sign In - WanderX</PageTitle>
 
@@ -83,9 +85,15 @@
         try
         {
             var response = await AuthApi.LoginAsync(_model);
-            _message = response is null
-                ? "Signed in successfully."
-                : $"Signed in as {response.FullName}.";
+
+            if (response is null)
+            {
+                Navigation.NavigateTo("/");
+                return;
+            }
+
+            await AuthSession.SaveAsync(response, _model.RememberMe);
+            Navigation.NavigateTo(GetRedirectPath(response.Role));
         }
         catch (Exception ex)
         {
@@ -103,5 +111,15 @@
         return exception.Message.Contains('{')
             ? "The server rejected the request. Please check your details and try again."
             : exception.Message;
+    }
+
+    private static string GetRedirectPath(string role)
+    {
+        return role.Trim().ToLowerInvariant() switch
+        {
+            "admin" => "/dashboard",
+            "guide" or "guider" => "/guide-portal",
+            _ => "/"
+        };
     }
 }

@@ -51,4 +51,6 @@ public class ApplicationUser
     public ICollection<AuthVerificationCode> VerificationCodes { get; set; } = new List<AuthVerificationCode>();
 
     public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
+
+    public GuideProfile? GuideProfile { get; set; }
 }

@@ -1,0 +1,430 @@
+@page "/guide-portal"
+@inject GuideTourApiClient GuideTourApi
+@inject AuthSessionService AuthSession
+
+<PageTitle>Guide Portal - WanderX</PageTitle>
+
+<div class="wx-page">
+    <AppHeader />
+
+    <main class="guide-self-page">
+        <section class="guide-self-hero">
+            <div class="wx-container guide-self-hero__inner">
+                <p class="guide-eyebrow">Guide Portal</p>
+                <h1>Your Assigned Tours</h1>
+                <p>View your working schedule, inspect assigned tour details, decline with a valid reason, or finish confirmed tours.</p>
+            </div>
+        </section>
+
+        <section class="wx-container guide-portal-layout">
+            <div class="guide-self-panel guide-portal-toolbar">
+                <div class="guide-section-heading">
+                    <div>
+                        <p class="guide-eyebrow">Schedule</p>
+                        <h2>Work calendar</h2>
+                    </div>
+                    @if (HasGuideSession)
+                    {
+                        <span class="@GetGuideAvailabilityClass()">
+                            <span></span>
+                            @GuideAvailability
+                        </span>
+                    }
+                </div>
+
+                @if (HasGuideSession)
+                {
+                    <div class="guide-session-strip">
+                        <div class="guide-session-avatar">
+                            <MaterialIcon Name="badge" />
+                        </div>
+                        <div class="guide-session-meta">
+                            <span>Signed in guide</span>
+                            <strong>@_guideName</strong>
+                            <p>@_guideEmail</p>
+                        </div>
+                        <button class="wx-button wx-button--outline" type="button" disabled="@_isLoading" @onclick="LoadScheduleAsync">
+                            <MaterialIcon Name="refresh" />
+                            @(_isLoading ? "Loading..." : "Refresh")
+                        </button>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(_message))
+                {
+                    <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")">
+                        @_message
+                    </div>
+                }
+
+                @if (_requiresLogin)
+                {
+                    <a class="wx-button" href="/login">
+                        <MaterialIcon Name="login" />
+                        Sign In
+                    </a>
+                }
+                else if (_accessDenied)
+                {
+                    <a class="wx-button wx-button--outline" href="/">
+                        <MaterialIcon Name="home" />
+                        Back Home
+                    </a>
+                }
+            </div>
+
+            @if (HasGuideSession && _scheduleLoaded)
+            {
+                <section class="guide-table-shell">
+                    <div class="guide-table-toolbar">
+                        <div>
+                            <p>@_assignments.Count assigned tour(s)</p>
+                        </div>
+                        <a class="wx-button wx-button--outline" href="/guide-profile">
+                            <MaterialIcon Name="manage_accounts" />
+                            Profile
+                        </a>
+                    </div>
+
+                    <div class="guide-table-scroll">
+                        <table class="guide-table guide-schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>Tour</th>
+                                    <th>Date</th>
+                                    <th>Destination</th>
+                                    <th>Travelers</th>
+                                    <th>Status</th>
+                                    <th class="guide-table__actions">Detail</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (_assignments.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="guide-empty guide-empty--compact">
+                                                <MaterialIcon Name="event_busy" />
+                                                No assigned tours were found.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var assignment in _assignments)
+                                    {
+                                        <tr class="@(assignment.Id == _selectedAssignment?.Id ? "guide-schedule-row--active" : null)">
+                                            <td>
+                                                <strong>@assignment.TourName</strong>
+                                                <span class="guide-table-subtext">@assignment.TourCode</span>
+                                            </td>
+                                            <td>@FormatDateRange(assignment)</td>
+                                            <td>@assignment.Destination</td>
+                                            <td>@assignment.TravelerCount</td>
+                                            <td>
+                                                <span class="@GetTourStatusClass(assignment)">
+                                                    <span></span>
+                                                    @assignment.Status
+                                                </span>
+                                            </td>
+                                            <td class="guide-table__actions">
+                                                <button class="guide-icon-button" type="button" title="View detail" @onclick="() => SelectAssignment(assignment)">
+                                                    <MaterialIcon Name="visibility" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+
+            @if (HasGuideSession && _selectedAssignment is not null)
+            {
+                <section class="guide-self-panel guide-tour-detail">
+                    <div class="guide-section-heading">
+                        <div>
+                            <p class="guide-eyebrow">Tour detail</p>
+                            <h2>@_selectedAssignment.TourName</h2>
+                        </div>
+                        <span class="@GetTourStatusClass(_selectedAssignment)">
+                            <span></span>
+                            @_selectedAssignment.Status
+                        </span>
+                    </div>
+
+                    <div class="guide-tour-detail-grid">
+                        <div>
+                            <span>Tour code</span>
+                            <strong>@_selectedAssignment.TourCode</strong>
+                        </div>
+                        <div>
+                            <span>Schedule</span>
+                            <strong>@FormatDateRange(_selectedAssignment)</strong>
+                        </div>
+                        <div>
+                            <span>Region</span>
+                            <strong>@_selectedAssignment.Region</strong>
+                        </div>
+                        <div>
+                            <span>Meeting point</span>
+                            <strong>@_selectedAssignment.MeetingPoint</strong>
+                        </div>
+                    </div>
+
+                    <p class="guide-tour-summary">@_selectedAssignment.ItinerarySummary</p>
+
+                    @if (!string.IsNullOrWhiteSpace(_selectedAssignment.DeclineReason))
+                    {
+                        <div class="guide-alert guide-alert--error">
+                            Decline reason: @_selectedAssignment.DeclineReason
+                        </div>
+                    }
+
+                    <div class="guide-tour-actions">
+                        <button class="wx-button wx-button--secondary" type="button" disabled="@(!_selectedAssignment.CanFinish || _isSaving)" @onclick="FinishSelectedAsync">
+                            <MaterialIcon Name="done_all" />
+                            Mark Finished
+                        </button>
+                        <button class="wx-button wx-button--outline" type="button" disabled="@(!_selectedAssignment.CanDecline || _isSaving)" @onclick="ToggleDeclinePanel">
+                            <MaterialIcon Name="cancel" />
+                            Decline Tour
+                        </button>
+                    </div>
+
+                    @if (_isDeclinePanelOpen)
+                    {
+                        <EditForm Model="@_declineModel" OnValidSubmit="@DeclineSelectedAsync" class="guide-form">
+                            <DataAnnotationsValidator />
+                            <div class="guide-field">
+                                <label for="decline-reason">Valid reason</label>
+                                <InputTextArea id="decline-reason" class="guide-control guide-control--area" @bind-Value="_declineModel.Reason" />
+                                <ValidationMessage For="@(() => _declineModel.Reason)" />
+                            </div>
+                            <button class="wx-button wx-button--secondary" type="submit" disabled="@_isSaving">
+                                <MaterialIcon Name="send" />
+                                Submit Decline Request
+                            </button>
+                        </EditForm>
+                    }
+                </section>
+            }
+        </section>
+    </main>
+
+    <AppFooter />
+    <MobileBottomNav />
+</div>
+
+@code {
+    private readonly DeclineTourRequest _declineModel = new();
+    private List<GuideTourAssignmentResponse> _assignments = new();
+    private GuideTourAssignmentResponse? _selectedAssignment;
+    private bool _isLoading;
+    private bool _isSaving;
+    private bool _isError;
+    private bool _scheduleLoaded;
+    private bool _isDeclinePanelOpen;
+    private bool _requiresLogin;
+    private bool _accessDenied;
+    private string _guideEmail = string.Empty;
+    private string _guideName = string.Empty;
+    private string? _message;
+
+    private bool HasGuideSession => !_requiresLogin && !_accessDenied && !string.IsNullOrWhiteSpace(_guideEmail);
+
+    private string GuideAvailability => _assignments.Any(item => item.IsCurrentBusyTour) ? "Busy" : "Available";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = await AuthSession.GetAsync();
+
+        if (session is null)
+        {
+            _requiresLogin = true;
+            _isError = true;
+            _message = "Please sign in with a guide account to view your schedule.";
+            return;
+        }
+
+        if (!session.IsGuide)
+        {
+            _accessDenied = true;
+            _isError = true;
+            _message = "Only guide accounts can view the guide portal schedule.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(session.Email))
+        {
+            _requiresLogin = true;
+            _isError = true;
+            _message = "Your login session does not include an email. Please sign in again.";
+            return;
+        }
+
+        _guideEmail = session.Email.Trim();
+        _guideName = string.IsNullOrWhiteSpace(session.FullName) ? "Guide account" : session.FullName.Trim();
+        await LoadScheduleAsync();
+    }
+
+    private async Task LoadScheduleAsync()
+    {
+        if (!HasGuideSession)
+        {
+            return;
+        }
+
+        _isLoading = true;
+        _isError = false;
+        _message = null;
+        _selectedAssignment = null;
+        _isDeclinePanelOpen = false;
+
+        try
+        {
+            _assignments = await GuideTourApi.GetScheduleAsync(_guideEmail);
+            _selectedAssignment = _assignments.FirstOrDefault(item =>
+                item.Status.Equals("Confirmed", StringComparison.OrdinalIgnoreCase) ||
+                item.Status.Equals("Assigned", StringComparison.OrdinalIgnoreCase)) ?? _assignments.FirstOrDefault();
+            _scheduleLoaded = true;
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+            _scheduleLoaded = false;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void SelectAssignment(GuideTourAssignmentResponse assignment)
+    {
+        _selectedAssignment = assignment;
+        _declineModel.Reason = string.Empty;
+        _isDeclinePanelOpen = false;
+        _message = null;
+        _isError = false;
+    }
+
+    private void ToggleDeclinePanel()
+    {
+        _isDeclinePanelOpen = !_isDeclinePanelOpen;
+    }
+
+    private async Task DeclineSelectedAsync()
+    {
+        if (_selectedAssignment is null)
+        {
+            return;
+        }
+
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            var updated = await GuideTourApi.DeclineAsync(_selectedAssignment.Id, _declineModel);
+            _message = "Tour decline request has been submitted.";
+            _isDeclinePanelOpen = false;
+            _declineModel.Reason = string.Empty;
+            await RefreshUpdatedAssignmentAsync(updated);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private async Task FinishSelectedAsync()
+    {
+        if (_selectedAssignment is null)
+        {
+            return;
+        }
+
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            var updated = await GuideTourApi.FinishAsync(_selectedAssignment.Id);
+            _message = "Tour has been marked as finished.";
+            await RefreshUpdatedAssignmentAsync(updated);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private async Task RefreshUpdatedAssignmentAsync(GuideTourAssignmentResponse? updated)
+    {
+        if (updated is null)
+        {
+            await LoadScheduleAsync();
+            return;
+        }
+
+        var index = _assignments.FindIndex(item => item.Id == updated.Id);
+
+        if (index >= 0)
+        {
+            _assignments[index] = updated;
+        }
+
+        _selectedAssignment = updated;
+        _assignments = await GuideTourApi.GetScheduleAsync(_guideEmail);
+        _selectedAssignment = _assignments.FirstOrDefault(item => item.Id == updated.Id) ?? updated;
+    }
+
+    private static string FormatDateRange(GuideTourAssignmentResponse assignment)
+    {
+        return $"{assignment.StartDate:dd MMM yyyy} - {assignment.EndDate:dd MMM yyyy}";
+    }
+
+    private string GetGuideAvailabilityClass()
+    {
+        return GuideAvailability == "Busy"
+            ? "guide-status guide-status--busy"
+            : "guide-status guide-status--active";
+    }
+
+    private static string GetTourStatusClass(GuideTourAssignmentResponse assignment)
+    {
+        return assignment.Status.ToLowerInvariant() switch
+        {
+            "confirmed" => assignment.IsCurrentBusyTour ? "guide-status guide-status--busy" : "guide-status guide-status--active",
+            "assigned" => "guide-status guide-status--active",
+            "finished" => "guide-status guide-status--muted",
+            "declined" => "guide-status guide-status--busy",
+            _ => "guide-status"
+        };
+    }
+
+    private static string ToUserMessage(Exception exception)
+    {
+        return exception.Message.Contains('{')
+            ? "The guide schedule request could not be completed."
+            : exception.Message;
+    }
+
+}

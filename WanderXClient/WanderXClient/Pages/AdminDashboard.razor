@@ -1,0 +1,77 @@
+@page "/dashboard"
+@page "/admin-dashboard"
+
+<PageTitle>Admin Dashboard - WanderX</PageTitle>
+
+<div class="guide-admin-page">
+    <aside class="guide-sidebar">
+        <div class="guide-sidebar__brand">
+            <a class="brand-mark" href="/">WanderX</a>
+            <p>Admin Suite</p>
+        </div>
+
+        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
+            <a class="guide-sidebar__link guide-sidebar__link--active" href="/dashboard" aria-current="page">
+                <MaterialIcon Name="dashboard" />
+                Dashboard
+            </a>
+            <a class="guide-sidebar__link" href="/guides">
+                <MaterialIcon Name="badge" />
+                Guides
+            </a>
+            <a class="guide-sidebar__link" href="/">
+                <MaterialIcon Name="home" />
+                Homepage
+            </a>
+        </nav>
+    </aside>
+
+    <main class="guide-main">
+        <header class="guide-topbar">
+            <div>
+                <p class="guide-eyebrow">Admin</p>
+                <h1>Dashboard</h1>
+                <p class="guide-subtitle">System overview and operations shortcuts.</p>
+            </div>
+        </header>
+
+        <section class="guide-content">
+            <div class="guide-stat-grid">
+                <article class="guide-stat">
+                    <p>Guide Management</p>
+                    <strong>01</strong>
+                    <span>Manage guide accounts and profiles</span>
+                </article>
+                <article class="guide-stat guide-stat--secondary">
+                    <p>Assignments</p>
+                    <strong>02</strong>
+                    <span>Track tour staffing work</span>
+                </article>
+                <article class="guide-stat guide-stat--tertiary">
+                    <p>Operations</p>
+                    <strong>03</strong>
+                    <span>Monitor active tour support</span>
+                </article>
+                <article class="guide-stat">
+                    <p>Accounts</p>
+                    <strong>04</strong>
+                    <span>Role-based access entry point</span>
+                </article>
+            </div>
+
+            <section class="guide-form-panel">
+                <div class="guide-section-heading">
+                    <div>
+                        <p class="guide-eyebrow">Quick action</p>
+                        <h2>Guide Directory</h2>
+                    </div>
+                    <a class="wx-button" href="/guides">
+                        <MaterialIcon Name="arrow_forward" />
+                        Open Guides
+                    </a>
+                </div>
+                <p class="guide-subtitle">Use this dashboard as the admin landing page after login. The detailed management flow remains in Guide Management.</p>
+            </section>
+        </section>
+    </main>
+</div>

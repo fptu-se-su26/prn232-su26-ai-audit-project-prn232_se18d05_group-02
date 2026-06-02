@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WanderXServer.BusinessObject;
-using WanderXServer.BusinessObject.Enums;
 using WanderXServer.DataAccessLayer;
 using WanderXServer.Services;
 
@@ -14,9 +11,15 @@ builder.Logging.AddDebug();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<WanderXDbContext>(options =>
 {
-    options.UseInMemoryDatabase("WanderX");
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
+    options.UseSqlServer(connectionString);
 });
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IGuideService, GuideService>();
+builder.Services.AddScoped<IGuideTourService, GuideTourService>();
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("WanderXClient", policy =>
@@ -33,7 +36,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-SeedDevelopmentUsers(app.Services);
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<WanderXDbContext>().SeedDevelopmentData();
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -46,29 +52,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-static void SeedDevelopmentUsers(IServiceProvider services)
-{
-    using var scope = services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<WanderXDbContext>();
-
-    if (dbContext.Users.Any())
-    {
-        return;
-    }
-
-    var admin = new ApplicationUser
-    {
-        FullName = "WanderX Admin",
-        Email = "ad@ad.123",
-        NormalizedEmail = AuthService.NormalizeEmail("ad@ad.123"),
-        PhoneNumber = "+10000000000",
-        Role = UserRole.Admin,
-        IsEmailConfirmed = true,
-        IsPhoneConfirmed = true
-    };
-
-    admin.PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(admin, "123456");
-    dbContext.Users.Add(admin);
-    dbContext.SaveChanges();
-}
