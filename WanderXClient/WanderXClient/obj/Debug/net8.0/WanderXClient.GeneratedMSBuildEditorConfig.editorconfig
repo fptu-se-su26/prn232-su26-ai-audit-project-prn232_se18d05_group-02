@@ -1,0 +1,153 @@
+is_global = true
+build_property.EnableAotAnalyzer = 
+build_property.EnableSingleFileAnalyzer = 
+build_property.EnableTrimAnalyzer = false
+build_property.IncludeAllContentForSelfExtract = 
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = WanderXClient
+build_property.RootNamespace = WanderXClient
+build_property.ProjectDir = D:\FPT\SU26\PRN232\prn232-su26-ai-audit-project-prn232_se18d05_group-02\WanderXClient\WanderXClient\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = false
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = D:\FPT\SU26\PRN232\prn232-su26-ai-audit-project-prn232_se18d05_group-02\WanderXClient\WanderXClient
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Auth/AuthFooter.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBdXRoXEF1dGhGb290ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Auth/AuthInput.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBdXRoXEF1dGhJbnB1dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Auth/AuthShell.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBdXRoXEF1dGhTaGVsbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Auth/AuthStatusMessage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBdXRoXEF1dGhTdGF0dXNNZXNzYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Home/DestinationBento.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXERlc3RpbmF0aW9uQmVudG8ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Home/DestinationCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXERlc3RpbmF0aW9uQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Home/FeaturedTours.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXEZlYXR1cmVkVG91cnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Home/FeatureGrid.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXEZlYXR1cmVHcmlkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Home/HeroSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXEhlcm9TZWFyY2gucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Home/HomeHero.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXEhvbWVIZXJvLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Home/SearchField.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXFNlYXJjaEZpZWxkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Home/TourCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXFRvdXJDYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Home/TravelQuizBanner.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xIb21lXFRyYXZlbFF1aXpCYW5uZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Shared/AppFooter.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcQXBwRm9vdGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Shared/AppHeader.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcQXBwSGVhZGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Shared/MaterialIcon.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcTWF0ZXJpYWxJY29uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Components/Shared/MobileBottomNav.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTaGFyZWRcTW9iaWxlQm90dG9tTmF2LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/AdminDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5EYXNoYm9hcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/ForgotPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRm9yZ290UGFzc3dvcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/GuideManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR3VpZGVNYW5hZ2VtZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/GuidePortal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR3VpZGVQb3J0YWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/GuideProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR3VpZGVQcm9maWxlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/VerifyAccount.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVmVyaWZ5QWNjb3VudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Pages/Weather.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2VhdGhlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-4xyn72ql1t
+
+[D:/FPT/SU26/PRN232/prn232-su26-ai-audit-project-prn232_se18d05_group-02/WanderXClient/WanderXClient/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-fbf901b07p

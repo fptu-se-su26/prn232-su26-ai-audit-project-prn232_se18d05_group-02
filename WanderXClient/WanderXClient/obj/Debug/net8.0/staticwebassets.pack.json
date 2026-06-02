@@ -1,0 +1,65 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\bin\\Debug\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js",
+      "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js"
+    },
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\obj\\Debug\\net8.0\\scopedcss\\bundle\\WanderXClient.styles.css",
+      "PackagePath": "staticwebassets\\WanderXClient.styles.css"
+    },
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\wwwroot\\appsettings.json",
+      "PackagePath": "staticwebassets\\appsettings.json"
+    },
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\wwwroot\\css\\app.css",
+      "PackagePath": "staticwebassets\\css\\app.css"
+    },
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\wwwroot\\css\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\wwwroot\\css\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\wwwroot\\icon-192.png",
+      "PackagePath": "staticwebassets\\icon-192.png"
+    },
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "D:\\FPT\\SU26\\PRN232\\prn232-su26-ai-audit-project-prn232_se18d05_group-02\\WanderXClient\\WanderXClient\\wwwroot\\sample-data\\weather.json",
+      "PackagePath": "staticwebassets\\sample-data\\weather.json"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.WanderXClient.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.WanderXClient.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.WanderXClient.props",
+      "PackagePath": "build\\WanderXClient.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.WanderXClient.props",
+      "PackagePath": "buildMultiTargeting\\WanderXClient.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.WanderXClient.props",
+      "PackagePath": "buildTransitive\\WanderXClient.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

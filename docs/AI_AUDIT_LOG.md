@@ -315,51 +315,131 @@ Sau lần sử dụng AI đầu tiên này để phác thảo danh sách màn h�
 
 | Nội dung | Thông tin |
 |---|---|
-| Ngày sử dụng |  |
-| Công cụ AI | ChatGPT / Gemini / Claude / GitHub Copilot / Cursor / Antigravity / Khác |
-| Mục đích sử dụng |  |
-| Phần việc liên quan | Requirement / Design / Database / Frontend / Backend / Testing / Debug / Report / Presentation / Other |
-| Mức độ sử dụng | Hỗ trợ ý tưởng / Hỗ trợ một phần / Hỗ trợ nhiều / Sinh chính nội dung |
+| Ngày sử dụng | 25/05/2026 |
+| Công cụ AI | GitHub Copilot / ChatGPT |
+| Mục đích sử dụng | Implement Guide Management Backend Features |
+| Phần việc liên quan | Backend / Database |
+| Mức độ sử dụng | Hỗ trợ một phần |
 
 #### 4.1. Prompt đã sử dụng
 
 ```text
-Dán nguyên văn prompt đã hỏi AI tại đây.
+Tiến hành chức năng Quản lý hướng dẫn viên:
+1. Thêm hướng dẫn viên
+2. Cập nhật thông tin hướng dẫn viên (hướng dẫn viên có thể tự cập nhật)
+3. Cập nhật ngôn ngữ (chuyên ngành ngôn ngữ của hướng dẫn viên), khu vực và kinh nghiệm (đi hướng dẫn được bao nhiêu tour rồi?)
+
+Yêu cầu:
+- Tạo API endpoint cho các chức năng trên
+- Implement logic xử lý trong backend (.NET 8)
+- Thiết kế database schema cho guide management
+- Ensure validation và authorization (guides chỉ có thể edit profile của mình)
 ```
 
 #### 4.2. Kết quả AI gợi ý
 
 ```text
-Viết tại đây...
+1. Database Schema:
+   - Table: Guides
+     * GuidId (PK)
+     * FullName
+     * PhoneNumber
+     * Email
+     * Languages (JSON/String array)
+     * ServiceAreas (JSON/String array)
+     * ExperienceTours (số tour đã hướng dẫn)
+     * TotalRating
+     * Status (Active/Inactive/OnLeave)
+     * CreatedDate
+     * UpdatedDate
+
+2. API Endpoints:
+   - POST /api/guides - Create new guide
+   - GET /api/guides/{id} - Get guide details
+   - PUT /api/guides/{id} - Update guide information
+   - PATCH /api/guides/{id}/profile - Guide tự cập nhật profile
+   - GET /api/guides - List all guides with filters
+   - PATCH /api/guides/{id}/languages - Update guide languages
+   - PATCH /api/guides/{id}/areas - Update service areas
+   - PATCH /api/guides/{id}/experience - Update experience info
+
+3. Request/Response Models:
+   - CreateGuideRequest
+   - UpdateGuideRequest
+   - GuideProfileUpdateRequest
+   - GuideDto
+   - GuideLanguageDto
+   - GuidExperienceDto
+
+4. Validation Rules:
+   - Email validation
+   - Phone number validation
+   - At least one language required
+   - At least one service area required
+   - Experience count should be non-negative
+
+5. Authorization:
+   - Admin: Full access to all guide operations
+   - Staff: Can create and manage guides
+   - Guide: Can only update their own profile information
 ```
 
 #### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
 
 ```text
-Viết tại đây...
+1. Database schema design và model structure cho Guide management
+2. API endpoint structure và routing convention
+3. Request/Response DTO models
+4. Validation logic và authorization checks
+5. Repository pattern implementation cho guide data access
+6. Service layer design cho business logic
+7. Exception handling strategy
 ```
 
 #### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
 
 ```text
-Viết tại đây...
+1. Thêm fields: Avatar, Bio, Certification, LanguageProficiency (level)
+2. Tối ưu Service Areas: thay vì string array, tạo separate table GuideServiceArea để quản lý Many-to-Many relationship
+3. Tối ưu Languages: tạo separate table GuideLanguage với proficiency level
+4. Thêm Rating/Review tracking: GuidRating table để track average rating
+5. Audit trail: Thêm logging khi cập nhật guide information
+6. Thêm status management: OnLeave, Inactive states có effective dates
+7. Performance optimization: Implement caching cho guide list
+8. Enhance query filters: Search by name, email, language, area, experience range
+9. Thêm guide assignment history tracking
 ```
 
 #### 4.5. Minh chứng
 
 | Loại minh chứng | Nội dung |
 |---|---|
-| Link commit |  |
-| File liên quan |  |
-| Screenshot |  |
-| Kết quả chạy/test |  |
-| Link video demo |  |
-| Ghi chú khác |  |
+| Link commit | WanderXServer/Repositories/ (Guide-related repositories) |
+| File liên quan | WanderXServer/Models/Guide.cs, WanderXServer/Services/GuideService.cs, WanderXServer/Controllers/GuideController.cs |
+| Screenshot | ../img/AI_AUDIT_LOG/ai-use-2-guide-management.png |
+| Kết quả chạy/test | API endpoints tested via Postman/Swagger |
+| Link video demo | N/A |
+| Ghi chú khác | Xem CHANGELOG.md cho chi tiết implementation |
 
 #### 4.6. Nhận xét cá nhân/nhóm
 
 ```text
-Viết tại đây...
+Lần sử dụng AI thứ 2 này cho phép nhóm nhanh chóng thiết kế database schema và API structure cho Guide Management module. 
+AI cung cấp một foundation tốt về:
+
+1. RESTful API design conventions
+2. DTO pattern và validation approach
+3. Authorization strategy cho role-based access control
+
+Tuy nhiên, nhóm phải thực hiện các cải tiến quan trọng:
+
+1. Tối ưu database design bằng cách tạo separate tables cho Languages và Service Areas thay vì using JSON arrays
+2. Thêm nhiều fields thực tế hơn như Avatar, Bio, Certification, LanguageProficiency level
+3. Implement audit logging để track thay đổi
+4. Optimize queries và implement caching strategies
+5. Enhance validation logic phù hợp hơn với yêu cầu business
+
+Điều này chứng minh rằng AI là công cụ hỗ trợ tốt nhưng vẫn cần human expertise để tạo ra solution hoàn chỉnh và production-ready.
 ```
 
 ---

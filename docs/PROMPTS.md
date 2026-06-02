@@ -52,8 +52,8 @@ Sinh viên/nhóm cần ghi lại:
 
 | STT | Ngày | Công cụ AI | Mục đích | Prompt tóm tắt | Kết quả chính | Có sử dụng vào bài không? | Minh chứng |
 |---:|---|---|---|---|---|---|---|
-| 1 |  |  |  |  |  | Có / Không |  |
-| 2 |  |  |  |  |  | Có / Không |  |
+| 1 | 17/05/2026 | ChatGPT / Gemini / Antigravity | Generate UI screens design | Liệt kê tất cả màn hình cần thiết cho hệ thống | 59 màn hình được phân loại thành 5 nhóm chính | Có | PROMPTS.md - Prompt-01 |
+| 2 | 25/5/2026 | GitHub Copilot / ChatGPT | Guide Management Backend Implementation | Triển khai chức năng quản lý hướng dẫn viên (CRUD, authorization, validation) | Database schema, API endpoints, authorization strategy | Có | PROMPTS.md - Prompt số 2 |
 | 3 |  |  |  |  |  | Có / Không |  |
 | 4 |  |  |  |  |  | Có / Không |  |
 | 5 |  |  |  |  |  | Có / Không |  |
@@ -168,48 +168,141 @@ Viết tại đây...
 
 | Nội dung | Thông tin |
 |---|---|
-| Ngày sử dụng |  |
-| Công cụ AI | ChatGPT / Gemini / Claude / GitHub Copilot / Cursor / Antigravity / Khác |
-| Mục đích |  |
-| Phần việc liên quan | Requirement / Design / Database / Coding / Testing / Debug / Report / Presentation / Other |
-| Mức độ sử dụng | Hỏi ý tưởng / Hỏi giải thích / Hỏi review / Hỏi debug / Hỏi sinh code / Hỏi tối ưu |
+| Ngày sử dụng | 25/05/2026 |
+| Công cụ AI | GitHub Copilot / ChatGPT |
+| Mục đích | Triển khai chức năng quản lý hướng dẫn viên và Guide Portal |
+| Phần việc liên quan | Database / Coding / Design |
+| Mức độ sử dụng | Hỏi sinh code / Hỏi review / Hỏi debug |
 
 #### 5.1. Prompt nguyên văn
 
 ```text
-Dán nguyên văn prompt đã hỏi AI tại đây.
+Tiến hành chức năng Quản lý hướng dẫn viên:
+1. Thêm hướng dẫn viên
+2. Cập nhật thông tin hướng dẫn viên (hướng dẫn viên có thể tự cập nhật)
+3. Cập nhật ngôn ngữ (chuyên ngành ngôn ngữ của hướng dẫn viên), khu vực và kinh nghiệm (đi hướng dẫn được bao nhiêu tour rồi?)
+
+Yêu cầu implement:
+- Tạo Database schema cho Guide model
+- Implement API endpoints (Create, Read, Update, Delete)
+- Thêm authorization: Guides chỉ có thể update profile của chính mình
+- Implement repository pattern
+- Validation logic cho input
 ```
 
 #### 5.2. Bối cảnh khi viết prompt
 
 ```text
-Viết tại đây...
+Sau khi xác định màn hình design ở prompt 1, nhóm cần phải bắt tay vào triển khai phần backend cho Guide Management module. Đây là một phần quan trọng vì:
+1. Guide là vai trò chính trong hệ thống tour du lịch
+2. Cần quản lý thông tin ngôn ngữ, khu vực phục vụ, kinh nghiệm
+3. Cần implement authorization để guides chỉ có thể edit profile của chính họ
+4. Đây là phần backend .NET core, cần thiết kế database schema và API endpoints
+
+Nhóm sử dụng prompt để nhận hướng dẫn từ AI về cấu trúc database, API design, và best practices cho implement phần này.
 ```
 
 #### 5.3. Kết quả AI trả về
 
 ```text
-Viết tại đây...
+AI gợi ý:
+
+1. Database Schema - Guide Model:
+   - GuidId (Primary Key)
+   - UserId (Foreign Key từ User table)
+   - FullName, PhoneNumber, Email
+   - Languages (JSON array hoặc separate table)
+   - ServiceAreas (JSON array hoặc separate table)
+   - ExperienceTours (int - số tour đã hướng dẫn)
+   - TotalRating (decimal)
+   - Status (Active/Inactive/OnLeave)
+   - Avatar (URL)
+   - Bio (text)
+   - CreatedDate, UpdatedDate
+
+2. Recommended API Endpoints:
+   - POST /api/guides - Create guide (Admin/Staff only)
+   - GET /api/guides - List all guides with filtering
+   - GET /api/guides/{id} - Get guide details
+   - PUT /api/guides/{id} - Update guide (Admin/Staff)
+   - PATCH /api/guides/{id}/profile - Guide update own profile
+   - DELETE /api/guides/{id} - Delete guide
+   - PATCH /api/guides/{id}/status - Update guide status
+
+3. Request/Response Models:
+   - CreateGuideRequest
+   - UpdateGuideRequest
+   - GuideProfileUpdateRequest
+   - GuideDto with nested LanguageDto, AreaDto
+
+4. Authorization Strategy:
+   - [Authorize(Roles = "Admin,Staff")] cho endpoints create/delete
+   - [Authorize(Roles = "Admin,Staff,Guide")] cho endpoints read
+   - Kiểm tra UserId khi Guide update own profile
+
+5. Validation:
+   - Email format validation
+   - Phone number validation
+   - At least one language required
+   - ExperienceTours >= 0
 ```
 
 #### 5.4. Kết quả đã áp dụng vào bài
 
 ```text
-Viết tại đây...
+1. Tạo Guide model class với các properties gợi ý của AI
+2. Implement GuideRepository và IGuideRepository interface theo Repository pattern
+3. Tạo GuideService với business logic
+4. Implement GuideController với 7 endpoints như gợi ý
+5. Sử dụng Authorize attributes cho authorization
+6. Implement validation logic trong Request models
+7. Tạo DTOs (Data Transfer Objects) cho API communication
+8. Thêm authorization check: Guide chỉ có thể update profile của chính mình
+9. Implement filtering và searching cho guide list
 ```
 
 #### 5.5. Phần sinh viên/nhóm đã chỉnh sửa hoặc cải tiến
 
 ```text
-Viết tại đây...
+1. Tối ưu Database Design:
+   - Thay vì sử dụng JSON array cho Languages và ServiceAreas, nhóm tạo separate tables:
+     * GuideLanguage (GuidId, LanguageId, ProficiencyLevel)
+     * GuideServiceArea (GuidId, AreaId)
+   - Điều này tốt hơn cho querying, filtering và normalization
+
+2. Thêm nhiều fields thực tế:
+   - Certification (certificate/qualification)
+   - YearsOfExperience (năm kinh nghiệm)
+   - IsVerified (guide đã verify chưa)
+   - VerificationDate
+
+3. Enhance API Features:
+   - Thêm GET /api/guides/available/{tourDate} - lấy guides available cho ngày tour cụ thể
+   - Thêm search/filter by language, area, rating
+   - Implement pagination cho list guides
+   - Thêm sorting options (by rating, experience, name)
+
+4. Implement Audit Trail:
+   - Ghi log khi guide update profile
+   - Track profile change history
+
+5. Thêm Guide Portal Features:
+   - GET /api/guides/me - Get current guide info
+   - GET /api/guides/me/assigned-tours - Get assigned tours
+   - PUT /api/guides/me/assigned-tours/{tourId}/reject - Reject tour assignment
+
+6. Performance Optimization:
+   - Implement caching cho guide list
+   - Use lazy loading cho related entities
+   - Optimize queries để giảm N+1 problem
 ```
 
 #### 5.6. Đánh giá chất lượng prompt
 
-- [ ] Prompt rõ ràng
-- [ ] Prompt có đủ bối cảnh
+- [X] Prompt rõ ràng
+- [X] Prompt có đủ bối cảnh
 - [ ] Prompt còn thiếu thông tin
-- [ ] Prompt tạo ra kết quả tốt
+- [X] Prompt tạo ra kết quả tốt
 - [ ] Prompt tạo ra kết quả chưa phù hợp
 - [ ] Cần hỏi lại AI nhiều lần
 - [ ] Cần tự kiểm tra và chỉnh sửa nhiều
@@ -219,17 +312,21 @@ Viết tại đây...
 
 | Loại minh chứng | Nội dung |
 |---|---|
-| Link commit |  |
-| File liên quan |  |
-| Screenshot |  |
-| Kết quả chạy/test |  |
-| Link tài liệu/báo cáo |  |
-| Ghi chú khác |  |
+| Link commit | WanderXServer/Repositories/GuideRepository.cs |
+| File liên quan | WanderXServer/Models/Guide.cs, WanderXServer/Services/GuideService.cs, WanderXServer/Controllers/GuideController.cs |
+| Screenshot | ../img/AI_AUDIT_LOG/guide-management-api-swagger.png |
+| Kết quả chạy/test | Postman test results - all endpoints passed |
+| Link tài liệu/báo cáo | CHANGELOG.md section [Phase 04] - Guide Management Implementation |
+| Ghi chú khác | Xem AI_AUDIT_LOG.md lần sử dụng AI số 2 để xem chi tiết |
 
 #### 5.8. Ghi chú thêm
 
 ```text
-Viết tại đây...
+- AI cung cấp foundation tốt cho database design và API structure
+- Nhóm phải thực hiện nhiều cải tiến để tối ưu cho production
+- Việc tạo separate tables cho Languages và ServiceAreas là quyết định thiết kế đúng đắn
+- Các feature enhance như pagination, caching, audit logging không phải là AI gợi ý mà nhóm tự bổ sung
+- Quá trình này minh họa rõ: AI là công cụ hỗ trợ, nhưng developer vẫn cần expertise để tạo production-quality code
 ```
 
 ---
