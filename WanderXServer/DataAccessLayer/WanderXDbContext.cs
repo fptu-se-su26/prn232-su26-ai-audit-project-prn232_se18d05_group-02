@@ -28,77 +28,12 @@ public class WanderXDbContext : DbContext
 
         var passwordHasher = new PasswordHasher<ApplicationUser>();
 
-        if (!Users.Any())
-        {
-            var admin = new ApplicationUser
-            {
-                FullName = "WanderX Admin",
-                Email = "ad@ad.123",
-                NormalizedEmail = NormalizeEmail("ad@ad.123"),
-                PhoneNumber = "+10000000000",
-                Role = UserRole.Admin,
-                IsEmailConfirmed = true,
-                IsPhoneConfirmed = true
-            };
-
-            admin.PasswordHash = passwordHasher.HashPassword(admin, "123456");
-            Users.Add(admin);
-        }
-
-        if (!GuideProfiles.Any())
-        {
-            AddGuide(
-                passwordHasher,
-                "Elena Rodriguez",
-                "elena.guide@wanderx.com",
-                "+34123456789",
-                "Spanish, English, French",
-                "High-Altitude Trekking",
-                "Europe Alps",
-                86,
-                "Active",
-                "Certified trekking leader for alpine and cultural routes.");
-            AddGuide(
-                passwordHasher,
-                "Kenji Tanaka",
-                "kenji.guide@wanderx.com",
-                "+81312345678",
-                "Japanese, English",
-                "Culinary Arts",
-                "Kyoto and Kansai",
-                112,
-                "On Tour",
-                "Food historian specializing in private markets and seasonal dining.");
-            AddGuide(
-                passwordHasher,
-                "Zara Nkosi",
-                "zara.guide@wanderx.com",
-                "+27111234567",
-                "Zulu, English, French",
-                "Safari Wildlife",
-                "Southern Africa",
-                47,
-                "Active",
-                "Wildlife interpreter for conservation-first safari experiences.");
-            AddGuide(
-                passwordHasher,
-                "Marcus Vane",
-                "marcus.guide@wanderx.com",
-                "+442012345678",
-                "English, German",
-                "European History",
-                "Western Europe",
-                154,
-                "Unavailable",
-                "Museum-trained historian for heritage and architecture tours.");
-        }
+        SeedAdmin(passwordHasher);
+        SeedGuides(passwordHasher);
 
         SaveChanges();
-
-        if (!GuideTourAssignments.Any())
-        {
-            SeedGuideTourAssignments();
-        }
+        SeedGuideTourAssignments();
+        SaveChanges();
     }
 
     private void EnsureGuideTourAssignmentsTable()
@@ -136,72 +71,21 @@ END
     private void SeedGuideTourAssignments()
     {
         var today = DateTime.Today;
-        AddAssignment(
-            "elena.guide@wanderx.com",
-            "WX-ALP-102",
-            "Swiss Alps Photography Trek",
-            "Zermatt, Switzerland",
-            "Europe Alps",
-            today.AddDays(-1),
-            today.AddDays(3),
-            8,
-            "Zermatt Station, north entrance",
-            "Confirmed",
-            "Lead a premium alpine photography route, coordinate sunrise viewpoints, and manage safety pacing.");
-        AddAssignment(
-            "elena.guide@wanderx.com",
-            "WX-VEN-214",
-            "Venice Hidden Canals",
-            "Venice, Italy",
-            "Northern Italy",
-            today.AddDays(12),
-            today.AddDays(15),
-            6,
-            "Hotel Danieli lobby",
-            "Assigned",
-            "Private cultural walking tour with artisan workshop and evening cicchetti tasting.");
-        AddAssignment(
-            "kenji.guide@wanderx.com",
-            "WX-KYO-330",
-            "Kyoto Culinary Immersion",
-            "Kyoto, Japan",
-            "Kyoto and Kansai",
-            today.AddDays(5),
-            today.AddDays(9),
-            10,
-            "Nishiki Market west gate",
-            "Confirmed",
-            "Market orientation, tea ceremony coordination, and private kaiseki dining support.");
-        AddAssignment(
-            "zara.guide@wanderx.com",
-            "WX-SAF-718",
-            "Serengeti Conservation Safari",
-            "Serengeti, Tanzania",
-            "Southern Africa",
-            today.AddDays(20),
-            today.AddDays(27),
-            12,
-            "Arusha Coffee Lodge reception",
-            "Assigned",
-            "Wildlife interpretation, conservation briefing, and daily field logistics for safari guests.");
 
-        SaveChanges();
+        foreach (var assignment in DevelopmentAssignments)
+        {
+            AddAssignment(today, assignment);
+        }
     }
 
-    private void AddAssignment(
-        string guideEmail,
-        string tourCode,
-        string tourName,
-        string destination,
-        string region,
-        DateTime startDate,
-        DateTime endDate,
-        int travelerCount,
-        string meetingPoint,
-        string status,
-        string itinerarySummary)
+    private void AddAssignment(DateTime today, DevelopmentAssignment assignment)
     {
-        var normalizedEmail = NormalizeEmail(guideEmail);
+        if (GuideTourAssignments.Any(item => item.TourCode == assignment.TourCode))
+        {
+            return;
+        }
+
+        var normalizedEmail = NormalizeEmail(assignment.GuideEmail);
         var guide = GuideProfiles.FirstOrDefault(item => item.User.NormalizedEmail == normalizedEmail);
 
         if (guide is null)
@@ -209,55 +93,115 @@ END
             return;
         }
 
+        var startDate = today.AddDays(assignment.StartOffsetDays);
+        var endDate = today.AddDays(assignment.EndOffsetDays);
+        var declinedAt = assignment.Status.Equals("Declined", StringComparison.OrdinalIgnoreCase)
+            ? today.AddDays(assignment.EndOffsetDays).AddHours(10)
+            : (DateTime?)null;
+        var finishedAt = assignment.Status.Equals("Finished", StringComparison.OrdinalIgnoreCase)
+            ? today.AddDays(assignment.EndOffsetDays).AddHours(18)
+            : (DateTime?)null;
+
         GuideTourAssignments.Add(new GuideTourAssignment
         {
             GuideProfileId = guide.Id,
-            TourCode = tourCode,
-            TourName = tourName,
-            Destination = destination,
-            Region = region,
+            TourCode = assignment.TourCode,
+            TourName = assignment.TourName,
+            Destination = assignment.Destination,
+            Region = assignment.Region,
             StartDate = startDate,
             EndDate = endDate,
-            TravelerCount = travelerCount,
-            MeetingPoint = meetingPoint,
-            Status = status,
-            ItinerarySummary = itinerarySummary
+            TravelerCount = assignment.TravelerCount,
+            MeetingPoint = assignment.MeetingPoint,
+            Status = assignment.Status,
+            ItinerarySummary = assignment.ItinerarySummary,
+            DeclineReason = assignment.DeclineReason,
+            DeclinedAt = declinedAt,
+            FinishedAt = finishedAt,
+            CreatedAt = today.AddDays(assignment.StartOffsetDays - 14),
+            UpdatedAt = declinedAt ?? finishedAt
         });
     }
 
-    private void AddGuide(
-        PasswordHasher<ApplicationUser> passwordHasher,
-        string fullName,
-        string email,
-        string phoneNumber,
-        string languages,
-        string expertiseArea,
-        string region,
-        int completedTours,
-        string status,
-        string bio)
+    private void SeedAdmin(PasswordHasher<ApplicationUser> passwordHasher)
     {
-        var user = new ApplicationUser
+        const string adminEmail = "ad@ad.123";
+        var normalizedEmail = NormalizeEmail(adminEmail);
+
+        if (Users.Any(user => user.NormalizedEmail == normalizedEmail))
         {
-            FullName = fullName,
-            Email = email,
-            NormalizedEmail = NormalizeEmail(email),
-            PhoneNumber = phoneNumber,
-            Role = UserRole.Guide,
+            return;
+        }
+
+        var admin = new ApplicationUser
+        {
+            FullName = "WanderX Admin",
+            Email = adminEmail,
+            NormalizedEmail = normalizedEmail,
+            PhoneNumber = "+10000000000",
+            Role = UserRole.Admin,
             IsEmailConfirmed = true,
             IsPhoneConfirmed = true
         };
-        user.PasswordHash = passwordHasher.HashPassword(user, "Guide@123");
+
+        admin.PasswordHash = passwordHasher.HashPassword(admin, "123456");
+        Users.Add(admin);
+    }
+
+    private void SeedGuides(PasswordHasher<ApplicationUser> passwordHasher)
+    {
+        foreach (var guide in DevelopmentGuides)
+        {
+            AddGuide(passwordHasher, guide);
+        }
+    }
+
+    private void AddGuide(PasswordHasher<ApplicationUser> passwordHasher, DevelopmentGuide guide)
+    {
+        var normalizedEmail = NormalizeEmail(guide.Email);
+
+        if (GuideProfiles.Any(profile => profile.User.NormalizedEmail == normalizedEmail))
+        {
+            return;
+        }
+
+        var user = Users.FirstOrDefault(item => item.NormalizedEmail == normalizedEmail);
+
+        if (user is null)
+        {
+            user = new ApplicationUser
+            {
+                FullName = guide.FullName,
+                Email = guide.Email,
+                NormalizedEmail = normalizedEmail,
+                PhoneNumber = guide.PhoneNumber,
+                Role = UserRole.Guide,
+                IsEmailConfirmed = true,
+                IsPhoneConfirmed = true
+            };
+            user.PasswordHash = passwordHasher.HashPassword(user, "Guide@123");
+        }
+        else
+        {
+            user.FullName = guide.FullName;
+            user.Email = guide.Email;
+            user.NormalizedEmail = normalizedEmail;
+            user.PhoneNumber = guide.PhoneNumber;
+            user.Role = UserRole.Guide;
+            user.IsEmailConfirmed = true;
+            user.IsPhoneConfirmed = true;
+            user.UpdatedAt = DateTime.UtcNow;
+        }
 
         GuideProfiles.Add(new GuideProfile
         {
             User = user,
-            Languages = languages,
-            ExpertiseArea = expertiseArea,
-            Region = region,
-            CompletedTours = completedTours,
-            Status = status,
-            Bio = bio
+            Languages = guide.Languages,
+            ExpertiseArea = guide.ExpertiseArea,
+            Region = guide.Region,
+            CompletedTours = guide.CompletedTours,
+            Status = guide.Status,
+            Bio = guide.Bio
         });
     }
 
@@ -265,4 +209,150 @@ END
     {
         return email.Trim().ToUpperInvariant();
     }
+
+    private static readonly DevelopmentGuide[] DevelopmentGuides =
+    {
+        new(
+            "Elena Rodriguez",
+            "elena.guide@wanderx.com",
+            "+34123456789",
+            "Spanish, English, French",
+            "High-Altitude Trekking",
+            "Europe Alps",
+            86,
+            "On Tour",
+            "Certified trekking leader for alpine and cultural routes."),
+        new(
+            "Kenji Tanaka",
+            "kenji.guide@wanderx.com",
+            "+81312345678",
+            "Japanese, English",
+            "Culinary Arts",
+            "Kyoto and Kansai",
+            112,
+            "On Tour",
+            "Food historian specializing in private markets and seasonal dining."),
+        new(
+            "Zara Nkosi",
+            "zara.guide@wanderx.com",
+            "+27111234567",
+            "English, French",
+            "Safari Wildlife",
+            "Southern Africa",
+            47,
+            "Active",
+            "Wildlife interpreter for conservation-first safari experiences."),
+        new(
+            "Marcus Vane",
+            "marcus.guide@wanderx.com",
+            "+442012345678",
+            "English, German",
+            "European History",
+            "Western Europe",
+            154,
+            "Unavailable",
+            "Museum-trained historian for heritage and architecture tours."),
+        new(
+            "Linh Pham",
+            "linh.guide@wanderx.com",
+            "+84901234567",
+            "Vietnamese, English, Korean",
+            "Heritage Walks",
+            "Hue, Da Nang, Hoi An",
+            63,
+            "On Tour",
+            "Central Vietnam specialist for royal heritage, craft villages, and coastal food trails."),
+        new(
+            "Aisha Rahman",
+            "aisha.guide@wanderx.com",
+            "+971501234567",
+            "English, French, Thai",
+            "Desert Expeditions",
+            "UAE and Oman",
+            78,
+            "Active",
+            "Desert logistics guide focused on private family itineraries and soft-adventure routes."),
+        new(
+            "Diego Silva",
+            "diego.guide@wanderx.com",
+            "+5511987654321",
+            "Spanish, English, Italian",
+            "Rainforest Ecology",
+            "Amazon Basin",
+            39,
+            "Active",
+            "Eco-guide for rainforest conservation trips, river routes, and birding experiences."),
+        new(
+            "Mira Novak",
+            "mira.guide@wanderx.com",
+            "+385911234567",
+            "English, German, Italian",
+            "Island Sailing",
+            "Adriatic Coast",
+            91,
+            "Unavailable",
+            "Sailing host and coastal culture guide for small-group Adriatic itineraries.")
+    };
+
+    private static readonly DevelopmentAssignment[] DevelopmentAssignments =
+    {
+        new("elena.guide@wanderx.com", "WX-ALP-102", "Swiss Alps Photography Trek", "Zermatt, Switzerland", "Europe Alps", -1, 3, 8, "Zermatt Station, north entrance", "Confirmed", "Lead a premium alpine photography route, coordinate sunrise viewpoints, and manage safety pacing."),
+        new("elena.guide@wanderx.com", "WX-VEN-214", "Venice Hidden Canals", "Venice, Italy", "Northern Italy", 12, 15, 6, "Hotel Danieli lobby", "Assigned", "Private cultural walking tour with artisan workshop and evening cicchetti tasting."),
+        new("elena.guide@wanderx.com", "WX-ROM-078", "Rome After Hours", "Rome, Italy", "Central Italy", -18, -15, 4, "Piazza Navona fountain", "Finished", "After-hours private landmarks route with gallery access, local host coordination, and supper transfer."),
+        new("elena.guide@wanderx.com", "WX-PYR-441", "Pyrenees Luxury Traverse", "Andorra la Vella, Andorra", "Europe Alps", 31, 35, 9, "Grand Plaza Hotel reception", "Confirmed", "Four-day mountain traverse with vehicle support, wellness stops, and daily route briefings."),
+
+        new("kenji.guide@wanderx.com", "WX-NAR-504", "Nara Temples and Tea", "Nara, Japan", "Kansai", -2, 1, 7, "Kintetsu Nara Station east gate", "Confirmed", "Temple etiquette support, tea master coordination, and cultural storytelling across private shrine visits."),
+        new("kenji.guide@wanderx.com", "WX-KYO-330", "Kyoto Culinary Immersion", "Kyoto, Japan", "Kyoto and Kansai", 5, 9, 10, "Nishiki Market west gate", "Assigned", "Market orientation, tea ceremony coordination, and private kaiseki dining support."),
+        new("kenji.guide@wanderx.com", "WX-OSA-119", "Osaka Street Food Lab", "Osaka, Japan", "Kansai", -9, -7, 12, "Namba Station exit 14", "Finished", "Hands-on takoyaki workshop, local bar crawl routing, and dietary preference support."),
+        new("kenji.guide@wanderx.com", "WX-TOK-204", "Tokyo Design Weekend", "Tokyo, Japan", "Kanto", 19, 22, 5, "Aoyama Grand Hotel lobby", "Assigned", "Architecture, fashion ateliers, and private design studio visits for a small creative group."),
+
+        new("zara.guide@wanderx.com", "WX-SAF-718", "Serengeti Conservation Safari", "Serengeti, Tanzania", "Southern Africa", 20, 27, 12, "Arusha Coffee Lodge reception", "Assigned", "Wildlife interpretation, conservation briefing, and daily field logistics for safari guests."),
+        new("zara.guide@wanderx.com", "WX-KRU-635", "Kruger Big Five Field Notes", "Kruger National Park, South Africa", "Southern Africa", 2, 6, 8, "Skukuza Airport arrivals", "Confirmed", "Morning game drives, track-reading sessions, and family-friendly conservation storytelling."),
+        new("zara.guide@wanderx.com", "WX-CPT-088", "Cape Town Coastal Wildlife", "Cape Town, South Africa", "Southern Africa", -25, -22, 6, "V&A Waterfront Clock Tower", "Finished", "Penguin colony visit, marine ecology briefing, and coastal picnic coordination."),
+        new("zara.guide@wanderx.com", "WX-VIC-012", "Victoria Falls River Walk", "Livingstone, Zambia", "Southern Africa", 14, 17, 10, "Royal Livingstone Hotel veranda", "Declined", "River trail guiding, waterfall history, and sunset boat support.", "Visa processing conflict with another cross-border assignment."),
+
+        new("marcus.guide@wanderx.com", "WX-LON-901", "London Museum Privileges", "London, United Kingdom", "Western Europe", -10, -8, 5, "British Museum main entrance", "Declined", "Curated museum access with architectural context and private dining transfer.", "Guide unavailable for medical appointment."),
+        new("marcus.guide@wanderx.com", "WX-PAR-510", "Paris Belle Epoque", "Paris, France", "Western Europe", 40, 44, 6, "Le Meurice lobby", "Assigned", "Private Belle Epoque architecture route with atelier visit and evening performance transfer."),
+
+        new("linh.guide@wanderx.com", "WX-HUE-226", "Hue Imperial Heritage", "Hue, Vietnam", "Central Vietnam", -1, 2, 9, "Azerai La Residence lobby", "Confirmed", "Imperial Citadel interpretation, dragon boat logistics, and royal cuisine experience coordination."),
+        new("linh.guide@wanderx.com", "WX-HAN-315", "Hoi An Lantern Makers", "Hoi An, Vietnam", "Central Vietnam", 8, 10, 5, "Japanese Covered Bridge", "Assigned", "Old town craft route, lantern workshop translation, and riverside dinner support."),
+        new("linh.guide@wanderx.com", "WX-DNG-144", "Da Nang Coastal Wellness", "Da Nang, Vietnam", "Central Vietnam", -16, -13, 4, "InterContinental Sun Peninsula lobby", "Finished", "Wellness-focused coastal route with spa transfers, seafood tasting, and sunrise photo stops."),
+
+        new("aisha.guide@wanderx.com", "WX-DXB-618", "Dubai Design and Desert", "Dubai, UAE", "UAE and Oman", 6, 8, 7, "Museum of the Future entrance", "Confirmed", "Contemporary design route, private desert camp handoff, and family-friendly pacing."),
+        new("aisha.guide@wanderx.com", "WX-MCT-407", "Muscat Forts and Frankincense", "Muscat, Oman", "UAE and Oman", 23, 26, 6, "Al Alam Palace parking court", "Assigned", "Coastal forts, souq interpretation, and frankincense workshop coordination."),
+        new("aisha.guide@wanderx.com", "WX-AUH-090", "Abu Dhabi Grand Mosque Etiquette", "Abu Dhabi, UAE", "UAE and Oman", -13, -12, 11, "Grand Mosque visitor center", "Declined", "Cultural etiquette briefing and mosque architecture tour.", "Family emergency; requested reassignment before confirmation."),
+
+        new("diego.guide@wanderx.com", "WX-AMZ-552", "Amazon Dawn Birding", "Manaus, Brazil", "Amazon Basin", 11, 16, 6, "Manaus river port pier 3", "Assigned", "Dawn birding route, canopy safety briefing, and lodge-to-river coordination."),
+        new("diego.guide@wanderx.com", "WX-PER-662", "Peruvian Cloud Forest", "Cusco, Peru", "Amazon Basin", 29, 34, 8, "Cusco airport domestic arrivals", "Confirmed", "Cloud forest ecology, lodge orientation, and daily trail difficulty checks."),
+        new("diego.guide@wanderx.com", "WX-RIO-203", "Rio Atlantic Forest Day", "Rio de Janeiro, Brazil", "Brazil Coast", -21, -20, 5, "Copacabana Palace entrance", "Finished", "Atlantic forest nature walk, viewpoint timing, and local lunch coordination."),
+
+        new("mira.guide@wanderx.com", "WX-ADR-884", "Croatian Islands by Sail", "Split, Croatia", "Adriatic Coast", 17, 24, 8, "Split marina gate B", "Assigned", "Island-hopping route, marina coordination, swim-stop safety, and coastal storytelling."),
+        new("mira.guide@wanderx.com", "WX-DBV-733", "Dubrovnik Walls at Sunrise", "Dubrovnik, Croatia", "Adriatic Coast", -6, -5, 4, "Pile Gate outer bridge", "Finished", "Early-access wall walk, filming-location context, and breakfast terrace transfer."),
+        new("mira.guide@wanderx.com", "WX-HVR-520", "Hvar Wine and Sail", "Hvar, Croatia", "Adriatic Coast", 4, 7, 6, "Hvar harbor customs pier", "Declined", "Sailing day with vineyard visit and island dinner booking.", "Boat captain schedule changed; guide requested operations review.")
+    };
+
+    private sealed record DevelopmentGuide(
+        string FullName,
+        string Email,
+        string PhoneNumber,
+        string Languages,
+        string ExpertiseArea,
+        string Region,
+        int CompletedTours,
+        string Status,
+        string Bio);
+
+    private sealed record DevelopmentAssignment(
+        string GuideEmail,
+        string TourCode,
+        string TourName,
+        string Destination,
+        string Region,
+        int StartOffsetDays,
+        int EndOffsetDays,
+        int TravelerCount,
+        string MeetingPoint,
+        string Status,
+        string ItinerarySummary,
+        string? DeclineReason = null);
 }

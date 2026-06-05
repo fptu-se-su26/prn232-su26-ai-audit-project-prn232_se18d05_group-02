@@ -1,6 +1,8 @@
 @page "/guide-portal"
+@using System.Globalization
 @inject GuideTourApiClient GuideTourApi
 @inject AuthSessionService AuthSession
+@inject IJSRuntime JsRuntime
 
 <PageTitle>Guide Portal - WanderX</PageTitle>
 
@@ -75,69 +77,160 @@
 
             @if (HasGuideSession && _scheduleLoaded)
             {
-                <section class="guide-table-shell">
-                    <div class="guide-table-toolbar">
+                <section class="guide-calendar-shell">
+                    <div class="guide-calendar-toolbar">
                         <div>
-                            <p>@_assignments.Count assigned tour(s)</p>
+                            <p class="guide-eyebrow">Calendar view</p>
+                            <h2>@_visibleMonth.ToString("MMMM yyyy", CultureInfo.InvariantCulture)</h2>
+                            <span>@GetVisibleMonthTourCount() tour(s) this month</span>
                         </div>
-                        <a class="wx-button wx-button--outline" href="/guide-profile">
-                            <MaterialIcon Name="manage_accounts" />
-                            Profile
-                        </a>
+                        <div class="guide-calendar-actions">
+                            <button class="guide-icon-button" type="button" title="Previous month" @onclick="ShowPreviousMonth">
+                                <MaterialIcon Name="chevron_left" />
+                            </button>
+                            <button class="wx-button wx-button--outline" type="button" @onclick="ShowCurrentMonth">
+                                <MaterialIcon Name="today" />
+                                Today
+                            </button>
+                            <label class="guide-calendar-date-picker" title="Filter by date">
+                                <MaterialIcon Name="event" />
+                                <input type="date" value="@DateFilterInputValue" @onchange="OnDatePickerChanged" />
+                            </label>
+                            <button class="guide-icon-button" type="button" title="Next month" @onclick="ShowNextMonth">
+                                <MaterialIcon Name="chevron_right" />
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="guide-table-scroll">
-                        <table class="guide-table guide-schedule-table">
-                            <thead>
-                                <tr>
-                                    <th>Tour</th>
-                                    <th>Date</th>
-                                    <th>Destination</th>
-                                    <th>Travelers</th>
-                                    <th>Status</th>
-                                    <th class="guide-table__actions">Detail</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (_assignments.Count == 0)
+                    @if (_assignments.Count == 0)
+                    {
+                        <div class="guide-empty guide-empty--compact">
+                            <MaterialIcon Name="event_busy" />
+                            No assigned tours were found.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="guide-calendar-filterbar">
+                            <div class="guide-filter-group" role="group" aria-label="Filter tour status">
+                                @foreach (var status in StatusFilterOptions)
                                 {
-                                    <tr>
-                                        <td colspan="6">
-                                            <div class="guide-empty guide-empty--compact">
-                                                <MaterialIcon Name="event_busy" />
-                                                No assigned tours were found.
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <button class="@GetStatusFilterClass(status)" type="button" @onclick="() => SetStatusFilter(status)">
+                                        @status
+                                    </button>
                                 }
-                                else
-                                {
-                                    @foreach (var assignment in _assignments)
-                                    {
-                                        <tr class="@(assignment.Id == _selectedAssignment?.Id ? "guide-schedule-row--active" : null)">
-                                            <td>
+                            </div>
+
+                            @if (_selectedDateFilter is DateTime selectedDate)
+                            {
+                                <button class="guide-date-filter-pill" type="button" @onclick="ClearDateFilter">
+                                    <MaterialIcon Name="event" />
+                                    @selectedDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture)
+                                    <MaterialIcon Name="close" />
+                                </button>
+                            }
+
+                            <p class="guide-calendar-filter-hint">
+                                <MaterialIcon Name="touch_app" />
+                                Select a calendar day or use the date picker to filter tours by date.
+                            </p>
+                        </div>
+
+                        <div class="guide-calendar-weekdays">
+                            @foreach (var weekday in CalendarWeekdays)
+                            {
+                                <span>@weekday</span>
+                            }
+                        </div>
+
+                        <div class="guide-calendar-grid">
+                            @foreach (var day in GetCalendarDays())
+                            {
+                                <div class="@GetCalendarDayClass(day)">
+                                    <div class="guide-calendar-day__head">
+                                        <button class="guide-calendar-day-date" type="button" @onclick="() => ToggleDateFilter(day.Date)">
+                                            @day.Date.Day
+                                        </button>
+                                        @if (day.IsToday)
+                                        {
+                                            <strong>Today</strong>
+                                        }
+                                    </div>
+
+                                    <div class="guide-calendar-events">
+                                        @foreach (var assignment in day.Assignments.Take(MaxEventsPerDay))
+                                        {
+                                            <button class="@GetCalendarEventClass(assignment)" type="button" @onclick="() => SelectCalendarAssignment(assignment)" @onclick:stopPropagation="true">
                                                 <strong>@assignment.TourName</strong>
-                                                <span class="guide-table-subtext">@assignment.TourCode</span>
-                                            </td>
-                                            <td>@FormatDateRange(assignment)</td>
-                                            <td>@assignment.Destination</td>
-                                            <td>@assignment.TravelerCount</td>
-                                            <td>
-                                                <span class="@GetTourStatusClass(assignment)">
-                                                    <span></span>
-                                                    @assignment.Status
-                                                </span>
-                                            </td>
-                                            <td class="guide-table__actions">
-                                                <button class="guide-icon-button" type="button" title="View detail" @onclick="() => SelectAssignment(assignment)">
-                                                    <MaterialIcon Name="visibility" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                        </table>
+                                                <span>@assignment.Destination</span>
+                                            </button>
+                                        }
+
+                                        @if (day.Assignments.Count > MaxEventsPerDay)
+                                        {
+                                            <span class="guide-calendar-more">
+                                                +@(day.Assignments.Count - MaxEventsPerDay) more
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="guide-calendar-legend">
+                            @foreach (var status in CalendarLegendStatuses)
+                            {
+                                <span class="@GetCalendarLegendClass(status)" style="color: @GetCalendarStatusColor(status);">
+                                    <i></i>
+                                    @status
+                                </span>
+                            }
+                        </div>
+                    }
+                </section>
+            }
+
+            @if (HasGuideSession && _scheduleLoaded && _assignments.Count > 0)
+            {
+                <section class="guide-table-shell guide-upcoming-shell">
+                    <div class="guide-table-toolbar">
+                        <div>
+                            <p>Upcoming assigned tour(s)</p>
+                        </div>
+                    </div>
+
+                    @{
+                        var upcomingAssignments = GetUpcomingAssignments();
+                    }
+
+                    <div class="guide-upcoming-list">
+                        @if (upcomingAssignments.Count == 0)
+                        {
+                            <div class="guide-empty guide-empty--compact">
+                                <MaterialIcon Name="filter_alt_off" />
+                                No tours match the current filters.
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var assignment in upcomingAssignments)
+                            {
+                                <button id="@GetUpcomingAssignmentElementId(assignment.Id)"
+                                        class="@(assignment.Id == _selectedAssignment?.Id ? "guide-upcoming-item guide-upcoming-item--active" : "guide-upcoming-item")"
+                                        type="button"
+                                        @onclick="() => SelectAssignment(assignment)">
+                                    <span class="@GetCalendarEventDotClass(assignment)"></span>
+                                    <div>
+                                        <strong>@assignment.TourName</strong>
+                                        <p>@FormatDateRange(assignment) - @assignment.Destination</p>
+                                    </div>
+                                    <span class="@GetTourStatusClass(assignment)">
+                                        <span></span>
+                                        @assignment.Status
+                                    </span>
+                                </button>
+                            }
+                        }
                     </div>
                 </section>
             }
@@ -184,18 +277,21 @@
                         </div>
                     }
 
-                    <div class="guide-tour-actions">
-                        <button class="wx-button wx-button--secondary" type="button" disabled="@(!_selectedAssignment.CanFinish || _isSaving)" @onclick="FinishSelectedAsync">
-                            <MaterialIcon Name="done_all" />
-                            Mark Finished
-                        </button>
-                        <button class="wx-button wx-button--outline" type="button" disabled="@(!_selectedAssignment.CanDecline || _isSaving)" @onclick="ToggleDeclinePanel">
-                            <MaterialIcon Name="cancel" />
-                            Decline Tour
-                        </button>
-                    </div>
+                    @if (CanShowTourActions(_selectedAssignment))
+                    {
+                        <div class="guide-tour-actions">
+                            <button class="wx-button wx-button--secondary" type="button" disabled="@(!_selectedAssignment.CanFinish || _isSaving)" @onclick="FinishSelectedAsync">
+                                <MaterialIcon Name="done_all" />
+                                Mark Finished
+                            </button>
+                            <button class="wx-button wx-button--outline" type="button" disabled="@(!_selectedAssignment.CanDecline || _isSaving)" @onclick="ToggleDeclinePanel">
+                                <MaterialIcon Name="cancel" />
+                                Decline Tour
+                            </button>
+                        </div>
+                    }
 
-                    @if (_isDeclinePanelOpen)
+                    @if (_isDeclinePanelOpen && _selectedAssignment.CanDecline)
                     {
                         <EditForm Model="@_declineModel" OnValidSubmit="@DeclineSelectedAsync" class="guide-form">
                             <DataAnnotationsValidator />
@@ -220,9 +316,16 @@
 </div>
 
 @code {
+    private const int MaxEventsPerDay = 3;
+    private static readonly string[] CalendarWeekdays = new[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    private static readonly string[] CalendarLegendStatuses = new[] { "Assigned", "Confirmed", "Finished", "Declined" };
+    private static readonly string[] StatusFilterOptions = new[] { "All", "Assigned", "Confirmed", "Finished", "Declined" };
+
     private readonly DeclineTourRequest _declineModel = new();
     private List<GuideTourAssignmentResponse> _assignments = new();
     private GuideTourAssignmentResponse? _selectedAssignment;
+    private DateTime _visibleMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    private DateTime? _selectedDateFilter;
     private bool _isLoading;
     private bool _isSaving;
     private bool _isError;
@@ -230,6 +333,8 @@
     private bool _isDeclinePanelOpen;
     private bool _requiresLogin;
     private bool _accessDenied;
+    private bool _calendarMonthInitialized;
+    private Guid? _pendingScrollAssignmentId;
     private string _guideEmail = string.Empty;
     private string _guideName = string.Empty;
     private string? _message;
@@ -237,6 +342,10 @@
     private bool HasGuideSession => !_requiresLogin && !_accessDenied && !string.IsNullOrWhiteSpace(_guideEmail);
 
     private string GuideAvailability => _assignments.Any(item => item.IsCurrentBusyTour) ? "Busy" : "Available";
+
+    private string _statusFilter = "All";
+
+    private string DateFilterInputValue => _selectedDateFilter?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -271,6 +380,17 @@
         await LoadScheduleAsync();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_pendingScrollAssignmentId is not Guid assignmentId)
+        {
+            return;
+        }
+
+        _pendingScrollAssignmentId = null;
+        await JsRuntime.InvokeVoidAsync("wanderX.scrollToElement", GetUpcomingAssignmentElementId(assignmentId));
+    }
+
     private async Task LoadScheduleAsync()
     {
         if (!HasGuideSession)
@@ -287,6 +407,7 @@
         try
         {
             _assignments = await GuideTourApi.GetScheduleAsync(_guideEmail);
+            InitializeCalendarMonth();
             _selectedAssignment = _assignments.FirstOrDefault(item =>
                 item.Status.Equals("Confirmed", StringComparison.OrdinalIgnoreCase) ||
                 item.Status.Equals("Assigned", StringComparison.OrdinalIgnoreCase)) ?? _assignments.FirstOrDefault();
@@ -311,6 +432,13 @@
         _isDeclinePanelOpen = false;
         _message = null;
         _isError = false;
+    }
+
+    private void SelectCalendarAssignment(GuideTourAssignmentResponse assignment)
+    {
+        SelectAssignment(assignment);
+        _selectedDateFilter = null;
+        _pendingScrollAssignmentId = assignment.Id;
     }
 
     private void ToggleDeclinePanel()
@@ -396,6 +524,181 @@
         _selectedAssignment = _assignments.FirstOrDefault(item => item.Id == updated.Id) ?? updated;
     }
 
+    private List<CalendarDayCell> GetCalendarDays()
+    {
+        var firstDayOfMonth = new DateTime(_visibleMonth.Year, _visibleMonth.Month, 1);
+        var gridStart = firstDayOfMonth.AddDays(-(int)firstDayOfMonth.DayOfWeek);
+
+        return Enumerable.Range(0, 42)
+            .Select(index =>
+            {
+                var date = gridStart.AddDays(index).Date;
+                var assignments = GetCalendarAssignments()
+                    .Where(item => IsAssignmentOnDate(item, date))
+                    .OrderBy(item => item.StartDate)
+                    .ThenBy(item => item.EndDate)
+                    .ToList();
+
+                return new CalendarDayCell
+                {
+                    Date = date,
+                    IsCurrentMonth = date.Month == _visibleMonth.Month,
+                    IsToday = date == DateTime.Today,
+                    Assignments = assignments
+                };
+            })
+            .ToList();
+    }
+
+    private List<GuideTourAssignmentResponse> GetUpcomingAssignments()
+    {
+        var today = DateTime.Today;
+
+        var orderedAssignments = GetCalendarAssignments()
+            .Where(MatchesDateFilter)
+            .OrderBy(item => item.EndDate.Date < today ? 1 : 0)
+            .ThenBy(item => item.StartDate)
+            .ThenBy(item => item.TourName)
+            .ToList();
+        var visibleAssignments = orderedAssignments.Take(6).ToList();
+
+        if (_selectedAssignment is not null && visibleAssignments.All(item => item.Id != _selectedAssignment.Id))
+        {
+            var selectedAssignment = orderedAssignments.FirstOrDefault(item => item.Id == _selectedAssignment.Id);
+
+            if (selectedAssignment is not null)
+            {
+                visibleAssignments.Add(selectedAssignment);
+            }
+        }
+
+        return visibleAssignments;
+    }
+
+    private int GetVisibleMonthTourCount()
+    {
+        return GetCalendarAssignments().Count(IsAssignmentVisibleInMonth);
+    }
+
+    private void ShowPreviousMonth()
+    {
+        _visibleMonth = _visibleMonth.AddMonths(-1);
+    }
+
+    private void ShowNextMonth()
+    {
+        _visibleMonth = _visibleMonth.AddMonths(1);
+    }
+
+    private void ShowCurrentMonth()
+    {
+        var today = DateTime.Today;
+        _visibleMonth = new DateTime(today.Year, today.Month, 1);
+    }
+
+    private void InitializeCalendarMonth()
+    {
+        if (_calendarMonthInitialized)
+        {
+            return;
+        }
+
+        var anchorAssignment = _assignments.FirstOrDefault(item => item.IsCurrentBusyTour)
+            ?? _assignments
+                .Where(item => item.EndDate.Date >= DateTime.Today)
+                .OrderBy(item => item.StartDate)
+                .FirstOrDefault()
+            ?? _assignments
+                .OrderByDescending(item => item.StartDate)
+                .FirstOrDefault();
+
+        var anchorDate = anchorAssignment?.StartDate.Date ?? DateTime.Today;
+        _visibleMonth = new DateTime(anchorDate.Year, anchorDate.Month, 1);
+        _calendarMonthInitialized = true;
+    }
+
+    private bool IsAssignmentVisibleInMonth(GuideTourAssignmentResponse assignment)
+    {
+        var monthStart = new DateTime(_visibleMonth.Year, _visibleMonth.Month, 1);
+        var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+        return assignment.StartDate.Date <= monthEnd && assignment.EndDate.Date >= monthStart;
+    }
+
+    private static bool IsAssignmentOnDate(GuideTourAssignmentResponse assignment, DateTime date)
+    {
+        return assignment.StartDate.Date <= date.Date && assignment.EndDate.Date >= date.Date;
+    }
+
+    private IEnumerable<GuideTourAssignmentResponse> GetCalendarAssignments()
+    {
+        return _assignments.Where(MatchesStatusFilter);
+    }
+
+    private bool MatchesStatusFilter(GuideTourAssignmentResponse assignment)
+    {
+        return _statusFilter.Equals("All", StringComparison.OrdinalIgnoreCase) ||
+            assignment.Status.Equals(_statusFilter, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool MatchesDateFilter(GuideTourAssignmentResponse assignment)
+    {
+        return _selectedDateFilter is not DateTime selectedDate ||
+            IsAssignmentOnDate(assignment, selectedDate);
+    }
+
+    private void SetStatusFilter(string status)
+    {
+        _statusFilter = status;
+
+        if (_selectedAssignment is not null && !MatchesStatusFilter(_selectedAssignment))
+        {
+            _selectedAssignment = null;
+            _isDeclinePanelOpen = false;
+        }
+    }
+
+    private void ToggleDateFilter(DateTime date)
+    {
+        _selectedDateFilter = _selectedDateFilter?.Date == date.Date ? null : date.Date;
+
+        if (_selectedAssignment is not null && !MatchesDateFilter(_selectedAssignment))
+        {
+            _selectedAssignment = null;
+            _isDeclinePanelOpen = false;
+        }
+    }
+
+    private void OnDatePickerChanged(ChangeEventArgs args)
+    {
+        var value = args.Value?.ToString();
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            ClearDateFilter();
+            return;
+        }
+
+        if (!DateTime.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var selectedDate))
+        {
+            return;
+        }
+
+        _selectedDateFilter = selectedDate.Date;
+        _visibleMonth = new DateTime(selectedDate.Year, selectedDate.Month, 1);
+
+        if (_selectedAssignment is not null && !MatchesDateFilter(_selectedAssignment))
+        {
+            _selectedAssignment = null;
+            _isDeclinePanelOpen = false;
+        }
+    }
+
+    private void ClearDateFilter()
+    {
+        _selectedDateFilter = null;
+    }
+
     private static string FormatDateRange(GuideTourAssignmentResponse assignment)
     {
         return $"{assignment.StartDate:dd MMM yyyy} - {assignment.EndDate:dd MMM yyyy}";
@@ -420,6 +723,102 @@
         };
     }
 
+    private string GetCalendarDayClass(CalendarDayCell day)
+    {
+        var cssClass = "guide-calendar-day";
+
+        if (!day.IsCurrentMonth)
+        {
+            cssClass += " guide-calendar-day--outside";
+        }
+
+        if (day.IsToday)
+        {
+            cssClass += " guide-calendar-day--today";
+        }
+
+        if (_selectedAssignment is not null && IsAssignmentOnDate(_selectedAssignment, day.Date))
+        {
+            cssClass += " guide-calendar-day--selected";
+        }
+
+        if (day.Assignments.Any(item => item.IsCurrentBusyTour))
+        {
+            cssClass += " guide-calendar-day--busy";
+        }
+
+        if (_selectedDateFilter?.Date == day.Date)
+        {
+            cssClass += " guide-calendar-day--filtered";
+        }
+
+        return cssClass;
+    }
+
+    private string GetStatusFilterClass(string status)
+    {
+        return _statusFilter.Equals(status, StringComparison.OrdinalIgnoreCase)
+            ? "guide-filter guide-filter--active"
+            : "guide-filter";
+    }
+
+    private string GetCalendarEventClass(GuideTourAssignmentResponse assignment)
+    {
+        var cssClass = $"guide-calendar-event guide-calendar-event--{GetCalendarStatusModifier(assignment.Status)}";
+
+        if (assignment.Id == _selectedAssignment?.Id)
+        {
+            cssClass += " guide-calendar-event--active";
+        }
+
+        return cssClass;
+    }
+
+    private static string GetCalendarEventDotClass(GuideTourAssignmentResponse assignment)
+    {
+        return $"guide-upcoming-dot guide-upcoming-dot--{GetCalendarStatusModifier(assignment.Status)}";
+    }
+
+    private static string GetCalendarLegendClass(string status)
+    {
+        return $"guide-calendar-legend-item guide-calendar-legend-item--{GetCalendarStatusModifier(status)}";
+    }
+
+    private static string GetCalendarStatusModifier(string status)
+    {
+        return status.Trim().ToLowerInvariant() switch
+        {
+            "assigned" => "assigned",
+            "confirmed" => "confirmed",
+            "finished" => "finished",
+            "declined" => "declined",
+            _ => "default"
+        };
+    }
+
+    private static string GetCalendarStatusColor(string status)
+    {
+        return GetCalendarStatusModifier(status) switch
+        {
+            "assigned" => "#007a6c",
+            "confirmed" => "#0052cc",
+            "finished" => "#667085",
+            "declined" => "#ba1a1a",
+            _ => "#434654"
+        };
+    }
+
+    private static string GetUpcomingAssignmentElementId(Guid assignmentId)
+    {
+        return $"upcoming-tour-{assignmentId:N}";
+    }
+
+    private static bool CanShowTourActions(GuideTourAssignmentResponse assignment)
+    {
+        return !assignment.Status.Equals("Declined", StringComparison.OrdinalIgnoreCase) &&
+            !assignment.Status.Equals("Finished", StringComparison.OrdinalIgnoreCase);
+    }
+
     private static string ToUserMessage(Exception exception)
     {
         return exception.Message.Contains('{')
@@ -427,4 +826,14 @@
             : exception.Message;
     }
 
+    private sealed class CalendarDayCell
+    {
+        public DateTime Date { get; init; }
+
+        public bool IsCurrentMonth { get; init; }
+
+        public bool IsToday { get; init; }
+
+        public List<GuideTourAssignmentResponse> Assignments { get; init; } = new();
+    }
 }

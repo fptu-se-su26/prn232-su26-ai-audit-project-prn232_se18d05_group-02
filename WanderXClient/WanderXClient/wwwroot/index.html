@@ -30,6 +30,16 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+    <script>
+        window.wanderX = window.wanderX || {};
+        window.wanderX.scrollToElement = function (elementId) {
+            const element = document.getElementById(elementId);
+
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        };
+    </script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
