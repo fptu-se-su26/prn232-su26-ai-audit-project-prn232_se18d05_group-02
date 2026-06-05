@@ -448,51 +448,113 @@ Tuy nhiên, nhóm phải thực hiện các cải tiến quan trọng:
 
 | Nội dung | Thông tin |
 |---|---|
-| Ngày sử dụng |  |
-| Công cụ AI | ChatGPT / Gemini / Claude / GitHub Copilot / Cursor / Antigravity / Khác |
-| Mục đích sử dụng |  |
-| Phần việc liên quan | Requirement / Design / Database / Frontend / Backend / Testing / Debug / Report / Presentation / Other |
-| Mức độ sử dụng | Hỗ trợ ý tưởng / Hỗ trợ một phần / Hỗ trợ nhiều / Sinh chính nội dung |
+| Ngày sử dụng | 05/06/2026 |
+| Công cụ AI | ChatGPT / Antigravity |
+| Mục đích sử dụng | Chỉnh sửa và hoàn thiện UX cho trang Guide Portal |
+| Phần việc liên quan | Frontend |
+| Mức độ sử dụng | Hỗ trợ một phần |
 
 #### 4.1. Prompt đã sử dụng
 
 ```text
-Dán nguyên văn prompt đã hỏi AI tại đây.
+Khi nhấn vào 1 tour bên trong calendar thì sẽ nhảy xuống tour phía dưới Upcoming assigned tour(s). Thêm filter theo tour status và filter bằng cách chọn ngày trên lịch.
 ```
 
 #### 4.2. Kết quả AI gợi ý
 
 ```text
-Viết tại đây...
+AI gợi ý các hướng giải quyết:
+
+1. Kiến trúc:
+   - Sử dụng event listener trên calendar elements
+   - Implement smooth scroll tới section Upcoming assigned tours
+   - State management: selectedDate, selectedStatus, filteredTours
+
+2. Cơ chế hoạt động:
+   - Click trên date → lưu selectedDate vào state
+   - Filter tours: array.filter(tour => tour.date === selectedDate && tour.status === selectedStatus)
+   - Scroll: element.scrollIntoView({behavior: 'smooth'})
+
+3. UI Components:
+   - Calendar (có highlight selected date)
+   - Filter chips/buttons cho status (Assigned, Confirmed, In Progress, Finished)
+   - Upcoming tours list (scroll-to-target)
+   - Reset filter button
+
+4. Code patterns:
+   - React hooks (useState, useEffect, useRef)
+   - Event handlers cho calendar clicks
+   - Array filtering logic
+   - Scroll behavior implementation
 ```
 
 #### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
 
 ```text
-Viết tại đây...
+1. Event handling pattern: Click listener trên calendar dates
+2. Scroll functionality: scrollIntoView() với smooth behavior
+3. Filter logic structure: Multi-criteria filtering (date + status)
+4. State management approach: selectedDate và selectedStatus state
+5. Component architecture: Tách filter logic từ display logic
 ```
 
 #### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
 
 ```text
-Viết tại đây...
+1. UI/UX enhancements:
+   - Tinh chỉnh smooth scroll timing (duration, easing)
+   - Thêm visual indicators: highlight selected date, bold active filter
+   - Improve responsive design cho mobile
+   - Thêm animation transitions cho better UX
+
+2. Feature refinements:
+   - Lọc theo date và status đồng thời (multi-filter)
+   - Hiển thị tour count cho mỗi status
+   - Thêm "Clear All Filters" button
+   - Persist filter state khi navigate away và quay lại
+
+3. Performance optimizations:
+   - Memoize filtered tours (useMemo) để tránh unnecessary re-renders
+   - Lazy load tour details khi cần
+   - Debounce filter updates
+
+4. Accessibility improvements:
+   - Keyboard navigation cho calendar
+   - ARIA labels cho filter buttons
+   - Screen reader support cho scroll-to functionality
 ```
 
 #### 4.5. Minh chứng
 
 | Loại minh chứng | Nội dung |
 |---|---|
-| Link commit |  |
-| File liên quan |  |
+| Link commit | WanderXClient/Pages/GuidePage.razor |
+| File liên quan | WanderXClient/Components/GuidePortal.razor, WanderXClient/js/guide-calendar.js |
 | Screenshot |  |
-| Kết quả chạy/test |  |
-| Link video demo |  |
-| Ghi chú khác |  |
+| Kết quả chạy/test | Tested calendar click, date filter, status filter, scroll behavior |
+| Link video demo | N/A |
+| Ghi chú khác | Feature hoàn thiện trong phase cuối của Guide Portal implementation |
 
 #### 4.6. Nhận xét cá nhân/nhóm
 
 ```text
-Viết tại đây...
+Lần sử dụng AI thứ 3 này cho phép nhóm nhanh chóng thiết kế UX flow cho Guide Portal calendar feature:
+
+1. Ưu điểm:
+   - AI cung cấp rõ kiến trúc state management
+   - Gợi ý cách implement scroll behavior hiệu quả
+   - Gợi ý multi-filter logic
+
+2. Điều chỉnh nhóm:
+   - Tinh chỉnh UX interaction để mượt hơn
+   - Thêm performance optimization (memoization)
+   - Enhance accessibility
+   - Cải thiện responsive design cho mobile
+
+3. Bài học:
+   - AI là tốt cho brainstorming UI interactions
+   - Nhưng cần human judgment cho UX details
+   - Performance và accessibility không phải lúc nào AI cũng suggest
 ```
 
 ---
@@ -507,13 +569,13 @@ Viết tại đây...
 | Viết user story/use case |  |  |  |  |  |
 | Thiết kế database |  |  |  |  |  |
 | Thiết kế kiến trúc hệ thống |  |  |  |  |  |
-| Thiết kế giao diện |  |  |  |  |  |
-| Code frontend |  |  |  |  |  |
+| Thiết kế giao diện |  |  | X |  | Sử dụng AI cho Guide Portal calendar design (Prompt 3) |
+| Code frontend |  | X |  |  | AI hỗ trợ ý tưởng pattern, nhóm tự implement chi tiết (Prompt 3) |
 | Code backend |  |  |  |  |  |
 | Debug lỗi |  |  |  |  |  |
 | Viết test case |  |  |  |  |  |
 | Kiểm thử sản phẩm |  |  |  |  |  |
-| Tối ưu code |  |  |  |  |  |
+| Tối ưu code |  | X |  |  | AI gợi ý, nhóm implement tối ưu thêm (Prompt 3) |
 | Viết báo cáo |  |  |  |  |  |
 | Làm slide thuyết trình |  |  |  |  |  |
 

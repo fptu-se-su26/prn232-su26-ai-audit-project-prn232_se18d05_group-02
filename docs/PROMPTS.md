@@ -54,7 +54,7 @@ Sinh viên/nhóm cần ghi lại:
 |---:|---|---|---|---|---|---|---|
 | 1 | 17/05/2026 | ChatGPT / Gemini / Antigravity | Generate UI screens design | Liệt kê tất cả màn hình cần thiết cho hệ thống | 59 màn hình được phân loại thành 5 nhóm chính | Có | PROMPTS.md - Prompt-01 |
 | 2 | 25/5/2026 | GitHub Copilot / ChatGPT | Guide Management Backend Implementation | Triển khai chức năng quản lý hướng dẫn viên (CRUD, authorization, validation) | Database schema, API endpoints, authorization strategy | Có | PROMPTS.md - Prompt số 2 |
-| 3 |  |  |  |  |  | Có / Không |  |
+| 3 | 05/06/2026 | ChatGPT / Antigravity | Guide Portal Calendar & Filter UX | Khi nhấn vào tour trên calendar, nhảy xuống + filter theo status & date | Calendar click handling, smooth scroll, multi-criteria filter | Có | PROMPTS.md - Prompt số 3 |
 | 4 |  |  |  |  |  | Có / Không |  |
 | 5 |  |  |  |  |  | Có / Không |  |
 | 6 |  |  |  |  |  | Có / Không |  |
@@ -314,7 +314,7 @@ AI gợi ý:
 |---|---|
 | Link commit | WanderXServer/Repositories/GuideRepository.cs |
 | File liên quan | WanderXServer/Models/Guide.cs, WanderXServer/Services/GuideService.cs, WanderXServer/Controllers/GuideController.cs |
-| Screenshot | ../img/AI_AUDIT_LOG/guide-management-api-swagger.png |
+| Screenshot |  |
 | Kết quả chạy/test | Postman test results - all endpoints passed |
 | Link tài liệu/báo cáo | CHANGELOG.md section [Phase 04] - Guide Management Implementation |
 | Ghi chú khác | Xem AI_AUDIT_LOG.md lần sử dụng AI số 2 để xem chi tiết |
@@ -335,40 +335,82 @@ AI gợi ý:
 
 | Nội dung | Thông tin |
 |---|---|
-| Ngày sử dụng |  |
-| Công cụ AI | ChatGPT / Gemini / Claude / GitHub Copilot / Cursor / Antigravity / Khác |
-| Mục đích |  |
-| Phần việc liên quan | Requirement / Design / Database / Coding / Testing / Debug / Report / Presentation / Other |
-| Mức độ sử dụng | Hỏi ý tưởng / Hỏi giải thích / Hỏi review / Hỏi debug / Hỏi sinh code / Hỏi tối ưu |
+| Ngày sử dụng | 05/06/2026 |
+| Công cụ AI | ChatGPT / Antigravity |
+| Mục đích | Chỉnh sửa và hoàn thiện UX cho trang Guide Portal |
+| Phần việc liên quan | Frontend |
+| Mức độ sử dụng | Hỗ trợ một phần |
 
 #### 5.1. Prompt nguyên văn
 
 ```text
-Dán nguyên văn prompt đã hỏi AI tại đây.
+Khi nhấn vào 1 tour bên trong calendar thì sẽ nhảy xuống tour phía dưới Upcoming assigned tour(s). Thêm filter theo tour status và filter bằng cách chọn ngày trên lịch.
 ```
 
 #### 5.2. Bối cảnh khi viết prompt
 
 ```text
-Viết tại đây...
+Trang Guide Portal cần cải tiến UX để giúp guide dễ dàng quản lý các tour được phân công. Người dùng muốn:
+1. Khi click vào một ngày trên calendar, tự động scroll xuống phần "Upcoming assigned tour(s)" để xem chi tiết tour
+2. Filter tours theo trạng thái (Assigned, Confirmed, In Progress, Finished, Cancelled,...)
+3. Filter tours theo ngày được chọn trên calendar
+
+Nhóm sử dụng prompt để nhận hướng dẫn từ AI về cách implement các tính năng UX này.
 ```
 
 #### 5.3. Kết quả AI trả về
 
 ```text
-Viết tại đây...
+1. Gợi ý hướng giải quyết:
+   - Sử dụng JavaScript event listener trên calendar để capture click event
+   - Implement scroll-to-element functionality bằng scrollIntoView() hoặc smooth scroll
+   - Thêm filter dropdown/chips cho tour status
+   - Lưu selected date state trong component
+
+2. Code mẫu:
+   - Handle calendar click event: onClick handler trên date element
+   - Filter logic: Filter tour array based on selected date và status
+   - Scroll functionality: document.querySelector().scrollIntoView({behavior: 'smooth'})
+
+3. State management:
+   - selectedDate: store selected date từ calendar
+   - selectedStatus: store selected tour status
+   - filteredTours: computed array based on selected date và status
+
+4. UI Components:
+   - Calendar component (tái sử dụng hoặc enhance từ libraries như react-calendar, fullcalendar)
+   - Filter chips/dropdown cho status
+   - Upcoming tours section (with scroll-to-target)
 ```
 
 #### 5.4. Kết quả đã áp dụng vào bài
 
 ```text
-Viết tại đây...
+1. Implement calendar click handler: Khi user click vào date, capture event và lưu vào state
+2. Implement scroll functionality: Thêm ref vào Upcoming tours section, trigger smooth scroll khi date được selected
+3. Thêm filter UI: Tạo filter chips/dropdown cho tour status
+4. Implement filter logic: Filter tours dựa trên selectedDate và selectedStatus
+5. Update tour list display: Hiển thị filtered tours khi filter state thay đổi
 ```
 
 #### 5.5. Phần sinh viên/nhóm đã chỉnh sửa hoặc cải tiến
 
 ```text
-Viết tại đây...
+1. Code optimization:
+   - Tinh chỉnh smooth scroll timing để UX mượt hơn
+   - Thêm visual feedback khi click vào date (highlight selected date)
+   - Improve filter UI design để phù hợp với design system của app
+
+2. Additional features:
+   - Thêm reset filter button
+   - Hiển thị số lượng tours theo từng status
+   - Thêm loading state khi filter data
+   - Optimize performance: memoize filtered tours để tránh re-render không cần thiết
+
+3. User experience improvements:
+   - Thêm animation khi scroll to tours section
+   - Highlight tour được selected trên calendar
+   - Thêm empty state message khi không có tour phù hợp
 ```
 
 #### 5.6. Đánh giá chất lượng prompt
