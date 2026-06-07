@@ -13,6 +13,27 @@ public sealed class GuideTourApiClient
         _httpClient = httpClient;
     }
 
+    public async Task<List<GuideTourAssignmentResponse>> GetAssignmentsAsync(string? guideEmail = null, string? search = null)
+    {
+        var query = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(guideEmail))
+        {
+            query.Add($"guideEmail={Uri.EscapeDataString(guideEmail)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query.Add($"search={Uri.EscapeDataString(search)}");
+        }
+
+        var path = query.Count == 0
+            ? "api/guide-tours"
+            : $"api/guide-tours?{string.Join("&", query)}";
+
+        return await GetAsync<List<GuideTourAssignmentResponse>>(path) ?? new List<GuideTourAssignmentResponse>();
+    }
+
     public async Task<List<GuideTourAssignmentResponse>> GetScheduleAsync(string email)
     {
         return await GetAsync<List<GuideTourAssignmentResponse>>(
@@ -22,6 +43,22 @@ public sealed class GuideTourApiClient
     public Task<GuideTourAssignmentResponse?> GetByIdAsync(Guid id)
     {
         return GetAsync<GuideTourAssignmentResponse>($"api/guide-tours/{id}");
+    }
+
+    public Task<GuideTourAssignmentResponse?> CreateAssignmentAsync(CreateGuideTourAssignmentRequest request)
+    {
+        return SendAsync<CreateGuideTourAssignmentRequest, GuideTourAssignmentResponse>(
+            HttpMethod.Post,
+            "api/guide-tours",
+            request);
+    }
+
+    public Task<GuideTourAssignmentResponse?> ChangeGuideAsync(Guid id, ChangeGuideAssignmentRequest request)
+    {
+        return SendAsync<ChangeGuideAssignmentRequest, GuideTourAssignmentResponse>(
+            HttpMethod.Put,
+            $"api/guide-tours/{id}/guide",
+            request);
     }
 
     public Task<GuideTourAssignmentResponse?> DeclineAsync(Guid id, DeclineTourRequest request)

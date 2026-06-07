@@ -1,6 +1,7 @@
 @page "/guide-profile"
 @using System.ComponentModel.DataAnnotations
 @inject GuideApiClient GuideApi
+@inject AuthSessionService AuthSession
 
 <PageTitle>Guide Profile - WanderX</PageTitle>
 
@@ -20,36 +21,54 @@
             <div class="guide-self-panel">
                 <div class="guide-section-heading">
                     <div>
-                        <p class="guide-eyebrow">Find profile</p>
-                        <h2>Load by guide email</h2>
+                        @* <p class="guide-eyebrow">Find profile</p> *@
+                        <h2>@(_hasGuideSession ? "Guide profile" : "Load by guide email")</h2>
                     </div>
-                    <a class="wx-button wx-button--outline" href="/guides">
-                        <MaterialIcon Name="admin_panel_settings" />
-                        Admin
-                    </a>
+                    @* <a class="wx-button wx-button--outline" href="/guides"> *@
+                    @* @*     <MaterialIcon Name="admin_panel_settings" /> *@
+                    @* @*     Admin *@
+                    @* @* </a> *@
                 </div>
 
-                <EditForm Model="@_lookup" OnValidSubmit="@LoadProfileAsync" class="guide-form guide-form--lookup">
-                    <DataAnnotationsValidator />
-
-                    <div class="guide-field">
-                        <label for="guide-profile-email">Guide email</label>
-                        <InputText id="guide-profile-email" class="guide-control" type="email" placeholder="elena.guide@wanderx.com" @bind-Value="_lookup.Email" />
-                        <ValidationMessage For="@(() => _lookup.Email)" />
-                    </div>
-
-                    <button class="wx-button" type="submit" disabled="@_isLoadingProfile">
-                        <MaterialIcon Name="manage_search" />
-                        @(_isLoadingProfile ? "Loading..." : "Load Profile")
-                    </button>
-                </EditForm>
-
-                @if (!string.IsNullOrWhiteSpace(_message))
+                @if (_hasGuideSession)
                 {
-                    <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")">
-                        @_message
+                    <div class="guide-session-strip">
+                        <div class="guide-session-avatar">
+                            <MaterialIcon Name="badge" />
+                        </div>
+                        <div class="guide-session-meta">
+                            <span>Signed in guide</span>
+                            <strong>@_signedInGuideName</strong>
+                            <p>@_lookup.Email</p>
+                        </div>
+                        @* <button class="wx-button wx-button--outline" type="button" disabled="@_isLoadingProfile" @onclick="LoadProfileAsync"> *@
+                        @*     <MaterialIcon Name="refresh" /> *@
+                        @*     @(_isLoadingProfile ? "Loading..." : "Refresh") *@
+                        @* </button> *@
                     </div>
                 }
+
+                @* <EditForm Model="@_lookup" OnValidSubmit="@LoadProfileAsync" class="guide-form guide-form--lookup"> *@
+                @*     <DataAnnotationsValidator /> *@
+
+                @*     <div class="guide-field"> *@
+                @*         <label for="guide-profile-email">Guide email</label> *@
+                @*         <InputText id="guide-profile-email" class="guide-control" type="email" placeholder="elena.guide@wanderx.com" readonly="@_hasGuideSession" @bind-Value="_lookup.Email" /> *@
+                @*         <ValidationMessage For="@(() => _lookup.Email)" /> *@
+                @*     </div> *@
+
+                @*     <button class="wx-button" type="submit" disabled="@_isLoadingProfile"> *@
+                @*         <MaterialIcon Name="manage_search" /> *@
+                @*         @(_isLoadingProfile ? "Loading..." : "Load Profile") *@
+                @*     </button> *@
+                @* </EditForm> *@
+
+                @* @if (!string.IsNullOrWhiteSpace(_message)) *@
+                @* { *@
+                @*     <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")"> *@
+                @*         @_message *@
+                @*     </div> *@
+                @* } *@
             </div>
 
             @if (_profileLoaded)
@@ -83,9 +102,52 @@
                                 <ValidationMessage For="@(() => _model.PhoneNumber)" />
                             </div>
 
-                            <div class="guide-field">
+                            <div class="guide-field guide-field--wide">
                                 <label for="self-languages">Languages</label>
-                                <InputText id="self-languages" class="guide-control" @bind-Value="_model.Languages" />
+                                <div id="self-languages" class="guide-language-picker">
+                                    <button class="guide-language-trigger" type="button" @onclick="ToggleLanguagePicker" aria-expanded="@_isLanguagePickerOpen">
+                                        <span class="guide-language-trigger__icon">
+                                            <MaterialIcon Name="translate" />
+                                        </span>
+                                        <span class="guide-language-trigger__text">
+                                            @LanguagePickerSummary
+                                        </span>
+                                        <MaterialIcon Name="@(_isLanguagePickerOpen ? "expand_less" : "expand_more")" />
+                                    </button>
+
+                                    @if (_isLanguagePickerOpen)
+                                    {
+                                        <div class="guide-language-menu">
+                                            @if (_model.SelectedLanguages.Count > 0)
+                                            {
+                                                <div class="guide-language-selected" aria-label="Selected languages">
+                                                    @foreach (var language in _model.SelectedLanguages)
+                                                    {
+                                                        <button class="guide-language-token" type="button" @onclick="() => RemoveLanguage(language)">
+                                                            @language
+                                                            <MaterialIcon Name="close" />
+                                                        </button>
+                                                    }
+                                                </div>
+                                            }
+
+                                            @foreach (var language in LanguageOptions)
+                                            {
+                                                var selected = IsLanguageSelected(language);
+
+                                                <button class="@(selected ? "guide-language-choice guide-language-choice--selected" : "guide-language-choice")"
+                                                        type="button"
+                                                        @onclick="() => ToggleLanguage(language)">
+                                                    <span>@language</span>
+                                                    @if (selected)
+                                                    {
+                                                        <MaterialIcon Name="check" />
+                                                    }
+                                                </button>
+                                            }
+                                        </div>
+                                    }
+                                </div>
                                 <ValidationMessage For="@(() => _model.Languages)" />
                             </div>
 
@@ -103,7 +165,7 @@
 
                             <div class="guide-field">
                                 <label for="self-tours">Completed tours</label>
-                                <InputNumber id="self-tours" class="guide-control" @bind-Value="_model.CompletedTours" />
+                                <InputNumber readonly id="self-tours" class="guide-control" @bind-Value="_model.CompletedTours" />
                                 <ValidationMessage For="@(() => _model.CompletedTours)" />
                             </div>
                         </div>
@@ -131,18 +193,60 @@
 @code {
     private readonly LookupModel _lookup = new();
     private SelfGuideFormModel _model = new();
-    private bool _isLoadingProfile;
     private bool _isSaving;
     private bool _profileLoaded;
-    private bool _isError;
+    private bool _hasGuideSession;
+    private bool _isLanguagePickerOpen;
     private string _status = "Active";
+    private string _signedInGuideName = "Guide account";
     private string? _message;
+    private static readonly string[] LanguageOptions =
+    {
+        "Vietnamese",
+        "English",
+        "Japanese",
+        "Korean",
+        "Chinese",
+        "French",
+        "Spanish",
+        "German",
+        "Italian",
+        "Thai"
+    };
+
+    private string LanguagePickerSummary => _model.SelectedLanguages.Count switch
+    {
+        0 => "Select languages",
+        1 => _model.SelectedLanguages[0],
+        _ => $"{_model.SelectedLanguages.Count} languages selected"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = await AuthSession.GetAsync();
+
+        if (session is null || !session.IsGuide || string.IsNullOrWhiteSpace(session.Email))
+        {
+            return;
+        }
+
+        _hasGuideSession = true;
+        _lookup.Email = session.Email.Trim();
+        _signedInGuideName = string.IsNullOrWhiteSpace(session.FullName)
+            ? "Guide account"
+            : session.FullName.Trim();
+
+        await LoadProfileAsync(showSuccessMessage: false);
+    }
 
     private async Task LoadProfileAsync()
     {
-        _isLoadingProfile = true;
+        await LoadProfileAsync(showSuccessMessage: true);
+    }
+
+    private async Task LoadProfileAsync(bool showSuccessMessage)
+    {
         _message = null;
-        _isError = false;
 
         try
         {
@@ -150,7 +254,6 @@
 
             if (guide is null)
             {
-                _isError = true;
                 _message = "Guide profile was not found.";
                 _profileLoaded = false;
                 return;
@@ -159,17 +262,13 @@
             _model = SelfGuideFormModel.FromGuide(guide);
             _status = guide.Status;
             _profileLoaded = true;
-            _message = "Profile loaded.";
+            _isLanguagePickerOpen = false;
+            _message = showSuccessMessage ? "Profile loaded." : null;
         }
         catch (Exception ex)
         {
-            _isError = true;
             _message = ToUserMessage(ex);
             _profileLoaded = false;
-        }
-        finally
-        {
-            _isLoadingProfile = false;
         }
     }
 
@@ -177,7 +276,6 @@
     {
         _isSaving = true;
         _message = null;
-        _isError = false;
 
         try
         {
@@ -188,11 +286,11 @@
             {
                 _model = SelfGuideFormModel.FromGuide(guide);
                 _status = guide.Status;
+                _isLanguagePickerOpen = false;
             }
         }
         catch (Exception ex)
         {
-            _isError = true;
             _message = ToUserMessage(ex);
         }
         finally
@@ -219,6 +317,26 @@
             : exception.Message;
     }
 
+    private void ToggleLanguagePicker()
+    {
+        _isLanguagePickerOpen = !_isLanguagePickerOpen;
+    }
+
+    private void ToggleLanguage(string language)
+    {
+        _model.SetLanguage(language, !IsLanguageSelected(language), LanguageOptions);
+    }
+
+    private void RemoveLanguage(string language)
+    {
+        _model.SetLanguage(language, isSelected: false, LanguageOptions);
+    }
+
+    private bool IsLanguageSelected(string language)
+    {
+        return _model.SelectedLanguages.Contains(language, StringComparer.OrdinalIgnoreCase);
+    }
+
     private sealed class LookupModel
     {
         [Required(ErrorMessage = "Email is required.")]
@@ -226,7 +344,7 @@
         public string Email { get; set; } = string.Empty;
     }
 
-    private sealed class SelfGuideFormModel
+    private sealed class SelfGuideFormModel : IValidatableObject
     {
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Enter a valid email address.")]
@@ -243,6 +361,8 @@
         [Required(ErrorMessage = "Languages are required.")]
         public string Languages { get; set; } = string.Empty;
 
+        public List<string> SelectedLanguages { get; set; } = new();
+
         [Required(ErrorMessage = "Expertise area is required.")]
         public string ExpertiseArea { get; set; } = string.Empty;
 
@@ -257,17 +377,38 @@
 
         public static SelfGuideFormModel FromGuide(GuideResponse guide)
         {
-            return new SelfGuideFormModel
+            var model = new SelfGuideFormModel
             {
                 Email = guide.Email,
                 FullName = guide.FullName,
                 PhoneNumber = guide.PhoneNumber,
-                Languages = guide.LanguagesText,
                 ExpertiseArea = guide.ExpertiseArea,
                 Region = guide.Region,
                 CompletedTours = guide.CompletedTours,
                 Bio = guide.Bio
             };
+
+            model.SelectedLanguages = SplitLanguages(guide.LanguagesText);
+            model.Languages = string.Join(", ", model.SelectedLanguages);
+            return model;
+        }
+
+        public void SetLanguage(string language, bool isSelected, IEnumerable<string> orderedLanguages)
+        {
+            if (isSelected && !SelectedLanguages.Contains(language, StringComparer.OrdinalIgnoreCase))
+            {
+                SelectedLanguages.Add(language);
+            }
+
+            if (!isSelected)
+            {
+                SelectedLanguages.RemoveAll(item => string.Equals(item, language, StringComparison.OrdinalIgnoreCase));
+            }
+
+            SelectedLanguages = orderedLanguages
+                .Where(item => SelectedLanguages.Contains(item, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+            Languages = string.Join(", ", SelectedLanguages);
         }
 
         public GuideSelfUpdateRequest ToRequest()
@@ -283,6 +424,22 @@
                 CompletedTours = CompletedTours,
                 Bio = Bio
             };
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (SelectedLanguages.Count == 0)
+            {
+                yield return new ValidationResult("Select at least one language.", new[] { nameof(Languages) });
+            }
+        }
+
+        private static List<string> SplitLanguages(string value)
+        {
+            return value
+                .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
         }
     }
 }

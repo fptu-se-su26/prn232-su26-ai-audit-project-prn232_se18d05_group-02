@@ -1096,6 +1096,10 @@ button {
     gap: 7px;
 }
 
+.guide-field--wide {
+    grid-column: span 2;
+}
+
 .guide-field label {
     color: var(--wx-muted);
     font-size: 12px;
@@ -1124,6 +1128,209 @@ button {
     min-height: 104px;
     resize: vertical;
     padding-block: 12px;
+}
+
+.guide-control--compact {
+    min-height: 40px;
+    padding-inline: 10px;
+}
+
+.guide-field-hint {
+    color: var(--wx-muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.guide-assignment-guide-picker {
+    position: relative;
+    display: grid;
+    gap: 8px;
+}
+
+.guide-assignment-guide-picker--compact {
+    min-width: 240px;
+}
+
+.guide-assignment-guide-search {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--wx-outline);
+    border-radius: var(--wx-radius);
+    background: var(--wx-surface-bright);
+    color: var(--wx-muted);
+    padding: 0 13px;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.guide-assignment-guide-search:focus-within {
+    border-color: var(--wx-primary);
+    box-shadow: 0 0 0 4px rgba(0, 61, 155, 0.14);
+}
+
+.guide-assignment-guide-search input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--wx-ink);
+    font: inherit;
+}
+
+.guide-assignment-guide-picker--compact .guide-assignment-guide-search {
+    min-height: 40px;
+    padding-inline: 10px;
+}
+
+.guide-assignment-guide-picker--compact .guide-assignment-guide-search input {
+    font-size: 14px;
+}
+
+.guide-picker-trigger {
+    width: 100%;
+    min-height: 48px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--wx-outline);
+    border-radius: var(--wx-radius);
+    background: var(--wx-surface-bright);
+    color: var(--wx-ink);
+    padding: 0 12px;
+    text-align: left;
+    transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.guide-picker-trigger:hover,
+.guide-picker-trigger[aria-expanded="True"] {
+    border-color: var(--wx-primary);
+    box-shadow: 0 0 0 4px rgba(0, 61, 155, 0.1);
+}
+
+.guide-picker-trigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.guide-picker-trigger--compact {
+    min-height: 40px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-inline: 10px;
+}
+
+.guide-picker-trigger__icon {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--wx-radius-sm);
+    background: var(--wx-primary-soft);
+    color: var(--wx-primary);
+}
+
+.guide-picker-trigger__text {
+    overflow: hidden;
+    color: var(--wx-muted);
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.guide-picker-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    left: 0;
+    z-index: 40;
+    display: grid;
+    gap: 8px;
+    border: 1px solid rgba(195, 198, 214, 0.85);
+    border-radius: var(--wx-radius);
+    background: #ffffff;
+    box-shadow: var(--wx-shadow);
+    padding: 10px;
+}
+
+.guide-picker-menu--compact {
+    right: 0;
+    left: auto;
+    width: min(360px, calc(100vw - 48px));
+}
+
+.guide-picker-search {
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--wx-outline);
+    border-radius: var(--wx-radius);
+    background: var(--wx-surface-bright);
+    color: var(--wx-muted);
+    padding: 0 11px;
+}
+
+.guide-picker-search:focus-within {
+    border-color: var(--wx-primary);
+    box-shadow: 0 0 0 4px rgba(0, 61, 155, 0.1);
+}
+
+.guide-picker-search input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--wx-ink);
+    font: inherit;
+}
+
+.guide-picker-options {
+    display: grid;
+    gap: 6px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.guide-picker-option {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-radius: var(--wx-radius-sm);
+    background: transparent;
+    color: var(--wx-muted);
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.guide-picker-option:hover {
+    background: var(--wx-surface-low);
+    color: var(--wx-primary);
+}
+
+.guide-picker-option--selected {
+    background: var(--wx-primary-soft);
+    color: var(--wx-primary);
+}
+
+.guide-picker-option strong,
+.guide-picker-option small {
+    display: block;
+}
+
+.guide-picker-option strong {
+    color: inherit;
+    font-size: 13px;
+}
+
+.guide-picker-option small {
+    color: var(--wx-muted);
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .guide-language-picker {
@@ -1216,9 +1423,13 @@ button {
 }
 
 .guide-language-selected {
+    grid-column: 1 / -1;
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(195, 198, 214, 0.6);
+    padding-bottom: 10px;
 }
 
 .guide-language-token {
@@ -1287,6 +1498,28 @@ button {
 .guide-filter--active {
     background: var(--wx-primary);
     color: #ffffff;
+}
+
+.guide-assignment-filter {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--wx-outline);
+    border-radius: var(--wx-radius);
+    background: var(--wx-surface-bright);
+    color: var(--wx-muted);
+    padding: 0 12px;
+}
+
+.guide-assignment-filter select {
+    min-width: 180px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--wx-ink);
+    font: inherit;
+    font-weight: 750;
 }
 
 .guide-table-scroll {
@@ -1372,6 +1605,20 @@ button {
     padding: 0 8px;
     font-size: 12px;
     font-weight: 800;
+}
+
+.guide-assignment-table {
+    min-width: 1160px;
+}
+
+.guide-tour-cell strong,
+.guide-tour-cell span {
+    display: block;
+}
+
+.guide-tour-cell span {
+    color: var(--wx-muted);
+    font-size: 13px;
 }
 
 .guide-status {
@@ -2193,6 +2440,10 @@ code {
     .guide-tour-detail-grid,
     .guide-self-layout {
         grid-template-columns: 1fr;
+    }
+
+    .guide-field--wide {
+        grid-column: auto;
     }
 
     .guide-session-strip {

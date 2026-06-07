@@ -28,6 +28,10 @@
                 <MaterialIcon Name="badge" />
                 Guides
             </a>
+            <a class="guide-sidebar__link" href="/guide-assignments">
+                <MaterialIcon Name="assignment_ind" />
+                Assignments
+            </a>
             <a class="guide-sidebar__link" href="/guide-profile">
                 <MaterialIcon Name="manage_accounts" />
                 Self Update
@@ -158,6 +162,19 @@
                                         @if (_isLanguagePickerOpen)
                                         {
                                             <div class="guide-language-menu">
+                                                @if (_form.SelectedLanguages.Count > 0)
+                                                {
+                                                    <div class="guide-language-selected" aria-label="Selected languages">
+                                                        @foreach (var language in _form.SelectedLanguages)
+                                                        {
+                                                            <button class="guide-language-token" type="button" @onclick="() => RemoveLanguage(language)">
+                                                                @language
+                                                                <MaterialIcon Name="close" />
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                }
+
                                                 @foreach (var language in LanguageOptions)
                                                 {
                                                     var selected = IsLanguageSelected(language);
@@ -170,19 +187,6 @@
                                                         {
                                                             <MaterialIcon Name="check" />
                                                         }
-                                                    </button>
-                                                }
-                                            </div>
-                                        }
-
-                                        @if (_form.SelectedLanguages.Count > 0)
-                                        {
-                                            <div class="guide-language-selected" aria-label="Selected languages">
-                                                @foreach (var language in _form.SelectedLanguages)
-                                                {
-                                                    <button class="guide-language-token" type="button" @onclick="() => RemoveLanguage(language)">
-                                                        @language
-                                                        <MaterialIcon Name="close" />
                                                     </button>
                                                 }
                                             </div>

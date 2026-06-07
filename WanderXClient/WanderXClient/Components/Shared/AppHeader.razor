@@ -1,7 +1,9 @@
+@inject AuthSessionService AuthSession
+
 <header class="wx-header">
     <div class="wx-header__inner">
         <div class="wx-header__left">
-            <a class="brand-mark" href="/">WanderX</a>
+            <a class="brand-mark" href="@_brandHref">WanderX</a>
             <label class="wx-search" aria-label="Search destinations">
                 <MaterialIcon Name="search" />
                 <input type="search" placeholder="Search..." />
@@ -25,7 +27,17 @@
 
 <header class="wx-mobile-header">
     <div class="wx-mobile-header__inner">
-        <a class="brand-mark" href="/">WanderX</a>
+        <a class="brand-mark" href="@_brandHref">WanderX</a>
         <a class="wx-button wx-button--outline" href="/guides">Guides</a>
     </div>
 </header>
+
+@code {
+    private string _brandHref = "/";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = await AuthSession.GetAsync();
+        _brandHref = session?.IsGuide == true ? "/guide-portal" : "/";
+    }
+}
