@@ -1,0 +1,44 @@
+<article class="tour-card">
+    <div class="tour-card__image">
+        <img alt="@Title" src="@ImageUrl" />
+        <span class="tour-card__rating">
+            <MaterialIcon Name="star" />
+            @Rating
+        </span>
+    </div>
+
+    <div class="tour-card__body">
+        <div class="tour-card__meta">
+            <span>@Location</span>
+            <span>@Duration</span>
+        </div>
+        <h3>@Title</h3>
+        <div class="tour-card__footer">
+            <div>
+                <span class="hero-search__label">From</span>
+                <div class="tour-card__price">@Price <small>/pp</small></div>
+            </div>
+            <a class="wx-button wx-button--outline" href="/login">Details</a>
+        </div>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Location { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Duration { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Price { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Rating { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string ImageUrl { get; set; } = string.Empty;
+}

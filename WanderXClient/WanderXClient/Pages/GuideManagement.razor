@@ -1,0 +1,714 @@
+@page "/guides"
+@using System.ComponentModel.DataAnnotations
+@inject GuideApiClient GuideApi
+
+<PageTitle>Guide Management - WanderX</PageTitle>
+
+<div class="guide-admin-page">
+    <aside class="guide-sidebar">
+        <div class="guide-sidebar__brand">
+            <a class="brand-mark" href="/">WanderX</a>
+            <p>Admin Suite</p>
+        </div>
+
+        <nav class="guide-sidebar__nav" aria-label="Guide management">
+            <a class="guide-sidebar__link" href="/dashboard">
+                <MaterialIcon Name="dashboard" />
+                Dashboard
+            </a>
+            <a class="guide-sidebar__link" href="/">
+                <MaterialIcon Name="explore" />
+                Tours
+            </a>
+            <a class="guide-sidebar__link" href="/">
+                <MaterialIcon Name="event_available" />
+                Bookings
+            </a>
+            <a class="guide-sidebar__link guide-sidebar__link--active" href="/guides" aria-current="page">
+                <MaterialIcon Name="badge" />
+                Guides
+            </a>
+            <a class="guide-sidebar__link" href="/guide-assignments">
+                <MaterialIcon Name="assignment_ind" />
+                Assignments
+            </a>
+            <a class="guide-sidebar__link" href="/guide-profile">
+                <MaterialIcon Name="manage_accounts" />
+                Self Update
+            </a>
+        </nav>
+    </aside>
+
+    <main class="guide-main">
+        <header class="guide-topbar">
+            <div>
+                <p class="guide-eyebrow">Guide Operations</p>
+                <h1>Manage Guides</h1>
+                <p class="guide-subtitle">Create, update, and track language expertise, coverage region, and completed tours.</p>
+            </div>
+
+            <div class="guide-topbar__actions">
+                <label class="guide-search" aria-label="Search guides">
+                    <MaterialIcon Name="search" />
+                    <input type="search" placeholder="Search guides, languages..." @bind="_searchTerm" @bind:event="oninput" />
+                </label>
+                <button class="wx-button wx-button--secondary" type="button" @onclick="OpenCreateForm">
+                    <MaterialIcon Name="person_add" />
+                    Add New Guide
+                </button>
+            </div>
+        </header>
+
+        <section class="guide-content">
+            @if (_isLoading)
+            {
+                <div class="guide-empty">
+                    <MaterialIcon Name="sync" />
+                    Loading guide directory...
+                </div>
+            }
+            else
+            {
+                var filteredGuides = FilteredGuides.ToList();
+
+                <div class="guide-stat-grid">
+                    <article class="guide-stat">
+                        <p>Total Guides</p>
+                        <strong>@TotalGuides</strong>
+                        <span>Network capacity</span>
+                    </article>
+                    <article class="guide-stat guide-stat--secondary">
+                        <p>Active</p>
+                        <strong>@ActiveGuides</strong>
+                        <span>Ready for assignment</span>
+                    </article>
+                    <article class="guide-stat guide-stat--tertiary">
+                        <p>On Tour</p>
+                        <strong>@OnTourGuides</strong>
+                        <span>Currently guiding</span>
+                    </article>
+                    <article class="guide-stat">
+                        <p>Avg. Tours</p>
+                        <strong>@AverageTours.ToString("0")</strong>
+                        <span>Completed per guide</span>
+                    </article>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(_message))
+                {
+                    <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")">
+                        @_message
+                    </div>
+                }
+
+                @if (_isFormOpen)
+                {
+                    <section class="guide-form-panel">
+                        <div class="guide-section-heading">
+                            <div>
+                                <p class="guide-eyebrow">@(_editingGuideId is null ? "New guide" : "Edit guide")</p>
+                                <h2>@(_editingGuideId is null ? "Add Guide Profile" : "Update Guide Profile")</h2>
+                            </div>
+                            <button class="guide-icon-button" type="button" title="Close form" @onclick="CloseForm">
+                                <MaterialIcon Name="close" />
+                            </button>
+                        </div>
+
+                        <EditForm Model="@_form" OnValidSubmit="@SaveGuideAsync" class="guide-form">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="guide-form-grid">
+                                <div class="guide-field">
+                                    <label for="guide-name">Full name</label>
+                                    <InputText id="guide-name" class="guide-control" @bind-Value="_form.FullName" />
+                                    <ValidationMessage For="@(() => _form.FullName)" />
+                                </div>
+
+                                <div class="guide-field">
+                                    <label for="guide-email">Email</label>
+                                    <InputText id="guide-email" class="guide-control" type="email" @bind-Value="_form.Email" />
+                                    <ValidationMessage For="@(() => _form.Email)" />
+                                </div>
+
+                                <div class="guide-field">
+                                    <label for="guide-phone">Phone number</label>
+                                    <InputText id="guide-phone" class="guide-control" type="tel" @bind-Value="_form.PhoneNumber" />
+                                    <ValidationMessage For="@(() => _form.PhoneNumber)" />
+                                </div>
+
+                                @if (_editingGuideId is null)
+                                {
+                                    <div class="guide-field">
+                                        <label for="guide-password">Temporary password</label>
+                                        <InputText id="guide-password" class="guide-control" type="password" @bind-Value="_form.Password" />
+                                        <ValidationMessage For="@(() => _form.Password)" />
+                                    </div>
+                                }
+
+                                <div class="guide-field">
+                                    <label for="guide-languages">Languages</label>
+                                    <div id="guide-languages" class="guide-language-picker">
+                                        <button class="guide-language-trigger" type="button" @onclick="ToggleLanguagePicker" aria-expanded="@_isLanguagePickerOpen">
+                                            <span class="guide-language-trigger__icon">
+                                                <MaterialIcon Name="translate" />
+                                            </span>
+                                            <span class="guide-language-trigger__text">
+                                                @LanguagePickerSummary
+                                            </span>
+                                            <MaterialIcon Name="@(_isLanguagePickerOpen ? "expand_less" : "expand_more")" />
+                                        </button>
+
+                                        @if (_isLanguagePickerOpen)
+                                        {
+                                            <div class="guide-language-menu">
+                                                @if (_form.SelectedLanguages.Count > 0)
+                                                {
+                                                    <div class="guide-language-selected" aria-label="Selected languages">
+                                                        @foreach (var language in _form.SelectedLanguages)
+                                                        {
+                                                            <button class="guide-language-token" type="button" @onclick="() => RemoveLanguage(language)">
+                                                                @language
+                                                                <MaterialIcon Name="close" />
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                }
+
+                                                @foreach (var language in LanguageOptions)
+                                                {
+                                                    var selected = IsLanguageSelected(language);
+
+                                                    <button class="@(selected ? "guide-language-choice guide-language-choice--selected" : "guide-language-choice")"
+                                                            type="button"
+                                                            @onclick="() => ToggleLanguage(language)">
+                                                        <span>@language</span>
+                                                        @if (selected)
+                                                        {
+                                                            <MaterialIcon Name="check" />
+                                                        }
+                                                    </button>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                    <ValidationMessage For="@(() => _form.Languages)" />
+                                </div>
+
+                                <div class="guide-field">
+                                    <label for="guide-expertise">Expertise area</label>
+                                    <InputText id="guide-expertise" class="guide-control" placeholder="Cultural Heritage, Trekking" @bind-Value="_form.ExpertiseArea" />
+                                    <ValidationMessage For="@(() => _form.ExpertiseArea)" />
+                                </div>
+
+                                <div class="guide-field">
+                                    <label for="guide-region">Region</label>
+                                    <InputText id="guide-region" class="guide-control" placeholder="Da Nang, Hoi An, Hue" @bind-Value="_form.Region" />
+                                    <ValidationMessage For="@(() => _form.Region)" />
+                                </div>
+
+                                <div class="guide-field">
+                                    <label for="guide-tours">Completed tours</label>
+                                    <InputNumber id="guide-tours" class="guide-control" @bind-Value="_form.CompletedTours" />
+                                    <ValidationMessage For="@(() => _form.CompletedTours)" />
+                                </div>
+
+                                <div class="guide-field">
+                                    <label for="guide-status">Status</label>
+                                    <InputSelect id="guide-status" class="guide-control" @bind-Value="_form.Status">
+                                        @foreach (var status in StatusOptions)
+                                        {
+                                            <option value="@status">@status</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => _form.Status)" />
+                                </div>
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="guide-bio">Profile note</label>
+                                <InputTextArea id="guide-bio" class="guide-control guide-control--area" @bind-Value="_form.Bio" />
+                                <ValidationMessage For="@(() => _form.Bio)" />
+                            </div>
+
+                            <div class="guide-form-actions">
+                                <button class="wx-button" type="submit" disabled="@_isSaving">
+                                    <MaterialIcon Name="save" />
+                                    @(_isSaving ? "Saving..." : "Save Guide")
+                                </button>
+                                <button class="wx-button wx-button--outline" type="button" @onclick="CloseForm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </EditForm>
+                    </section>
+                }
+
+                <section class="guide-table-shell">
+                    <div class="guide-table-toolbar">
+                        <div class="guide-filter-group" role="group" aria-label="Filter guide status">
+                            @foreach (var filter in FilterOptions)
+                            {
+                                <button class="@GetFilterClass(filter)" type="button" @onclick="() => SetStatusFilter(filter)">
+                                    @filter
+                                </button>
+                            }
+                        </div>
+                        <p>@filteredGuides.Count guide(s)</p>
+                    </div>
+
+                    <div class="guide-table-scroll">
+                        <table class="guide-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Languages</th>
+                                    <th>Expertise Area</th>
+                                    <th>Region</th>
+                                    <th>Completed Tours</th>
+                                    <th>Status</th>
+                                    <th class="guide-table__actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (filteredGuides.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="guide-empty guide-empty--compact">
+                                                <MaterialIcon Name="manage_search" />
+                                                No guides match the current filters.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var guide in filteredGuides)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="guide-person">
+                                                    <div class="guide-avatar">@GetInitials(guide.FullName)</div>
+                                                    <div>
+                                                        <strong>@guide.FullName</strong>
+                                                        <span>@guide.Email</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="guide-chip-list">
+                                                    @foreach (var language in guide.Languages)
+                                                    {
+                                                        <span class="guide-chip">@language</span>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>@guide.ExpertiseArea</td>
+                                            <td>@guide.Region</td>
+                                            <td>@guide.CompletedTours</td>
+                                            <td>
+                                                <span class="@GetStatusClass(guide.Status)">
+                                                    <span></span>
+                                                    @guide.Status
+                                                </span>
+                                            </td>
+                                            <td class="guide-table__actions">
+                                                <button class="guide-icon-button" type="button" title="Edit guide" @onclick="() => OpenEditForm(guide)">
+                                                    <MaterialIcon Name="edit" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+        </section>
+    </main>
+</div>
+
+@code {
+    private static readonly string[] StatusOptions = { "Active", "On Tour", "Unavailable" };
+    private static readonly string[] FilterOptions = { "All", "Active", "On Tour", "Unavailable" };
+    private static readonly string[] LanguageOptions =
+    {
+        "Vietnamese",
+        "English",
+        "Japanese",
+        "Korean",
+        "Chinese",
+        "French",
+        "Spanish",
+        "German",
+        "Italian",
+        "Thai"
+    };
+
+    private List<GuideResponse> _guides = new();
+    private GuideFormModel _form = GuideFormModel.CreateDefault();
+    private Guid? _editingGuideId;
+    private bool _isLoading = true;
+    private bool _isSaving;
+    private bool _isFormOpen;
+    private bool _isLanguagePickerOpen;
+    private bool _isError;
+    private string? _message;
+    private string _searchTerm = string.Empty;
+    private string _statusFilter = "All";
+
+    private IEnumerable<GuideResponse> FilteredGuides => _guides
+        .Where(MatchesSearch)
+        .Where(MatchesStatus);
+
+    private int TotalGuides => _guides.Count;
+
+    private int ActiveGuides => _guides.Count(guide => IsStatus(guide, "Active"));
+
+    private int OnTourGuides => _guides.Count(guide => IsStatus(guide, "On Tour"));
+
+    private double AverageTours => _guides.Count == 0 ? 0 : _guides.Average(guide => guide.CompletedTours);
+
+    private string LanguagePickerSummary => _form.SelectedLanguages.Count switch
+    {
+        0 => "Select languages",
+        1 => _form.SelectedLanguages[0],
+        _ => $"{_form.SelectedLanguages.Count} languages selected"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGuidesAsync();
+    }
+
+    private async Task LoadGuidesAsync(bool clearMessage = true)
+    {
+        _isLoading = true;
+
+        if (clearMessage)
+        {
+            _message = null;
+            _isError = false;
+        }
+
+        try
+        {
+            _guides = await GuideApi.GetGuidesAsync();
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void OpenCreateForm()
+    {
+        _form = GuideFormModel.CreateDefault();
+        _editingGuideId = null;
+        _isFormOpen = true;
+        _isLanguagePickerOpen = false;
+        _message = null;
+        _isError = false;
+    }
+
+    private void OpenEditForm(GuideResponse guide)
+    {
+        _form = GuideFormModel.FromGuide(guide);
+        _editingGuideId = guide.Id;
+        _isFormOpen = true;
+        _isLanguagePickerOpen = false;
+        _message = null;
+        _isError = false;
+    }
+
+    private void CloseForm()
+    {
+        _isFormOpen = false;
+        _isLanguagePickerOpen = false;
+        _editingGuideId = null;
+        _form = GuideFormModel.CreateDefault();
+    }
+
+    private async Task SaveGuideAsync()
+    {
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            if (_editingGuideId is Guid guideId)
+            {
+                await GuideApi.UpdateGuideAsync(guideId, _form.ToUpdateRequest());
+                _message = "Guide profile updated.";
+            }
+            else
+            {
+                if (await GuideApi.EmailExistsAsync(_form.Email))
+                {
+                    _isError = true;
+                    _message = "An account with this email already exists.";
+                    return;
+                }
+
+                await GuideApi.CreateGuideAsync(_form.ToCreateRequest());
+                _message = "New guide added and notification email was queued.";
+            }
+
+            await LoadGuidesAsync(clearMessage: false);
+            CloseForm();
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void SetStatusFilter(string filter)
+    {
+        _statusFilter = filter;
+    }
+
+    private void ToggleLanguagePicker()
+    {
+        _isLanguagePickerOpen = !_isLanguagePickerOpen;
+    }
+
+    private void ToggleLanguage(string language)
+    {
+        _form.SetLanguage(language, !IsLanguageSelected(language), LanguageOptions);
+    }
+
+    private void RemoveLanguage(string language)
+    {
+        _form.SetLanguage(language, isSelected: false, LanguageOptions);
+    }
+
+    private bool IsLanguageSelected(string language)
+    {
+        return _form.SelectedLanguages.Contains(language, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private bool MatchesSearch(GuideResponse guide)
+    {
+        if (string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            return true;
+        }
+
+        var term = _searchTerm.Trim();
+        return Contains(guide.FullName, term) ||
+            Contains(guide.Email, term) ||
+            Contains(guide.LanguagesText, term) ||
+            Contains(guide.ExpertiseArea, term) ||
+            Contains(guide.Region, term);
+    }
+
+    private bool MatchesStatus(GuideResponse guide)
+    {
+        return _statusFilter == "All" || IsStatus(guide, _statusFilter);
+    }
+
+    private static bool Contains(string value, string term)
+    {
+        return value.Contains(term, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsStatus(GuideResponse guide, string status)
+    {
+        return string.Equals(guide.Status, status, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string GetFilterClass(string filter)
+    {
+        return string.Equals(_statusFilter, filter, StringComparison.OrdinalIgnoreCase)
+            ? "guide-filter guide-filter--active"
+            : "guide-filter";
+    }
+
+    private static string GetStatusClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "active" => "guide-status guide-status--active",
+            "on tour" => "guide-status guide-status--busy",
+            "unavailable" => "guide-status guide-status--muted",
+            _ => "guide-status"
+        };
+    }
+
+    private static string GetInitials(string fullName)
+    {
+        var parts = fullName
+            .Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Take(2)
+            .Select(part => part[0]);
+
+        return string.Concat(parts).ToUpperInvariant();
+    }
+
+    private static string ToUserMessage(Exception exception)
+    {
+        return exception.Message.Contains('{')
+            ? "The guide request could not be completed. Please check the form and try again."
+            : exception.Message;
+    }
+
+    private sealed class GuideFormModel : IValidatableObject
+    {
+        [Required(ErrorMessage = "Full name is required.")]
+        [StringLength(120, MinimumLength = 2, ErrorMessage = "Full name must be between 2 and 120 characters.")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        [Phone(ErrorMessage = "Enter a valid phone number.")]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        public string Password { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Languages are required.")]
+        public string Languages { get; set; } = string.Empty;
+
+        public List<string> SelectedLanguages { get; set; } = new();
+
+        [Required(ErrorMessage = "Expertise area is required.")]
+        public string ExpertiseArea { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Region is required.")]
+        public string Region { get; set; } = string.Empty;
+
+        [Range(0, 10000, ErrorMessage = "Completed tours must be 0 or higher.")]
+        public int CompletedTours { get; set; }
+
+        [Required(ErrorMessage = "Status is required.")]
+        public string Status { get; set; } = "Active";
+
+        [StringLength(600, ErrorMessage = "Profile note must be 600 characters or fewer.")]
+        public string Bio { get; set; } = string.Empty;
+
+        public bool IsCreate { get; set; }
+
+        public static GuideFormModel CreateDefault()
+        {
+            return new GuideFormModel
+            {
+                IsCreate = true,
+                Status = "Active",
+                Password = "Guide@123"
+            };
+        }
+
+        public static GuideFormModel FromGuide(GuideResponse guide)
+        {
+            var model = new GuideFormModel
+            {
+                IsCreate = false,
+                FullName = guide.FullName,
+                Email = guide.Email,
+                PhoneNumber = guide.PhoneNumber,
+                Languages = guide.LanguagesText,
+                ExpertiseArea = guide.ExpertiseArea,
+                Region = guide.Region,
+                CompletedTours = guide.CompletedTours,
+                Status = guide.Status,
+                Bio = guide.Bio
+            };
+
+            model.SelectedLanguages = SplitLanguages(guide.LanguagesText);
+            return model;
+        }
+
+        public void SetLanguage(string language, bool isSelected, IEnumerable<string> orderedLanguages)
+        {
+            if (isSelected && !SelectedLanguages.Contains(language, StringComparer.OrdinalIgnoreCase))
+            {
+                SelectedLanguages.Add(language);
+            }
+
+            if (!isSelected)
+            {
+                SelectedLanguages.RemoveAll(item => string.Equals(item, language, StringComparison.OrdinalIgnoreCase));
+            }
+
+            SelectedLanguages = orderedLanguages
+                .Where(item => SelectedLanguages.Contains(item, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+            Languages = string.Join(", ", SelectedLanguages);
+        }
+
+        public CreateGuideRequest ToCreateRequest()
+        {
+            return new CreateGuideRequest
+            {
+                FullName = FullName,
+                Email = Email,
+                PhoneNumber = PhoneNumber,
+                Password = Password,
+                Languages = Languages,
+                ExpertiseArea = ExpertiseArea,
+                Region = Region,
+                CompletedTours = CompletedTours,
+                Status = Status,
+                Bio = Bio
+            };
+        }
+
+        public UpdateGuideRequest ToUpdateRequest()
+        {
+            return new UpdateGuideRequest
+            {
+                FullName = FullName,
+                Email = Email,
+                PhoneNumber = PhoneNumber,
+                Languages = Languages,
+                ExpertiseArea = ExpertiseArea,
+                Region = Region,
+                CompletedTours = CompletedTours,
+                Status = Status,
+                Bio = Bio
+            };
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (IsCreate && string.IsNullOrWhiteSpace(Password))
+            {
+                yield return new ValidationResult("Temporary password is required.", new[] { nameof(Password) });
+            }
+
+            if (IsCreate && Password.Length is > 0 and < 6)
+            {
+                yield return new ValidationResult("Password must be at least 6 characters.", new[] { nameof(Password) });
+            }
+
+            if (SelectedLanguages.Count == 0)
+            {
+                yield return new ValidationResult("Select at least one language.", new[] { nameof(Languages) });
+            }
+        }
+
+        private static List<string> SplitLanguages(string value)
+        {
+            return value
+                .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+    }
+}

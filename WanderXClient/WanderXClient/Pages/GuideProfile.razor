@@ -1,0 +1,445 @@
+@page "/guide-profile"
+@using System.ComponentModel.DataAnnotations
+@inject GuideApiClient GuideApi
+@inject AuthSessionService AuthSession
+
+<PageTitle>Guide Profile - WanderX</PageTitle>
+
+<div class="wx-page">
+    <AppHeader />
+
+    <main class="guide-self-page">
+        <section class="guide-self-hero">
+            <div class="wx-container guide-self-hero__inner">
+                <p class="guide-eyebrow">Guide Portal</p>
+                <h1>Update Your Guide Profile</h1>
+                <p>Keep your language specialties, operating region, and completed tour experience current for better assignments.</p>
+            </div>
+        </section>
+
+        <section class="wx-container guide-self-layout">
+            <div class="guide-self-panel">
+                <div class="guide-section-heading">
+                    <div>
+                        @* <p class="guide-eyebrow">Find profile</p> *@
+                        <h2>@(_hasGuideSession ? "Guide profile" : "Load by guide email")</h2>
+                    </div>
+                    @* <a class="wx-button wx-button--outline" href="/guides"> *@
+                    @* @*     <MaterialIcon Name="admin_panel_settings" /> *@
+                    @* @*     Admin *@
+                    @* @* </a> *@
+                </div>
+
+                @if (_hasGuideSession)
+                {
+                    <div class="guide-session-strip">
+                        <div class="guide-session-avatar">
+                            <MaterialIcon Name="badge" />
+                        </div>
+                        <div class="guide-session-meta">
+                            <span>Signed in guide</span>
+                            <strong>@_signedInGuideName</strong>
+                            <p>@_lookup.Email</p>
+                        </div>
+                        @* <button class="wx-button wx-button--outline" type="button" disabled="@_isLoadingProfile" @onclick="LoadProfileAsync"> *@
+                        @*     <MaterialIcon Name="refresh" /> *@
+                        @*     @(_isLoadingProfile ? "Loading..." : "Refresh") *@
+                        @* </button> *@
+                    </div>
+                }
+
+                @* <EditForm Model="@_lookup" OnValidSubmit="@LoadProfileAsync" class="guide-form guide-form--lookup"> *@
+                @*     <DataAnnotationsValidator /> *@
+
+                @*     <div class="guide-field"> *@
+                @*         <label for="guide-profile-email">Guide email</label> *@
+                @*         <InputText id="guide-profile-email" class="guide-control" type="email" placeholder="elena.guide@wanderx.com" readonly="@_hasGuideSession" @bind-Value="_lookup.Email" /> *@
+                @*         <ValidationMessage For="@(() => _lookup.Email)" /> *@
+                @*     </div> *@
+
+                @*     <button class="wx-button" type="submit" disabled="@_isLoadingProfile"> *@
+                @*         <MaterialIcon Name="manage_search" /> *@
+                @*         @(_isLoadingProfile ? "Loading..." : "Load Profile") *@
+                @*     </button> *@
+                @* </EditForm> *@
+
+                @* @if (!string.IsNullOrWhiteSpace(_message)) *@
+                @* { *@
+                @*     <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")"> *@
+                @*         @_message *@
+                @*     </div> *@
+                @* } *@
+            </div>
+
+            @if (_profileLoaded)
+            {
+                <div class="guide-self-panel">
+                    <div class="guide-section-heading">
+                        <div>
+                            <p class="guide-eyebrow">Self update</p>
+                            <h2>@_model.FullName</h2>
+                        </div>
+                        <span class="@GetStatusClass(_status)">
+                            <span></span>
+                            @_status
+                        </span>
+                    </div>
+
+                    <EditForm Model="@_model" OnValidSubmit="@SaveProfileAsync" class="guide-form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="guide-form-grid">
+                            <div class="guide-field">
+                                <label for="self-full-name">Full name</label>
+                                <InputText id="self-full-name" class="guide-control" @bind-Value="_model.FullName" />
+                                <ValidationMessage For="@(() => _model.FullName)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="self-phone">Phone number</label>
+                                <InputText id="self-phone" class="guide-control" type="tel" @bind-Value="_model.PhoneNumber" />
+                                <ValidationMessage For="@(() => _model.PhoneNumber)" />
+                            </div>
+
+                            <div class="guide-field guide-field--wide">
+                                <label for="self-languages">Languages</label>
+                                <div id="self-languages" class="guide-language-picker">
+                                    <button class="guide-language-trigger" type="button" @onclick="ToggleLanguagePicker" aria-expanded="@_isLanguagePickerOpen">
+                                        <span class="guide-language-trigger__icon">
+                                            <MaterialIcon Name="translate" />
+                                        </span>
+                                        <span class="guide-language-trigger__text">
+                                            @LanguagePickerSummary
+                                        </span>
+                                        <MaterialIcon Name="@(_isLanguagePickerOpen ? "expand_less" : "expand_more")" />
+                                    </button>
+
+                                    @if (_isLanguagePickerOpen)
+                                    {
+                                        <div class="guide-language-menu">
+                                            @if (_model.SelectedLanguages.Count > 0)
+                                            {
+                                                <div class="guide-language-selected" aria-label="Selected languages">
+                                                    @foreach (var language in _model.SelectedLanguages)
+                                                    {
+                                                        <button class="guide-language-token" type="button" @onclick="() => RemoveLanguage(language)">
+                                                            @language
+                                                            <MaterialIcon Name="close" />
+                                                        </button>
+                                                    }
+                                                </div>
+                                            }
+
+                                            @foreach (var language in LanguageOptions)
+                                            {
+                                                var selected = IsLanguageSelected(language);
+
+                                                <button class="@(selected ? "guide-language-choice guide-language-choice--selected" : "guide-language-choice")"
+                                                        type="button"
+                                                        @onclick="() => ToggleLanguage(language)">
+                                                    <span>@language</span>
+                                                    @if (selected)
+                                                    {
+                                                        <MaterialIcon Name="check" />
+                                                    }
+                                                </button>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                                <ValidationMessage For="@(() => _model.Languages)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="self-expertise">Expertise area</label>
+                                <InputText id="self-expertise" class="guide-control" @bind-Value="_model.ExpertiseArea" />
+                                <ValidationMessage For="@(() => _model.ExpertiseArea)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="self-region">Region</label>
+                                <InputText id="self-region" class="guide-control" @bind-Value="_model.Region" />
+                                <ValidationMessage For="@(() => _model.Region)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="self-tours">Completed tours</label>
+                                <InputNumber readonly id="self-tours" class="guide-control" @bind-Value="_model.CompletedTours" />
+                                <ValidationMessage For="@(() => _model.CompletedTours)" />
+                            </div>
+                        </div>
+
+                        <div class="guide-field">
+                            <label for="self-bio">Profile note</label>
+                            <InputTextArea id="self-bio" class="guide-control guide-control--area" @bind-Value="_model.Bio" />
+                            <ValidationMessage For="@(() => _model.Bio)" />
+                        </div>
+
+                        <button class="wx-button wx-button--secondary" type="submit" disabled="@_isSaving">
+                            <MaterialIcon Name="save" />
+                            @(_isSaving ? "Saving..." : "Save My Profile")
+                        </button>
+                    </EditForm>
+                </div>
+            }
+        </section>
+    </main>
+
+    <AppFooter />
+    <MobileBottomNav />
+</div>
+
+@code {
+    private readonly LookupModel _lookup = new();
+    private SelfGuideFormModel _model = new();
+    private bool _isSaving;
+    private bool _profileLoaded;
+    private bool _hasGuideSession;
+    private bool _isLanguagePickerOpen;
+    private string _status = "Active";
+    private string _signedInGuideName = "Guide account";
+    private string? _message;
+    private static readonly string[] LanguageOptions =
+    {
+        "Vietnamese",
+        "English",
+        "Japanese",
+        "Korean",
+        "Chinese",
+        "French",
+        "Spanish",
+        "German",
+        "Italian",
+        "Thai"
+    };
+
+    private string LanguagePickerSummary => _model.SelectedLanguages.Count switch
+    {
+        0 => "Select languages",
+        1 => _model.SelectedLanguages[0],
+        _ => $"{_model.SelectedLanguages.Count} languages selected"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = await AuthSession.GetAsync();
+
+        if (session is null || !session.IsGuide || string.IsNullOrWhiteSpace(session.Email))
+        {
+            return;
+        }
+
+        _hasGuideSession = true;
+        _lookup.Email = session.Email.Trim();
+        _signedInGuideName = string.IsNullOrWhiteSpace(session.FullName)
+            ? "Guide account"
+            : session.FullName.Trim();
+
+        await LoadProfileAsync(showSuccessMessage: false);
+    }
+
+    private async Task LoadProfileAsync()
+    {
+        await LoadProfileAsync(showSuccessMessage: true);
+    }
+
+    private async Task LoadProfileAsync(bool showSuccessMessage)
+    {
+        _message = null;
+
+        try
+        {
+            var guide = await GuideApi.GetGuideByEmailAsync(_lookup.Email);
+
+            if (guide is null)
+            {
+                _message = "Guide profile was not found.";
+                _profileLoaded = false;
+                return;
+            }
+
+            _model = SelfGuideFormModel.FromGuide(guide);
+            _status = guide.Status;
+            _profileLoaded = true;
+            _isLanguagePickerOpen = false;
+            _message = showSuccessMessage ? "Profile loaded." : null;
+        }
+        catch (Exception ex)
+        {
+            _message = ToUserMessage(ex);
+            _profileLoaded = false;
+        }
+    }
+
+    private async Task SaveProfileAsync()
+    {
+        _isSaving = true;
+        _message = null;
+
+        try
+        {
+            var guide = await GuideApi.SelfUpdateGuideAsync(_model.ToRequest());
+            _message = "Your guide profile has been updated.";
+
+            if (guide is not null)
+            {
+                _model = SelfGuideFormModel.FromGuide(guide);
+                _status = guide.Status;
+                _isLanguagePickerOpen = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private static string GetStatusClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "active" => "guide-status guide-status--active",
+            "on tour" => "guide-status guide-status--busy",
+            "unavailable" => "guide-status guide-status--muted",
+            _ => "guide-status"
+        };
+    }
+
+    private static string ToUserMessage(Exception exception)
+    {
+        return exception.Message.Contains('{')
+            ? "The guide profile could not be updated. Please check the form and try again."
+            : exception.Message;
+    }
+
+    private void ToggleLanguagePicker()
+    {
+        _isLanguagePickerOpen = !_isLanguagePickerOpen;
+    }
+
+    private void ToggleLanguage(string language)
+    {
+        _model.SetLanguage(language, !IsLanguageSelected(language), LanguageOptions);
+    }
+
+    private void RemoveLanguage(string language)
+    {
+        _model.SetLanguage(language, isSelected: false, LanguageOptions);
+    }
+
+    private bool IsLanguageSelected(string language)
+    {
+        return _model.SelectedLanguages.Contains(language, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private sealed class LookupModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    private sealed class SelfGuideFormModel : IValidatableObject
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Full name is required.")]
+        [StringLength(120, MinimumLength = 2, ErrorMessage = "Full name must be between 2 and 120 characters.")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        [Phone(ErrorMessage = "Enter a valid phone number.")]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Languages are required.")]
+        public string Languages { get; set; } = string.Empty;
+
+        public List<string> SelectedLanguages { get; set; } = new();
+
+        [Required(ErrorMessage = "Expertise area is required.")]
+        public string ExpertiseArea { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Region is required.")]
+        public string Region { get; set; } = string.Empty;
+
+        [Range(0, 10000, ErrorMessage = "Completed tours must be 0 or higher.")]
+        public int CompletedTours { get; set; }
+
+        [StringLength(600, ErrorMessage = "Profile note must be 600 characters or fewer.")]
+        public string Bio { get; set; } = string.Empty;
+
+        public static SelfGuideFormModel FromGuide(GuideResponse guide)
+        {
+            var model = new SelfGuideFormModel
+            {
+                Email = guide.Email,
+                FullName = guide.FullName,
+                PhoneNumber = guide.PhoneNumber,
+                ExpertiseArea = guide.ExpertiseArea,
+                Region = guide.Region,
+                CompletedTours = guide.CompletedTours,
+                Bio = guide.Bio
+            };
+
+            model.SelectedLanguages = SplitLanguages(guide.LanguagesText);
+            model.Languages = string.Join(", ", model.SelectedLanguages);
+            return model;
+        }
+
+        public void SetLanguage(string language, bool isSelected, IEnumerable<string> orderedLanguages)
+        {
+            if (isSelected && !SelectedLanguages.Contains(language, StringComparer.OrdinalIgnoreCase))
+            {
+                SelectedLanguages.Add(language);
+            }
+
+            if (!isSelected)
+            {
+                SelectedLanguages.RemoveAll(item => string.Equals(item, language, StringComparison.OrdinalIgnoreCase));
+            }
+
+            SelectedLanguages = orderedLanguages
+                .Where(item => SelectedLanguages.Contains(item, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+            Languages = string.Join(", ", SelectedLanguages);
+        }
+
+        public GuideSelfUpdateRequest ToRequest()
+        {
+            return new GuideSelfUpdateRequest
+            {
+                Email = Email,
+                FullName = FullName,
+                PhoneNumber = PhoneNumber,
+                Languages = Languages,
+                ExpertiseArea = ExpertiseArea,
+                Region = Region,
+                CompletedTours = CompletedTours,
+                Bio = Bio
+            };
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (SelectedLanguages.Count == 0)
+            {
+                yield return new ValidationResult("Select at least one language.", new[] { nameof(Languages) });
+            }
+        }
+
+        private static List<string> SplitLanguages(string value)
+        {
+            return value
+                .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+    }
+}

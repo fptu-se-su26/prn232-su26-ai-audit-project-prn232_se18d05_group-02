@@ -1,0 +1,14 @@
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <div class="auth-alert @(IsError ? "auth-alert--error" : "auth-alert--success")" role="status">
+        @Message
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? Message { get; set; }
+
+    [Parameter]
+    public bool IsError { get; set; }
+}

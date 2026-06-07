@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WanderX - Destinations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#e1e8ff",
+                      "on-secondary-container": "#640f00",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "tertiary-fixed-dim": "#48d7f9",
+                      "error-container": "#ffdad6",
+                      "on-secondary-fixed": "#3d0600",
+                      "primary-container": "#0052cc",
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed": "#001f27",
+                      "on-error": "#ffffff",
+                      "surface-bright": "#faf9ff",
+                      "inverse-on-surface": "#edf0ff",
+                      "on-surface": "#051a3e",
+                      "surface-container-highest": "#d8e2ff",
+                      "surface-dim": "#ccdaff",
+                      "surface-tint": "#0c56d0",
+                      "secondary": "#ae3115",
+                      "on-surface-variant": "#434654",
+                      "on-primary": "#ffffff",
+                      "tertiary-container": "#006477",
+                      "surface": "#faf9ff",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed-dim": "#ffb4a3",
+                      "outline-variant": "#c3c6d6",
+                      "on-primary-container": "#c4d2ff",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#004e5d",
+                      "secondary-fixed": "#ffdad2",
+                      "on-error-container": "#93000a",
+                      "primary": "#003d9b",
+                      "tertiary-fixed": "#afecff",
+                      "background": "#faf9ff",
+                      "on-background": "#051a3e",
+                      "surface-container": "#e9edff",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "inverse-primary": "#b2c5ff",
+                      "on-primary-fixed": "#001848",
+                      "on-secondary-fixed-variant": "#8c1900",
+                      "inverse-surface": "#1d3054",
+                      "outline": "#737685",
+                      "on-tertiary-container": "#76e2ff",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#dae2ff",
+                      "tertiary": "#004b59",
+                      "secondary-container": "#fd6a49",
+                      "surface-container-low": "#f1f3ff",
+                      "surface-variant": "#d8e2ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "section-gap": "80px",
+                      "base": "8px",
+                      "container-padding-desktop": "48px",
+                      "container-padding-mobile": "16px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Hanken Grotesk"],
+                      "body-lg": ["Inter"],
+                      "headline-lg-mobile": ["Hanken Grotesk"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "label-sm": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                      "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                      "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                      "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                      "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                      "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                      "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased pb-24 md:pb-0">
+<!-- TopNavBar (Desktop) -->
+<header class="hidden md:flex bg-surface/80 border-b border-outline-variant/30 docked full-width top-0 sticky z-50 shadow-sm flex justify-between items-center w-full px-container-padding-mobile md:px-container-padding-desktop h-16 glass-panel">
+<a class="contents" href="../SystemAccount/Homepage.html"><div class="flex items-center gap-8">
+<div class="font-headline-md text-headline-md font-bold text-primary">WanderX</div></a>
+<nav class="flex gap-6">
+<!-- Active Nav Item -->
+<a class="text-primary font-bold border-b-2 border-primary py-4 px-2 font-label-md text-label-md" href="./TourDiscovery.html">Destinations</a>
+<!-- Inactive Nav Items -->
+<a class="text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors duration-200 py-4 px-2 font-label-md text-label-md" href="./My%20Bookings.html">My Bookings</a>
+<a class="text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors duration-200 py-4 px-2 font-label-md text-label-md" href="./TourDiscovery.html">Deals</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Support</button>
+<button class="font-label-md text-label-md bg-secondary text-on-secondary px-4 py-2 rounded-full hover:shadow-md transition-shadow">Travel Quiz</button>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsFAdSpe5_7bXXpZF9rKJM2JDAzpVLDIm9n2BVpZZVfl7Aib6qv6JNIEir2xoRcHmrvw7WAy4zpZVLQR0jTCi78raNbDJve0FN6oPXzm5BKFqnzDwhjiBuIJYFMRu9e8RtbWeveDpfK7Dgf7u1moDGshIALZVBEUR8kVYYVDsSZcz4sPJSmUfTGoai-VCFGTTbaYc3Agcsq6UN4AVli6iDgLY_7qCUuken4qF7Hib18KTRx_aw2TqddXBLeHD-YjQajFf1Lj3jFg"/>
+</div>
+</div>
+</header>
+<!-- Top Mobile Header (Alternative to text links) -->
+<header class="md:hidden flex justify-between items-center bg-surface/80 backdrop-blur-md px-container-padding-mobile h-16 sticky top-0 z-40 shadow-sm border-b border-outline-variant/30">
+<a class="contents" href="../SystemAccount/Homepage.html"><div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">WanderX</div></a>
+<button class="text-on-surface-variant">
+<span class="material-symbols-outlined">search</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="max-w-[1440px] mx-auto px-container-padding-mobile md:px-container-padding-desktop py-8 md:py-12">
+<div class="mb-10">
+<h1 class="font-display-lg text-display-lg text-primary mb-2 hidden md:block">Explore Destinations</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2 md:hidden">Explore Destinations</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Discover curated experiences matched to your unique travel profile. Our concierge engine has highlighted the best options for you.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Filters Sidebar -->
+<aside class="md:col-span-3 lg:col-span-3">
+<div class="bg-surface rounded-xl border border-outline-variant/50 p-6 shadow-[0_4px_24px_rgba(0,61,155,0.04)] sticky top-24">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-headline-md text-headline-md text-primary">Filters</h2>
+<button class="font-label-sm text-label-sm text-secondary hover:underline">Reset All</button>
+</div>
+<!-- Filter Section: Destination -->
+<div class="mb-6">
+<label class="block font-label-md text-label-md text-on-surface mb-2 uppercase tracking-wide text-xs">Destination</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
+<option>Anywhere</option>
+<option>Europe</option>
+<option>Asia</option>
+<option>South America</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Filter Section: Price -->
+<div class="mb-6">
+<label class="block font-label-md text-label-md text-on-surface mb-2 uppercase tracking-wide text-xs">Price Range</label>
+<div class="flex items-center gap-2 mb-2">
+<input class="w-1/2 bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md focus:border-primary" placeholder="Min" type="text"/>
+<span class="text-outline-variant">-</span>
+<input class="w-1/2 bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md focus:border-primary" placeholder="Max" type="text"/>
+</div>
+</div>
+<!-- Filter Section: Tour Type -->
+<div class="mb-6">
+<label class="block font-label-md text-label-md text-on-surface mb-3 uppercase tracking-wide text-xs">Tour Type</label>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline-variant flex items-center justify-center group-hover:border-primary transition-colors bg-primary text-on-primary">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">Adventure</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline-variant flex items-center justify-center group-hover:border-primary transition-colors"></div>
+<span class="font-body-md text-body-md text-on-surface-variant">Relaxation</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline-variant flex items-center justify-center group-hover:border-primary transition-colors bg-primary text-on-primary">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">Culture</span>
+</label>
+</div>
+</div>
+<!-- Filter Section: Tags -->
+<div class="mb-6">
+<label class="block font-label-md text-label-md text-on-surface mb-3 uppercase tracking-wide text-xs">Tags</label>
+<div class="flex flex-wrap gap-2">
+<button class="bg-primary-container text-on-primary-container border border-primary-container font-label-sm text-label-sm px-3 py-1.5 rounded-full hover:bg-primary hover:text-on-primary transition-colors">Family</button>
+<button class="bg-surface-container text-on-surface-variant border border-outline-variant/30 font-label-sm text-label-sm px-3 py-1.5 rounded-full hover:bg-surface-container-high transition-colors">Solo</button>
+<button class="bg-primary-container text-on-primary-container border border-primary-container font-label-sm text-label-sm px-3 py-1.5 rounded-full hover:bg-primary hover:text-on-primary transition-colors">Romantic</button>
+<button class="bg-surface-container text-on-surface-variant border border-outline-variant/30 font-label-sm text-label-sm px-3 py-1.5 rounded-full hover:bg-surface-container-high transition-colors">Luxury</button>
+</div>
+</div>
+</div>
+</aside>
+<!-- Tour List Area -->
+<div class="md:col-span-9 lg:col-span-9 flex flex-col gap-6">
+<!-- Sort Bar -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-surface rounded-xl border border-outline-variant/50 p-4 shadow-sm gap-4">
+<div class="font-body-md text-body-md text-on-surface-variant">
+                        Showing <strong class="text-on-surface">24</strong> premium experiences
+                    </div>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase text-xs">Sort by:</span>
+<div class="relative">
+<select class="bg-surface border-none focus:ring-0 font-label-md text-label-md text-primary font-bold appearance-none pr-6 cursor-pointer">
+<option>Compatibility (High to Low)</option>
+<option>Price (Low to High)</option>
+<option>Rating (High to Low)</option>
+<option>Duration (Shortest first)</option>
+</select>
+<span class="material-symbols-outlined absolute right-0 top-0.5 text-primary pointer-events-none text-[20px]">swap_vert</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid of Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="bg-surface rounded-xl border border-outline-variant/40 overflow-hidden shadow-[0_4px_24px_rgba(0,61,155,0.03)] hover:shadow-[0_8px_32px_rgba(0,61,155,0.08)] transition-all duration-300 group flex flex-col">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img alt="Kyoto Tour" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A serene, high-quality photograph of a traditional Japanese temple in Kyoto during autumn. The scene is framed by vibrant red and orange maple leaves, set against a pristine, light blue sky. The lighting is soft and natural, evoking a premium, tranquil mood consistent with a modern luxury travel concierge aesthetic. Deep shadows provide contrast to the bright, airy composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfdB-p91wFEj0DHJgemSQ5w3Cp1DcsCqoxms5HsAUprvfxBkY4xeFBJtktdWxFeB3rrHdQ8NXVbFza_B-t45DvienaVFbPF4J0bKRBcYP8zdq-CzB1805nkthk_3OiY_VEeqG-IaF8b7vtFxOwSPREwIxUOkClw7zrKWHdSP5xQ8e6gN_EJRtB_Vuv43xtKh5jKayEK5tRdrB42wlKkvvxWFktedAbTSGTA78_QYApk0I3C26bqLt476VWYx0PocE8IVFZa7f9Lw"/>
+<div class="absolute top-3 right-3 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">95% Match</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors line-clamp-1">Kyoto Cultural Immersion</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 flex-grow">Discover hidden temples, traditional tea ceremonies, and serene bamboo forests.</p>
+<div class="flex items-center gap-4 mb-4 text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-label-sm text-label-sm">7 Days</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-[#f59e0b]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm">4.9</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/30 mt-auto">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">From</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">$2,400</span>
+</div>
+<a class="font-label-md text-label-md text-primary border border-primary/30 rounded-full px-4 py-2 hover:bg-primary hover:text-on-primary transition-colors" href="../AdminStaff/TourDetail.html">
+Explore Plan
+</a>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface rounded-xl border border-outline-variant/40 overflow-hidden shadow-[0_4px_24px_rgba(0,61,155,0.03)] hover:shadow-[0_8px_32px_rgba(0,61,155,0.08)] transition-all duration-300 group flex flex-col">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img alt="Swiss Alps" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A breathtaking landscape of the Swiss Alps with dramatic, snow-capped peaks dominating the background. In the foreground, a pristine turquoise alpine lake reflects the bright, clear sky. The image has a crisp, high-fidelity look with a cool, airy color palette dominated by azure blues and stark whites. The overall feel is adventurous yet luxurious and safe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx12NIAPe0QjPs3mZGLRgtQyYs1ONwFGy-qqpZ5FtDzmtV9oZpYgL3pLn__n-esc5rb4591gN0W9rB7ExBE9YwYXjX7mNnHfoSfrjvvSifpQ2vBT9Of-KfAjBxtMm6FORJb0C8JNt2QVJU7R4lHTSQcCIAyWxBECqSyVoaoFuwK6o_OAOds6lEZYsmFC0yGFT9nNYUjsothT-IKpt3azfH7Ppe6SS1cftT2OXxxUtFQfz_o064IEk7pTwL2hjkNHwqktNz2HYWZQ"/>
+<div class="absolute top-3 right-3 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">88% Match</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors line-clamp-1">Alpine Adventure &amp; Spa</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 flex-grow">Combine thrilling hikes with world-class wellness retreats in the mountains.</p>
+<div class="flex items-center gap-4 mb-4 text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-label-sm text-label-sm">5 Days</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-[#f59e0b]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm">4.7</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/30 mt-auto">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">From</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">$3,100</span>
+</div>
+<a class="font-label-md text-label-md text-primary border border-primary/30 rounded-full px-4 py-2 hover:bg-primary hover:text-on-primary transition-colors" href="../AdminStaff/TourDetail.html">
+Explore Plan
+</a>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface rounded-xl border border-outline-variant/40 overflow-hidden shadow-[0_4px_24px_rgba(0,61,155,0.03)] hover:shadow-[0_8px_32px_rgba(0,61,155,0.08)] transition-all duration-300 group flex flex-col">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img alt="Maldives" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An expansive view of overwater bungalows in the Maldives resting above crystal-clear, vibrant aquamarine water. The scene is bathed in brilliant, high-key sunlight, creating a modern, airy, and ultra-luxurious atmosphere. The composition emphasizes generous whitespace in the bright sky above, perfectly aligning with a premium concierge travel aesthetic. Soft, diffused lighting enhances the relaxed mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiIgRHlvPuT3x7J5EvDz_cvJQGUryvW_JdK7g4Xz2ulDmRwqoZ0VqIzTPed5nfApIe7DpmjX4J5aWeRsgapzvP4dBoPZt-UdueW50PZX6dm_I9Ar6TxnEJwrPwdwk_kl30r_vmEHOp7lntUdKAWhKfZWPDoez9OX352Pc2VkE4dhXSSKCs8jfSKM_7TZKaSmCvwYXxldYf4BNwNQ5stm-c03jDl7aNVmzFRoa1sGBTZXu6ESdwPZJmdeEiiHeGhDsD3Mz8fskMtw"/>
+<div class="absolute top-3 right-3 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">82% Match</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors line-clamp-1">Private Atoll Escape</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 flex-grow">Ultimate seclusion with private villas, dedicated butler service, and diving.</p>
+<div class="flex items-center gap-4 mb-4 text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-label-sm text-label-sm">10 Days</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-[#f59e0b]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm">5.0</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/30 mt-auto">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">From</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">$8,500</span>
+</div>
+<a class="font-label-md text-label-md text-primary border border-primary/30 rounded-full px-4 py-2 hover:bg-primary hover:text-on-primary transition-colors" href="../AdminStaff/TourDetail.html">
+Explore Plan
+</a>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface rounded-xl border border-outline-variant/40 overflow-hidden shadow-[0_4px_24px_rgba(0,61,155,0.03)] hover:shadow-[0_8px_32px_rgba(0,61,155,0.08)] transition-all duration-300 group flex flex-col">
+<div class="relative aspect-[4/3] overflow-hidden">
+<img alt="Rome Culinary" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A beautifully plated, high-end Italian meal featuring fresh pasta and a glass of red wine, set on a rustic wooden table overlooking the Colosseum in Rome. The lighting is warm, golden-hour sunlight that creates soft ambient shadows, emphasizing texture and quality. The image exudes a sophisticated, cultured, and premium culinary travel experience with a clean, editorial composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBh3FSj1P7QGhUjoTMB2qbyc3sneEReq0ct8NAjTpyEBWFdiMyrBjmxHiXzHBC8NvRK5zvOq2L8M8dL4y16mkEpc61H8jPpMjtMZ8gSQ_tIQjDXjRCgzZI1G79etYoO-Mghx-UwtFcxAIKR-rdmQAeb0WA2O6msaXBKjIa059KmCKj93TawAcQQ5SuMvRLZRTw_kPLJGDGW8RMPKeLjvqkGIi7KDfnqRnuxMzHrscZydooz7RHsz9Ah4WkuBoQWsqh4S83n1Okpxg"/>
+<div class="absolute top-3 right-3 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">79% Match</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors line-clamp-1">Roman Culinary Journey</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 flex-grow">Exclusive tastings, private cooking classes, and historical food tours.</p>
+<div class="flex items-center gap-4 mb-4 text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-label-sm text-label-sm">4 Days</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-[#f59e0b]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm">4.8</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/30 mt-auto">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">From</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">$1,800</span>
+</div>
+<a class="font-label-md text-label-md text-primary border border-primary/30 rounded-full px-4 py-2 hover:bg-primary hover:text-on-primary transition-colors" href="../AdminStaff/TourDetail.html">
+Explore Plan
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Load More -->
+<div class="flex justify-center mt-8">
+<button class="bg-surface border border-primary text-primary font-label-md text-label-md px-8 py-3 rounded-full hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+                        Load More Experiences
+                        <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface dark:bg-surface-container-lowest border-t border-outline-variant shadow-[0_-4px_10px_rgba(0,0,0,0.05)] docked full-width bottom-0 fixed z-50 fixed bottom-0 w-full flex justify-around items-center py-3 px-4">
+<!-- Active -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1 scale-90 transition-transform" href="./TourDiscovery.html">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-label-sm text-label-sm">Tours</span>
+</a>
+<!-- Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="./My%20Bookings.html">
+<span class="material-symbols-outlined mb-1">calendar_today</span>
+<span class="font-label-sm text-label-sm">Schedule</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="../SystemAccount/notificationManagerment.html">
+<span class="material-symbols-outlined mb-1">verified_user</span>
+<span class="font-label-sm text-label-sm">Status</span>
+</a>
+</nav>
+<!-- Footer -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface mt-section-gap w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6 flat">
+<a class="contents" href="../SystemAccount/Homepage.html"><div class="font-headline-md text-headline-md text-primary font-bold">
+            WanderX
+        </div></a>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant hover:text-primary underline transition-all font-body-md text-body-md" href="./HomeScreen.html">About Us</a>
+<a class="text-on-surface-variant hover:text-primary underline transition-all font-body-md text-body-md" href="./HomeScreen.html">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary underline transition-all font-body-md text-body-md" href="./HomeScreen.html">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary underline transition-all font-body-md text-body-md" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
+</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">
+            © 2024 WanderX Travel. All rights reserved.
+        </div>
+</footer>
+</body></html>

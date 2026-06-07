@@ -1,0 +1,178 @@
+@page "/verify-account"
+@inject AuthApiClient AuthApi
+
+<PageTitle>Verify Account - WanderX</PageTitle>
+
+<AuthShell
+    Title="Verify your account"
+    Subtitle="Enter the 6-digit code sent to your phone number."
+    Compact="true"
+    BackgroundImage="https://lh3.googleusercontent.com/aida-public/AB6AXuC-kqed4FEophTTTXJ_GIQXEW7ae38TS_d65DVUiJ9VPZBSSjRP5ZExyDH3OvrR-wOticzVvwh3moe_TJDNhPRCEtYOpr1_8Eix3pRZCtV9OodhZH696Oe1i7lMdHWd9_yYT13LZn046XGZ3qD9XjjDZK4HwaUMXUoT5yVHAKF2fjl8-SzUZo5_Ed8CYr3Fd09q1jflUiDu-P-XbAcW9EX88bfBgNu9qH9eR0gUHWCth5-dKH-NyL1nh3FkSQxo1njMLkSD9r39IA">
+    <div class="otp-panel">
+        <div class="otp-panel__icon">
+            <MaterialIcon Name="verified_user" />
+        </div>
+    </div>
+
+    <EditForm EditContext="@_editContext" OnSubmit="@SubmitAsync" class="auth-form">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <AuthInput
+            Id="verify-email"
+            Label="Email Address"
+            Icon="mail"
+            Type="email"
+            AutoComplete="email"
+            Placeholder="name@example.com"
+            @bind-Value="_model.Email" />
+
+        <div class="otp-grid" aria-label="Verification code">
+            @for (var i = 0; i < _digits.Length; i++)
+            {
+                var index = i;
+                <input
+                    class="otp-digit"
+                    inputmode="numeric"
+                    maxlength="1"
+                    aria-label="Digit @(index + 1)"
+                    value="@_digits[index]"
+                    @oninput="args => SetDigit(index, args)" />
+            }
+        </div>
+
+        <button class="wx-button wx-button--secondary" type="submit" disabled="@_isBusy">
+            @(_isBusy ? "Verifying..." : "Verify & Continue")
+        </button>
+
+        <button class="social-button" type="button" disabled="@_isBusy" @onclick="@ResendAsync">
+            Resend Code
+        </button>
+
+        <AuthStatusMessage Message="@_message" IsError="@_isError" />
+
+        <a class="back-link" href="/register">
+            <MaterialIcon Name="arrow_back" />
+            Back to Register
+        </a>
+    </EditForm>
+</AuthShell>
+
+@code {
+    private readonly VerifyPhoneRequest _model = new();
+    private readonly string[] _digits = new string[6];
+    private EditContext? _editContext;
+    private bool _initializedFromQuery;
+    private bool _isBusy;
+    private bool _isError;
+    private string? _message;
+
+    [SupplyParameterFromQuery(Name = "email")]
+    public string? Email { get; set; }
+
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? Code { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (_initializedFromQuery)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(Email))
+        {
+            _model.Email = Email;
+        }
+
+        if (!string.IsNullOrWhiteSpace(Code))
+        {
+            var code = new string(Code.Where(char.IsDigit).Take(6).ToArray());
+
+            for (var i = 0; i < code.Length; i++)
+            {
+                _digits[i] = code[i].ToString();
+            }
+        }
+
+        _initializedFromQuery = true;
+    }
+
+    private void SetDigit(int index, ChangeEventArgs args)
+    {
+        var value = args.Value?.ToString() ?? string.Empty;
+        _digits[index] = value.Length == 0 ? string.Empty : value[^1].ToString();
+    }
+
+    private async Task SubmitAsync(EditContext editContext)
+    {
+        _model.Code = string.Concat(_digits);
+        _message = null;
+        _isError = false;
+
+        if (!editContext.Validate())
+        {
+            return;
+        }
+
+        _isBusy = true;
+
+        try
+        {
+            var response = await AuthApi.VerifyPhoneAsync(_model);
+            _message = response?.Message ?? "Account verified. You can sign in now.";
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isBusy = false;
+        }
+    }
+
+    private async Task ResendAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_model.Email))
+        {
+            _isError = true;
+            _message = "Enter your email address before requesting another code.";
+            return;
+        }
+
+        _isBusy = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            var response = await AuthApi.ResendCodeAsync(new ForgotPasswordRequest { Email = _model.Email });
+            _message = response?.VerificationCode is null
+                ? response?.Message
+                : $"{response.Message} Development OTP: {response.VerificationCode}";
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isBusy = false;
+        }
+    }
+
+    private static string ToUserMessage(Exception exception)
+    {
+        return exception.Message.Contains('{')
+            ? "The verification request could not be completed. Please check the code and try again."
+            : exception.Message;
+    }
+}

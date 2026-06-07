@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "surface-tint": "#0c56d0",
+                  "outline-variant": "#c3c6d6",
+                  "surface": "#faf9ff",
+                  "on-tertiary-fixed-variant": "#004e5d",
+                  "on-secondary-fixed": "#3d0600",
+                  "on-surface": "#051a3e",
+                  "surface-container": "#e9edff",
+                  "on-primary": "#ffffff",
+                  "on-primary-fixed-variant": "#0040a2",
+                  "on-error-container": "#93000a",
+                  "tertiary-container": "#006477",
+                  "primary-container": "#0052cc",
+                  "error": "#ba1a1a",
+                  "secondary-container": "#fd6a49",
+                  "on-error": "#ffffff",
+                  "on-primary-fixed": "#001848",
+                  "surface-container-high": "#e1e8ff",
+                  "on-background": "#051a3e",
+                  "surface-container-highest": "#d8e2ff",
+                  "inverse-on-surface": "#edf0ff",
+                  "surface-container-lowest": "#ffffff",
+                  "on-secondary": "#ffffff",
+                  "background": "#faf9ff",
+                  "tertiary": "#004b59",
+                  "secondary-fixed-dim": "#ffb4a3",
+                  "primary-fixed-dim": "#b2c5ff",
+                  "secondary-fixed": "#ffdad2",
+                  "primary-fixed": "#dae2ff",
+                  "outline": "#737685",
+                  "tertiary-fixed-dim": "#48d7f9",
+                  "on-tertiary-fixed": "#001f27",
+                  "primary": "#003d9b",
+                  "on-tertiary": "#ffffff",
+                  "on-secondary-fixed-variant": "#8c1900",
+                  "on-primary-container": "#c4d2ff",
+                  "surface-bright": "#faf9ff",
+                  "surface-dim": "#ccdaff",
+                  "inverse-primary": "#b2c5ff",
+                  "secondary": "#ae3115",
+                  "tertiary-fixed": "#afecff",
+                  "error-container": "#ffdad6",
+                  "on-secondary-container": "#640f00",
+                  "surface-variant": "#d8e2ff",
+                  "on-surface-variant": "#434654",
+                  "surface-container-low": "#f1f3ff",
+                  "on-tertiary-container": "#76e2ff",
+                  "inverse-surface": "#1d3054"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "gutter": "24px",
+                  "container-padding-desktop": "48px",
+                  "container-padding-mobile": "16px",
+                  "section-gap": "80px",
+                  "base": "8px"
+          },
+          "fontFamily": {
+                  "headline-md": ["Hanken Grotesk"],
+                  "body-md": ["Inter"],
+                  "body-lg": ["Inter"],
+                  "display-lg": ["Hanken Grotesk"],
+                  "label-md": ["Inter"],
+                  "label-sm": ["Inter"],
+                  "headline-lg": ["Hanken Grotesk"],
+                  "headline-lg-mobile": ["Hanken Grotesk"]
+          },
+          "fontSize": {
+                  "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                  "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                  "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                  "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                  "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                  "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}]
+          }
+        },
+      },
+    }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c3c6d6;
+            border-radius: 10px;
+        }
+    </style>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-page-fade {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .animate-metric {
+            animation: slideUpFade 0.8s ease-out forwards;
+        }
+
+        .card-hover-effect {
+            transition: all 0.3s ease;
+        }
+
+            .card-hover-effect:hover {
+                transform: scale(1.02);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md overflow-hidden animate-page-fade">
+    <div class="flex h-screen w-full">
+        <!-- SideNavBar (Authority Source: JSON) -->
+        <aside class="hidden md:flex flex-col h-full py-6 px-4 gap-2 bg-surface-container-low border-r border-outline-variant w-64 shadow-md">
+            <div class="px-2 mb-8">
+                <a class="contents" href="../SystemAccount/Homepage.html"><h1 class="font-headline-md text-headline-md font-black text-primary">Admin Central</h1></a>
+                <p class="font-label-sm text-label-sm text-outline">Platform Manager</p>
+            </div>
+            <nav class="flex-1 space-y-1">
+                <a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-150 translate-x-1 transition-transform hover:scale-105" href="./Admin%20Dashboard.html">
+                    <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    <span class="font-label-md text-label-md">Dashboard</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg transition-transform hover:scale-105" href="./ManagerTour.html">
+                    <span class="material-symbols-outlined" data-icon="map">map</span>
+                    <span class="font-label-md text-label-md">Tours</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg transition-transform hover:scale-105" href="./Booking%20Management.html">
+                    <span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+                    <span class="font-label-md text-label-md">Bookings</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg transition-transform hover:scale-105" href="./CustomerManagement.html">
+                    <span class="material-symbols-outlined" data-icon="group">group</span>
+                    <span class="font-label-md text-label-md">Customers</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg transition-transform hover:scale-105" href="./PaymentManagement.html">
+                    <span class="material-symbols-outlined" data-icon="payments">payments</span>
+                    <span class="font-label-md text-label-md">Payments</span>
+                </a>
+            </nav>
+            <div class="mt-auto pt-6 border-t border-outline-variant/30 space-y-1">
+                <button class="w-full mb-4 py-3 px-4 bg-secondary text-on-secondary rounded-full font-label-md text-label-md shadow-lg hover:brightness-110 transition-all transition-transform hover:scale-105">
+                    Generate Reports
+                </button>
+                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="./Account%20Management.html">
+                    <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    <span class="font-label-md text-label-md">Settings</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all duration-150 rounded-lg" href="../GuideOperation/GuideManagement.html">
+                    <span class="material-symbols-outlined" data-icon="badge">badge</span>
+                    <span class="font-label-md text-label-md">Guides</span>
+                </a>
+            </div>
+        </aside>
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar">
+            <!-- Top Header -->
+            <header class="sticky top-0 z-40 h-16 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
+                <div class="flex items-center gap-4">
+                    <h2 class="font-headline-md text-headline-md font-bold text-primary">WanderX Dashboard</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative hidden sm:block">
+                        <span class="absolute inset-y-0 left-3 flex items-center text-outline">
+                            <span class="material-symbols-outlined text-[20px]" data-icon="search">search</span>
+                        </span>
+                        <input class="pl-10 pr-4 py-1.5 bg-surface-container border-none rounded-full text-label-md w-64 focus:ring-2 focus:ring-primary" placeholder="Search data points..." type="text" />
+                    </div>
+                    <button class="p-2 rounded-full hover:bg-surface-container transition-colors relative">
+                        <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span>
+                    </button>
+                    <div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+                        <img alt="Admin Avatar" class="w-full h-full object-cover" data-alt="A professional portrait of a senior platform manager in a modern, brightly lit office environment. The lighting is soft and high-key, reflecting a clean corporate aesthetic with blue and white tones. She has a confident expression, conveying trust and expertise in the premium travel concierge industry." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6tZZo78D3VJ1O-5Gx2rHV-XPd78rmB2IgCs1IAtd2Rk_bSCtfSjU1KJ8ucZt6velM6OlkPFrUExNEXh8qFDV486UJBLEpYOlv3JQq7mh6zyVMD8FrcOE3RQJq8aQlRaFCrZ_ON9IwrppDUr4W3wt6KFpnCmTVW2zyMGZ15lsT-u4pjD8JXbbVsXZZWtkRCOeu5QZEQ2S4m4FkgJUE_jpjm8UcjwqEmnc0Y13S_ESby1umBYOIkV8xGrxcoKhTEBfrwWdcIAfCWg" />
+                    </div>
+                </div>
+            </header>
+            <!-- Dashboard Content -->
+            <div class="p-container-padding-mobile md:p-container-padding-desktop">
+                <!-- Stats Row (Bento Style) -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm card-hover-effect">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2 bg-primary-container/10 text-primary rounded-lg">
+                                <span class="material-symbols-outlined" data-icon="travel_explore">travel_explore</span>
+                            </div>
+                            <span class="text-secondary font-label-sm text-label-sm">+12%</span>
+                        </div>
+                        <p class="text-on-surface-variant font-label-md text-label-md">Open Tours</p>
+                        <h3 class="font-headline-lg text-headline-lg text-on-surface animate-metric">1,284</h3>
+                    </div>
+                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm card-hover-effect">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="p-2 bg-tertiary-container/10 text-tertiary rounded-lg">
+                                <span class="material-symbols-outlined" data-icon="book_online">book_online</span>
+                            </div>
+                            <span class="text-secondary font-label-sm text-label-sm">+24%</span>
+                        </div>
+                        <p class="text-on-surface-variant font-label-md text-label-md">Monthly Bookings</p>
+                        <h3 class="font-headline-lg text-headline-lg text-on-surface animate-metric">8,492</h3>
+                    </div>
+                    <div class="md:col-span-2 bg-primary text-on-primary p-6 rounded-xl shadow-lg relative overflow-hidden card-hover-effect">
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-2 bg-white/20 rounded-lg">
+                                    <span class="material-symbols-outlined" data-icon="payments">payments</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <span class="px-2 py-0.5 bg-white/20 rounded text-[10px] uppercase font-bold">Target: 95%</span>
+                                </div>
+                            </div>
+                            <p class="text-primary-fixed-dim font-label-md text-label-md">Expected Revenue (Q4)</p>
+                            <div class="flex items-baseline gap-2">
+                                <h3 class="font-headline-lg text-headline-lg animate-metric">$2.4M</h3>
+                                <span class="text-primary-fixed text-label-sm">Forecasted Growth</span>
+                            </div>
+                            <div class="mt-4 h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                <div class="h-full bg-white w-3/4 rounded-full"></div>
+                            </div>
+                        </div>
+                        <!-- Decorative Glass Circle -->
+                        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+                    </div>
+                </div>
+                <!-- Charts & Rankings Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Revenue Chart (Visualization Component) -->
+                    <div class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/30 shadow-sm card-hover-effect">
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h4 class="font-headline-md text-headline-md text-on-surface">Revenue Performance</h4>
+                                <p class="text-on-surface-variant text-body-md">Monthly overview of generated earnings</p>
+                            </div>
+                            <select class="bg-surface-container border-none text-label-sm rounded-lg px-4 py-2 ring-1 ring-outline-variant focus:ring-primary">
+                                <option>Last 6 Months</option>
+                                <option>Last Year</option>
+                            </select>
+                        </div>
+                        <div class="h-64 flex items-end justify-between gap-2 px-2">
+                            <!-- Simple CSS Bar Chart -->
+                            <div class="flex flex-col items-center w-full gap-2 group">
+                                <div class="w-full bg-surface-container-high rounded-t-lg h-[40%] group-hover:bg-primary/40 transition-colors transition-all duration-400"></div>
+                                <span class="text-label-sm text-outline">Jul</span>
+                            </div>
+                            <div class="flex flex-col items-center w-full gap-2 group">
+                                <div class="w-full bg-surface-container-high rounded-t-lg h-[65%] group-hover:bg-primary/40 transition-colors transition-all duration-400"></div>
+                                <span class="text-label-sm text-outline">Aug</span>
+                            </div>
+                            <div class="flex flex-col items-center w-full gap-2 group">
+                                <div class="w-full bg-primary rounded-t-lg h-[55%] group-hover:brightness-110 transition-colors relative transition-all duration-400">
+                                    <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] px-2 py-1 rounded hidden group-hover:block">$320k</div>
+                                </div>
+                                <span class="text-label-sm text-on-surface font-bold">Sep</span>
+                            </div>
+                            <div class="flex flex-col items-center w-full gap-2 group">
+                                <div class="w-full bg-surface-container-high rounded-t-lg h-[80%] group-hover:bg-primary/40 transition-colors transition-all duration-400"></div>
+                                <span class="text-label-sm text-outline">Oct</span>
+                            </div>
+                            <div class="flex flex-col items-center w-full gap-2 group">
+                                <div class="w-full bg-surface-container-high rounded-t-lg h-[95%] group-hover:bg-primary/40 transition-colors transition-all duration-400"></div>
+                                <span class="text-label-sm text-outline">Nov</span>
+                            </div>
+                            <div class="flex flex-col items-center w-full gap-2 group">
+                                <div class="w-full bg-surface-container-high rounded-t-lg h-[70%] group-hover:bg-primary/40 transition-colors border-2 border-dashed border-primary/20 transition-all duration-400"></div>
+                                <span class="text-label-sm text-outline">Dec</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Guide Ranking List (Authority Style: Premium Cards) -->
+                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm flex flex-col card-hover-effect">
+                        <div class="mb-6">
+                            <h4 class="font-headline-md text-headline-md text-on-surface">Top Guides</h4>
+                            <p class="text-on-surface-variant text-body-md">By rating &amp; tour volume</p>
+                        </div>
+                        <div class="space-y-4 flex-1">
+                            <!-- Guide 1 -->
+                            <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-container-low transition-colors group transition-all duration-400">
+                                <div class="relative">
+                                    <img class="w-12 h-12 rounded-full object-cover border-2 border-primary-container" data-alt="A professional portrait of a male travel guide with a warm, welcoming smile. He is standing outdoors with a blurred natural landscape behind him, lit by the golden hour sun. The image quality is high-fidelity, conveying experience and trust in premium travel services." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3tkidYpWThl-_gm-pBHbn7jh_lefq0zqX8kKD1bgenuzTTIEEXIn4pSG2Qpr2UPeEWe2UgY3vL9GNEMOtMu-gVAj3gtXNRcWfULzR2IExXc3hvpFtLVx1idZyIwHcICGBIRG5XmqDEyEER3FD6G5dvl7iIVFjtZyCMar4xvQpAxvPkvawqF8O21Jb2ffsXHAhMgxhEhVMcDAknrM8flaVfIod2fguM3wysr_aG0kZAXtmzia_yYormt9vrur-b9bJfQDjcKfDOg" />
+                                    <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-tertiary text-white rounded-full flex items-center justify-center text-[10px] font-bold">1</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="font-label-md text-label-md text-on-surface">Marco V.</h5>
+                                    <p class="text-outline text-label-sm">Alpine Expeditions</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="flex items-center justify-end text-secondary">
+                                        <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                        <span class="font-label-sm text-label-sm font-bold">4.9</span>
+                                    </div>
+                                    <p class="text-outline text-[10px]">142 Tours</p>
+                                </div>
+                            </div>
+                            <!-- Guide 2 -->
+                            <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-container-low transition-colors group transition-all duration-400">
+                                <div class="relative">
+                                    <img class="w-12 h-12 rounded-full object-cover border-2 border-transparent" data-alt="A professional portrait of a female travel guide in her early thirties, appearing sophisticated and knowledgeable. She is set against a modern architectural backdrop with soft, diffused daylight. The lighting is crisp, and her expression is friendly yet professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKDtIzb6p4FdCOOSMa_SPOot7RLGURoHA2KW8LgtVHy6g4c_84Jg31NjkEMAuMJfqEdWiXSGnfv-dKUotjWNacUW_j4AVdXCPKljPLJexJcfc_knPVPaFklDZFncGE0j7iRXQKrV0e_vK9wXjPfiA0JGkLXS-RPCCzkGuFq7xNlqfqXozbbCVNIeLs6mEss9k85gdES2s5isv4E78ztYHFbzed5GQJvUylUPfg0pa93SS7gFxx73zOMykc0z4qNktKKcwcvmloxQ" />
+                                    <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-surface-container-highest text-on-surface-variant rounded-full flex items-center justify-center text-[10px] font-bold">2</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="font-label-md text-label-md text-on-surface">Elena S.</h5>
+                                    <p class="text-outline text-label-sm">Urban Concierge</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="flex items-center justify-end text-secondary">
+                                        <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                        <span class="font-label-sm text-label-sm font-bold">4.8</span>
+                                    </div>
+                                    <p class="text-outline text-[10px]">118 Tours</p>
+                                </div>
+                            </div>
+                            <!-- Guide 3 -->
+                            <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-container-low transition-colors group transition-all duration-400">
+                                <div class="relative">
+                                    <img class="w-12 h-12 rounded-full object-cover border-2 border-transparent" data-alt="A professional portrait of a male travel guide with an adventurous yet approachable look. He is dressed in high-quality outdoor gear, standing in a sunny, high-altitude setting. The photograph is sharp and well-balanced, emphasizing the reliability and excitement of a tech-enabled travel service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRNDVyuZOmj91IZ4Qg0CrU6vgrZeXHoEKiZTr2arjl1hOpCDvQTtrGrlmCFK6IJeCPObHg8_tjDc-ek76aQIuyt0xsCkGCrUZL3FSH6yApdfxG2OiMXevd5RLz3QQZSTRYSo12-Jx0t_2AT22oyrbG2tqSpR3y7YStztRddio7INxV8CyEs23HshHdXLq0RjvC27gW-WT-rFTDN8_pvZZzQ_P16Vxn0gAT1mJcdmlkjAi62nr3hO8en52PjeHIu3SIMcWVBzDhog" />
+                                    <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-surface-container-highest text-on-surface-variant rounded-full flex items-center justify-center text-[10px] font-bold">3</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="font-label-md text-label-md text-on-surface">Chen L.</h5>
+                                    <p class="text-outline text-label-sm">Safari Specialist</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="flex items-center justify-end text-secondary">
+                                        <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                        <span class="font-label-sm text-label-sm font-bold">4.8</span>
+                                    </div>
+                                    <p class="text-outline text-[10px]">95 Tours</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full mt-6 py-2.5 text-primary border border-primary/20 rounded-lg font-label-md text-label-md hover:bg-primary-container/10 transition-colors transition-transform hover:scale-105">
+                            View All Guides
+                        </button>
+                    </div>
+                </div>
+                <!-- Operations Hub -->
+                <div class="mt-8 bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden card-hover-effect">
+                    <div class="p-6 border-b border-outline-variant/30">
+                        <h4 class="font-headline-md text-headline-md text-on-surface">Operations Hub</h4>
+                        <p class="text-on-surface-variant text-body-md">Admin work areas</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-6">
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./Admin%20Dashboard.html"><span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Dashboard</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./ManagerTour.html"><span class="material-symbols-outlined">map</span><span class="font-label-md text-label-md">Tour Management</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./TourForm.html"><span class="material-symbols-outlined">add_location_alt</span><span class="font-label-md text-label-md">Create Tour</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./TourDetail.html"><span class="material-symbols-outlined">travel_explore</span><span class="font-label-md text-label-md">Tour Detail</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./TourPricingManagement.html"><span class="material-symbols-outlined">sell</span><span class="font-label-md text-label-md">Pricing</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./Booking%20Management.html"><span class="material-symbols-outlined">event_note</span><span class="font-label-md text-label-md">Bookings</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./Booking%20Detail%20Management.html"><span class="material-symbols-outlined">list_alt</span><span class="font-label-md text-label-md">Booking Detail</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./CancelBookingApproval.html"><span class="material-symbols-outlined">approval_delegation</span><span class="font-label-md text-label-md">Cancel Approval</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./Invoice%20%26%20Receipt.html"><span class="material-symbols-outlined">receipt_long</span><span class="font-label-md text-label-md">Invoice</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./PaymentManagement.html"><span class="material-symbols-outlined">payments</span><span class="font-label-md text-label-md">Payments</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./CustomerManagement.html"><span class="material-symbols-outlined">group</span><span class="font-label-md text-label-md">Customers</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./Account%20Management.html"><span class="material-symbols-outlined">manage_accounts</span><span class="font-label-md text-label-md">Accounts</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./Review%20Management.html"><span class="material-symbols-outlined">reviews</span><span class="font-label-md text-label-md">Reviews</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./Recommended%20Tours.html"><span class="material-symbols-outlined">recommend</span><span class="font-label-md text-label-md">Recommended Tours</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./SpecialRequests.html"><span class="material-symbols-outlined">support_agent</span><span class="font-label-md text-label-md">Special Requests</span></a>
+                        <a class="flex items-center gap-3 px-4 py-3 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all" href="./Assigned%20Tour%20Detail.html"><span class="material-symbols-outlined">assignment_ind</span><span class="font-label-md text-label-md">Assigned Tour</span></a>
+                    </div>
+                </div>
+                <!-- Recent Activity / Transactions Section -->
+                <div class="mt-8 bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden card-hover-effect">
+                    <div class="p-6 border-b border-outline-variant/30 flex justify-between items-center">
+                        <h4 class="font-headline-md text-headline-md text-on-surface">Recent Booking Activity</h4>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-surface-container rounded-full text-label-sm text-on-surface-variant">Live Feed</span>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-outline-variant/30">
+                                    <th class="px-6 py-4 font-label-md text-label-md text-outline">Customer</th>
+                                    <th class="px-6 py-4 font-label-md text-label-md text-outline">Tour Name</th>
+                                    <th class="px-6 py-4 font-label-md text-label-md text-outline">Date</th>
+                                    <th class="px-6 py-4 font-label-md text-label-md text-outline">Amount</th>
+                                    <th class="px-6 py-4 font-label-md text-label-md text-outline">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant/10">
+                                <tr class="hover:bg-surface-container-low transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded bg-primary-container/20 flex items-center justify-center text-primary font-bold text-xs">JS</div>
+                                            <span class="font-label-md text-label-md">John Smith</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-on-surface-variant">Kyoto Zen Garden Tour</td>
+                                    <td class="px-6 py-4 text-on-surface-variant">Oct 24, 2024</td>
+                                    <td class="px-6 py-4 font-bold text-on-surface">$1,250.00</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-0.5 bg-tertiary/10 text-tertiary rounded-full text-[10px] font-bold uppercase tracking-wider">Confirmed</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-surface-container-low transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded bg-secondary-container/20 flex items-center justify-center text-secondary font-bold text-xs">AM</div>
+                                            <span class="font-label-md text-label-md">Alice Miller</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-on-surface-variant">Swiss Alps Skiing</td>
+                                    <td class="px-6 py-4 text-on-surface-variant">Oct 24, 2024</td>
+                                    <td class="px-6 py-4 font-bold text-on-surface">$3,840.00</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-0.5 bg-secondary/10 text-secondary rounded-full text-[10px] font-bold uppercase tracking-wider">Pending</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-surface-container-low transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded bg-tertiary-container/20 flex items-center justify-center text-tertiary font-bold text-xs">RK</div>
+                                            <span class="font-label-md text-label-md">Robert King</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-on-surface-variant">Santorini Luxury Cruise</td>
+                                    <td class="px-6 py-4 text-on-surface-variant">Oct 23, 2024</td>
+                                    <td class="px-6 py-4 font-bold text-on-surface">$5,200.00</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-0.5 bg-tertiary/10 text-tertiary rounded-full text-[10px] font-bold uppercase tracking-wider">Confirmed</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer (Authority Source: JSON) -->
+            <footer class="w-full py-8 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-surface-container-highest mt-auto">
+                <div class="flex flex-col md:items-start items-center gap-2">
+                    <a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md text-primary">WanderX</span></a>
+                    <p class="font-label-sm text-label-sm text-on-surface-variant">� 2024 WanderX Travel. All rights reserved.</p>
+                </div>
+                <div class="flex gap-8">
+                    <a class="text-on-surface-variant hover:text-primary underline transition-all font-label-sm text-label-sm transition-transform hover:scale-105" href="./Admin%20Dashboard.html">About Us</a>
+                    <a class="text-on-surface-variant hover:text-primary underline transition-all font-label-sm text-label-sm transition-transform hover:scale-105" href="./Admin%20Dashboard.html">Privacy Policy</a>
+                    <a class="text-on-surface-variant hover:text-primary underline transition-all font-label-sm text-label-sm transition-transform hover:scale-105" href="./Admin%20Dashboard.html">Terms of Service</a>
+                    <a class="text-on-surface-variant hover:text-primary underline transition-all font-label-sm text-label-sm transition-transform hover:scale-105" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
+                </div>
+            </footer>
+        </main>
+    </div>
+    <!-- Mobile Navigation (Authority Source: JSON) -->
+    <nav class="md:hidden fixed bottom-0 w-full flex justify-around items-center py-3 px-4 bg-surface border-t border-outline-variant z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-6 py-1 scale-90 transition-transform" href="./Admin%20Dashboard.html">
+            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            <span class="font-label-sm text-label-sm">Home</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="./ManagerTour.html">
+            <span class="material-symbols-outlined" data-icon="explore">explore</span>
+            <span class="font-label-sm text-label-sm">Tours</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="./Booking%20Management.html">
+            <span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+            <span class="font-label-sm text-label-sm">Schedule</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary" href="../SystemAccount/notificationManagerment.html">
+            <span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+            <span class="font-label-sm text-label-sm">Status</span>
+        </a>
+    </nav>
+</body>
+</html>

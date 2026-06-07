@@ -1,0 +1,56 @@
+@using System.Linq.Expressions
+
+<div class="auth-input">
+    @if (ShowLabel)
+    {
+        <label class="auth-input__label" for="@Id">@Label</label>
+    }
+    <div class="auth-input__control-wrap">
+        <MaterialIcon Name="@Icon" Class="auth-input__icon" />
+        <InputText
+            id="@Id"
+            class="auth-input__control"
+            type="@Type"
+            autocomplete="@AutoComplete"
+            placeholder="@Placeholder"
+            Value="@Value"
+            ValueChanged="@ValueChanged"
+            ValueExpression="@ValueExpression" />
+    </div>
+    @if (ValueExpression is not null)
+    {
+        <ValidationMessage For="@ValueExpression" />
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Id { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool ShowLabel { get; set; } = true;
+
+    [Parameter, EditorRequired]
+    public string Icon { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Type { get; set; } = "text";
+
+    [Parameter]
+    public string? AutoComplete { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
+}

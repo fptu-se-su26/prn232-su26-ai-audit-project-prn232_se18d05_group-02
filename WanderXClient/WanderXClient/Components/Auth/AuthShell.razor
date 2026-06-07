@@ -1,0 +1,40 @@
+<div class="auth-page">
+    <main class="auth-shell">
+        <div class="auth-shell__media" aria-hidden="true">
+            <img alt="" src="@BackgroundImage" />
+        </div>
+
+        <section class="auth-card @(Compact ? "auth-card--compact" : null)">
+            <div class="auth-card__brand">
+                <a class="brand-mark" href="/">WanderX</a>
+                <p>Smart Adventure Concierge</p>
+            </div>
+
+            <div class="auth-card__heading">
+                <h1>@Title</h1>
+                <p>@Subtitle</p>
+            </div>
+
+            @ChildContent
+        </section>
+    </main>
+
+    <AuthFooter />
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Subtitle { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string BackgroundImage { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool Compact { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,305 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WanderX - Create Tour</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-tint": "#0c56d0",
+                      "outline-variant": "#c3c6d6",
+                      "surface": "#faf9ff",
+                      "on-tertiary-fixed-variant": "#004e5d",
+                      "on-secondary-fixed": "#3d0600",
+                      "on-surface": "#051a3e",
+                      "surface-container": "#e9edff",
+                      "on-primary": "#ffffff",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "on-error-container": "#93000a",
+                      "tertiary-container": "#006477",
+                      "primary-container": "#0052cc",
+                      "error": "#ba1a1a",
+                      "secondary-container": "#fd6a49",
+                      "on-error": "#ffffff",
+                      "on-primary-fixed": "#001848",
+                      "surface-container-high": "#e1e8ff",
+                      "on-background": "#051a3e",
+                      "surface-container-highest": "#d8e2ff",
+                      "inverse-on-surface": "#edf0ff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "background": "#faf9ff",
+                      "tertiary": "#004b59",
+                      "secondary-fixed-dim": "#ffb4a3",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "secondary-fixed": "#ffdad2",
+                      "primary-fixed": "#dae2ff",
+                      "outline": "#737685",
+                      "tertiary-fixed-dim": "#48d7f9",
+                      "on-tertiary-fixed": "#001f27",
+                      "primary": "#003d9b",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#8c1900",
+                      "on-primary-container": "#c4d2ff",
+                      "surface-bright": "#faf9ff",
+                      "surface-dim": "#ccdaff",
+                      "inverse-primary": "#b2c5ff",
+                      "secondary": "#ae3115",
+                      "tertiary-fixed": "#afecff",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#640f00",
+                      "surface-variant": "#d8e2ff",
+                      "on-surface-variant": "#434654",
+                      "surface-container-low": "#f1f3ff",
+                      "on-tertiary-container": "#76e2ff",
+                      "inverse-surface": "#1d3054"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "container-padding-desktop": "48px",
+                      "container-padding-mobile": "16px",
+                      "section-gap": "80px",
+                      "base": "8px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Hanken Grotesk"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "label-md": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "headline-lg-mobile": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+<!-- Header Navigation Shell -->
+<header class="bg-surface/80 dark:bg-surface/80 backdrop-blur-md shadow-sm fixed top-0 w-full z-50 border-b border-outline-variant/30 h-16 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop">
+<div class="flex items-center gap-8">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">WanderX</span></a>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-on-surface-variant dark:text-outline hover:text-primary transition-colors duration-200 font-label-md text-label-md" href="./ManagerTour.html">Destinations</a>
+<a class="text-primary dark:text-inverse-primary font-bold border-b-2 border-primary h-16 flex items-center font-label-md text-label-md" href="./Booking%20Management.html">My Bookings</a>
+<a class="text-on-surface-variant dark:text-outline hover:text-primary transition-colors duration-200 font-label-md text-label-md" href="./ManagerTour.html">Deals</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:flex items-center gap-2 px-4 py-2 text-primary hover:bg-surface-container-low transition-colors duration-200 rounded-full font-label-md text-label-md">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+                Support
+            </button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all">
+                Travel Quiz
+            </button>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="User Profile" data-alt="A professional close-up headshot of a person with a friendly expression, captured with soft studio lighting. The background is a clean, neutral gradient that complements the modern and corporate aesthetic of the WanderX platform. High-fidelity clarity ensures a premium, concierge-like user experience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjvpIADmGm0VkyE3BFypEvErF9YgzvDFIvvDCwmAJzDwC6hmwSu7ynGS4MVGYZV4o0gZn-jX9JQjnHl1EozdiLh57_lW4-AxJi7xQTAUI22FadMTb9HsszI21aa68SXQL392_Uymjk2ASHT-zbQenD1cGx701G9u7qB5lOaTiVKLbagh7oV5d_aurvMRweEN4UuJrxxq_YekMzINLQvrjlEEsnyT6VFoSdfM6Kb_XzIhe8YGCSf0xbXIxtBy8gWWoijY668HD22g">
+</div>
+</div>
+</header>
+<main class="pt-24 pb-20 px-container-padding-mobile md:px-container-padding-desktop max-w-7xl mx-auto">
+<!-- Back and Title -->
+<div class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="space-y-1">
+<a class="flex items-center gap-2 text-primary font-label-md text-label-md hover:underline mb-2 group" href="./Admin%20Dashboard.html">
+<span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform" data-icon="arrow_back">arrow_back</span>
+                    Back to Dashboard
+                </a>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Create New Tour Experience</h1>
+<p class="text-on-surface-variant font-body-md text-body-md">Drafting a unique journey for the global traveler.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-3 border border-primary text-primary rounded-full font-label-md text-label-md hover:bg-surface-container-low transition-all active:scale-95">
+                    Save Draft
+                </button>
+<button class="px-8 py-3 bg-secondary text-on-secondary rounded-full font-label-md text-label-md hover:opacity-90 shadow-lg active:scale-95 transition-all">
+                    Publish Tour
+                </button>
+</div>
+</div>
+<!-- Form Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Side: Basic Info -->
+<div class="lg:col-span-8 space-y-gutter">
+<!-- Main Details Card -->
+<section class="bg-white rounded-xl p-8 border border-outline-variant/30 shadow-sm space-y-6">
+<div class="flex items-center gap-2 pb-4 border-b border-outline-variant/20">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+<h2 class="font-headline-md text-headline-md">General Information</h2>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Tour Title</label>
+<input class="w-full bg-surface-container-low border-outline-variant/50 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md" placeholder="e.g., Midnight Northern Lights in Svalbard" type="text">
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Destination</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-3 text-outline text-[20px]" data-icon="location_on">location_on</span>
+<input class="w-full bg-surface-container-low border-outline-variant/50 rounded-lg p-3 pl-10 focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md" placeholder="City, Country" type="text">
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Tour Category</label>
+<select class="w-full bg-surface-container-low border-outline-variant/50 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md appearance-none">
+<option>Select Category</option>
+<option>Luxury Adventure</option>
+<option>Cultural Heritage</option>
+<option>Eco-Friendly</option>
+<option>Family Fun</option>
+</select>
+</div>
+</div>
+</div>
+</section>
+<!-- Description Area Card (Rich Text Placeholder) -->
+<section class="bg-white rounded-xl p-8 border border-outline-variant/30 shadow-sm space-y-6">
+<div class="flex items-center justify-between pb-4 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="description">description</span>
+<h2 class="font-headline-md text-headline-md">High-Level Description</h2>
+</div>
+<div class="flex gap-1">
+<button class="p-2 hover:bg-surface-container rounded-md"><span class="material-symbols-outlined text-outline" data-icon="format_bold">format_bold</span></button>
+<button class="p-2 hover:bg-surface-container rounded-md"><span class="material-symbols-outlined text-outline" data-icon="format_italic">format_italic</span></button>
+<button class="p-2 hover:bg-surface-container rounded-md"><span class="material-symbols-outlined text-outline" data-icon="format_list_bulleted">format_list_bulleted</span></button>
+<button class="p-2 hover:bg-surface-container rounded-md"><span class="material-symbols-outlined text-outline" data-icon="link">link</span></button>
+</div>
+</div>
+<textarea class="w-full bg-surface-container-low border-outline-variant/50 rounded-lg p-4 focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md resize-none" placeholder="Describe the soul of this journey... What will travelers see, feel, and remember?" rows="10"></textarea>
+</section>
+<!-- Media Section -->
+<section class="bg-white rounded-xl p-8 border border-outline-variant/30 shadow-sm space-y-6">
+<div class="flex items-center gap-2 pb-4 border-b border-outline-variant/20">
+<span class="material-symbols-outlined text-primary" data-icon="image">image</span>
+<h2 class="font-headline-md text-headline-md">Visual Storytelling</h2>
+</div>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-10 flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-display-lg" data-icon="cloud_upload">cloud_upload</span>
+<p class="mt-4 font-label-md text-label-md text-on-surface">Drag and drop high-fidelity photography</p>
+<p class="text-outline text-label-sm">Minimum resolution 1920x1080px (JPG, PNG)</p>
+</div>
+</section>
+</div>
+<!-- Right Side: Specifics & Analytics -->
+<div class="lg:col-span-4 space-y-gutter">
+<!-- Logistics Card -->
+<section class="glass-panel rounded-xl p-6 border border-white/50 shadow-md space-y-6">
+<h3 class="font-label-md text-label-md font-bold text-primary uppercase tracking-widest border-b border-primary/10 pb-2">Tour Logistics</h3>
+<div class="space-y-4">
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Pricing (USD)</label>
+<div class="relative">
+<span class="absolute left-3 top-3 text-on-surface-variant font-bold">$</span>
+<input class="w-full bg-white border-outline-variant/50 rounded-lg p-3 pl-8 focus:ring-2 focus:ring-primary focus:border-primary font-body-md text-body-md" placeholder="2,500" type="number">
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Duration</label>
+<div class="flex gap-2">
+<input class="w-1/2 bg-white border-outline-variant/50 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary font-body-md text-body-md" placeholder="7" type="number">
+<select class="w-1/2 bg-white border-outline-variant/50 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary font-body-md text-body-md appearance-none">
+<option>Days</option>
+<option>Weeks</option>
+<option>Hours</option>
+</select>
+</div>
+</div><div class="flex flex-col gap-2"><label class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Maximum Capacity</label><input class="w-full bg-white border-outline-variant/50 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:border-primary font-body-md text-body-md" placeholder="e.g. 12" type="number"></div>
+</div>
+</section>
+<!-- Tags Section -->
+<section class="bg-white rounded-xl p-6 border border-outline-variant/30 shadow-sm space-y-4">
+<h3 class="font-label-md text-label-md font-bold text-primary uppercase tracking-widest border-b border-primary/10 pb-2">Experience Tags</h3>
+<div class="flex flex-wrap gap-2">
+<span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-label-sm flex items-center gap-1">
+                            Adventure <span class="material-symbols-outlined text-[14px] cursor-pointer" data-icon="close">close</span>
+</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-label-sm flex items-center gap-1">
+                            Private <span class="material-symbols-outlined text-[14px] cursor-pointer" data-icon="close">close</span>
+</span>
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-3 py-1 rounded-full text-label-sm flex items-center gap-1">
+                            Sustainable <span class="material-symbols-outlined text-[14px] cursor-pointer" data-icon="close">close</span>
+</span>
+<button class="border border-outline-variant border-dashed text-outline px-3 py-1 rounded-full text-label-sm hover:border-primary hover:text-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="add">add</span> Add Tag
+                        </button>
+</div>
+</section>
+<!-- Preview Card -->
+<section class="rounded-xl overflow-hidden border border-outline-variant/30 shadow-lg group">
+<div class="h-40 bg-surface-container relative">
+<img alt="Preview Background" data-alt="A breathtaking view of a wide, open-road landscape with rugged mountains in the distance and a vibrant sunset painting the sky in deep shades of azure blue and soft coral. The composition is clean and expansive, embodying the spirit of luxury travel and adventure that WanderX offers its discerning clients." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDswiPLpaYUoFZfKMx36iBs3mwUn4wFrVwf0UoDU4NarRhMbQmPGi4myuC-PKNtwscEUWJvdM5Ar0lU9hGo04rPrSsjHNgPVs9Yuk8NuAxpe_d_nvRUNOvoHBz0RuDuAftUUo-8gs-4gpXMDkIcD2bbGmEDb2VBpUzxsRh-_oIEWL6dJ-reWMXXyo2RZ3sQrO2v8MIzKMxi3BxR8yyD57Tvix30r5A8JKd7WlgsTWuoMaAPJyK5fPchK9yoKsk2LoCK1gJP2JccEw">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-4 left-4 text-white">
+<p class="font-label-sm text-label-sm uppercase tracking-widest opacity-80">Quick Preview</p>
+<p class="font-headline-md text-headline-md">Your Tour Title Here</p>
+</div>
+</div>
+<div class="p-6 bg-white space-y-3">
+<div class="flex justify-between items-center text-label-sm text-outline">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span> 7 Days</span>
+<span class="flex items-center gap-1 font-bold text-secondary">$2,500</span>
+</div>
+<p class="text-on-surface-variant text-label-md line-clamp-2">The description you write on the left will populate this preview card for potential bookings...</p>
+<button class="w-full py-2 bg-surface-container text-primary font-bold rounded-lg text-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors">See Full Details</button>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer Shell -->
+<footer class="w-full py-12 px-container-padding-mobile md:px-container-padding-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-surface-container-highest border-t border-outline-variant/30 mt-section-gap">
+<div class="flex flex-col gap-2">
+<a class="contents" href="../SystemAccount/Homepage.html"><span class="font-headline-md text-headline-md text-primary font-bold">WanderX</span></a>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 WanderX Travel. All rights reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-on-surface-variant font-label-sm text-label-sm hover:text-primary underline transition-all" href="./Admin%20Dashboard.html">About Us</a>
+<a class="text-on-surface-variant font-label-sm text-label-sm hover:text-primary underline transition-all" href="./Admin%20Dashboard.html">Privacy Policy</a>
+<a class="text-on-surface-variant font-label-sm text-label-sm hover:text-primary underline transition-all" href="./Admin%20Dashboard.html">Terms of Service</a>
+<a class="text-on-surface-variant font-label-sm text-label-sm hover:text-primary underline transition-all" href="../GuideOperation/Guide%20Portal.html">Become a Guide</a>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer" data-icon="public">public</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer" data-icon="chat">chat</span>
+</div>
+</footer>
+
+
+</body></html>
