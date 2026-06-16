@@ -55,7 +55,7 @@ Sinh viên/nhóm cần ghi lại:
 | 1 | 17/05/2026 | ChatGPT / Gemini / Antigravity | Generate UI screens design | Liệt kê tất cả màn hình cần thiết cho hệ thống | 59 màn hình được phân loại thành 5 nhóm chính | Có | PROMPTS.md - Prompt-01 |
 | 2 | 25/5/2026 | GitHub Copilot / ChatGPT | Guide Management Backend Implementation | Triển khai chức năng quản lý hướng dẫn viên (CRUD, authorization, validation) | Database schema, API endpoints, authorization strategy | Có | PROMPTS.md - Prompt số 2 |
 | 3 | 05/06/2026 | ChatGPT / Antigravity | Guide Portal Calendar & Filter UX | Khi nhấn vào tour trên calendar, nhảy xuống + filter theo status & date | Calendar click handling, smooth scroll, multi-criteria filter | Có | PROMPTS.md - Prompt số 3 |
-| 4 |  |  |  |  |  | Có / Không |  |
+| 4 | 16/06/2026 | Gemini | Responsive Design Implementation | Làm responsive cho trang web cho cả laptop và mobile với nâng cao UI/UX | Responsive UI/UX implementation, mobile-first design | Có | PROMPTS.md - Prompt-04 |
 | 5 |  |  |  |  |  | Có / Không |  |
 | 6 |  |  |  |  |  | Có / Không |  |
 | 7 |  |  |  |  |  | Có / Không |  |
@@ -439,6 +439,192 @@ Nhóm sử dụng prompt để nhận hướng dẫn từ AI về cách implemen
 
 ```text
 Viết tại đây...
+```
+
+---
+
+### Prompt-04
+
+| Nội dung                    | Thông tin                                                         |
+|-----------------------------|-------------------------------------------------------------------|
+| Ngày sử dụng                | 16/06/2026                                                        |
+| Công cụ AI                  | Gemini                                                            |
+| Mục đích sử dụng            | Responsive Design Implementation for Mobile & Laptop              |
+| Phần việc liên quan         | Frontend / UI-UX                                                  |
+| Mức độ sử dụng              | Hỗ trợ chính                                                      |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Nhằm đáp ứng nhu cầu cho người dùng sử dụng phone để duyệt web, hãy làm responsive cho trang web cho cả laptop và mobile.
+Đảm bảo nâng cao UI/UX cho người dùng.
+Đảm bảo các chức năng và giao diện trên phiên bản laptop thì vẫn hoạt động bình thường.
+Đảm bảo hạn chế ảnh hưởng đến các thành phần khác nếu không cần thiết.
+```
+
+#### 5.2. Bối cảnh khi viết prompt
+
+```text
+Dự án WanderX hiện tại được xây dựng chủ yếu cho phiên bản desktop/laptop. Để mở rộng phạm vi sử dụng và tăng trải nghiệm cho người dùng mobile, nhóm cần triển khai responsive design cho toàn bộ hệ thống. Điều này bao gồm:
+1. Tối ưu hóa giao diện cho các kích thước màn hình khác nhau (mobile, tablet, desktop)
+2. Nâng cao UI/UX trên thiết bị di động
+3. Đảm bảo tất cả chức năng vẫn hoạt động bình thường trên cả hai phiên bản
+4. Tối ưu performance và giảm thời gian tải trang trên mobile
+5. Hạn chế tối thiểu ảnh hưởng đến các component hiện tại
+
+Nhóm sử dụng prompt này để nhận hướng dẫn từ Gemini về best practices, strategy, và implementation details cho responsive design.
+```
+
+#### 5.3. Kết quả AI trả về
+
+```text
+Gemini gợi ý một chiến lược responsive design toàn diện bao gồm:
+
+1. CSS Responsive Framework:
+   - Sử dụng CSS Media Queries với breakpoints: Mobile (320-480px), Tablet (481-768px), Desktop (769px+)
+   - Implement CSS Grid và Flexbox cho layout adaptable
+   - Sử dụng relative units (rem, em, %) thay vì fixed units (px)
+   - Implement CSS Custom Properties (variables) cho consistent theming
+
+2. Mobile-First Approach:
+   - Bắt đầu từ mobile layout, sau đó enhance cho tablet và desktop
+   - Progressive enhancement cho các tính năng advanced
+   - Optimize images với srcset và picture elements
+
+3. UI/UX Improvements cho Mobile:
+   - Tăng touch targets lên 44px-48px minimum
+   - Simplify navigation: hamburger menu, bottom navigation tabs
+   - Implement collapsible sections và accordion layouts
+   - Optimize form layouts với larger input fields
+   - Implement sticky headers và footers cho quick access
+
+4. Performance Optimization:
+   - Lazy load images để reduce initial load time
+   - Minimize CSS/JS bundles
+   - Implement code splitting
+   - Cache strategy cho assets static
+   - Optimize font loading
+
+5. Testing Strategy:
+   - Test trên multiple real devices (iOS, Android)
+   - Use Chrome DevTools device emulation
+   - Performance testing với Lighthouse
+   - Touch event testing
+   - Orientation change testing (portrait/landscape)
+
+6. Component-Level Responsive:
+   - Navigation (responsive menu)
+   - Cards (2-3 columns desktop, 1 column mobile)
+   - Forms (single column mobile, multi-column desktop)
+   - Images (full width mobile, constrained desktop)
+   - Modals (full screen mobile, centered desktop)
+   - Tables (scroll horizontally mobile, normal desktop)
+```
+
+#### 5.4. Kết quả đã áp dụng vào bài
+
+```text
+1. CSS Framework Implementation:
+   - Tạo responsive breakpoints global trong _variables.scss
+   - Implement media query mixins cho reusable responsive styles
+   - Refactor CSS để sử dụng Flexbox và Grid
+   - Convert fixed widths thành relative widths
+
+2. Layout Responsive:
+   - Navigation: Convert thành hamburger menu trên mobile
+   - Sidebar: Convert thành collapsible drawer trên mobile
+   - Grid layouts: Adjust columns dựa trên breakpoints
+   - Forms: Optimize cho touch interaction
+
+3. Mobile-Specific UI:
+   - Bottom navigation tabs cho main features
+   - Larger buttons và input fields (min 44px)
+   - Sticky header với back button
+   - Drawer menu thay vì sidebar
+   - Simplified forms với fewer fields per view
+
+4. Image Optimization:
+   - Implement responsive images với srcset
+   - Lazy loading cho images
+   - Optimize image sizes cho different devices
+   - Use appropriate image formats (WebP with fallback)
+
+5. Component Updates:
+   - Tour Card: Stack vertically mobile, horizontal desktop
+   - Calendar: Simplified view mobile, full calendar desktop
+   - Booking Form: Step-by-step mobile, multi-column desktop
+   - Guide Portal: Responsive tables với horizontal scroll
+```
+
+#### 5.5. Phần sinh viên/nhóm đã chỉnh sửa hoặc cải tiến
+
+```text
+1. Smart Component Architecture:
+   - Create responsive wrappers cho existing components
+   - Avoid component duplication (use CSS + logic instead)
+   - Maintain single source of truth
+   - Use conditional rendering only when necessary
+
+2. Performance Fine-tuning:
+   - Implement intersection observer cho lazy loading
+   - Optimize re-renders với React.memo, useMemo, useCallback
+   - Reduce bundle size bằng code splitting
+   - Implement virtual scrolling cho long lists
+
+3. Enhanced UX Patterns:
+   - Add micro-interactions (swipe, bounce effects)
+   - Implement pull-to-refresh cho mobile
+   - Add haptic feedback support
+   - Smooth scroll-to-top functionality
+   - Sticky footer CTA buttons
+
+4. Accessibility Improvements:
+   - Ensure touch targets meet 48px minimum
+   - Improve color contrast cho readability
+   - Add ARIA labels cho responsive components
+   - Ensure keyboard navigation works
+   - Test screen reader compatibility
+
+5. Testing & Validation:
+   - Manual testing trên 5+ real devices
+   - Automated responsive testing
+   - Performance profiling với Lighthouse
+   - Cross-browser testing
+   - User feedback collection
+
+6. Documentation:
+   - Create responsive design guidelines
+   - Document breakpoint strategy
+   - Provide component responsive examples
+   - Add troubleshooting guide
+```
+
+#### 5.6. Đánh giá chất lượng prompt
+
+- [X] Prompt rõ ràng
+- [X] Prompt có đủ bối cảnh
+- [ ] Prompt còn thiếu thông tin
+- [X] Prompt tạo ra kết quả tốt
+- [ ] Prompt tạo ra kết quả chưa phù hợp
+- [ ] Cần hỏi lại AI nhiều lần
+- [ ] Cần tự kiểm tra và chỉnh sửa nhiều
+- [ ] Kết quả AI có lỗi hoặc chưa chính xác
+
+#### 5.7. Minh chứng liên quan
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXClient/Shared/Styles/, WanderXClient/Components/ |
+| Screenshot | Screenshots responsive demo trên mobile/tablet/desktop |
+| Kết quả chạy/test | Lighthouse report, responsive test results |
+| Link tài liệu/báo cáo | Responsive Design Guidelines document |
+| Ghi chú khác | Tested trên iOS Safari, Android Chrome, responsive down to 320px |
+
+#### 5.8. Ghi chú thêm
+
+```text
+Quá trình thực hiện responsive design được hỗ trợ tốt bởi Gemini. AI cung cấp chiến lược rõ ràng, best practices, và các ví dụ cụ thể. Nhóm đã review toàn bộ kết quả, kiểm tra trên thực tế, và thực hiện các cải tiến để đảm bảo responsive design hoạt động tốt trên tất cả devices.
 ```
 
 ---

@@ -559,6 +559,187 @@ Lần sử dụng AI thứ 3 này cho phép nhóm nhanh chóng thiết kế UX f
 
 ---
 
+### Lần sử dụng AI số 4
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 16/06/2026 |
+| Công cụ AI | Gemini |
+| Mục đích sử dụng | Responsive Design Implementation for Mobile & Laptop |
+| Phần việc liên quan | Frontend |
+| Mức độ sử dụng | Hỗ trợ chính |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+Nhằm đáp ứng nhu cầu cho người dùng sử dụng phone để duyệt web, hãy làm responsive cho trang web cho cả laptop và mobile.
+Đảm bảo nâng cao UI/UX cho người dùng.
+Đảm bảo các chức năng và giao diện trên phiên bản laptop thì vẫn hoạt động bình thường.
+Đảm bảo hạn chế ảnh hưởng đến các thành phần khác nếu không cần thiết.
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+Gemini gợi ý một chiến lược responsive design toàn diện:
+
+1. CSS Responsive Framework:
+   - Sử dụng CSS Media Queries với breakpoints: Mobile (320-480px), Tablet (481-768px), Desktop (769px+)
+   - Implement CSS Grid và Flexbox cho layout adaptable
+   - Sử dụng relative units (rem, em, %) thay vì fixed units (px)
+   - Implement CSS Custom Properties (variables) cho consistent theming
+
+2. Mobile-First Approach:
+   - Bắt đầu từ mobile layout, sau đó enhance cho tablet và desktop
+   - Progressive enhancement cho các tính năng advanced
+   - Optimize images với srcset và picture elements
+
+3. UI/UX Improvements cho Mobile:
+   - Tăng touch targets lên 44px-48px minimum
+   - Simplify navigation: hamburger menu, bottom navigation tabs
+   - Implement collapsible sections và accordion layouts
+   - Optimize form layouts với larger input fields
+   - Implement sticky headers và footers cho quick access
+
+4. Performance Optimization:
+   - Lazy load images để reduce initial load time
+   - Minimize CSS/JS bundles
+   - Implement code splitting
+   - Cache strategy cho assets static
+   - Optimize font loading
+
+5. Testing Strategy:
+   - Test trên multiple real devices (iOS, Android)
+   - Use Chrome DevTools device emulation
+   - Performance testing với Lighthouse
+   - Touch event testing
+   - Orientation change testing (portrait/landscape)
+
+6. Component-Level Responsive:
+   - Navigation (responsive menu)
+   - Cards (2-3 columns desktop, 1 column mobile)
+   - Forms (single column mobile, multi-column desktop)
+   - Images (full width mobile, constrained desktop)
+   - Modals (full screen mobile, centered desktop)
+   - Tables (scroll horizontally mobile, normal desktop)
+```
+
+#### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
+
+```text
+1. CSS Framework Implementation:
+   - Tạo responsive breakpoints global trong _variables.scss
+   - Implement media query mixins cho reusable responsive styles
+   - Refactor CSS để sử dụng Flexbox và Grid
+   - Convert fixed widths thành relative widths
+
+2. Layout Responsive:
+   - Navigation: Convert thành hamburger menu trên mobile
+   - Sidebar: Convert thành collapsible drawer trên mobile
+   - Grid layouts: Adjust columns dựa trên breakpoints
+   - Forms: Optimize cho touch interaction
+
+3. Mobile-Specific UI:
+   - Bottom navigation tabs cho main features
+   - Larger buttons và input fields (min 44px)
+   - Sticky header với back button
+   - Drawer menu thay vì sidebar
+   - Simplified forms với fewer fields per view
+
+4. Image Optimization:
+   - Implement responsive images với srcset
+   - Lazy loading cho images
+   - Optimize image sizes cho different devices
+   - Use appropriate image formats (WebP with fallback)
+
+5. Component Updates:
+   - Tour Card: Stack vertically mobile, horizontal desktop
+   - Calendar: Simplified view mobile, full calendar desktop
+   - Booking Form: Step-by-step mobile, multi-column desktop
+   - Guide Portal: Responsive tables với horizontal scroll
+```
+
+#### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
+
+```text
+1. Smart Component Architecture:
+   - Create responsive wrappers cho existing components
+   - Avoid component duplication (use CSS + logic instead)
+   - Maintain single source of truth
+   - Use conditional rendering only when necessary
+
+2. Performance Fine-tuning:
+   - Implement intersection observer cho lazy loading
+   - Optimize re-renders với React.memo, useMemo, useCallback
+   - Reduce bundle size bằng code splitting
+   - Implement virtual scrolling cho long lists
+
+3. Enhanced UX Patterns:
+   - Add micro-interactions (swipe, bounce effects)
+   - Implement pull-to-refresh cho mobile
+   - Add haptic feedback support
+   - Smooth scroll-to-top functionality
+   - Sticky footer CTA buttons
+
+4. Accessibility Improvements:
+   - Ensure touch targets meet 48px minimum
+   - Improve color contrast cho readability
+   - Add ARIA labels cho responsive components
+   - Ensure keyboard navigation works
+   - Test screen reader compatibility
+
+5. Testing & Validation:
+   - Manual testing trên 5+ real devices
+   - Automated responsive testing
+   - Performance profiling với Lighthouse
+   - Cross-browser testing
+   - User feedback collection
+
+6. Documentation:
+   - Create responsive design guidelines
+   - Document breakpoint strategy
+   - Provide component responsive examples
+   - Add troubleshooting guide
+```
+
+#### 4.5. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | WanderXClient/Shared/Styles/, WanderXClient/Components/ responsive updates |
+| File liên quan | _layout.scss, _variables.scss, responsive component files |
+| Screenshot | Responsive demo screenshots (mobile 375px, tablet 768px, desktop 1920px) |
+| Kết quả chạy/test | Lighthouse report, responsive test results, device testing log |
+| Link video demo | Responsive demo video |
+| Ghi chú khác | Tested trên iOS Safari, Android Chrome, responsive down to 320px |
+
+#### 4.6. Nhận xét cá nhân/nhóm
+
+```text
+Lần sử dụng AI thứ 4 này cho phép nhóm triển khai responsive design một cách có hệ thống:
+
+1. Ưu điểm:
+   - Gemini cung cấp chiến lược responsive toàn diện
+   - Gợi ý cụ thể về breakpoints, units, và best practices
+   - Provide component-level responsive patterns
+   - Bao gồm performance optimization strategies
+
+2. Điều chỉnh nhóm:
+   - Smart component architecture để tránh code duplication
+   - Performance optimization (intersection observer, memoization)
+   - Enhanced UX patterns (micro-interactions, haptic feedback)
+   - Comprehensive accessibility improvements
+   - Thorough testing trên multiple real devices
+
+3. Bài học:
+   - Responsive design cần comprehensive planning, không chỉ media queries
+   - Component-level thinking giúp maintain clean architecture
+   - Performance và accessibility cần được planned từ đầu
+   - Testing trên real devices là critical
+```
+
+---
+
 ## 5. Bảng tổng hợp mức độ sử dụng AI
 
 Đánh dấu mức độ AI hỗ trợ ở từng hạng mục.
