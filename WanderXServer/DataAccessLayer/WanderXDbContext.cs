@@ -21,6 +21,125 @@ public class WanderXDbContext : DbContext
 
     public DbSet<GuideTourAssignment> GuideTourAssignments => Set<GuideTourAssignment>();
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        var passwordHasher = new PasswordHasher<ApplicationUser>();
+
+        // 1. Seed Admin
+        var adminEmail = "ad@ad.123";
+        var adminUser = new ApplicationUser
+        {
+            Id = CreateGuidFromEmail(adminEmail, "User"),
+            FullName = "WanderX Admin",
+            Email = adminEmail,
+            NormalizedEmail = NormalizeEmail(adminEmail),
+            PhoneNumber = "+10000000000",
+            Role = UserRole.Admin,
+            IsEmailConfirmed = true,
+            IsPhoneConfirmed = true,
+            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+        };
+        adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "123456");
+        modelBuilder.Entity<ApplicationUser>().HasData(adminUser);
+
+        // 2. Seed Guides
+        var usersToSeed = new List<ApplicationUser>();
+        var profilesToSeed = new List<GuideProfile>();
+
+        foreach (var guide in DevelopmentGuides)
+        {
+            var userId = CreateGuidFromEmail(guide.Email, "User");
+            var profileId = CreateGuidFromEmail(guide.Email, "Profile");
+
+            var user = new ApplicationUser
+            {
+                Id = userId,
+                FullName = guide.FullName,
+                Email = guide.Email,
+                NormalizedEmail = NormalizeEmail(guide.Email),
+                PhoneNumber = guide.PhoneNumber,
+                Role = UserRole.Guide,
+                IsEmailConfirmed = true,
+                IsPhoneConfirmed = true,
+                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            };
+            user.PasswordHash = passwordHasher.HashPassword(user, "Guide@123");
+            usersToSeed.Add(user);
+
+            var profile = new GuideProfile
+            {
+                Id = profileId,
+                UserId = userId,
+                Languages = guide.Languages,
+                ExpertiseArea = guide.ExpertiseArea,
+                Region = guide.Region,
+                CompletedTours = guide.CompletedTours,
+                Status = guide.Status,
+                Bio = guide.Bio,
+                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            };
+            profilesToSeed.Add(profile);
+        }
+
+        modelBuilder.Entity<ApplicationUser>().HasData(usersToSeed.ToArray());
+        modelBuilder.Entity<GuideProfile>().HasData(profilesToSeed.ToArray());
+
+        // 3. Seed Guide Tour Assignments
+        var assignmentsToSeed = new List<GuideTourAssignment>();
+        var today = new DateTime(2026, 6, 16, 0, 0, 0, DateTimeKind.Utc);
+
+        foreach (var assignment in DevelopmentAssignments)
+        {
+            var profileId = CreateGuidFromEmail(assignment.GuideEmail, "Profile");
+            var assignmentId = CreateGuidFromEmail(assignment.TourCode, "Assignment");
+
+            var startDate = today.AddDays(assignment.StartOffsetDays);
+            var endDate = today.AddDays(assignment.EndOffsetDays);
+            var declinedAt = assignment.Status.Equals("Declined", StringComparison.OrdinalIgnoreCase)
+                ? today.AddDays(assignment.EndOffsetDays).AddHours(10)
+                : (DateTime?)null;
+            var finishedAt = assignment.Status.Equals("Finished", StringComparison.OrdinalIgnoreCase)
+                ? today.AddDays(assignment.EndOffsetDays).AddHours(18)
+                : (DateTime?)null;
+
+            var dbAssignment = new GuideTourAssignment
+            {
+                Id = assignmentId,
+                GuideProfileId = profileId,
+                TourCode = assignment.TourCode,
+                TourName = assignment.TourName,
+                Destination = assignment.Destination,
+                Region = assignment.Region,
+                StartDate = startDate,
+                EndDate = endDate,
+                TravelerCount = assignment.TravelerCount,
+                MeetingPoint = assignment.MeetingPoint,
+                Status = assignment.Status,
+                ItinerarySummary = assignment.ItinerarySummary,
+                DeclineReason = assignment.DeclineReason,
+                DeclinedAt = declinedAt,
+                FinishedAt = finishedAt,
+                EvidenceImage = assignment.Status.Equals("Finished", StringComparison.OrdinalIgnoreCase)
+                    ? SampleEvidenceImageBase64
+                    : null,
+                CreatedAt = today.AddDays(assignment.StartOffsetDays - 14),
+                UpdatedAt = declinedAt ?? finishedAt
+            };
+            assignmentsToSeed.Add(dbAssignment);
+        }
+
+        modelBuilder.Entity<GuideTourAssignment>().HasData(assignmentsToSeed.ToArray());
+    }
+
+    private static Guid CreateGuidFromEmail(string key, string type)
+    {
+        using var md5 = System.Security.Cryptography.MD5.Create();
+        byte[] hash = md5.ComputeHash(System.Text.Encoding.UTF8.GetBytes(key + "_" + type));
+        return new Guid(hash);
+    }
+
     public void SeedDevelopmentData()
     {
         Database.EnsureCreated();
@@ -34,6 +153,20 @@ public class WanderXDbContext : DbContext
         SaveChanges();
         SeedGuideTourAssignments();
         SaveChanges();
+
+        // Update existing Finished assignments that don't have an evidence image
+        var finishedToursWithNoEvidence = GuideTourAssignments
+            .Where(item => item.Status == "Finished" && string.IsNullOrEmpty(item.EvidenceImage))
+            .ToList();
+
+        if (finishedToursWithNoEvidence.Count > 0)
+        {
+            foreach (var tour in finishedToursWithNoEvidence)
+            {
+                tour.EvidenceImage = SampleEvidenceImageBase64;
+            }
+            SaveChanges();
+        }
     }
 
     private void EnsureGuideTourAssignmentsTable()
@@ -57,6 +190,7 @@ BEGIN
         [DeclineReason] nvarchar(600) NULL,
         [DeclinedAt] datetime2 NULL,
         [FinishedAt] datetime2 NULL,
+        [EvidenceImage] nvarchar(max) NULL,
         [CreatedAt] datetime2 NOT NULL,
         [UpdatedAt] datetime2 NULL,
         CONSTRAINT [PK_GuideTourAssignments] PRIMARY KEY ([Id]),
@@ -64,6 +198,13 @@ BEGIN
     );
 
     CREATE INDEX [IX_GuideTourAssignments_GuideProfileId] ON [GuideTourAssignments] ([GuideProfileId]);
+END
+""");
+
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('GuideTourAssignments', 'EvidenceImage') IS NULL
+BEGIN
+    ALTER TABLE [GuideTourAssignments] ADD [EvidenceImage] nvarchar(max) NULL;
 END
 """);
     }
@@ -118,6 +259,9 @@ END
             DeclineReason = assignment.DeclineReason,
             DeclinedAt = declinedAt,
             FinishedAt = finishedAt,
+            EvidenceImage = assignment.Status.Equals("Finished", StringComparison.OrdinalIgnoreCase)
+                ? SampleEvidenceImageBase64
+                : null,
             CreatedAt = today.AddDays(assignment.StartOffsetDays - 14),
             UpdatedAt = declinedAt ?? finishedAt
         });
@@ -330,6 +474,8 @@ END
         new("mira.guide@wanderx.com", "WX-DBV-733", "Dubrovnik Walls at Sunrise", "Dubrovnik, Croatia", "Adriatic Coast", -6, -5, 4, "Pile Gate outer bridge", "Finished", "Early-access wall walk, filming-location context, and breakfast terrace transfer."),
         new("mira.guide@wanderx.com", "WX-HVR-520", "Hvar Wine and Sail", "Hvar, Croatia", "Adriatic Coast", 4, 7, 6, "Hvar harbor customs pier", "Declined", "Sailing day with vineyard visit and island dinner booking.", "Boat captain schedule changed; guide requested operations review.")
     };
+
+    private const string SampleEvidenceImageBase64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y0ZjZmOCIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjEyMCIgcj0iNDUiIGZpbGw9IiNlOGY1ZTkiLz48cGF0aCBkPSJNMTg1LDEyMCBMMTk1LDEzMCBMMjE1LDExMCIgc3Ryb2tlPSIjMmU3ZDMyIiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjIwMCIgeT0iMjAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZm9udC1zdHlsZT0ibm9ybWFsIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzJjM2U1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VG91ciBFdmlkZW5jZSBQcm9vZjwvdGV4dD48dGV4dCB4PSIyMDAiIHk9IjIyNSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTUiIGZpbGw9IiM3ZjhjOGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPldhbmRlclggVmVyaWZpZWQgRmluaXNoPC90ZXh0Pjwvc3ZnPg==";
 
     private sealed record DevelopmentGuide(
         string FullName,

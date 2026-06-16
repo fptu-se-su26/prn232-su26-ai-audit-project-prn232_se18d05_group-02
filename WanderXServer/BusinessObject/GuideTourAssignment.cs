@@ -57,6 +57,8 @@ public class GuideTourAssignment
 
     public DateTime? FinishedAt { get; set; }
 
+    public string? EvidenceImage { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdatedAt { get; set; }
