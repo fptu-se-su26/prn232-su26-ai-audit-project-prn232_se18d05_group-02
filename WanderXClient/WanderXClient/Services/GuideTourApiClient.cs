@@ -69,12 +69,12 @@ public sealed class GuideTourApiClient
             request);
     }
 
-    public Task<GuideTourAssignmentResponse?> FinishAsync(Guid id)
+    public Task<GuideTourAssignmentResponse?> FinishAsync(Guid id, FinishTourRequest request)
     {
-        return SendAsync<object, GuideTourAssignmentResponse>(
+        return SendAsync<FinishTourRequest, GuideTourAssignmentResponse>(
             HttpMethod.Put,
             $"api/guide-tours/{id}/finish",
-            new { });
+            request);
     }
 
     private async Task<TResponse?> GetAsync<TResponse>(string path)

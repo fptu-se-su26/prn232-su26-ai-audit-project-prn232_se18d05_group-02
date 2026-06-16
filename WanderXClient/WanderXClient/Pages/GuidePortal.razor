@@ -18,7 +18,7 @@
             </div>
         </section>
 
-        <section class="wx-container guide-portal-layout">
+        <section class="wx-container guide-portal-layout" data-active-tab="@_activePortalTab">
             <div class="guide-self-panel guide-portal-toolbar">
                 <div class="guide-section-heading">
                     <div>
@@ -77,236 +77,281 @@
 
             @if (HasGuideSession && _scheduleLoaded)
             {
-                <section class="guide-calendar-shell">
-                    <div class="guide-calendar-toolbar">
-                        <div>
-                            <p class="guide-eyebrow">Calendar view</p>
-                            <h2>@_visibleMonth.ToString("MMMM yyyy", CultureInfo.InvariantCulture)</h2>
-                            <span>@GetVisibleMonthTourCount() tour(s) this month</span>
-                        </div>
-                        <div class="guide-calendar-actions">
-                            <button class="guide-icon-button" type="button" title="Previous month" @onclick="ShowPreviousMonth">
-                                <MaterialIcon Name="chevron_left" />
-                            </button>
-                            <button class="wx-button wx-button--outline" type="button" @onclick="ShowCurrentMonth">
-                                <MaterialIcon Name="today" />
-                                Today
-                            </button>
-                            <label class="guide-calendar-date-picker" title="Filter by date">
-                                <MaterialIcon Name="event" />
-                                <input type="date" value="@DateFilterInputValue" @onchange="OnDatePickerChanged" />
-                            </label>
-                            <button class="guide-icon-button" type="button" title="Next month" @onclick="ShowNextMonth">
-                                <MaterialIcon Name="chevron_right" />
-                            </button>
-                        </div>
-                    </div>
+                <div class="guide-portal-tabs" role="tablist" aria-label="Guide portal sections" style="margin-bottom: 24px;">
+                    <button class="@GetPortalTabClass(PortalTabCalendar)" type="button" role="tab" @onclick="() => SetPortalTab(PortalTabCalendar)">
+                        <MaterialIcon Name="calendar_month" />
+                        Calendar
+                    </button>
+                    <button class="@GetPortalTabClass(PortalTabTours)" type="button" role="tab" @onclick="() => SetPortalTab(PortalTabTours)">
+                        <MaterialIcon Name="list_alt" />
+                        Tours
+                        @if (_assignments.Count > 0)
+                        {
+                            <strong>@_assignments.Count</strong>
+                        }
+                    </button>
+                    <button class="@GetPortalTabClass(PortalTabDetail)" type="button" role="tab" @onclick="() => SetPortalTab(PortalTabDetail)" disabled="@(_selectedAssignment is null)">
+                        <MaterialIcon Name="info" />
+                        Details
+                    </button>
+                </div>
 
-                    @if (_assignments.Count == 0)
-                    {
-                        <div class="guide-empty guide-empty--compact">
-                            <MaterialIcon Name="event_busy" />
-                            No assigned tours were found.
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="guide-calendar-filterbar">
-                            <div class="guide-filter-group" role="group" aria-label="Filter tour status">
-                                @foreach (var status in StatusFilterOptions)
-                                {
-                                    <button class="@GetStatusFilterClass(status)" type="button" @onclick="() => SetStatusFilter(status)">
-                                        @status
-                                    </button>
-                                }
+                <div class="guide-portal-left-col">
+                    <section class="guide-calendar-shell">
+                        <div class="guide-calendar-toolbar">
+                            <div>
+                                <p class="guide-eyebrow">Calendar view</p>
+                                <h2>@_visibleMonth.ToString("MMMM yyyy", CultureInfo.InvariantCulture)</h2>
+                                <span>@GetVisibleMonthTourCount() tour(s) this month</span>
                             </div>
-
-                            @if (_selectedDateFilter is DateTime selectedDate)
-                            {
-                                <button class="guide-date-filter-pill" type="button" @onclick="ClearDateFilter">
-                                    <MaterialIcon Name="event" />
-                                    @selectedDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture)
-                                    <MaterialIcon Name="close" />
+                            <div class="guide-calendar-actions">
+                                <button class="guide-icon-button" type="button" title="Previous month" @onclick="ShowPreviousMonth">
+                                    <MaterialIcon Name="chevron_left" />
                                 </button>
-                            }
-
-                            <p class="guide-calendar-filter-hint">
-                                <MaterialIcon Name="touch_app" />
-                                Select a calendar day or use the date picker to filter tours by date.
-                            </p>
+                                <button class="wx-button wx-button--outline" type="button" @onclick="ShowCurrentMonth">
+                                    <MaterialIcon Name="today" />
+                                    Today
+                                </button>
+                                <label class="guide-calendar-date-picker" title="Filter by date">
+                                    <MaterialIcon Name="event" />
+                                    <input type="date" value="@DateFilterInputValue" @onchange="OnDatePickerChanged" />
+                                </label>
+                                <button class="guide-icon-button" type="button" title="Next month" @onclick="ShowNextMonth">
+                                    <MaterialIcon Name="chevron_right" />
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="guide-calendar-weekdays">
-                            @foreach (var weekday in CalendarWeekdays)
-                            {
-                                <span>@weekday</span>
-                            }
-                        </div>
-
-                        <div class="guide-calendar-grid">
-                            @foreach (var day in GetCalendarDays())
-                            {
-                                <div class="@GetCalendarDayClass(day)">
-                                    <div class="guide-calendar-day__head">
-                                        <button class="guide-calendar-day-date" type="button" @onclick="() => ToggleDateFilter(day.Date)">
-                                            @day.Date.Day
-                                        </button>
-                                        @if (day.IsToday)
-                                        {
-                                            <strong>Today</strong>
-                                        }
-                                    </div>
-
-                                    <div class="guide-calendar-events">
-                                        @foreach (var assignment in day.Assignments.Take(MaxEventsPerDay))
-                                        {
-                                            <button class="@GetCalendarEventClass(assignment)" type="button" @onclick="() => SelectCalendarAssignment(assignment)" @onclick:stopPropagation="true">
-                                                <strong>@assignment.TourName</strong>
-                                                <span>@assignment.Destination</span>
-                                            </button>
-                                        }
-
-                                        @if (day.Assignments.Count > MaxEventsPerDay)
-                                        {
-                                            <span class="guide-calendar-more">
-                                                +@(day.Assignments.Count - MaxEventsPerDay) more
-                                            </span>
-                                        }
-                                    </div>
-                                </div>
-                            }
-                        </div>
-
-                        <div class="guide-calendar-legend">
-                            @foreach (var status in CalendarLegendStatuses)
-                            {
-                                <span class="@GetCalendarLegendClass(status)" style="color: @GetCalendarStatusColor(status);">
-                                    <i></i>
-                                    @status
-                                </span>
-                            }
-                        </div>
-                    }
-                </section>
-            }
-
-            @if (HasGuideSession && _scheduleLoaded && _assignments.Count > 0)
-            {
-                <section class="guide-table-shell guide-upcoming-shell">
-                    <div class="guide-table-toolbar">
-                        <div>
-                            <p>Upcoming assigned tour(s)</p>
-                        </div>
-                    </div>
-
-                    @{
-                        var upcomingAssignments = GetUpcomingAssignments();
-                    }
-
-                    <div class="guide-upcoming-list">
-                        @if (upcomingAssignments.Count == 0)
+                        @if (_assignments.Count == 0)
                         {
                             <div class="guide-empty guide-empty--compact">
-                                <MaterialIcon Name="filter_alt_off" />
-                                No tours match the current filters.
+                                <MaterialIcon Name="event_busy" />
+                                No assigned tours were found.
                             </div>
                         }
                         else
                         {
-                            @foreach (var assignment in upcomingAssignments)
-                            {
-                                <button id="@GetUpcomingAssignmentElementId(assignment.Id)"
-                                        class="@(assignment.Id == _selectedAssignment?.Id ? "guide-upcoming-item guide-upcoming-item--active" : "guide-upcoming-item")"
-                                        type="button"
-                                        @onclick="() => SelectAssignment(assignment)">
-                                    <span class="@GetCalendarEventDotClass(assignment)"></span>
-                                    <div>
-                                        <strong>@assignment.TourName</strong>
-                                        <p>@FormatDateRange(assignment) - @assignment.Destination</p>
-                                    </div>
-                                    <span class="@GetTourStatusClass(assignment)">
-                                        <span></span>
-                                        @assignment.Status
-                                    </span>
-                                </button>
-                            }
-                        }
-                    </div>
-                </section>
-            }
+                            <div class="guide-calendar-filterbar">
+                                <div class="guide-filter-group" role="group" aria-label="Filter tour status">
+                                    @foreach (var status in StatusFilterOptions)
+                                    {
+                                        <button class="@GetStatusFilterClass(status)" type="button" @onclick="() => SetStatusFilter(status)">
+                                            @status
+                                        </button>
+                                    }
+                                </div>
 
-            @if (HasGuideSession && _selectedAssignment is not null)
-            {
-                <section class="guide-self-panel guide-tour-detail">
-                    <div class="guide-section-heading">
-                        <div>
-                            <p class="guide-eyebrow">Tour detail</p>
-                            <h2>@_selectedAssignment.TourName</h2>
-                        </div>
-                        <span class="@GetTourStatusClass(_selectedAssignment)">
-                            <span></span>
-                            @_selectedAssignment.Status
-                        </span>
-                    </div>
+                                @if (_selectedDateFilter is DateTime selectedDate)
+                                {
+                                    <button class="guide-date-filter-pill" type="button" @onclick="ClearDateFilter">
+                                        <MaterialIcon Name="event" />
+                                        @selectedDate.ToString("dd MMM yyyy", CultureInfo.InvariantCulture)
+                                        <MaterialIcon Name="close" />
+                                    </button>
+                                }
 
-                    <div class="guide-tour-detail-grid">
-                        <div>
-                            <span>Tour code</span>
-                            <strong>@_selectedAssignment.TourCode</strong>
-                        </div>
-                        <div>
-                            <span>Schedule</span>
-                            <strong>@FormatDateRange(_selectedAssignment)</strong>
-                        </div>
-                        <div>
-                            <span>Region</span>
-                            <strong>@_selectedAssignment.Region</strong>
-                        </div>
-                        <div>
-                            <span>Meeting point</span>
-                            <strong>@_selectedAssignment.MeetingPoint</strong>
-                        </div>
-                    </div>
-
-                    <p class="guide-tour-summary">@_selectedAssignment.ItinerarySummary</p>
-
-                    @if (!string.IsNullOrWhiteSpace(_selectedAssignment.DeclineReason))
-                    {
-                        <div class="guide-alert guide-alert--error">
-                            Decline reason: @_selectedAssignment.DeclineReason
-                        </div>
-                    }
-
-                    @if (CanShowTourActions(_selectedAssignment))
-                    {
-                        <div class="guide-tour-actions">
-                            <button class="wx-button wx-button--secondary" type="button" disabled="@(!_selectedAssignment.CanFinish || _isSaving)" @onclick="FinishSelectedAsync">
-                                <MaterialIcon Name="done_all" />
-                                Mark Finished
-                            </button>
-                            <button class="wx-button wx-button--outline" type="button" disabled="@(!_selectedAssignment.CanDecline || _isSaving)" @onclick="ToggleDeclinePanel">
-                                <MaterialIcon Name="cancel" />
-                                Decline Tour
-                            </button>
-                        </div>
-                    }
-
-                    @if (_isDeclinePanelOpen && _selectedAssignment.CanDecline)
-                    {
-                        <EditForm Model="@_declineModel" OnValidSubmit="@DeclineSelectedAsync" class="guide-form">
-                            <DataAnnotationsValidator />
-                            <div class="guide-field">
-                                <label for="decline-reason">Valid reason</label>
-                                <InputTextArea id="decline-reason" class="guide-control guide-control--area" @bind-Value="_declineModel.Reason" />
-                                <ValidationMessage For="@(() => _declineModel.Reason)" />
+                                <p class="guide-calendar-filter-hint">
+                                    <MaterialIcon Name="touch_app" />
+                                    Select a calendar day or use the date picker to filter tours by date.
+                                </p>
                             </div>
-                            <button class="wx-button wx-button--secondary" type="submit" disabled="@_isSaving">
-                                <MaterialIcon Name="send" />
-                                Submit Decline Request
-                            </button>
-                        </EditForm>
+
+                            <div class="guide-calendar-scroll-container">
+                                <div class="guide-calendar-weekdays">
+                                    @foreach (var weekday in CalendarWeekdays)
+                                    {
+                                        <span>@weekday</span>
+                                    }
+                                </div>
+
+                                <div class="guide-calendar-grid">
+                                    @foreach (var day in GetCalendarDays())
+                                    {
+                                        <div class="@GetCalendarDayClass(day)">
+                                            <div class="guide-calendar-day__head">
+                                                <button class="guide-calendar-day-date" type="button" @onclick="() => ToggleDateFilter(day.Date)">
+                                                    @day.Date.Day
+                                                </button>
+                                                @if (day.IsToday)
+                                                {
+                                                    <strong>Today</strong>
+                                                }
+                                            </div>
+
+                                            <div class="guide-calendar-events">
+                                                @foreach (var assignment in day.Assignments.Take(MaxEventsPerDay))
+                                                {
+                                                    <button class="@GetCalendarEventClass(assignment)" type="button" @onclick="() => SelectCalendarAssignment(assignment)" @onclick:stopPropagation="true">
+                                                        <strong>@assignment.TourName</strong>
+                                                        <span>@assignment.Destination</span>
+                                                    </button>
+                                                }
+
+                                                @if (day.Assignments.Count > MaxEventsPerDay)
+                                                {
+                                                    <span class="guide-calendar-more">
+                                                        +@(day.Assignments.Count - MaxEventsPerDay) more
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="guide-calendar-legend">
+                                @foreach (var status in CalendarLegendStatuses)
+                                {
+                                    <span class="@GetCalendarLegendClass(status)" style="color: @GetCalendarStatusColor(status);">
+                                        <i></i>
+                                        @status
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </section>
+
+                    @if (_assignments.Count > 0)
+                    {
+                        <section class="guide-table-shell guide-upcoming-shell">
+                            <div class="guide-table-toolbar">
+                                <div>
+                                    <p>Upcoming assigned tour(s)</p>
+                                </div>
+                            </div>
+
+                            @{
+                                var upcomingAssignments = GetUpcomingAssignments();
+                            }
+
+                            <div class="guide-upcoming-list">
+                                @if (upcomingAssignments.Count == 0)
+                                {
+                                    <div class="guide-empty guide-empty--compact">
+                                        <MaterialIcon Name="filter_alt_off" />
+                                        No tours match the current filters.
+                                    </div>
+                                }
+                                else
+                                {
+                                    @foreach (var assignment in upcomingAssignments)
+                                    {
+                                        <button id="@GetUpcomingAssignmentElementId(assignment.Id)"
+                                                class="@(assignment.Id == _selectedAssignment?.Id ? "guide-upcoming-item guide-upcoming-item--active" : "guide-upcoming-item")"
+                                                type="button"
+                                                @onclick="() => SelectAssignment(assignment)">
+                                            <span class="@GetCalendarEventDotClass(assignment)"></span>
+                                            <div>
+                                                <strong>@assignment.TourName</strong>
+                                                <p>@FormatDateRange(assignment) - @assignment.Destination</p>
+                                            </div>
+                                            <span class="@GetTourStatusClass(assignment)">
+                                                <span></span>
+                                                @assignment.Status
+                                            </span>
+                                        </button>
+                                    }
+                                }
+                            </div>
+                        </section>
                     }
-                </section>
+                </div>
+
+                <div class="guide-portal-right-col">
+                    @if (_selectedAssignment is not null)
+                    {
+                        <section class="guide-self-panel guide-tour-detail">
+                            <div class="guide-section-heading">
+                                <div>
+                                    <p class="guide-eyebrow">Tour detail</p>
+                                    <h2>@_selectedAssignment.TourName</h2>
+                                </div>
+                                <span class="@GetTourStatusClass(_selectedAssignment)">
+                                    <span></span>
+                                    @_selectedAssignment.Status
+                                </span>
+                            </div>
+
+                            <div class="guide-tour-detail-grid">
+                                <div>
+                                    <span>Tour code</span>
+                                    <strong>@_selectedAssignment.TourCode</strong>
+                                </div>
+                                <div>
+                                    <span>Schedule</span>
+                                    <strong>@FormatDateRange(_selectedAssignment)</strong>
+                                </div>
+                                <div>
+                                    <span>Region</span>
+                                    <strong>@_selectedAssignment.Region</strong>
+                                </div>
+                                <div>
+                                    <span>Meeting point</span>
+                                    <strong>@_selectedAssignment.MeetingPoint</strong>
+                                </div>
+                            </div>
+
+                            <p class="guide-tour-summary">@_selectedAssignment.ItinerarySummary</p>
+
+                            @if (!string.IsNullOrWhiteSpace(_selectedAssignment.EvidenceImage))
+                            {
+                                <div class="guide-tour-evidence" style="margin-top: 1rem;">
+                                    <span class="guide-label-text" style="display: block; font-weight: 600; margin-bottom: 0.25rem;">Evidence Proof:</span>
+                                    <div class="guide-evidence-preview-wrapper" style="max-width: 300px; border-radius: 8px; overflow: hidden; border: 1px solid #e4e7ec;">
+                                        <img src="@_selectedAssignment.EvidenceImage" alt="Evidence proof" style="width: 100%; height: auto; display: block;" />
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(_selectedAssignment.DeclineReason))
+                            {
+                                <div class="guide-alert guide-alert--error">
+                                    Decline reason: @_selectedAssignment.DeclineReason
+                                </div>
+                            }
+
+                            @if (CanShowTourActions(_selectedAssignment))
+                            {
+                                <div class="guide-tour-actions">
+                                    <button class="wx-button wx-button--secondary" type="button" disabled="@(!_selectedAssignment.CanFinish || _isSaving)" @onclick="OpenFinishModal">
+                                        <MaterialIcon Name="done_all" />
+                                        Mark Finished
+                                    </button>
+                                    <button class="wx-button wx-button--outline" type="button" disabled="@(!_selectedAssignment.CanDecline || _isSaving)" @onclick="ToggleDeclinePanel">
+                                        <MaterialIcon Name="cancel" />
+                                        Decline Tour
+                                    </button>
+                                </div>
+                            }
+
+                            @if (_isDeclinePanelOpen && _selectedAssignment.CanDecline)
+                            {
+                                <EditForm Model="@_declineModel" OnValidSubmit="@DeclineSelectedAsync" class="guide-form">
+                                    <DataAnnotationsValidator />
+                                    <div class="guide-field">
+                                        <label for="decline-reason">Valid reason</label>
+                                        <InputTextArea id="decline-reason" class="guide-control guide-control--area" @bind-Value="_declineModel.Reason" />
+                                        <ValidationMessage For="@(() => _declineModel.Reason)" />
+                                    </div>
+                                    <button class="wx-button wx-button--secondary" type="submit" disabled="@_isSaving">
+                                        <MaterialIcon Name="send" />
+                                        Submit Decline Request
+                                    </button>
+                                </EditForm>
+                            }
+                        </section>
+                    }
+                    else
+                    {
+                        <div class="guide-detail-placeholder guide-self-panel">
+                            <div class="placeholder-content">
+                                <MaterialIcon Name="info" />
+                                <h3>No Tour Selected</h3>
+                                <p>Select a tour from the calendar or tours list to view detailed itinerary, meeting points, and record completion.</p>
+                            </div>
+                        </div>
+                    }
+                </div>
             }
         </section>
     </main>
@@ -315,7 +360,695 @@
     <MobileBottomNav />
 </div>
 
+@if (_isFinishModalOpen)
+{
+    <div class="wx-modal-backdrop">
+        <div class="wx-modal-container">
+            <div class="wx-modal-header">
+                <h3>Hoàn thành chuyến đi</h3>
+                <button type="button" class="wx-modal-close" @onclick="CloseFinishModalAsync">&times;</button>
+            </div>
+            <div class="wx-modal-body">
+                <p class="guide-modal-desc">Vui lòng cung cấp ảnh chụp bằng chứng để hoàn thành chuyến đi <strong>@_selectedAssignment?.TourName</strong>.</p>
+                
+                <div class="wx-modal-tabs">
+                    <button type="button" class="wx-modal-tab-btn @(_activeTab == "upload" ? "active" : "")" @onclick='() => SelectTabAsync("upload")'>
+                        <MaterialIcon Name="upload_file" /> Tải ảnh lên
+                    </button>
+                    <button type="button" class="wx-modal-tab-btn @(_activeTab == "camera" ? "active" : "")" @onclick='() => SelectTabAsync("camera")'>
+                        <MaterialIcon Name="photo_camera" /> Chụp ảnh
+                    </button>
+                </div>
+
+                <div class="wx-modal-tab-content">
+                    @if (_activeTab == "upload")
+                    {
+                        <div class="wx-upload-pane">
+                            <label class="wx-upload-zone">
+                                <InputFile OnChange="OnInputFileChange" accept="image/*" class="wx-file-input-hidden" />
+                                <div class="wx-upload-prompt">
+                                    <MaterialIcon Name="cloud_upload" />
+                                    <span>Nhấp để chọn ảnh từ thiết bị</span>
+                                </div>
+                            </label>
+                        </div>
+                    }
+                    else if (_activeTab == "camera")
+                    {
+                        <div class="wx-camera-pane">
+                            @if (_cameraError is not null)
+                            {
+                                <div class="guide-alert guide-alert--error" style="margin-bottom: 0.5rem;">
+                                    @_cameraError
+                                </div>
+                            }
+                            <div class="wx-camera-viewport" style='display: @(string.IsNullOrEmpty(_evidenceImageBase64) ? "block" : "none")'>
+                                <video id="evidence-video" class="wx-video-feed" autoplay playsinline></video>
+                                <button type="button" class="wx-button wx-button--secondary wx-btn-capture" @onclick="CapturePhotoAsync">
+                                    <MaterialIcon Name="circle" /> Chụp ảnh
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (!string.IsNullOrEmpty(_evidenceImageBase64))
+                {
+                    <div class="wx-evidence-preview">
+                        <span class="guide-label-text" style="font-weight: 600; display: block; margin-bottom: 0.25rem;">Xem trước bằng chứng:</span>
+                        <div class="wx-preview-box">
+                            <img src="@_evidenceImageBase64" alt="Preview evidence" />
+                            @if (_activeTab == "camera")
+                            {
+                                <button type="button" class="wx-button wx-button--outline wx-btn-retake" @onclick="RetakePhotoAsync">
+                                    <MaterialIcon Name="replay" /> Chụp lại
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="wx-modal-footer">
+                <button type="button" class="wx-button wx-button--outline" @onclick="CloseFinishModalAsync" disabled="@_isSaving">Hủy</button>
+                <button type="button" class="wx-button wx-button--secondary" @onclick="ConfirmFinishTourAsync" disabled="@(string.IsNullOrEmpty(_evidenceImageBase64) || _isSaving)">
+                    @if (_isSaving)
+                    {
+                        <span class="wx-spinner"></span> <span>Đang xử lý...</span>
+                    }
+                    else
+                    {
+                        <MaterialIcon Name="done_all" /> <span>Hoàn thành</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .wx-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1100;
+        padding: 1rem;
+    }
+    .wx-modal-container {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+    }
+    .wx-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #f2f4f7;
+    }
+    .wx-modal-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #101828;
+    }
+    .wx-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #667085;
+        line-height: 1;
+    }
+    .wx-modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+    .guide-modal-desc {
+        margin: 0;
+        color: #475467;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+    .wx-modal-tabs {
+        display: flex;
+        border-bottom: 1px solid #e4e7ec;
+    }
+    .wx-modal-tab-btn {
+        flex: 1;
+        background: none;
+        border: none;
+        padding: 0.75rem;
+        font-weight: 600;
+        color: #667085;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+    }
+    .wx-modal-tab-btn.active {
+        color: #007a6c;
+        border-bottom-color: #007a6c;
+    }
+    .wx-modal-tab-content {
+        min-height: 120px;
+    }
+    .wx-upload-zone {
+        border: 2px dashed #d0d5dd;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        display: block;
+        transition: border-color 0.2s;
+    }
+    .wx-upload-zone:hover {
+        border-color: #007a6c;
+    }
+    .wx-file-input-hidden {
+        display: none;
+    }
+    .wx-upload-prompt {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: #475467;
+    }
+    .wx-upload-prompt span {
+        font-weight: 500;
+    }
+    .wx-camera-viewport {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #000;
+    }
+    .wx-video-feed {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4/3;
+        display: block;
+        transform: scaleX(-1);
+    }
+    .wx-btn-capture {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .wx-evidence-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .wx-preview-box {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #d0d5dd;
+    }
+    .wx-preview-box img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    .wx-btn-retake {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: 6px;
+    }
+    .wx-modal-footer {
+        padding: 1.25rem 1.5rem;
+        border-top: 1px solid #f2f4f7;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+    .wx-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 0.8s linear infinite;
+    }
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive layout styling for Guide Portal */
+    @@media (min-width: 901px) {
+        .guide-portal-layout {
+            display: grid !important;
+            grid-template-columns: 1.55fr 1fr !important;
+            gap: 32px !important;
+            align-items: start !important;
+        }
+
+        .guide-portal-toolbar {
+            grid-column: 1 / -1 !important;
+        }
+
+        .guide-portal-tabs {
+            display: none !important;
+        }
+
+        .guide-portal-left-col {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 32px !important;
+        }
+
+        .guide-portal-right-col {
+            position: sticky !important;
+            top: 24px !important;
+        }
+    }
+
+    /* Premium Mobile-First Calendar scrolling & Fit overrides */
+    .guide-calendar-scroll-container {
+        width: 100% !important;
+        border-radius: var(--wx-radius, 12px) !important;
+        border: 1px solid rgba(195, 198, 214, 0.45) !important;
+        background: #ffffff !important;
+        box-shadow: var(--wx-shadow-sm) !important;
+        margin-bottom: 24px !important;
+        overflow: hidden !important;
+    }
+
+    .guide-calendar-scroll-container .guide-calendar-weekdays,
+    .guide-calendar-scroll-container .guide-calendar-grid {
+        min-width: 0 !important;
+        width: 100% !important;
+        grid-template-columns: repeat(7, 1fr) !important;
+    }
+
+    .guide-calendar-shell,
+    .guide-table-shell,
+    .guide-upcoming-shell,
+    .guide-tour-detail,
+    .guide-portal-toolbar {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    @@media (max-width: 900px) {
+        /* Mobile tab system */
+        .guide-portal-layout {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 20px !important;
+            padding-inline: 12px !important; /* Ensure proper screen edge spacing */
+        }
+
+        /* Hide tabs depending on the active tab attribute */
+        .guide-portal-layout[data-active-tab="Calendar"] .guide-portal-right-col {
+            display: none !important;
+        }
+
+        .guide-portal-layout[data-active-tab="Tours"] .guide-calendar-shell,
+        .guide-portal-layout[data-active-tab="Tours"] .guide-portal-right-col {
+            display: none !important;
+        }
+
+        .guide-portal-layout[data-active-tab="Detail"] .guide-portal-left-col {
+            display: none !important;
+        }
+
+        /* Responsive Calendar Overrides */
+        .guide-calendar-toolbar {
+            min-width: 0 !important;
+            width: 100% !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            padding: 16px 12px !important;
+        }
+
+        .guide-calendar-actions {
+            width: 100% !important;
+            justify-content: space-between !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+        }
+
+        .guide-calendar-date-picker {
+            padding: 0 8px !important;
+            font-size: 13px !important;
+            min-height: 38px !important;
+        }
+
+        .guide-calendar-date-picker input {
+            min-width: 110px !important;
+        }
+
+        .guide-calendar-weekdays span {
+            min-height: 32px !important;
+            font-size: 10px !important;
+            border-right: 1px solid rgba(195, 198, 214, 0.22) !important;
+        }
+
+        .guide-calendar-day {
+            min-height: 64px !important;
+            padding: 4px 2px !important;
+            gap: 2px !important;
+            border-right: 1px solid rgba(195, 198, 214, 0.22) !important;
+            border-bottom: 1px solid rgba(195, 198, 214, 0.22) !important;
+        }
+
+        .guide-calendar-day__head {
+            justify-content: center !important;
+            gap: 2px !important;
+        }
+
+        .guide-calendar-day-date {
+            width: 22px !important;
+            height: 22px !important;
+            font-size: 12px !important;
+        }
+
+        .guide-calendar-day__head strong {
+            display: none !important;
+        }
+
+        .guide-calendar-events {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 2px !important;
+            margin-top: 2px !important;
+        }
+
+        .guide-calendar-event {
+            display: inline-block !important;
+            width: 6px !important;
+            height: 6px !important;
+            border-radius: 50% !important;
+            padding: 0 !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            font-size: 0 !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            overflow: hidden !important;
+        }
+
+        .guide-calendar-event strong,
+        .guide-calendar-event span {
+            display: none !important;
+        }
+
+        .guide-calendar-event--assigned {
+            background: var(--wx-primary) !important;
+        }
+
+        .guide-calendar-event--confirmed {
+            background: #e65100 !important; /* Rich Orange */
+        }
+
+        .guide-calendar-event--finished {
+            background: #2e7d32 !important; /* Forest Green */
+        }
+
+        .guide-calendar-event--declined {
+            background: var(--wx-danger) !important;
+        }
+
+        .guide-calendar-event--default {
+            background: var(--wx-outline-strong) !important;
+        }
+
+        /* Clean full width tabs on mobile */
+        .guide-portal-tabs {
+            display: flex !important;
+            width: 100% !important;
+            gap: 4px !important;
+            padding: 4px !important;
+            box-sizing: border-box !important;
+        }
+
+        .guide-portal-tab {
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            justify-content: center !important;
+            font-size: 13px !important;
+            padding: 10px 8px !important;
+            gap: 6px !important;
+        }
+
+        /* Override min-width to avoid horizontal viewport overflow */
+        .guide-calendar-filterbar,
+        .guide-calendar-legend {
+            min-width: 0 !important;
+            min-width: auto !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .guide-calendar-filterbar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            padding: 16px 12px !important;
+        }
+
+        .guide-filter-group {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 6px !important;
+            width: 100% !important;
+        }
+
+        .guide-filter {
+            flex: 1 1 calc(33.333% - 6px) !important;
+            text-align: center !important;
+            font-size: 12px !important;
+            padding: 8px 4px !important;
+            height: auto !important;
+            min-width: 0 !important;
+        }
+
+        .guide-calendar-filter-hint {
+            font-size: 11px !important;
+            line-height: 1.4 !important;
+            width: 100% !important;
+            justify-content: flex-start !important;
+        }
+
+        .guide-calendar-legend {
+            padding: 16px 12px !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 12px !important;
+            justify-content: flex-start !important;
+        }
+
+        /* Hero spacing */
+        .guide-self-hero__inner {
+            padding-block: 40px !important;
+            min-height: 200px !important;
+            gap: 8px !important;
+        }
+
+        .guide-self-hero h1 {
+            font-size: 30px !important;
+        }
+
+        .guide-self-hero p {
+            font-size: 14px !important;
+        }
+
+        /* Toolbar / Availability panel */
+        .guide-portal-toolbar {
+            padding: 16px !important;
+            gap: 16px !important;
+        }
+
+        .guide-session-strip {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            text-align: center !important;
+        }
+
+        .guide-session-avatar {
+            margin: 0 auto !important;
+        }
+
+        .guide-session-meta {
+            text-align: center !important;
+        }
+
+        .guide-session-strip .wx-button {
+            width: 100% !important;
+        }
+
+        /* Calendar Toolbar controls */
+        .guide-calendar-toolbar {
+            padding: 16px 12px !important;
+            gap: 12px !important;
+        }
+
+        .guide-calendar-toolbar h2 {
+            font-size: 20px !important;
+        }
+
+        .guide-calendar-actions {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+
+        .guide-calendar-actions button,
+        .guide-calendar-actions label {
+            flex: 1 1 auto !important;
+            min-width: 48px !important;
+            height: 38px !important;
+            font-size: 13px !important;
+            padding: 0 10px !important;
+        }
+
+        .guide-calendar-actions .guide-calendar-date-picker {
+            flex: 2 1 140px !important;
+        }
+
+        /* Upcoming Tours list panel */
+        .guide-upcoming-shell {
+            padding: 16px 12px !important;
+        }
+
+        .guide-upcoming-item {
+            padding: 12px !important;
+            gap: 10px !important;
+        }
+
+        /* Detail Shell */
+        .guide-tour-detail {
+            padding: 16px 12px !important;
+        }
+
+        .guide-tour-detail h2 {
+            font-size: 22px !important;
+        }
+
+        .guide-tour-detail-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+        }
+
+        .guide-tour-actions {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+            width: 100% !important;
+        }
+
+        .guide-tour-actions button {
+            width: 100% !important;
+            justify-content: center !important;
+        }
+
+        /* Camera & Evidence Modal on mobile */
+        .wx-modal-container {
+            max-height: 95vh !important;
+            margin: 0 !important;
+            border-radius: 12px !important;
+            width: 100% !important;
+        }
+
+        .wx-modal-body {
+            padding: 16px !important;
+            gap: 12px !important;
+        }
+
+        .wx-modal-tabs {
+            width: 100% !important;
+        }
+    }
+
+    /* Premium Placeholder Styling */
+    .guide-detail-placeholder {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 360px !important;
+        border: 2px dashed rgba(195, 198, 214, 0.4) !important;
+        border-radius: var(--wx-radius, 12px) !important;
+        background: rgba(255, 255, 255, 0.5) !important;
+        backdrop-filter: blur(8px) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .guide-detail-placeholder:hover {
+        border-color: #007a6c !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+    }
+
+    .placeholder-content {
+        text-align: center !important;
+        max-width: 320px !important;
+        padding: 24px !important;
+    }
+
+    .placeholder-content .material-icons {
+        font-size: 48px !important;
+        color: #007a6c !important;
+        opacity: 0.7 !important;
+        margin-bottom: 16px !important;
+        display: inline-block !important;
+    }
+
+    .placeholder-content h3 {
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: #101828 !important;
+        margin-top: 0 !important;
+        margin-bottom: 8px !important;
+    }
+
+    .placeholder-content p {
+        font-size: 0.875rem !important;
+        line-height: 1.5 !important;
+        color: #667085 !important;
+        margin: 0 !important;
+    }
+</style>
+
 @code {
+    private const string PortalTabCalendar = "Calendar";
+    private const string PortalTabTours = "Tours";
+    private const string PortalTabDetail = "Detail";
+    private string _activePortalTab = PortalTabCalendar;
+
     private const int MaxEventsPerDay = 3;
     private static readonly string[] CalendarWeekdays = new[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
     private static readonly string[] CalendarLegendStatuses = new[] { "Assigned", "Confirmed", "Finished", "Declined" };
@@ -331,6 +1064,11 @@
     private bool _isError;
     private bool _scheduleLoaded;
     private bool _isDeclinePanelOpen;
+    private bool _isFinishModalOpen;
+    private string? _evidenceImageBase64;
+    private bool _isCameraActive;
+    private string _activeTab = "upload";
+    private string? _cameraError;
     private bool _requiresLogin;
     private bool _accessDenied;
     private bool _calendarMonthInitialized;
@@ -432,6 +1170,7 @@
         _isDeclinePanelOpen = false;
         _message = null;
         _isError = false;
+        _activePortalTab = PortalTabDetail;
     }
 
     private void SelectCalendarAssignment(GuideTourAssignmentResponse assignment)
@@ -476,9 +1215,108 @@
         }
     }
 
-    private async Task FinishSelectedAsync()
+    private void OpenFinishModal()
     {
-        if (_selectedAssignment is null)
+        _isFinishModalOpen = true;
+        _evidenceImageBase64 = null;
+        _activeTab = "upload";
+        _cameraError = null;
+        _isCameraActive = false;
+    }
+
+    private async Task CloseFinishModalAsync()
+    {
+        if (_isCameraActive)
+        {
+            await StopCameraAsync();
+        }
+        _isFinishModalOpen = false;
+    }
+
+    private async Task SelectTabAsync(string tab)
+    {
+        _activeTab = tab;
+        if (tab == "camera")
+        {
+            await StartCameraAsync();
+        }
+        else
+        {
+            await StopCameraAsync();
+        }
+    }
+
+    private async Task StartCameraAsync()
+    {
+        _cameraError = null;
+        _isCameraActive = true;
+        StateHasChanged();
+        await Task.Delay(100);
+        bool success = await JsRuntime.InvokeAsync<bool>("wanderXCamera.startCamera", "evidence-video");
+        if (!success)
+        {
+            _cameraError = "Không thể truy cập camera. Vui lòng cấp quyền camera hoặc tải ảnh lên.";
+            _isCameraActive = false;
+        }
+    }
+
+    private async Task StopCameraAsync()
+    {
+        _isCameraActive = false;
+        await JsRuntime.InvokeVoidAsync("wanderXCamera.stopCamera", "evidence-video");
+    }
+
+    private async Task CapturePhotoAsync()
+    {
+        if (!_isCameraActive) return;
+        var capturedData = await JsRuntime.InvokeAsync<string>("wanderXCamera.captureFrame", "evidence-video");
+        if (!string.IsNullOrEmpty(capturedData))
+        {
+            _evidenceImageBase64 = capturedData;
+            await StopCameraAsync();
+        }
+    }
+
+    private async Task RetakePhotoAsync()
+    {
+        _evidenceImageBase64 = null;
+        await StartCameraAsync();
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file is not null)
+        {
+            var format = file.ContentType;
+            if (format.StartsWith("image/"))
+            {
+                try
+                {
+                    var resizedImage = await file.RequestImageFileAsync(format, 800, 800);
+                    using var stream = resizedImage.OpenReadStream(1024 * 1024 * 5); // 5MB max
+                    using var memoryStream = new System.IO.MemoryStream();
+                    await stream.CopyToAsync(memoryStream);
+                    var buffer = memoryStream.ToArray();
+                    _evidenceImageBase64 = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+                }
+                catch (Exception ex)
+                {
+                    _message = "Lỗi khi tải ảnh: " + ex.Message;
+                    _isError = true;
+                }
+            }
+            else
+            {
+                _message = "Vui lòng chọn tệp ảnh hợp lệ.";
+                _isError = true;
+            }
+        }
+    }
+
+    private async Task ConfirmFinishTourAsync()
+    {
+        if (string.IsNullOrEmpty(_evidenceImageBase64) || _selectedAssignment is null)
         {
             return;
         }
@@ -489,9 +1327,11 @@
 
         try
         {
-            var updated = await GuideTourApi.FinishAsync(_selectedAssignment.Id);
+            var request = new FinishTourRequest { EvidenceImage = _evidenceImageBase64 };
+            var updated = await GuideTourApi.FinishAsync(_selectedAssignment.Id, request);
             _message = "Tour has been marked as finished.";
             await RefreshUpdatedAssignmentAsync(updated);
+            await CloseFinishModalAsync();
         }
         catch (Exception ex)
         {
@@ -667,6 +1507,11 @@
             _selectedAssignment = null;
             _isDeclinePanelOpen = false;
         }
+
+        if (_selectedDateFilter is not null)
+        {
+            _activePortalTab = PortalTabTours;
+        }
     }
 
     private void OnDatePickerChanged(ChangeEventArgs args)
@@ -686,6 +1531,7 @@
 
         _selectedDateFilter = selectedDate.Date;
         _visibleMonth = new DateTime(selectedDate.Year, selectedDate.Month, 1);
+        _activePortalTab = PortalTabTours;
 
         if (_selectedAssignment is not null && !MatchesDateFilter(_selectedAssignment))
         {
@@ -697,6 +1543,18 @@
     private void ClearDateFilter()
     {
         _selectedDateFilter = null;
+    }
+
+    private string GetPortalTabClass(string tab)
+    {
+        return _activePortalTab == tab
+            ? "guide-portal-tab guide-portal-tab--active"
+            : "guide-portal-tab";
+    }
+
+    private void SetPortalTab(string tab)
+    {
+        _activePortalTab = tab;
     }
 
     private static string FormatDateRange(GuideTourAssignmentResponse assignment)
