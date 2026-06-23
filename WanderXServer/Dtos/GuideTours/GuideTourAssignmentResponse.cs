@@ -41,4 +41,6 @@ public class GuideTourAssignmentResponse
     public bool CanDecline { get; set; }
 
     public bool CanFinish { get; set; }
+
+    public string? EvidenceImage { get; set; }
 }

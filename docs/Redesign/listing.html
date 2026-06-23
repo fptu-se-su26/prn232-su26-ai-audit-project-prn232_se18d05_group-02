@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html class="light scroll-smooth" lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>WanderX - Danh sách Tour du lịch cao cấp</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Headers, Inter for Body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0..200" rel="stylesheet" />
+
+    <!-- Tailwind Configuration matching the TravelHub-Design-System -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0f172a",          // Deep Ocean Blue
+                        "on-primary": "#ffffff",
+                        canvas: "#ffffff",
+                        "surface-soft": "#f8fafc",    // Slate 50
+                        "surface-mid": "#f1f5f9",     // Slate 100
+                        hairline: "#e2e8f0",          // Slate 200
+                        "muted-fg": "#64748b",         // Slate 500
+                        
+                        "accent-orange": "#ff5a5f",   // Sunset Orange
+                        "on-accent-orange": "#ffffff",
+                        "accent-orange-soft": "#fff1f2",
+                        
+                        "type-tour": "#0284c7",
+                        "type-hotel": "#10b981",
+                        "type-flight": "#6366f1",
+                        "type-combo": "#f59e0b",
+                    },
+                    borderRadius: {
+                        sm: "6px",
+                        md: "12px",
+                        lg: "16px",                   // Cards
+                        xl: "24px",                   // Search Bar
+                    },
+                    fontFamily: {
+                        title: ["'Plus Jakarta Sans'", "Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    boxShadow: {
+                        "premium": "0 10px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 10px -6px rgba(0, 0, 0, 0.03)",
+                        "drawer": "0 -10px 30px rgba(15, 23, 42, 0.15)",
+                    }
+                },
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, .font-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-canvas text-primary antialiased min-h-screen flex flex-col">
+
+    <!-- TopNavBar (Desktop & Tablet) -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-hairline transition-all duration-200">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-10">
+                <a class="flex items-center gap-2 group" href="index.html">
+                    <span class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-black text-lg shadow-sm group-hover:bg-accent-orange transition-colors duration-300">W</span>
+                    <span class="font-title font-extrabold text-2xl tracking-tight text-primary">Wander<span class="text-accent-orange">X</span></span>
+                </a>
+                
+                <!-- Navigation menu -->
+                <nav class="hidden md:flex items-center gap-1">
+                    <a class="text-accent-orange hover:text-accent-orange hover:bg-surface-soft transition-colors duration-200 font-semibold text-sm py-2.5 px-4 rounded-full" href="listing.html">Điểm Đến</a>
+                    <a class="text-primary hover:text-accent-orange hover:bg-surface-soft transition-colors duration-200 font-semibold text-sm py-2.5 px-4 rounded-full" href="listing.html">Tour Trọn Gói</a>
+                    <a class="text-muted-fg hover:text-primary hover:bg-surface-soft transition-colors duration-200 font-semibold text-sm py-2.5 px-4 rounded-full" href="#">Cẩm Nang Du Lịch</a>
+                    <a class="text-muted-fg hover:text-primary hover:bg-surface-soft transition-colors duration-200 font-semibold text-sm py-2.5 px-4 rounded-full" href="#">Ưu Đãi</a>
+                </nav>
+            </div>
+            
+            <!-- Right Actions -->
+            <div class="flex items-center gap-4">
+                <button class="hidden lg:inline-flex text-sm font-semibold text-primary hover:bg-surface-soft px-5 py-2.5 rounded-full transition-colors border border-hairline">Liên hệ hỗ trợ</button>
+                <a class="text-sm font-semibold bg-primary text-white hover:bg-primary/90 px-6 py-2.5 rounded-full transition-all shadow-sm hover:shadow-md" href="#">Trắc nghiệm Travel Style</a>
+                <a class="w-10 h-10 rounded-full overflow-hidden border border-hairline hover:border-accent-orange transition-colors duration-200 flex-shrink-0" href="#">
+                    <img alt="User Avatar" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-12">
+        <!-- Breadcrumbs -->
+        <nav class="flex items-center gap-2 text-xs font-semibold text-muted-fg mb-6">
+            <a href="index.html" class="hover:text-primary transition-colors">Trang chủ</a>
+            <span class="material-symbols-outlined text-sm">chevron_right</span>
+            <span class="text-primary">Tour du lịch</span>
+        </nav>
+
+        <div class="mb-10">
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight font-title">Khám Phá Các Tour Kỳ Thú</h1>
+            <p class="text-muted-fg text-sm mt-2">Tìm kiếm các hành trình cao cấp được thiết kế tinh tế và chuyên nghiệp trên khắp thế giới.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
+            
+            <!-- Left Filter Sidebar (Hidden on Mobile) -->
+            <aside class="hidden lg:block lg:col-span-1 bg-white border border-hairline rounded-lg p-6 space-y-8 sticky top-24">
+                <div class="flex items-center justify-between pb-4 border-b border-hairline">
+                    <h3 class="font-title font-bold text-base flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">filter_alt</span>
+                        Bộ lọc tìm kiếm
+                    </h3>
+                    <button onclick="clearAllFilters()" class="text-xs font-semibold text-muted-fg hover:text-accent-orange transition-colors">Xóa lọc</button>
+                </div>
+
+                <!-- Filter Category 1: Destinations -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Điểm đến phổ biến</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" checked class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Châu Á
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Châu Âu
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Châu Mỹ
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Châu Đại Dương
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Filter Category 2: Budget range -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Khoảng giá (VNĐ)</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="radio" name="price-range" class="border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Dưới 10 triệu
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="radio" name="price-range" class="border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Từ 10 - 30 triệu
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="radio" name="price-range" checked class="border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Từ 30 - 80 triệu
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="radio" name="price-range" class="border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Trên 80 triệu
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Filter Category 3: Ratings -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Đánh giá khách hàng</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" checked class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-sm text-amber-500 fill-1">star</span> 4.5+ (Xuất sắc)</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-sm text-amber-500 fill-1">star</span> 4.0+ (Rất tốt)</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-sm text-amber-500 fill-1">star</span> 3.5+ (Khá tốt)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Filter Category 4: Tour Duration -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Thời lượng tour</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Trong ngày
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            2 - 4 Ngày
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" checked class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            5 - 9 Ngày
+                        </label>
+                        <label class="flex items-center gap-2.5 text-sm text-muted-fg hover:text-primary cursor-pointer">
+                            <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                            Trên 10 Ngày
+                        </label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Product Grid (Desktop: 3 Columns) -->
+            <section class="col-span-1 lg:col-span-3 space-y-8">
+                <!-- Sorting & Result Summary Row -->
+                <div class="flex items-center justify-between border-b border-hairline pb-4">
+                    <span class="text-sm font-semibold text-muted-fg">Tìm thấy <span class="text-primary font-bold">128</span> kết quả</span>
+                    
+                    <div class="flex items-center gap-3">
+                        <label class="hidden sm:inline-block text-xs font-bold uppercase tracking-wider text-muted-fg">Sắp xếp theo:</label>
+                        <select class="border-hairline rounded-full text-xs font-semibold text-primary py-1.5 pl-4 pr-10 focus:ring-primary focus:border-primary">
+                            <option selected>Phổ biến nhất</option>
+                            <option>Giá từ thấp đến cao</option>
+                            <option>Giá từ cao đến thấp</option>
+                            <option>Đánh giá tốt nhất</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Product Grid (Grid 3 Columns) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <!-- Product Card 1 -->
+                    <article class="bg-white rounded-lg border border-hairline overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col group">
+                        <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-mid">
+                            <img alt="Tour Venice Ý" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?auto=format&fit=crop&q=80&w=600">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-accent-orange text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Bán chạy nhất</span>
+                            </div>
+                            <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-semibold text-primary flex items-center gap-1 z-10 shadow-sm">
+                                <span class="material-symbols-outlined text-amber-500 text-sm fill-1">star</span> 4.9
+                            </span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 text-muted-fg text-xs font-semibold mb-2">
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">location_on</span>Venice, Ý</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span>5 Ngày</span>
+                                </div>
+                                <h3 class="font-title font-semibold text-base text-primary leading-snug group-hover:text-accent-orange transition-colors line-clamp-2 mb-4">
+                                    Hành Trình Venice Lãng Mạn & Trải Nghiệm Thuyền Gondola
+                                </h3>
+                            </div>
+                            <div class="flex items-end justify-between border-t border-hairline pt-4 mt-2">
+                                <div>
+                                    <span class="block text-[11px] font-bold text-muted-fg uppercase tracking-wider">Giá từ</span>
+                                    <span class="text-lg font-bold text-accent-orange font-title">45.000.000đ</span>
+                                </div>
+                                <a href="detail.html" class="inline-flex items-center justify-center bg-accent-orange hover:bg-accent-orange/90 text-white font-semibold text-xs px-5 py-2.5 rounded-full transition-all shadow-sm">
+                                    Đặt ngay
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Product Card 2 -->
+                    <article class="bg-white rounded-lg border border-hairline overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col group">
+                        <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-mid">
+                            <img alt="Tour Tokyo Kyoto" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=600">
+                            <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-semibold text-primary flex items-center gap-1 z-10 shadow-sm">
+                                <span class="material-symbols-outlined text-amber-500 text-sm fill-1">star</span> 4.8
+                            </span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 text-muted-fg text-xs font-semibold mb-2">
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">location_on</span>Kyoto, Nhật Bản</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span>6 Ngày</span>
+                                </div>
+                                <h3 class="font-title font-semibold text-base text-primary leading-snug group-hover:text-accent-orange transition-colors line-clamp-2 mb-4">
+                                    Kyoto Cổ Kính & Trải Nghiệm Trà Đạo Truyền Thống
+                                </h3>
+                            </div>
+                            <div class="flex items-end justify-between border-t border-hairline pt-4 mt-2">
+                                <div>
+                                    <span class="block text-[11px] font-bold text-muted-fg uppercase tracking-wider">Giá từ</span>
+                                    <span class="text-lg font-bold text-accent-orange font-title">38.900.000đ</span>
+                                </div>
+                                <a href="detail.html" class="inline-flex items-center justify-center bg-accent-orange hover:bg-accent-orange/90 text-white font-semibold text-xs px-5 py-2.5 rounded-full transition-all shadow-sm">
+                                    Đặt ngay
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Product Card 3 -->
+                    <article class="bg-white rounded-lg border border-hairline overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col group">
+                        <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-mid">
+                            <img alt="Tour Maldives Resort" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=600">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-accent-orange text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Giảm 10%</span>
+                            </div>
+                            <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-semibold text-primary flex items-center gap-1 z-10 shadow-sm">
+                                <span class="material-symbols-outlined text-amber-500 text-sm fill-1">star</span> 5.0
+                            </span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 text-muted-fg text-xs font-semibold mb-2">
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">location_on</span>Maldives</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span>5 Ngày</span>
+                                </div>
+                                <h3 class="font-title font-semibold text-base text-primary leading-snug group-hover:text-accent-orange transition-colors line-clamp-2 mb-4">
+                                    Thiên Đường Maldives - Nghỉ Dưỡng Villa Mặt Nước Cao Cấp
+                                </h3>
+                            </div>
+                            <div class="flex items-end justify-between border-t border-hairline pt-4 mt-2">
+                                <div>
+                                    <span class="block text-[11px] font-bold text-muted-fg uppercase tracking-wider">Giá từ</span>
+                                    <span class="text-lg font-bold text-accent-orange font-title">62.000.000đ</span>
+                                </div>
+                                <a href="detail.html" class="inline-flex items-center justify-center bg-accent-orange hover:bg-accent-orange/90 text-white font-semibold text-xs px-5 py-2.5 rounded-full transition-all shadow-sm">
+                                    Đặt ngay
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Product Card 4 -->
+                    <article class="bg-white rounded-lg border border-hairline overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col group">
+                        <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-mid">
+                            <img alt="Tour Amalfi Coast" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&q=80&w=600">
+                            <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-semibold text-primary flex items-center gap-1 z-10 shadow-sm">
+                                <span class="material-symbols-outlined text-amber-500 text-sm fill-1">star</span> 4.9
+                            </span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 text-muted-fg text-xs font-semibold mb-2">
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">location_on</span>Amalfi, Ý</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span>7 Ngày</span>
+                                </div>
+                                <h3 class="font-title font-semibold text-base text-primary leading-snug group-hover:text-accent-orange transition-colors line-clamp-2 mb-4">
+                                    Bờ Biển Amalfi Tuyệt Đẹp - Khám Phá Nam Ý Hùng Vĩ
+                                </h3>
+                            </div>
+                            <div class="flex items-end justify-between border-t border-hairline pt-4 mt-2">
+                                <div>
+                                    <span class="block text-[11px] font-bold text-muted-fg uppercase tracking-wider">Giá từ</span>
+                                    <span class="text-lg font-bold text-accent-orange font-title">82.500.000đ</span>
+                                </div>
+                                <a href="detail.html" class="inline-flex items-center justify-center bg-accent-orange hover:bg-accent-orange/90 text-white font-semibold text-xs px-5 py-2.5 rounded-full transition-all shadow-sm">
+                                    Đặt ngay
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Product Card 5 -->
+                    <article class="bg-white rounded-lg border border-hairline overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col group">
+                        <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-mid">
+                            <img alt="Tour Desert Safari" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1547234935-80c7145ec969?auto=format&fit=crop&q=80&w=600">
+                            <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-semibold text-primary flex items-center gap-1 z-10 shadow-sm">
+                                <span class="material-symbols-outlined text-amber-500 text-sm fill-1">star</span> 4.7
+                            </span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 text-muted-fg text-xs font-semibold mb-2">
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">location_on</span>Dubai, UAE</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span>4 Ngày</span>
+                                </div>
+                                <h3 class="font-title font-semibold text-base text-primary leading-snug group-hover:text-accent-orange transition-colors line-clamp-2 mb-4">
+                                    Khám Phá Dubai Kỳ Vĩ & Sa Mạc Huyền Bí
+                                </h3>
+                            </div>
+                            <div class="flex items-end justify-between border-t border-hairline pt-4 mt-2">
+                                <div>
+                                    <span class="block text-[11px] font-bold text-muted-fg uppercase tracking-wider">Giá từ</span>
+                                    <span class="text-lg font-bold text-accent-orange font-title">28.900.000đ</span>
+                                </div>
+                                <a href="detail.html" class="inline-flex items-center justify-center bg-accent-orange hover:bg-accent-orange/90 text-white font-semibold text-xs px-5 py-2.5 rounded-full transition-all shadow-sm">
+                                    Đặt ngay
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Product Card 6 -->
+                    <article class="bg-white rounded-lg border border-hairline overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col group">
+                        <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-mid">
+                            <img alt="Tour Grand Canyon" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1615551043360-33de8b5f410c?auto=format&fit=crop&q=80&w=600">
+                            <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-semibold text-primary flex items-center gap-1 z-10 shadow-sm">
+                                <span class="material-symbols-outlined text-amber-500 text-sm fill-1">star</span> 5.0
+                            </span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 text-muted-fg text-xs font-semibold mb-2">
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">location_on</span>Southwest, USA</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span>8 Ngày</span>
+                                </div>
+                                <h3 class="font-title font-semibold text-base text-primary leading-snug group-hover:text-accent-orange transition-colors line-clamp-2 mb-4">
+                                    Canyonlands Elite - Kỳ Quan Sa Mạc Mỹ Đích Thực
+                                </h3>
+                            </div>
+                            <div class="flex items-end justify-between border-t border-hairline pt-4 mt-2">
+                                <div>
+                                    <span class="block text-[11px] font-bold text-muted-fg uppercase tracking-wider">Giá từ</span>
+                                    <span class="text-lg font-bold text-accent-orange font-title">89.000.000đ</span>
+                                </div>
+                                <a href="detail.html" class="inline-flex items-center justify-center bg-accent-orange hover:bg-accent-orange/90 text-white font-semibold text-xs px-5 py-2.5 rounded-full transition-all shadow-sm">
+                                    Đặt ngay
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Pagination (Premium minimalist layout) -->
+                <div class="flex items-center justify-center gap-2 pt-10 border-t border-hairline">
+                    <button class="w-10 h-10 rounded-full flex items-center justify-center border border-hairline text-muted-fg hover:text-primary hover:border-primary transition-all"><span class="material-symbols-outlined">chevron_left</span></button>
+                    <button class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white font-semibold text-sm">1</button>
+                    <button class="w-10 h-10 rounded-full flex items-center justify-center border border-transparent text-muted-fg hover:text-primary font-semibold text-sm">2</button>
+                    <button class="w-10 h-10 rounded-full flex items-center justify-center border border-transparent text-muted-fg hover:text-primary font-semibold text-sm">3</button>
+                    <button class="w-10 h-10 rounded-full flex items-center justify-center border border-hairline text-muted-fg hover:text-primary hover:border-primary transition-all"><span class="material-symbols-outlined">chevron_right</span></button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Floating Filter Button for Mobile -->
+    <div class="lg:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40">
+        <button onclick="toggleMobileFilter(true)" class="flex items-center gap-2 bg-primary hover:bg-primary/95 text-white font-semibold text-sm px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all">
+            <span class="material-symbols-outlined text-lg">filter_alt</span>
+            Bộ lọc & Sắp xếp
+        </button>
+    </div>
+
+    <!-- Mobile Bottom Drawer Backdrop -->
+    <div onclick="toggleMobileFilter(false)" id="drawer-backdrop" class="lg:hidden fixed inset-0 z-50 bg-primary/40 backdrop-blur-sm hidden transition-opacity duration-300 opacity-0"></div>
+
+    <!-- Mobile Filter Drawer -->
+    <div id="filter-drawer" class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-xl shadow-drawer p-6 max-h-[85vh] overflow-y-auto translate-y-full transition-transform duration-300 flex flex-col gap-6">
+        <div class="flex items-center justify-between border-b border-hairline pb-4">
+            <h3 class="font-title font-bold text-lg flex items-center gap-2">
+                <span class="material-symbols-outlined">filter_alt</span>
+                Lọc kết quả
+            </h3>
+            <button onclick="toggleMobileFilter(false)" class="w-8 h-8 rounded-full bg-surface-mid flex items-center justify-center text-primary"><span class="material-symbols-outlined text-lg">close</span></button>
+        </div>
+
+        <!-- Copy filters into drawer -->
+        <div class="space-y-6">
+            <!-- Destinations -->
+            <div class="space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Điểm đến phổ biến</h4>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex items-center gap-2.5 text-sm text-muted-fg py-2 px-3 bg-surface-soft border border-hairline rounded-lg cursor-pointer">
+                        <input type="checkbox" checked class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                        Châu Á
+                    </label>
+                    <label class="flex items-center gap-2.5 text-sm text-muted-fg py-2 px-3 bg-surface-soft border border-hairline rounded-lg cursor-pointer">
+                        <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                        Châu Âu
+                    </label>
+                    <label class="flex items-center gap-2.5 text-sm text-muted-fg py-2 px-3 bg-surface-soft border border-hairline rounded-lg cursor-pointer">
+                        <input type="checkbox" class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                        Châu Mỹ
+                    </label>
+                </div>
+            </div>
+
+            <!-- Price -->
+            <div class="space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Khoảng giá (VNĐ)</h4>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2.5 text-sm text-muted-fg py-2 px-3 bg-surface-soft border border-hairline rounded-lg cursor-pointer">
+                        <input type="radio" name="mobile-price" class="border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                        Dưới 10 triệu
+                    </label>
+                    <label class="flex items-center gap-2.5 text-sm text-muted-fg py-2 px-3 bg-surface-soft border border-hairline rounded-lg cursor-pointer">
+                        <input type="radio" name="mobile-price" checked class="border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                        Từ 30 - 80 triệu
+                    </label>
+                </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Đánh giá khách hàng</h4>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2.5 text-sm text-muted-fg py-2 px-3 bg-surface-soft border border-hairline rounded-lg cursor-pointer">
+                        <input type="checkbox" checked class="rounded border-hairline text-accent-orange focus:ring-accent-orange/20 w-4 h-4">
+                        <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-sm text-amber-500 fill-1">star</span> 4.5+ (Xuất sắc)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 border-t border-hairline pt-4">
+            <button onclick="toggleMobileFilter(false)" class="w-full py-3 bg-surface-mid hover:bg-surface-mid/90 text-primary font-semibold text-sm rounded-full transition-colors">Xóa bộ lọc</button>
+            <button onclick="toggleMobileFilter(false)" class="w-full py-3 bg-accent-orange hover:bg-accent-orange/95 text-white font-semibold text-sm rounded-full transition-colors shadow-sm">Áp dụng</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white pt-16 pb-24 md:pb-16 border-t border-white/10 mt-20">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-10">
+            <!-- Brand & Pitch -->
+            <div class="md:col-span-4">
+                <a class="flex items-center gap-2 mb-6" href="#">
+                    <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary font-black text-lg">W</span>
+                    <span class="font-title font-extrabold text-2xl tracking-tight text-white">Wander<span class="text-accent-orange">X</span></span>
+                </a>
+                <p class="text-muted-fg text-sm leading-relaxed mb-6">
+                    Hệ thống cung cấp trải nghiệm du lịch cao cấp hàng đầu Việt Nam. Nơi kiến tạo những kỳ nghỉ mang dấu ấn cá nhân, khác biệt và thượng lưu.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors"><span class="material-symbols-outlined text-sm">share</span></a>
+                    <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors"><span class="material-symbols-outlined text-sm">mail</span></a>
+                    <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-white transition-colors"><span class="material-symbols-outlined text-sm">call</span></a>
+                </div>
+            </div>
+
+            <!-- Links Column 1 -->
+            <div class="md:col-span-2 md:col-start-6">
+                <h4 class="font-title font-bold text-sm tracking-wider uppercase mb-6 text-white/50">Dịch Vụ</h4>
+                <ul class="space-y-3.5 text-sm text-muted-fg">
+                    <li><a class="hover:text-white transition-colors" href="listing.html">Tìm kiếm Tour</a></li>
+                    <li><a class="hover:text-white transition-colors" href="#">Khách Sạn Nổi Bật</a></li>
+                    <li><a class="hover:text-white transition-colors" href="#">Vé Máy Bay Nhanh</a></li>
+                    <li><a class="hover:text-white transition-colors" href="#">Combo Đặc Quyền</a></li>
+                </ul>
+            </div>
+
+            <!-- Links Column 2 -->
+            <div class="md:col-span-2">
+                <h4 class="font-title font-bold text-sm tracking-wider uppercase mb-6 text-white/50">Công Ty</h4>
+                <ul class="space-y-3.5 text-sm text-muted-fg">
+                    <li><a class="hover:text-white transition-colors" href="#">Về Chúng Tôi</a></li>
+                    <li><a class="hover:text-white transition-colors" href="#">Tuyển Dụng</a></li>
+                    <li><a class="hover:text-white transition-colors" href="#">Báo Chí</a></li>
+                    <li><a class="hover:text-white transition-colors" href="#">Blog Tin Tức</a></li>
+                </ul>
+            </div>
+
+            <!-- Links Column 3 -->
+            <div class="md:col-span-3">
+                <h4 class="font-title font-bold text-sm tracking-wider uppercase mb-6 text-white/50">Đăng ký bản tin</h4>
+                <p class="text-sm text-muted-fg mb-4">Nhận thông tin ưu đãi độc quyền sớm nhất từ WanderX.</p>
+                <form class="flex rounded-full overflow-hidden border border-white/20 bg-white/5 p-1 focus-within:border-white/50 transition-colors">
+                    <input type="email" placeholder="Email của bạn" class="bg-transparent border-0 outline-none text-xs text-white placeholder-muted-fg px-4 py-2 flex-grow focus:ring-0">
+                    <button type="submit" class="bg-accent-orange text-white hover:bg-accent-orange/90 font-semibold text-xs px-4 py-2 rounded-full transition-colors flex items-center justify-center"><span class="material-symbols-outlined text-[16px]">send</span></button>
+                </form>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-fg">
+            <p>© 2026 WanderX Travel. Bảo lưu mọi quyền.</p>
+            <div class="flex gap-6">
+                <a class="hover:text-white" href="#">Chính sách bảo mật</a>
+                <a class="hover:text-white" href="#">Điều khoản sử dụng</a>
+                <a class="hover:text-white" href="#">Quy chế hoạt động</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Bottom Navigation Bar (Hidden on desktop) -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-hairline shadow-[0_-5px_15px_rgba(0,0,0,0.03)] px-6 py-2 flex justify-between items-center">
+        <a class="flex flex-col items-center gap-1 text-muted-fg hover:text-accent-orange transition-colors text-[10px]" href="index.html">
+            <span class="material-symbols-outlined text-2xl">home</span>
+            Trang chủ
+        </a>
+        <a class="flex flex-col items-center gap-1 text-accent-orange font-semibold text-[10px]" href="listing.html">
+            <span class="material-symbols-outlined text-2xl">explore</span>
+            Tìm tour
+        </a>
+        <a class="flex flex-col items-center gap-1 text-muted-fg hover:text-primary transition-colors text-[10px]" href="#">
+            <span class="material-symbols-outlined text-2xl">favorite</span>
+            Yêu thích
+        </a>
+        <a class="flex flex-col items-center gap-1 text-muted-fg hover:text-primary transition-colors text-[10px]" href="#">
+            <span class="material-symbols-outlined text-2xl">book_online</span>
+            Đặt chỗ
+        </a>
+        <a class="flex flex-col items-center gap-1 text-muted-fg hover:text-primary transition-colors text-[10px]" href="#">
+            <span class="material-symbols-outlined text-2xl">person</span>
+            Cá nhân
+        </a>
+    </div>
+
+    <!-- Mobile Drawer JavaScript -->
+    <script>
+        function toggleMobileFilter(open) {
+            const drawer = document.getElementById('filter-drawer');
+            const backdrop = document.getElementById('drawer-backdrop');
+
+            if (open) {
+                backdrop.classList.remove('hidden');
+                setTimeout(() => {
+                    backdrop.classList.add('opacity-100');
+                    drawer.classList.remove('translate-y-full');
+                    drawer.classList.add('translate-y-0');
+                }, 10);
+            } else {
+                backdrop.classList.remove('opacity-100');
+                drawer.classList.remove('translate-y-0');
+                drawer.classList.add('translate-y-full');
+                setTimeout(() => {
+                    backdrop.classList.add('hidden');
+                }, 300);
+            }
+        }
+        
+        function clearAllFilters() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+            const radioRange = document.getElementsByName('price-range');
+            radioRange.forEach(r => r.checked = false);
+        }
+    </script>
+</body>
+</html>

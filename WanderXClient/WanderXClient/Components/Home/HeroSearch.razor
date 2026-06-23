@@ -1,5 +1,17 @@
+<div class="hero-search-tabs">
+    <button type="button" class="search-tab @(_activeTab == "tour" ? "active" : "")" @onclick='() => SetActiveTab("tour")'>
+        <MaterialIcon Name="tour" /> Tour Du Lịch
+    </button>
+    <button type="button" class="search-tab @(_activeTab == "hotel" ? "active" : "")" @onclick='() => SetActiveTab("hotel")'>
+        <MaterialIcon Name="hotel" /> Khách Sạn
+    </button>
+    <button type="button" class="search-tab @(_activeTab == "flight" ? "active" : "")" @onclick='() => SetActiveTab("flight")'>
+        <MaterialIcon Name="flight_takeoff" /> Vé Máy Bay
+    </button>
+</div>
+
 <form class="hero-search">
-    <SearchField Icon="location_on" Label="Where to?" Placeholder="Anywhere" />
+    <SearchField Icon="location_on" Label="Where to?" Placeholder="@_placeholder" />
     <SearchField Icon="calendar_month" Label="Dates" Placeholder="Add dates" />
     <SearchField Icon="group" Label="Travelers" Placeholder="1 guest" />
     <a class="wx-button" href="#experiences">
@@ -7,3 +19,20 @@
         Search
     </a>
 </form>
+
+@code {
+    private string _activeTab = "tour";
+    private string _placeholder = "Anywhere";
+
+    private void SetActiveTab(string tab)
+    {
+        _activeTab = tab;
+        _placeholder = tab switch
+        {
+            "tour" => "Anywhere",
+            "hotel" => "Enter hotel, resort name...",
+            "flight" => "Origin, destination airport...",
+            _ => "Anywhere"
+        };
+    }
+}

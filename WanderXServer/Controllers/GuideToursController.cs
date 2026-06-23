@@ -100,11 +100,11 @@ public class GuideToursController : ControllerBase
     }
 
     [HttpPut("{id:guid}/finish")]
-    public async Task<ActionResult<GuideTourAssignmentResponse>> Finish(Guid id)
+    public async Task<ActionResult<GuideTourAssignmentResponse>> Finish(Guid id, [FromBody] FinishTourRequest request)
     {
         try
         {
-            return Ok(await _guideTourService.FinishAsync(id));
+            return Ok(await _guideTourService.FinishAsync(id, request));
         }
         catch (KeyNotFoundException exception)
         {

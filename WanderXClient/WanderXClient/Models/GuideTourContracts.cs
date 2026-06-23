@@ -43,6 +43,14 @@ public sealed class GuideTourAssignmentResponse
     public bool CanDecline { get; set; }
 
     public bool CanFinish { get; set; }
+
+    public string? EvidenceImage { get; set; }
+}
+
+public sealed class FinishTourRequest
+{
+    [Required(ErrorMessage = "Evidence image is required.")]
+    public string EvidenceImage { get; set; } = string.Empty;
 }
 
 public sealed class DeclineTourRequest
