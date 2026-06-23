@@ -524,8 +524,8 @@
         transition: all 0.2s;
     }
     .wx-modal-tab-btn.active {
-        color: #007a6c;
-        border-bottom-color: #007a6c;
+        color: var(--wx-secondary);
+        border-bottom-color: var(--wx-secondary);
     }
     .wx-modal-tab-content {
         min-height: 120px;
@@ -540,7 +540,7 @@
         transition: border-color 0.2s;
     }
     .wx-upload-zone:hover {
-        border-color: #007a6c;
+        border-color: var(--wx-secondary);
     }
     .wx-file-input-hidden {
         display: none;
@@ -788,15 +788,15 @@
         }
 
         .guide-calendar-event--assigned {
-            background: var(--wx-primary) !important;
+            background: #0284c7 !important;
         }
 
         .guide-calendar-event--confirmed {
-            background: #e65100 !important; /* Rich Orange */
+            background: var(--wx-secondary) !important;
         }
 
         .guide-calendar-event--finished {
-            background: #2e7d32 !important; /* Forest Green */
+            background: #22c55e !important;
         }
 
         .guide-calendar-event--declined {
@@ -1009,7 +1009,7 @@
     }
 
     .guide-detail-placeholder:hover {
-        border-color: #007a6c !important;
+        border-color: var(--wx-secondary) !important;
         background: rgba(255, 255, 255, 0.85) !important;
     }
 
@@ -1021,7 +1021,7 @@
 
     .placeholder-content .material-icons {
         font-size: 48px !important;
-        color: #007a6c !important;
+        color: var(--wx-secondary) !important;
         opacity: 0.7 !important;
         margin-bottom: 16px !important;
         display: inline-block !important;
@@ -1658,11 +1658,11 @@
     {
         return GetCalendarStatusModifier(status) switch
         {
-            "assigned" => "#007a6c",
-            "confirmed" => "#0052cc",
-            "finished" => "#667085",
-            "declined" => "#ba1a1a",
-            _ => "#434654"
+            "assigned" => "#0284c7",
+            "confirmed" => "#ff5a5f",
+            "finished" => "#22c55e",
+            "declined" => "#ef4444",
+            _ => "#64748b"
         };
     }
 
