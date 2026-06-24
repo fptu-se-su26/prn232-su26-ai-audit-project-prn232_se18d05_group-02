@@ -315,51 +315,131 @@ Sau lần sử dụng AI đầu tiên này để phác thảo danh sách màn h�
 
 | Nội dung | Thông tin |
 |---|---|
-| Ngày sử dụng |  |
-| Công cụ AI | ChatGPT / Gemini / Claude / GitHub Copilot / Cursor / Antigravity / Khác |
-| Mục đích sử dụng |  |
-| Phần việc liên quan | Requirement / Design / Database / Frontend / Backend / Testing / Debug / Report / Presentation / Other |
-| Mức độ sử dụng | Hỗ trợ ý tưởng / Hỗ trợ một phần / Hỗ trợ nhiều / Sinh chính nội dung |
+| Ngày sử dụng | 25/05/2026 |
+| Công cụ AI | GitHub Copilot / ChatGPT |
+| Mục đích sử dụng | Implement Guide Management Backend Features |
+| Phần việc liên quan | Backend / Database |
+| Mức độ sử dụng | Hỗ trợ một phần |
 
 #### 4.1. Prompt đã sử dụng
 
 ```text
-Dán nguyên văn prompt đã hỏi AI tại đây.
+Tiến hành chức năng Quản lý hướng dẫn viên:
+1. Thêm hướng dẫn viên
+2. Cập nhật thông tin hướng dẫn viên (hướng dẫn viên có thể tự cập nhật)
+3. Cập nhật ngôn ngữ (chuyên ngành ngôn ngữ của hướng dẫn viên), khu vực và kinh nghiệm (đi hướng dẫn được bao nhiêu tour rồi?)
+
+Yêu cầu:
+- Tạo API endpoint cho các chức năng trên
+- Implement logic xử lý trong backend (.NET 8)
+- Thiết kế database schema cho guide management
+- Ensure validation và authorization (guides chỉ có thể edit profile của mình)
 ```
 
 #### 4.2. Kết quả AI gợi ý
 
 ```text
-Viết tại đây...
+1. Database Schema:
+   - Table: Guides
+     * GuidId (PK)
+     * FullName
+     * PhoneNumber
+     * Email
+     * Languages (JSON/String array)
+     * ServiceAreas (JSON/String array)
+     * ExperienceTours (số tour đã hướng dẫn)
+     * TotalRating
+     * Status (Active/Inactive/OnLeave)
+     * CreatedDate
+     * UpdatedDate
+
+2. API Endpoints:
+   - POST /api/guides - Create new guide
+   - GET /api/guides/{id} - Get guide details
+   - PUT /api/guides/{id} - Update guide information
+   - PATCH /api/guides/{id}/profile - Guide tự cập nhật profile
+   - GET /api/guides - List all guides with filters
+   - PATCH /api/guides/{id}/languages - Update guide languages
+   - PATCH /api/guides/{id}/areas - Update service areas
+   - PATCH /api/guides/{id}/experience - Update experience info
+
+3. Request/Response Models:
+   - CreateGuideRequest
+   - UpdateGuideRequest
+   - GuideProfileUpdateRequest
+   - GuideDto
+   - GuideLanguageDto
+   - GuidExperienceDto
+
+4. Validation Rules:
+   - Email validation
+   - Phone number validation
+   - At least one language required
+   - At least one service area required
+   - Experience count should be non-negative
+
+5. Authorization:
+   - Admin: Full access to all guide operations
+   - Staff: Can create and manage guides
+   - Guide: Can only update their own profile information
 ```
 
 #### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
 
 ```text
-Viết tại đây...
+1. Database schema design và model structure cho Guide management
+2. API endpoint structure và routing convention
+3. Request/Response DTO models
+4. Validation logic và authorization checks
+5. Repository pattern implementation cho guide data access
+6. Service layer design cho business logic
+7. Exception handling strategy
 ```
 
 #### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
 
 ```text
-Viết tại đây...
+1. Thêm fields: Avatar, Bio, Certification, LanguageProficiency (level)
+2. Tối ưu Service Areas: thay vì string array, tạo separate table GuideServiceArea để quản lý Many-to-Many relationship
+3. Tối ưu Languages: tạo separate table GuideLanguage với proficiency level
+4. Thêm Rating/Review tracking: GuidRating table để track average rating
+5. Audit trail: Thêm logging khi cập nhật guide information
+6. Thêm status management: OnLeave, Inactive states có effective dates
+7. Performance optimization: Implement caching cho guide list
+8. Enhance query filters: Search by name, email, language, area, experience range
+9. Thêm guide assignment history tracking
 ```
 
 #### 4.5. Minh chứng
 
 | Loại minh chứng | Nội dung |
 |---|---|
-| Link commit |  |
-| File liên quan |  |
-| Screenshot |  |
-| Kết quả chạy/test |  |
-| Link video demo |  |
-| Ghi chú khác |  |
+| Link commit | WanderXServer/Repositories/ (Guide-related repositories) |
+| File liên quan | WanderXServer/Models/Guide.cs, WanderXServer/Services/GuideService.cs, WanderXServer/Controllers/GuideController.cs |
+| Screenshot | ../img/AI_AUDIT_LOG/ai-use-2-guide-management.png |
+| Kết quả chạy/test | API endpoints tested via Postman/Swagger |
+| Link video demo | N/A |
+| Ghi chú khác | Xem CHANGELOG.md cho chi tiết implementation |
 
 #### 4.6. Nhận xét cá nhân/nhóm
 
 ```text
-Viết tại đây...
+Lần sử dụng AI thứ 2 này cho phép nhóm nhanh chóng thiết kế database schema và API structure cho Guide Management module. 
+AI cung cấp một foundation tốt về:
+
+1. RESTful API design conventions
+2. DTO pattern và validation approach
+3. Authorization strategy cho role-based access control
+
+Tuy nhiên, nhóm phải thực hiện các cải tiến quan trọng:
+
+1. Tối ưu database design bằng cách tạo separate tables cho Languages và Service Areas thay vì using JSON arrays
+2. Thêm nhiều fields thực tế hơn như Avatar, Bio, Certification, LanguageProficiency level
+3. Implement audit logging để track thay đổi
+4. Optimize queries và implement caching strategies
+5. Enhance validation logic phù hợp hơn với yêu cầu business
+
+Điều này chứng minh rằng AI là công cụ hỗ trợ tốt nhưng vẫn cần human expertise để tạo ra solution hoàn chỉnh và production-ready.
 ```
 
 ---
@@ -368,51 +448,392 @@ Viết tại đây...
 
 | Nội dung | Thông tin |
 |---|---|
-| Ngày sử dụng |  |
-| Công cụ AI | ChatGPT / Gemini / Claude / GitHub Copilot / Cursor / Antigravity / Khác |
-| Mục đích sử dụng |  |
-| Phần việc liên quan | Requirement / Design / Database / Frontend / Backend / Testing / Debug / Report / Presentation / Other |
-| Mức độ sử dụng | Hỗ trợ ý tưởng / Hỗ trợ một phần / Hỗ trợ nhiều / Sinh chính nội dung |
+| Ngày sử dụng | 05/06/2026 |
+| Công cụ AI | ChatGPT / Antigravity |
+| Mục đích sử dụng | Chỉnh sửa và hoàn thiện UX cho trang Guide Portal |
+| Phần việc liên quan | Frontend |
+| Mức độ sử dụng | Hỗ trợ một phần |
 
 #### 4.1. Prompt đã sử dụng
 
 ```text
-Dán nguyên văn prompt đã hỏi AI tại đây.
+Khi nhấn vào 1 tour bên trong calendar thì sẽ nhảy xuống tour phía dưới Upcoming assigned tour(s). Thêm filter theo tour status và filter bằng cách chọn ngày trên lịch.
 ```
 
 #### 4.2. Kết quả AI gợi ý
 
 ```text
-Viết tại đây...
+AI gợi ý các hướng giải quyết:
+
+1. Kiến trúc:
+   - Sử dụng event listener trên calendar elements
+   - Implement smooth scroll tới section Upcoming assigned tours
+   - State management: selectedDate, selectedStatus, filteredTours
+
+2. Cơ chế hoạt động:
+   - Click trên date → lưu selectedDate vào state
+   - Filter tours: array.filter(tour => tour.date === selectedDate && tour.status === selectedStatus)
+   - Scroll: element.scrollIntoView({behavior: 'smooth'})
+
+3. UI Components:
+   - Calendar (có highlight selected date)
+   - Filter chips/buttons cho status (Assigned, Confirmed, In Progress, Finished)
+   - Upcoming tours list (scroll-to-target)
+   - Reset filter button
+
+4. Code patterns:
+   - React hooks (useState, useEffect, useRef)
+   - Event handlers cho calendar clicks
+   - Array filtering logic
+   - Scroll behavior implementation
 ```
 
 #### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
 
 ```text
-Viết tại đây...
+1. Event handling pattern: Click listener trên calendar dates
+2. Scroll functionality: scrollIntoView() với smooth behavior
+3. Filter logic structure: Multi-criteria filtering (date + status)
+4. State management approach: selectedDate và selectedStatus state
+5. Component architecture: Tách filter logic từ display logic
 ```
 
 #### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
 
 ```text
-Viết tại đây...
+1. UI/UX enhancements:
+   - Tinh chỉnh smooth scroll timing (duration, easing)
+   - Thêm visual indicators: highlight selected date, bold active filter
+   - Improve responsive design cho mobile
+   - Thêm animation transitions cho better UX
+
+2. Feature refinements:
+   - Lọc theo date và status đồng thời (multi-filter)
+   - Hiển thị tour count cho mỗi status
+   - Thêm "Clear All Filters" button
+   - Persist filter state khi navigate away và quay lại
+
+3. Performance optimizations:
+   - Memoize filtered tours (useMemo) để tránh unnecessary re-renders
+   - Lazy load tour details khi cần
+   - Debounce filter updates
+
+4. Accessibility improvements:
+   - Keyboard navigation cho calendar
+   - ARIA labels cho filter buttons
+   - Screen reader support cho scroll-to functionality
 ```
 
 #### 4.5. Minh chứng
 
 | Loại minh chứng | Nội dung |
 |---|---|
-| Link commit |  |
-| File liên quan |  |
+| Link commit | WanderXClient/Pages/GuidePage.razor |
+| File liên quan | WanderXClient/Components/GuidePortal.razor, WanderXClient/js/guide-calendar.js |
 | Screenshot |  |
-| Kết quả chạy/test |  |
-| Link video demo |  |
-| Ghi chú khác |  |
+| Kết quả chạy/test | Tested calendar click, date filter, status filter, scroll behavior |
+| Link video demo | N/A |
+| Ghi chú khác | Feature hoàn thiện trong phase cuối của Guide Portal implementation |
 
 #### 4.6. Nhận xét cá nhân/nhóm
 
 ```text
-Viết tại đây...
+Lần sử dụng AI thứ 3 này cho phép nhóm nhanh chóng thiết kế UX flow cho Guide Portal calendar feature:
+
+1. Ưu điểm:
+   - AI cung cấp rõ kiến trúc state management
+   - Gợi ý cách implement scroll behavior hiệu quả
+   - Gợi ý multi-filter logic
+
+2. Điều chỉnh nhóm:
+   - Tinh chỉnh UX interaction để mượt hơn
+   - Thêm performance optimization (memoization)
+   - Enhance accessibility
+   - Cải thiện responsive design cho mobile
+
+3. Bài học:
+   - AI là tốt cho brainstorming UI interactions
+   - Nhưng cần human judgment cho UX details
+   - Performance và accessibility không phải lúc nào AI cũng suggest
+```
+
+---
+
+### Lần sử dụng AI số 4
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 16/06/2026 |
+| Công cụ AI | Gemini |
+| Mục đích sử dụng | Responsive Design Implementation for Mobile & Laptop |
+| Phần việc liên quan | Frontend |
+| Mức độ sử dụng | Hỗ trợ chính |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+Nhằm đáp ứng nhu cầu cho người dùng sử dụng phone để duyệt web, hãy làm responsive cho trang web cho cả laptop và mobile.
+Đảm bảo nâng cao UI/UX cho người dùng.
+Đảm bảo các chức năng và giao diện trên phiên bản laptop thì vẫn hoạt động bình thường.
+Đảm bảo hạn chế ảnh hưởng đến các thành phần khác nếu không cần thiết.
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+Gemini gợi ý một chiến lược responsive design toàn diện:
+
+1. CSS Responsive Framework:
+   - Sử dụng CSS Media Queries với breakpoints: Mobile (320-480px), Tablet (481-768px), Desktop (769px+)
+   - Implement CSS Grid và Flexbox cho layout adaptable
+   - Sử dụng relative units (rem, em, %) thay vì fixed units (px)
+   - Implement CSS Custom Properties (variables) cho consistent theming
+
+2. Mobile-First Approach:
+   - Bắt đầu từ mobile layout, sau đó enhance cho tablet và desktop
+   - Progressive enhancement cho các tính năng advanced
+   - Optimize images với srcset và picture elements
+
+3. UI/UX Improvements cho Mobile:
+   - Tăng touch targets lên 44px-48px minimum
+   - Simplify navigation: hamburger menu, bottom navigation tabs
+   - Implement collapsible sections và accordion layouts
+   - Optimize form layouts với larger input fields
+   - Implement sticky headers và footers cho quick access
+
+4. Performance Optimization:
+   - Lazy load images để reduce initial load time
+   - Minimize CSS/JS bundles
+   - Implement code splitting
+   - Cache strategy cho assets static
+   - Optimize font loading
+
+5. Testing Strategy:
+   - Test trên multiple real devices (iOS, Android)
+   - Use Chrome DevTools device emulation
+   - Performance testing với Lighthouse
+   - Touch event testing
+   - Orientation change testing (portrait/landscape)
+
+6. Component-Level Responsive:
+   - Navigation (responsive menu)
+   - Cards (2-3 columns desktop, 1 column mobile)
+   - Forms (single column mobile, multi-column desktop)
+   - Images (full width mobile, constrained desktop)
+   - Modals (full screen mobile, centered desktop)
+   - Tables (scroll horizontally mobile, normal desktop)
+```
+
+#### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
+
+```text
+1. CSS Framework Implementation:
+   - Tạo responsive breakpoints global trong _variables.scss
+   - Implement media query mixins cho reusable responsive styles
+   - Refactor CSS để sử dụng Flexbox và Grid
+   - Convert fixed widths thành relative widths
+
+2. Layout Responsive:
+   - Navigation: Convert thành hamburger menu trên mobile
+   - Sidebar: Convert thành collapsible drawer trên mobile
+   - Grid layouts: Adjust columns dựa trên breakpoints
+   - Forms: Optimize cho touch interaction
+
+3. Mobile-Specific UI:
+   - Bottom navigation tabs cho main features
+   - Larger buttons và input fields (min 44px)
+   - Sticky header với back button
+   - Drawer menu thay vì sidebar
+   - Simplified forms với fewer fields per view
+
+4. Image Optimization:
+   - Implement responsive images với srcset
+   - Lazy loading cho images
+   - Optimize image sizes cho different devices
+   - Use appropriate image formats (WebP with fallback)
+
+5. Component Updates:
+   - Tour Card: Stack vertically mobile, horizontal desktop
+   - Calendar: Simplified view mobile, full calendar desktop
+   - Booking Form: Step-by-step mobile, multi-column desktop
+   - Guide Portal: Responsive tables với horizontal scroll
+```
+
+#### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
+
+```text
+1. Smart Component Architecture:
+   - Create responsive wrappers cho existing components
+   - Avoid component duplication (use CSS + logic instead)
+   - Maintain single source of truth
+   - Use conditional rendering only when necessary
+
+2. Performance Fine-tuning:
+   - Implement intersection observer cho lazy loading
+   - Optimize re-renders với React.memo, useMemo, useCallback
+   - Reduce bundle size bằng code splitting
+   - Implement virtual scrolling cho long lists
+
+3. Enhanced UX Patterns:
+   - Add micro-interactions (swipe, bounce effects)
+   - Implement pull-to-refresh cho mobile
+   - Add haptic feedback support
+   - Smooth scroll-to-top functionality
+   - Sticky footer CTA buttons
+
+4. Accessibility Improvements:
+   - Ensure touch targets meet 48px minimum
+   - Improve color contrast cho readability
+   - Add ARIA labels cho responsive components
+   - Ensure keyboard navigation works
+   - Test screen reader compatibility
+
+5. Testing & Validation:
+   - Manual testing trên 5+ real devices
+   - Automated responsive testing
+   - Performance profiling với Lighthouse
+   - Cross-browser testing
+   - User feedback collection
+
+6. Documentation:
+   - Create responsive design guidelines
+   - Document breakpoint strategy
+   - Provide component responsive examples
+   - Add troubleshooting guide
+```
+
+#### 4.5. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | WanderXClient/Shared/Styles/, WanderXClient/Components/ responsive updates |
+| File liên quan | _layout.scss, _variables.scss, responsive component files |
+| Screenshot | Responsive demo screenshots (mobile 375px, tablet 768px, desktop 1920px) |
+| Kết quả chạy/test | Lighthouse report, responsive test results, device testing log |
+| Link video demo | Responsive demo video |
+| Ghi chú khác | Tested trên iOS Safari, Android Chrome, responsive down to 320px |
+
+#### 4.6. Nhận xét cá nhân/nhóm
+
+```text
+Lần sử dụng AI thứ 4 này cho phép nhóm triển khai responsive design một cách có hệ thống:
+
+1. Ưu điểm:
+   - Gemini cung cấp chiến lược responsive toàn diện
+   - Gợi ý cụ thể về breakpoints, units, và best practices
+   - Provide component-level responsive patterns
+   - Bao gồm performance optimization strategies
+
+2. Điều chỉnh nhóm:
+   - Smart component architecture để tránh code duplication
+   - Performance optimization (intersection observer, memoization)
+   - Enhanced UX patterns (micro-interactions, haptic feedback)
+   - Comprehensive accessibility improvements
+   - Thorough testing trên multiple real devices
+
+3. Bài học:
+   - Responsive design cần comprehensive planning, không chỉ media queries
+   - Component-level thinking giúp maintain clean architecture
+   - Performance và accessibility cần được planned từ đầu
+   - Testing trên real devices là critical
+```
+
+
+### Lần sử dụng AI số 5
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 23/06/2026 |
+| Công cụ AI | Antigravity / Gemini |
+| Mục đích sử dụng | Tái cấu trúc toàn diện UI/UX cho Travel Website (Homepage, Listing, Detail) |
+| Phần việc liên quan | Frontend / UI-UX |
+| Mức độ sử dụng | Hỗ trợ chính |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-05
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+AI đã đưa ra phân tích chi tiết về 4 điểm yếu UX kinh điển của web du lịch truyền thống và cung cấp giải pháp thiết kế giao diện hiện đại:
+
+1. Thiết kế Homepage:
+   - Hero Section tràn màn hình, ảnh nền chất lượng cao tạo cảm hứng du lịch.
+   - Cụm thanh tìm kiếm tích hợp bộ lọc đa năng dạng Tab (Tours, Hotels, Flights) với các trường thông tin gọn gàng.
+   - Hiển thị danh mục điểm đến hot dạng Grid hình ảnh 3D hover và danh sách tour giờ chót với tông màu cam nhấn ({colors.accent-orange}).
+
+2. Thiết kế Listing Page:
+   - Filter Sidebar đặt bên trái với phân cấp rõ ràng (giá, xếp hạng, loại hình tour), có khoảng trắng thoáng đãng.
+   - Product Grid 3 cột sang trọng. Mỗi thẻ sản phẩm (Product Card) bo góc rounded-lg, tỷ lệ ảnh 4:3 sắc nét, hiển thị rõ giá và CTA "Book Now".
+
+3. Thiết kế Detail Page:
+   - Phân bổ thông tin rõ ràng: Khối Gallery ảnh (1 lớn + 4 nhỏ) -> Timeline lịch trình tour chi tiết mượt mà -> Sticky Booking Widget cố định bên phải màn hình khi cuộn chuột.
+
+4. Responsive Design:
+   - Layout co giãn linh hoạt theo breakpoints của Tailwind.
+   - Phiên bản Mobile: chuyển bộ lọc sang dạng Drawer trượt dưới lên, product list về Grid 1 cột, widget đặt tour chuyển thành Bottom Sticky Bar cố định.
+```
+
+#### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
+
+```text
+1. Giao diện bộ lọc và danh sách sản phẩm:
+   - Áp dụng cấu trúc Flexbox và Grid từ code mẫu để dựng khung Homepage và Listing page.
+   - Sử dụng CSS của AI cho Sticky Booking Widget trên desktop.
+2. Responsive layout:
+   - Sử dụng các class responsive của Tailwind CSS (`md:`, `lg:`) theo gợi ý của AI.
+   - Áp dụng cơ chế Drawer trên Mobile để tiết kiệm không gian màn hình.
+3. Design tokens:
+   - Áp dụng màu cam nhấn `{colors.accent-orange}` (`#FF6B35`) cho giá tiền và các nút CTA nổi bật.
+   - Dùng khoảng trắng rộng rãi (`py-12`, `py-16`, `gap-8`) tạo cảm giác cao cấp.
+```
+
+#### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
+
+```text
+1. Tái cấu trúc mã nguồn (Component Refactoring):
+   - Chia nhỏ file code gộp của AI thành các React components riêng biệt trong dự án WanderXClient (`HeroSection.jsx`, `SearchBar.jsx`, `FilterSidebar.jsx`, `ProductCard.jsx`, `BookingWidget.jsx`, `Timeline.jsx`).
+2. Tối ưu UX & Hiệu ứng động:
+   - Thêm hiệu ứng Skeleton Loading giúp giao diện mượt mà khi tải dữ liệu từ API.
+   - Sử dụng transition và transform CSS cho hiệu ứng Hover trên Product Cards phóng to nhẹ ảnh nền mà không làm vỡ layout.
+   - Đảm bảo hình ảnh không bị méo bằng thuộc tính `object-cover aspect-[4/3]`.
+3. Tích hợp Backend API:
+   - Đấu nối dữ liệu thực tế từ cơ sở dữ liệu (Database) thông qua API thay vì dùng mock data tĩnh của AI.
+   - Bổ sung logic validation form đặt tour trên Sticky Booking Widget trước khi chuyển hướng sang trang thanh toán.
+```
+
+#### 4.5. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXClient/Components/SearchBar.jsx, WanderXClient/Components/ProductCard.jsx, WanderXClient/Components/BookingWidget.jsx, WanderXClient/Pages/Home.jsx, WanderXClient/Pages/TourList.jsx, WanderXClient/Pages/TourDetail.jsx |
+| Screenshot | Ảnh chụp so sánh UI trước và sau refactor |
+| Kết quả chạy/test | Kiểm tra hoạt động mượt mà trên Mobile Safari và Chrome Desktop |
+| Link video demo | |
+| Ghi chú khác | Hệ thống đạt tiêu chuẩn giao diện tạp chí cao cấp, đáp ứng tốt UX của người dùng |
+
+#### 4.6. Nhận xét cá nhân/nhóm
+
+```text
+Lần sử dụng AI thứ 5 giúp định hình phong cách thiết kế UI/UX hiện đại theo chuẩn tạp chí cho dự án:
+
+1. Ưu điểm:
+   - AI cung cấp code mẫu Tailwind CSS trực quan, hiện đại, đúng tinh thần của Design System WanderXDesign.md.
+   - Phân tích tốt các lỗi UX thường gặp của web cũ giúp nhóm rút kinh nghiệm khi triển khai thực tế.
+   - Gợi ý responsive mobile tối ưu (Drawer, Sticky Bottom Bar).
+
+2. Điều chỉnh nhóm:
+   - Tách code mẫu thành các React components tái sử dụng được, clean code.
+   - Bổ sung hiệu ứng Skeleton loading và mượt mà hóa chuyển động mở Drawer/Hover.
+   - Kết nối API dữ liệu thực tế của dự án.
+
+3. Bài học:
+   - Tận dụng sức mạnh của CSS Grid/Flexbox giúp layout responsive rất dễ dàng.
+   - Khoảng trắng (whitespace) và phân cấp thông tin rõ ràng là chìa khóa tạo nên thiết kế cao cấp (premium feel).
 ```
 
 ---
@@ -427,13 +848,13 @@ Viết tại đây...
 | Viết user story/use case |  |  |  |  |  |
 | Thiết kế database |  |  |  |  |  |
 | Thiết kế kiến trúc hệ thống |  |  |  |  |  |
-| Thiết kế giao diện |  |  |  |  |  |
-| Code frontend |  |  |  |  |  |
+| Thiết kế giao diện |  |  | X |  | Sử dụng AI cho Guide Portal calendar design (Prompt 3) |
+| Code frontend |  | X |  |  | AI hỗ trợ ý tưởng pattern, nhóm tự implement chi tiết (Prompt 3) |
 | Code backend |  |  |  |  |  |
 | Debug lỗi |  |  |  |  |  |
 | Viết test case |  |  |  |  |  |
 | Kiểm thử sản phẩm |  |  |  |  |  |
-| Tối ưu code |  |  |  |  |  |
+| Tối ưu code |  | X |  |  | AI gợi ý, nhóm implement tối ưu thêm (Prompt 3) |
 | Viết báo cáo |  |  |  |  |  |
 | Làm slide thuyết trình |  |  |  |  |  |
 
