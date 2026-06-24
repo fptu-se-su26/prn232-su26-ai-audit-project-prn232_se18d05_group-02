@@ -738,6 +738,104 @@ Lần sử dụng AI thứ 4 này cho phép nhóm triển khai responsive design
    - Testing trên real devices là critical
 ```
 
+
+### Lần sử dụng AI số 5
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 23/06/2026 |
+| Công cụ AI | Antigravity / Gemini |
+| Mục đích sử dụng | Tái cấu trúc toàn diện UI/UX cho Travel Website (Homepage, Listing, Detail) |
+| Phần việc liên quan | Frontend / UI-UX |
+| Mức độ sử dụng | Hỗ trợ chính |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-05
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+AI đã đưa ra phân tích chi tiết về 4 điểm yếu UX kinh điển của web du lịch truyền thống và cung cấp giải pháp thiết kế giao diện hiện đại:
+
+1. Thiết kế Homepage:
+   - Hero Section tràn màn hình, ảnh nền chất lượng cao tạo cảm hứng du lịch.
+   - Cụm thanh tìm kiếm tích hợp bộ lọc đa năng dạng Tab (Tours, Hotels, Flights) với các trường thông tin gọn gàng.
+   - Hiển thị danh mục điểm đến hot dạng Grid hình ảnh 3D hover và danh sách tour giờ chót với tông màu cam nhấn ({colors.accent-orange}).
+
+2. Thiết kế Listing Page:
+   - Filter Sidebar đặt bên trái với phân cấp rõ ràng (giá, xếp hạng, loại hình tour), có khoảng trắng thoáng đãng.
+   - Product Grid 3 cột sang trọng. Mỗi thẻ sản phẩm (Product Card) bo góc rounded-lg, tỷ lệ ảnh 4:3 sắc nét, hiển thị rõ giá và CTA "Book Now".
+
+3. Thiết kế Detail Page:
+   - Phân bổ thông tin rõ ràng: Khối Gallery ảnh (1 lớn + 4 nhỏ) -> Timeline lịch trình tour chi tiết mượt mà -> Sticky Booking Widget cố định bên phải màn hình khi cuộn chuột.
+
+4. Responsive Design:
+   - Layout co giãn linh hoạt theo breakpoints của Tailwind.
+   - Phiên bản Mobile: chuyển bộ lọc sang dạng Drawer trượt dưới lên, product list về Grid 1 cột, widget đặt tour chuyển thành Bottom Sticky Bar cố định.
+```
+
+#### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
+
+```text
+1. Giao diện bộ lọc và danh sách sản phẩm:
+   - Áp dụng cấu trúc Flexbox và Grid từ code mẫu để dựng khung Homepage và Listing page.
+   - Sử dụng CSS của AI cho Sticky Booking Widget trên desktop.
+2. Responsive layout:
+   - Sử dụng các class responsive của Tailwind CSS (`md:`, `lg:`) theo gợi ý của AI.
+   - Áp dụng cơ chế Drawer trên Mobile để tiết kiệm không gian màn hình.
+3. Design tokens:
+   - Áp dụng màu cam nhấn `{colors.accent-orange}` (`#FF6B35`) cho giá tiền và các nút CTA nổi bật.
+   - Dùng khoảng trắng rộng rãi (`py-12`, `py-16`, `gap-8`) tạo cảm giác cao cấp.
+```
+
+#### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
+
+```text
+1. Tái cấu trúc mã nguồn (Component Refactoring):
+   - Chia nhỏ file code gộp của AI thành các React components riêng biệt trong dự án WanderXClient (`HeroSection.jsx`, `SearchBar.jsx`, `FilterSidebar.jsx`, `ProductCard.jsx`, `BookingWidget.jsx`, `Timeline.jsx`).
+2. Tối ưu UX & Hiệu ứng động:
+   - Thêm hiệu ứng Skeleton Loading giúp giao diện mượt mà khi tải dữ liệu từ API.
+   - Sử dụng transition và transform CSS cho hiệu ứng Hover trên Product Cards phóng to nhẹ ảnh nền mà không làm vỡ layout.
+   - Đảm bảo hình ảnh không bị méo bằng thuộc tính `object-cover aspect-[4/3]`.
+3. Tích hợp Backend API:
+   - Đấu nối dữ liệu thực tế từ cơ sở dữ liệu (Database) thông qua API thay vì dùng mock data tĩnh của AI.
+   - Bổ sung logic validation form đặt tour trên Sticky Booking Widget trước khi chuyển hướng sang trang thanh toán.
+```
+
+#### 4.5. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXClient/Components/SearchBar.jsx, WanderXClient/Components/ProductCard.jsx, WanderXClient/Components/BookingWidget.jsx, WanderXClient/Pages/Home.jsx, WanderXClient/Pages/TourList.jsx, WanderXClient/Pages/TourDetail.jsx |
+| Screenshot | Ảnh chụp so sánh UI trước và sau refactor |
+| Kết quả chạy/test | Kiểm tra hoạt động mượt mà trên Mobile Safari và Chrome Desktop |
+| Link video demo | |
+| Ghi chú khác | Hệ thống đạt tiêu chuẩn giao diện tạp chí cao cấp, đáp ứng tốt UX của người dùng |
+
+#### 4.6. Nhận xét cá nhân/nhóm
+
+```text
+Lần sử dụng AI thứ 5 giúp định hình phong cách thiết kế UI/UX hiện đại theo chuẩn tạp chí cho dự án:
+
+1. Ưu điểm:
+   - AI cung cấp code mẫu Tailwind CSS trực quan, hiện đại, đúng tinh thần của Design System WanderXDesign.md.
+   - Phân tích tốt các lỗi UX thường gặp của web cũ giúp nhóm rút kinh nghiệm khi triển khai thực tế.
+   - Gợi ý responsive mobile tối ưu (Drawer, Sticky Bottom Bar).
+
+2. Điều chỉnh nhóm:
+   - Tách code mẫu thành các React components tái sử dụng được, clean code.
+   - Bổ sung hiệu ứng Skeleton loading và mượt mà hóa chuyển động mở Drawer/Hover.
+   - Kết nối API dữ liệu thực tế của dự án.
+
+3. Bài học:
+   - Tận dụng sức mạnh của CSS Grid/Flexbox giúp layout responsive rất dễ dàng.
+   - Khoảng trắng (whitespace) và phân cấp thông tin rõ ràng là chìa khóa tạo nên thiết kế cao cấp (premium feel).
+```
+
 ---
 
 ## 5. Bảng tổng hợp mức độ sử dụng AI

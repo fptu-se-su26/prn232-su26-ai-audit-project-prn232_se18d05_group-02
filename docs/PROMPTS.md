@@ -56,7 +56,7 @@ Sinh viên/nhóm cần ghi lại:
 | 2 | 25/5/2026 | GitHub Copilot / ChatGPT | Guide Management Backend Implementation | Triển khai chức năng quản lý hướng dẫn viên (CRUD, authorization, validation) | Database schema, API endpoints, authorization strategy | Có | PROMPTS.md - Prompt số 2 |
 | 3 | 05/06/2026 | ChatGPT / Antigravity | Guide Portal Calendar & Filter UX | Khi nhấn vào tour trên calendar, nhảy xuống + filter theo status & date | Calendar click handling, smooth scroll, multi-criteria filter | Có | PROMPTS.md - Prompt số 3 |
 | 4 | 16/06/2026 | Gemini | Responsive Design Implementation | Làm responsive cho trang web cho cả laptop và mobile với nâng cao UI/UX | Responsive UI/UX implementation, mobile-first design | Có | PROMPTS.md - Prompt-04 |
-| 5 |  |  |  |  |  | Có / Không |  |
+| 5 | 23/06/2026 | Antigravity / Gemini | Redesign Travel Website UI/UX | Tái cấu trúc toàn diện UI/UX (Homepage, Listing, Detail) theo Design System | Đề xuất UX và mã nguồn mẫu React/Tailwind cho các trang cốt lõi | Có | PROMPTS.md - Prompt-05 |
 | 6 |  |  |  |  |  | Có / Không |  |
 | 7 |  |  |  |  |  | Có / Không |  |
 | 8 |  |  |  |  |  | Có / Không |  |
@@ -625,6 +625,128 @@ Gemini gợi ý một chiến lược responsive design toàn diện bao gồm:
 
 ```text
 Quá trình thực hiện responsive design được hỗ trợ tốt bởi Gemini. AI cung cấp chiến lược rõ ràng, best practices, và các ví dụ cụ thể. Nhóm đã review toàn bộ kết quả, kiểm tra trên thực tế, và thực hiện các cải tiến để đảm bảo responsive design hoạt động tốt trên tất cả devices.
+```
+
+---
+
+### Prompt-05
+
+| Nội dung                    | Thông tin                                                         |
+|-----------------------------|-------------------------------------------------------------------|
+| Ngày sử dụng                | 23/06/2026                                                        |
+| Công cụ AI                  | Antigravity / Gemini                                              |
+| Mục đích sử dụng            | Tái cấu trúc toàn diện UI/UX cho Travel Website                   |
+| Phần việc liên quan         | Frontend / UI-UX / Design                                         |
+| Mức độ sử dụng              | Hỗ trợ chính                                                      |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Vai trò: Bạn là một Chuyên gia UI/UX Senior kiêm Kỹ sư Frontend xuất sắc. 
+Bối cảnh: Tôi đang có một hệ thống website du lịch (Travel Website) nhưng hiện tại UI (Giao diện) nhìn rất lỗi thời, thiếu chuyên nghiệp và UX (Trải nghiệm người dùng) rất tệ, tỷ lệ chuyển đổi thấp, người dùng gặp khó khăn khi tìm kiếm và đặt tour/phòng.
+
+Tôi muốn bạn dựa vào File Design System (TravelHub-Design-System) dưới đây để tiến hành tái cấu trúc toàn diện UI/UX cho hệ thống của tôi.
+
+Follow theo file design: WanderXDesign.md
+
+Nhiệm vụ của bạn:
+Phân tích những điểm yếu chí tử về UI/UX thường gặp trên các trang web du lịch cũ (như nhồi nhét thông tin, bộ lọc phức tạp, nút CTA không nổi bật, hình ảnh bị bóp méo).
+
+Hãy từng bước tái cấu trúc lại các trang cốt lõi sau đây theo chuẩn Design System mới:
+1. Trang chủ (Homepage): Tập trung vào Hero Banner lớn có hình ảnh truyền cảm hứng, tích hợp cụm bộ lọc thông minh (Tab: Tour/Khách sạn/Vé máy bay, Input: Điểm đến, Ngày đi, Số khách). Hiển thị các danh mục "Điểm đến thịnh hành" bằng lưới Grid trực quan và hàng "Tour giờ chót giá tốt" ứng dụng token {colors.accent-orange}.
+2. Trang danh sách sản phẩm (Tour/Hotel Listing): Thiết kế bộ lọc (Filter Sidebar) bên trái thoáng đãng, phân cấp rõ ràng. Bên phải là danh sách sản phẩm dạng Grid 3 cột (Desktop). Các `product-card` phải tuân thủ đúng bo góc {rounded.lg}, ảnh tỉ lệ 4:3, hiển thị giá rõ ràng bằng `price-value` và nút `button-book-now`.
+3. Trang chi tiết sản phẩm (Detail Page): UX phân khối thông tin: Khối ảnh Gallery (1 ảnh lớn + 4 ảnh nhỏ) -> Khối thông tin tour (Lịch trình chi tiết dạng Timeline mượt mà) -> Khối Đặt Ngay (Sticky Booking Widget cố định bên màn hình khi cuộn chuột).
+
+Yêu cầu kỹ thuật & Thẩm mỹ:
+- Hãy viết mã nguồn mẫu (Sử dụng React + Tailwind CSS HOẶC HTML/CSS thuần tùy bạn chọn, ưu tiên Tailwind dựa trên các mã màu trong Design System).
+- Áp dụng triệt để nguyên lý khoảng trắng (Whitespace): Sử dụng spacing rộng rãi để giao diện trông giống một tạp chí du lịch sang trọng, không nhồi nhét.
+- Đảm bảo Responsive hoàn hảo: Trên Mobile, bộ lọc biến thành một Drawer trượt từ dưới lên, danh sách sản phẩm chuyển về Grid 1 column, cụm đặt hàng biến thành một thanh Bottom Sticky Bar.
+
+Hãy bắt đầu bằng việc đưa ra các đề xuất cải tiến UX cụ thể, sau đó cung cấp code cấu trúc bố cục (Layout) và giao diện mẫu cho các thành phần (Component) quan trọng nhất.
+```
+
+#### 5.2. Bối cảnh khi viết prompt
+
+```text
+Hệ thống website WanderX hiện tại đang sở hữu giao diện khá cũ kỹ, các bố cục hiển thị chưa được tối ưu hóa khoảng trắng khiến người dùng cảm thấy bị rối thông tin. Đồng thời, trải nghiệm tìm kiếm và đặt tour chưa mượt mà trên cả desktop lẫn các thiết bị di động, ảnh hưởng tiêu cực đến tỷ lệ chuyển đổi. 
+
+Để giải quyết vấn đề này, nhóm cần tái cấu trúc (refactor) lại giao diện của 3 trang chính (Homepage, Tour Listing, Tour Detail) theo bộ quy chuẩn mới của Design System (TravelHub-Design-System / WanderXDesign.md). Nhóm sử dụng prompt này để tham khảo ý kiến chuyên gia của AI về các lỗi UX thường gặp, nhận đề xuất cải tiến thiết kế và mã nguồn mẫu React + Tailwind CSS cho các component cốt lõi.
+```
+
+#### 5.3. Kết quả AI trả về
+
+```text
+AI đã phân tích các điểm yếu UX thường gặp và đưa ra giải pháp toàn diện:
+
+1. Phân tích điểm yếu UI/UX của web du lịch cũ:
+   - Nhồi nhét thông tin (Information Overload): Thiếu khoảng trắng, gây mỏi mắt và phân tán chú ý.
+   - Bộ lọc phức tạp (Complex Filters): Quá nhiều tùy chọn không cần thiết hiển thị cùng lúc.
+   - CTA chìm nghỉm (Weak CTA): Các nút "Đặt ngay" không nổi bật, không có tương tác hover tốt.
+   - Hình ảnh không chuẩn tỉ lệ (Distorted Images): Ảnh bị co giãn sai tỷ lệ, thiếu chuyên nghiệp.
+
+2. Cấu trúc Layout & Code mẫu (React + Tailwind CSS):
+   - Homepage: Thiết kế Hero Section lớn, thanh bộ lọc đa năng dạng Tab (Tour/Hotel/Flight) với input trực quan. Hiển thị "Điểm đến thịnh hành" bằng Grid CSS 3D Hover và "Tour giờ chót" với màu nhấn cam accent-orange rực rỡ.
+   - Tour Listing: Thiết kế filter bên trái thoáng, Grid 3 cột bên phải cho desktop. Product card có ảnh tỷ lệ 4:3, border-radius lớn (rounded-lg), tag giá trị rõ ràng và CTA nổi bật.
+   - Detail Page: Thể hiện bộ sưu tập ảnh (Gallery) tỉ lệ 1 lớn + 4 nhỏ sang trọng, timeline lịch trình tour dạng thẻ/đường nối mượt mà, và khối đặt chỗ Sticky Booking Widget cố định bên phải màn hình khi cuộn trang.
+   - Responsive Design: 
+     + Sử dụng Tailwind breakpoints (`md:`, `lg:`) để chuyển đổi linh hoạt.
+     + Trên mobile, bộ lọc chuyển thành Bottom Drawer trượt lên, Product Listing chuyển thành Grid 1 cột, và widget đặt tour chuyển thành Bottom Sticky Bar cố định chân trang.
+```
+
+#### 5.4. Kết quả đã áp dụng vào bài
+
+```text
+1. Cấu trúc lại giao diện (Refactoring Components):
+   - Triển khai Hero Banner và thanh bộ lọc thông minh (SearchBar Component) trên Homepage.
+   - Tạo bộ lọc Filter Sidebar và lưới sản phẩm Grid 3 cột cho trang danh sách tour.
+   - Tích hợp Gallery ảnh tỉ lệ 1:4 và Sticky Booking Widget cho trang chi tiết.
+2. Áp dụng Design Tokens:
+   - Sử dụng các màu sắc chủ đạo từ Design System bao gồm: màu cam nhấn ({colors.accent-orange} - `#FF6B35`), màu xanh navy làm chủ đạo (`#1A2B49`).
+   - Sử dụng bo góc chuẩn {rounded.lg} (12px / `rounded-xl` trong Tailwind) cho tất cả card.
+   - Tạo các khoảng trắng (spacing) rộng rãi (`py-16`, `gap-8`) tạo phong cách sang trọng.
+3. Responsive Mobile:
+   - Xây dựng Mobile Drawer cho bộ lọc bằng cách quản lý state `isOpenFilterDrawer` trong React.
+   - Tạo Sticky Bottom CTA Bar cho mobile ở màn hình chi tiết giúp tăng tỷ lệ đặt tour.
+```
+
+#### 5.5. Phần sinh viên/nhóm đã chỉnh sửa hoặc cải tiến
+
+```text
+1. Tối ưu hóa UI/UX chi tiết:
+   - Thêm hiệu ứng Skeleton Loading khi danh sách tour đang tải để cải thiện trải nghiệm đợi.
+   - Thêm các micro-animations tinh tế bằng CSS Transitions / Framer Motion khi mở bộ lọc Drawer và hover vào các thẻ sản phẩm.
+   - Tối ưu hóa tỉ lệ co giãn ảnh tự động sử dụng class `object-cover w-full h-full` kết hợp aspect ratio `aspect-[4/3]` để chống móp méo hình ảnh trên mọi thiết bị.
+2. Nâng cao nghiệp vụ & Clean Code:
+   - Phân chia mã nguồn của AI thành các Component nhỏ độc lập: `HeroSection.jsx`, `SearchBar.jsx`, `FilterSidebar.jsx`, `ProductCard.jsx`, `BookingWidget.jsx`, `Timeline.jsx`.
+   - Kết nối dữ liệu tĩnh (Mock Data) từ API backend thật thay vì hardcode thông tin sản phẩm.
+   - Thêm logic validation cho Sticky Booking Widget (kiểm tra ngày đi hợp lệ, số lượng khách không được vượt quá chỗ còn trống).
+```
+
+#### 5.6. Đánh giá chất lượng prompt
+
+- [X] Prompt rõ ràng
+- [X] Prompt có đủ bối cảnh
+- [ ] Prompt còn thiếu thông tin
+- [X] Prompt tạo ra kết quả tốt
+- [ ] Prompt tạo ra kết quả chưa phù hợp
+- [ ] Cần hỏi lại AI nhiều lần
+- [ ] Cần tự kiểm tra và chỉnh sửa nhiều
+- [ ] Kết quả AI có lỗi hoặc chưa chính xác
+
+#### 5.7. Minh chứng liên quan
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXClient/Components/SearchBar.jsx, WanderXClient/Components/ProductCard.jsx, WanderXClient/Components/BookingWidget.jsx, WanderXClient/Pages/Home.jsx, WanderXClient/Pages/TourList.jsx, WanderXClient/Pages/TourDetail.jsx |
+| Screenshot | Ảnh chụp so sánh UI cũ và UI mới sau khi tái cấu trúc |
+| Kết quả chạy/test | Đạt điểm Lighthouse Performance/Accessibility cao hơn sau khi tối ưu |
+| Link tài liệu/báo cáo | Tài liệu bàn giao thiết kế UI/UX WanderX |
+
+#### 5.8. Ghi chú thêm
+
+```text
+Mã nguồn mẫu do AI cung cấp rất sạch và chuẩn cấu trúc Tailwind CSS, giúp nhóm tiết kiệm hàng chục giờ thiết kế bộ cục và viết CSS responsive thủ công. Việc tối ưu hóa bằng cách chia nhỏ component giúp code dễ bảo trì hơn rất nhiều.
 ```
 
 ---
