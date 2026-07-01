@@ -57,7 +57,7 @@ Sinh viên/nhóm cần ghi lại:
 | 3 | 05/06/2026 | ChatGPT / Antigravity | Guide Portal Calendar & Filter UX | Khi nhấn vào tour trên calendar, nhảy xuống + filter theo status & date | Calendar click handling, smooth scroll, multi-criteria filter | Có | PROMPTS.md - Prompt số 3 |
 | 4 | 16/06/2026 | Gemini | Responsive Design Implementation | Làm responsive cho trang web cho cả laptop và mobile với nâng cao UI/UX | Responsive UI/UX implementation, mobile-first design | Có | PROMPTS.md - Prompt-04 |
 | 5 | 23/06/2026 | Antigravity / Gemini | Redesign Travel Website UI/UX | Tái cấu trúc toàn diện UI/UX (Homepage, Listing, Detail) theo Design System | Đề xuất UX và mã nguồn mẫu React/Tailwind cho các trang cốt lõi | Có | PROMPTS.md - Prompt-05 |
-| 6 |  |  |  |  |  | Có / Không |  |
+| 6 | 01/07/2026 | Antigravity (Gemini 3.5 Flash) | Tối ưu hóa Responsive Mobile & Sửa lỗi tràn chữ | Sửa lỗi responsive cho mobile và lỗi tràn văn bản ở thẻ thông tin Tour Detail | Bố cục grid 2 cột cho Tour Detail, thuộc tính ngắt dòng, xóa hero banner | Có | PROMPTS.md - Prompt-06 |
 | 7 |  |  |  |  |  | Có / Không |  |
 | 8 |  |  |  |  |  | Có / Không |  |
 | 9 |  |  |  |  |  | Có / Không |  |
@@ -747,6 +747,85 @@ AI đã phân tích các điểm yếu UX thường gặp và đưa ra giải ph
 
 ```text
 Mã nguồn mẫu do AI cung cấp rất sạch và chuẩn cấu trúc Tailwind CSS, giúp nhóm tiết kiệm hàng chục giờ thiết kế bộ cục và viết CSS responsive thủ công. Việc tối ưu hóa bằng cách chia nhỏ component giúp code dễ bảo trì hơn rất nhiều.
+```
+
+### Prompt-06
+
+| Nội dung                    | Thông tin                                                         |
+|-----------------------------|-------------------------------------------------------------------|
+| Ngày sử dụng                | 01/07/2026                                                        |
+| Công cụ AI                  | Antigravity (Gemini 3.5 Flash)                                    |
+| Mục đích sử dụng            | Tối ưu hóa Responsive Mobile & Sửa lỗi tràn chữ ở Tour Detail     |
+| Phần việc liên quan         | Frontend / UI Refactoring                                         |
+| Mức độ sử dụng              | Hỗ trợ chính                                                      |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+trong trang /guide-portal giúp tôi format lại responsive cho mobile, hiện tại thì cho mobile chưa fit.
+Bỏ đi banner phía trên để tối ưu hóa diện tích trang web.
+Phía bên pop-up Tour detail thì các thẻ như tour, schedule, region,.. đag hiển thị text tràn ra khỏi khung, có thể xem ảnh đính kèm.
+Đảm bảo chỉ thay đổi những chổ cần thiết, không ảnh hưởng đến các đoạn code khác khi khôg cần thiết.
+Đảm bảo khôg ảnh hưởng đến các chức năng khác.
+Đảm bảo giao diện layout phù hợp cho các thiết bị mobile.
+```
+
+#### 5.2. Bối cảnh khi viết prompt
+
+```text
+Trang Guide Portal hoạt động tốt trên các màn hình chuẩn, nhưng khi test trên di động và một số kích thước màn hình đặc biệt, layout hiển thị chưa vừa vặn (fit). Hơn nữa, việc hero banner đầu trang hiển thị quá to chiếm không gian và các thẻ chi tiết Tour hiển thị dạng 4 cột dọc nằm ngang hẹp làm tràn văn bản ra ngoài. Vì vậy nhóm cần prompt này để tìm ra phương án tối ưu hóa CSS & HTML hiệu quả và an toàn nhất.
+```
+
+#### 5.3. Kết quả AI trả về
+
+```text
+1. Đề xuất loại bỏ <section class="guide-self-hero"> khỏi GuidePortal.razor.
+2. Đề xuất sửa đổi .guide-tour-detail-grid thành grid-template-columns: repeat(2, 1fr) trong app.css để tăng chiều rộng của các thẻ chi tiết khi hiển thị ở sidebar hẹp.
+3. Đề xuất thêm min-width: 0 và overflow-wrap: break-word cho thẻ .guide-tour-detail-grid div và các thẻ con (span, strong) để buộc tự động xuống dòng khi từ quá dài.
+```
+
+#### 5.4. Giải thích cách kiểm tra/sửa đổi của sinh viên/nhóm
+
+```text
+- Áp dụng các thay đổi CSS cho .guide-tour-detail-grid vào wwwroot/css/app.css.
+- Xóa bỏ thẻ section chứa hero banner trong GuidePortal.razor.
+- Thực hiện dotnet build để kiểm chứng tính đúng đắn về mặt cú pháp và build của Blazor.
+- Xác nhận các thẻ chi tiết Tour Detail tự động xuống dòng và co giãn phù hợp trên cả môi trường Desktop, Tablet và Mobile.
+```
+
+#### 5.5. Kết quả sau khi kiểm tra/sửa đổi
+
+```text
+- Giao diện Tour Detail hiển thị trực quan và không còn lỗi tràn chữ ra ngoài khung thẻ bo tròn.
+- Chiều rộng của các thẻ thông tin chi tiết trên mobile và desktop đều tự co giãn linh hoạt và ngắt dòng tự nhiên.
+- Tiết kiệm diện tích hiển thị giúp người dùng dễ dàng thao tác xem lịch trình.
+```
+
+#### 5.6. Đánh giá chất lượng prompt
+
+- [X] Prompt rõ ràng
+- [X] Prompt có đủ bối cảnh
+- [ ] Prompt còn thiếu thông tin
+- [X] Prompt tạo ra kết quả tốt
+- [ ] Prompt tạo ra kết quả chưa phù hợp
+- [ ] Cần hỏi lại AI nhiều lần
+- [ ] Cần tự kiểm tra và chỉnh sửa nhiều
+- [ ] Kết quả AI có lỗi hoặc chưa chính xác
+
+#### 5.7. Minh chứng liên quan
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXClient/Pages/GuidePortal.razor, WanderXClient/wwwroot/css/app.css |
+| Screenshot | |
+| Kết quả chạy/test | Đã chạy build thành công, kiểm thử layout fit 100% trên các kích cỡ màn hình khác nhau |
+| Link tài liệu/báo cáo | docs/GUIDE_PORTAL_MOBILE_RESPONSIVE_FIX.md |
+
+#### 5.8. Ghi chú thêm
+
+```text
+Lỗi tràn chữ chủ yếu do thuộc tính mặc định min-width của grid-items là auto, ngăn cản chúng co giãn bé hơn nội dung văn bản. Việc thêm min-width: 0 cùng overflow-wrap: break-word đã sửa triệt để lỗi này.
 ```
 
 ---

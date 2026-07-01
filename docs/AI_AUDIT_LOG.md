@@ -838,6 +838,80 @@ Lần sử dụng AI thứ 5 giúp định hình phong cách thiết kế UI/UX 
 
 ---
 
+### Lần sử dụng AI số 6
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 01/07/2026 |
+| Công cụ AI | Antigravity (Gemini 3.5 Flash) |
+| Mục đích sử dụng | Tối ưu hóa Responsive Mobile & Sửa lỗi tràn chữ ở Tour Detail trên Guide Portal |
+| Phần việc liên quan | Frontend / UI Refactoring |
+| Mức độ sử dụng | Hỗ trợ chính |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+trong trang /guide-portal giúp tôi format lại responsive cho mobile, hiện tại thì cho mobile chưa fit.
+Bỏ đi banner phía trên để tối ưu hóa diện tích trang web.
+Phía bên pop-up Tour detail thì các thẻ như tour, schedule, region,.. đag hiển thị text tràn ra khỏi khung, có thể xem ảnh đính kèm.
+Đảm bảo chỉ thay đổi những chổ cần thiết, không ảnh hưởng đến các đoạn code khác khi khôg cần thiết.
+Đảm bảo khôg ảnh hưởng đến các chức năng khác.
+Đảm bảo giao diện layout phù hợp cho các thiết bị mobile.
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+1. Cấu trúc HTML & Layout:
+   - Loại bỏ Hero Banner (<section class="guide-self-hero">) để giải phóng diện tích màn hình trên thiết bị di động.
+
+2. Định dạng CSS & Grid:
+   - Cập nhật định dạng .guide-tour-detail-grid từ 4 cột (repeat(4, minmax(0, 1fr))) về 2 cột (repeat(2, 1fr)) để nới rộng không gian cho các thẻ thông tin chi tiết.
+   - Thêm thuộc tính min-width: 0 vào các thẻ div con của grid nhằm vô hiệu hóa chiều rộng tối thiểu mặc định, cho phép các thẻ co giãn tùy biến.
+   - Áp dụng cơ chế ngắt dòng tự động bằng overflow-wrap: break-word, word-wrap: break-word, word-break: break-word cho các chuỗi văn bản dài.
+```
+
+#### 4.3. Ý kiến của sinh viên/nhóm
+
+```text
+Nhóm hoàn toàn đồng ý với gợi ý của AI. Việc đổi về 2 cột giải quyết trực tiếp lỗi hiển thị hẹp trên sidebar, đồng thời thuộc tính ngắt từ đảm bảo tính ổn định tối đa của giao diện.
+```
+
+#### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
+
+```text
+1. Tiến hành kiểm tra và xác nhận tính tương thích của layout trên mobile (vẫn giữ chế độ 1 cột dọc thông qua media query định sẵn).
+2. Chạy thử dotnet build cho dự án client để kiểm chứng không có lỗi biên dịch Blazor.
+```
+
+#### 4.5. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXClient/Pages/GuidePortal.razor, WanderXClient/wwwroot/css/app.css |
+| Screenshot | |
+| Kết quả chạy/test | Build thành công 100%, giao diện Tour Detail fit hoàn toàn với khung viền, không còn lỗi tràn chữ |
+| Tài liệu chi tiết | docs/GUIDE_PORTAL_MOBILE_RESPONSIVE_FIX.md |
+
+#### 4.6. Nhận xét cá nhân/nhóm
+
+```text
+Lần sử dụng AI thứ 6 giải quyết nhanh chóng lỗi UI/UX trên phiên bản mobile và các kích thước màn hình đặc biệt:
+
+1. Ưu điểm:
+   - AI phân tích đúng nguyên nhân lỗi tràn chữ (do thuộc tính min-width: auto mặc định của flexbox/grid items và thiếu ngắt dòng).
+   - Gợi ý thay đổi giao diện 2 cột rất phù hợp với tính chất của sidebar hẹp trên desktop/tablet.
+
+2. Bài học:
+   - Khi thiết kế giao diện dạng thẻ nhỏ chứa dữ liệu động (như ngày tháng hay tên địa điểm dài), luôn phải dự phòng thuộc tính ngắt dòng (overflow-wrap) để tránh lỗi tràn khung.
+```
+
+---
+
+
+---
+
 ## 5. Bảng tổng hợp mức độ sử dụng AI
 
 Đánh dấu mức độ AI hỗ trợ ở từng hạng mục.

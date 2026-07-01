@@ -81,6 +81,7 @@ Nguyên tắc ghi changelog:
 | 6 | Implement Guide Portal endpoints | Group 2 | WanderXServer/Controllers/GuidePortalController.cs | Commit: feat/guide-portal |
 | 7 | Add authorization & validation | Group 2 | WanderXServer/Controllers/GuideController.cs | Commit: feat/guide-auth-validation |
 | 8 | Implement filtering, search, pagination | Group 2 | WanderXServer/Services/GuideService.cs | Commit: feat/guide-advanced-queries |
+| 9 | Tối ưu hóa Responsive Mobile & sửa lỗi tràn chữ ở Tour Detail | Group 2 / AI | WanderXClient/Pages/GuidePortal.razor, WanderXClient/wwwroot/css/app.css | Tài liệu: docs/GUIDE_PORTAL_MOBILE_RESPONSIVE_FIX.md |
 
 ## AI có hỗ trợ không?
 
