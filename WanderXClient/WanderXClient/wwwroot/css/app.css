@@ -2337,7 +2337,7 @@ button {
 
 .guide-tour-detail-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
 }
 
@@ -2348,6 +2348,10 @@ button {
     border-radius: var(--wx-radius);
     background: var(--wx-surface-low);
     padding: 14px;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
 }
 
 .guide-tour-detail-grid span {
@@ -2355,11 +2359,17 @@ button {
     font-size: 11px;
     font-weight: 850;
     text-transform: uppercase;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
 }
 
 .guide-tour-detail-grid strong {
     color: var(--wx-ink);
     font-size: 14px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
 }
 
 .guide-tour-summary {
