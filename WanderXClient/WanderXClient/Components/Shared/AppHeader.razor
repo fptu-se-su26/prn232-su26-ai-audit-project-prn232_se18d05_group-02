@@ -1,4 +1,5 @@
 @inject AuthSessionService AuthSession
+@inject NavigationManager Navigation
 
 <header class="wx-header">
     <div class="wx-header__inner">
@@ -11,16 +12,28 @@
         </div>
 
         <nav class="wx-nav" aria-label="Primary">
-            <a href="#destinations">Destinations</a>
-            <a href="#experiences">Experiences</a>
-            <a href="#why-wanderx">Why WanderX</a>
+            <a href="/#destinations">Destinations</a>
+            <a href="/#experiences">Experiences</a>
+            <a href="/#why-wanderx">Why WanderX</a>
             <a href="/guides">Guides</a>
         </nav>
 
         <div class="wx-header__right">
             <a class="wx-ghost-button" href="/forgot-password">Support</a>
-            <a class="wx-button wx-button--secondary" href="/guide-profile">Guide Profile</a>
-            <a class="wx-button wx-button--outline" href="/login">Sign In</a>
+            @if (_session?.IsGuide == true)
+            {
+                <a class="wx-button wx-button--secondary" href="/guide-profile">Guide Profile</a>
+                <button class="wx-button wx-button--outline" type="button" @onclick="HandleSignOut">Sign Out</button>
+            }
+            else if (_session?.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                <a class="wx-button wx-button--secondary" href="/dashboard">Dashboard</a>
+                <button class="wx-button wx-button--outline" type="button" @onclick="HandleSignOut">Sign Out</button>
+            }
+            else
+            {
+                <a class="wx-button wx-button--outline" href="/login">Sign In</a>
+            }
         </div>
     </div>
 </header>
@@ -28,16 +41,114 @@
 <header class="wx-mobile-header">
     <div class="wx-mobile-header__inner">
         <a class="brand-mark" href="@_brandHref">WanderX</a>
-        <a class="wx-button wx-button--outline" href="/guides">Guides</a>
+        <button class="mobile-menu-toggle" type="button" @onclick="ToggleDrawer" aria-label="Toggle menu">
+            <MaterialIcon Name="@(_isDrawerOpen ? "close" : "menu")" />
+        </button>
     </div>
 </header>
 
+@if (_isDrawerOpen)
+{
+    <div class="mobile-drawer-backdrop" @onclick="ToggleDrawer"></div>
+    <div class="mobile-drawer">
+        <div class="mobile-drawer__header">
+            <a class="brand-mark" href="@_brandHref" @onclick="ToggleDrawer">WanderX</a>
+            <button class="mobile-menu-toggle" type="button" @onclick="ToggleDrawer" aria-label="Close menu">
+                <MaterialIcon Name="close" />
+            </button>
+        </div>
+        <nav class="mobile-drawer__nav">
+            @if (_session?.IsGuide == true)
+            {
+                <div class="mobile-drawer__section-title">Guide Portal</div>
+                <a class="mobile-drawer__link" href="/guide-portal" @onclick="ToggleDrawer">
+                    <MaterialIcon Name="dashboard" /> Guide Portal
+                </a>
+                <a class="mobile-drawer__link" href="/guide-profile" @onclick="ToggleDrawer">
+                    <MaterialIcon Name="manage_accounts" /> Update Profile
+                </a>
+                <hr />
+            }
+            else if (_session?.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                <div class="mobile-drawer__section-title">Admin Controls</div>
+                <a class="mobile-drawer__link" href="/dashboard" @onclick="ToggleDrawer">
+                    <MaterialIcon Name="dashboard" /> Dashboard
+                </a>
+                <a class="mobile-drawer__link" href="/admin/tours" @onclick="ToggleDrawer">
+                    <MaterialIcon Name="travel_explore" /> Manage Tours
+                </a>
+                <a class="mobile-drawer__link" href="/guides" @onclick="ToggleDrawer">
+                    <MaterialIcon Name="badge" /> Manage Guides
+                </a>
+                <a class="mobile-drawer__link" href="/guide-assignments" @onclick="ToggleDrawer">
+                    <MaterialIcon Name="assignment_ind" /> Assignments
+                </a>
+                <hr />
+            }
+
+            <div class="mobile-drawer__section-title">Explore</div>
+            <a class="mobile-drawer__link" href="/#destinations" @onclick="ToggleDrawer">
+                <MaterialIcon Name="explore" /> Destinations
+            </a>
+            <a class="mobile-drawer__link" href="/#experiences" @onclick="ToggleDrawer">
+                <MaterialIcon Name="tour" /> Experiences
+            </a>
+            <a class="mobile-drawer__link" href="/#why-wanderx" @onclick="ToggleDrawer">
+                <MaterialIcon Name="info" /> Why WanderX
+            </a>
+            <a class="mobile-drawer__link" href="/guides" @onclick="ToggleDrawer">
+                <MaterialIcon Name="people" /> Tour Guides
+            </a>
+            
+            <hr />
+            
+            @if (_session is not null)
+            {
+                <div class="mobile-drawer__user">
+                    <MaterialIcon Name="account_circle" />
+                    <div>
+                        <div class="user-name">@_session.FullName</div>
+                        <div class="user-email">@_session.Email</div>
+                    </div>
+                </div>
+                <button class="wx-button wx-button--outline mobile-drawer__btn" type="button" @onclick="HandleSignOut">
+                    <MaterialIcon Name="logout" /> Sign Out
+                </button>
+            }
+            else
+            {
+                <a class="wx-button mobile-drawer__btn" href="/login" @onclick="ToggleDrawer">
+                    <MaterialIcon Name="login" /> Sign In
+                </a>
+                <a class="wx-button wx-button--outline mobile-drawer__btn" href="/register" @onclick="ToggleDrawer">
+                    <MaterialIcon Name="person_add" /> Create Account
+                </a>
+            }
+        </nav>
+    </div>
+}
+
 @code {
     private string _brandHref = "/";
+    private bool _isDrawerOpen;
+    private AuthSession? _session;
 
     protected override async Task OnInitializedAsync()
     {
-        var session = await AuthSession.GetAsync();
-        _brandHref = session?.IsGuide == true ? "/guide-portal" : "/";
+        _session = await AuthSession.GetAsync();
+        _brandHref = _session?.IsGuide == true ? "/guide-portal" : "/";
+    }
+
+    private void ToggleDrawer()
+    {
+        _isDrawerOpen = !_isDrawerOpen;
+    }
+
+    private async Task HandleSignOut()
+    {
+        _isDrawerOpen = false;
+        await AuthSession.ClearAsync();
+        Navigation.NavigateTo("/", forceLoad: true);
     }
 }

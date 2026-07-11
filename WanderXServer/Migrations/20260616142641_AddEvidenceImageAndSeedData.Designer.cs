@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WanderXServer.DataAccessLayer;
 
@@ -11,9 +12,11 @@ using WanderXServer.DataAccessLayer;
 namespace WanderXServer.Migrations
 {
     [DbContext(typeof(WanderXDbContext))]
-    partial class WanderXDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260616142641_AddEvidenceImageAndSeedData")]
+    partial class AddEvidenceImageAndSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

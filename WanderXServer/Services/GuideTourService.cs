@@ -167,13 +167,25 @@ public class GuideTourService : IGuideTourService
         assignment.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync();
+
+        if (!CanDecline(assignment.Status))
+        {
+            throw new InvalidOperationException("Only assigned or confirmed tours can be declined.");
+        }
+
+        assignment.Status = DeclinedStatus;
+        assignment.DeclineReason = request.Reason.Trim();
+        assignment.DeclinedAt = DateTime.UtcNow;
+        assignment.UpdatedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
         await RefreshGuideAvailabilityAsync(assignment.GuideProfile);
         await _dbContext.SaveChangesAsync();
 
         return ToResponse(assignment);
     }
 
-    public async Task<GuideTourAssignmentResponse> FinishAsync(Guid id)
+    public async Task<GuideTourAssignmentResponse> FinishAsync(Guid id, FinishTourRequest request)
     {
         var assignment = await FindAssignmentAsync(id);
 
@@ -183,6 +195,7 @@ public class GuideTourService : IGuideTourService
         }
 
         assignment.Status = FinishedStatus;
+        assignment.EvidenceImage = request.EvidenceImage;
         assignment.FinishedAt = DateTime.UtcNow;
         assignment.UpdatedAt = DateTime.UtcNow;
 
@@ -340,6 +353,7 @@ public class GuideTourService : IGuideTourService
             DeclineReason = assignment.DeclineReason,
             DeclinedAt = assignment.DeclinedAt,
             FinishedAt = assignment.FinishedAt,
+            EvidenceImage = assignment.EvidenceImage,
             IsCurrentBusyTour = IsCurrentBusyTour(assignment),
             CanDecline = CanDecline(assignment.Status),
             CanFinish = string.Equals(assignment.Status, ConfirmedStatus, StringComparison.OrdinalIgnoreCase)

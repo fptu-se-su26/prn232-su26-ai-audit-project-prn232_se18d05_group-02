@@ -1,14 +1,91 @@
+@implements IDisposable
+@inject NavigationManager Navigation
+@inject AuthSessionService AuthSession
+
 <nav class="mobile-bottom-nav" aria-label="Mobile">
-    <a class="active" href="#destinations">
-        <MaterialIcon Name="explore" />
-        Tours
-    </a>
-    <a href="#experiences">
-        <MaterialIcon Name="calendar_today" />
-        Schedule
-    </a>
-    <a href="/guide-profile">
-        <MaterialIcon Name="verified_user" />
-        Profile
-    </a>
+    @if (_session?.IsGuide == true)
+    {
+        <a class="@GetActiveCss("/guide-portal")" href="/guide-portal">
+            <MaterialIcon Name="calendar_month" />
+            Portal
+        </a>
+        <a class="@GetActiveCss("/guide-profile")" href="/guide-profile">
+            <MaterialIcon Name="account_circle" />
+            Profile
+        </a>
+        <a class="@GetActiveCss("/")" href="/">
+            <MaterialIcon Name="home" />
+            Home
+        </a>
+    }
+    else if (_session?.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true)
+    {
+        <a class="@GetActiveCss("/dashboard")" href="/dashboard">
+            <MaterialIcon Name="dashboard" />
+            Dashboard
+        </a>
+        <a class="@GetActiveCss("/admin/tours")" href="/admin/tours">
+            <MaterialIcon Name="travel_explore" />
+            Tours
+        </a>
+        <a class="@GetActiveCss("/guide-assignments")" href="/guide-assignments">
+            <MaterialIcon Name="assignment_ind" />
+            Assigns
+        </a>
+    }
+    else
+    {
+        <a class="@GetActiveCss("/")" href="/">
+            <MaterialIcon Name="home" />
+            Home
+        </a>
+        <a class="@GetActiveCss("/guides")" href="/guides">
+            <MaterialIcon Name="people" />
+            Guides
+        </a>
+        <a class="@GetActiveCss("/login")" href="/login">
+            <MaterialIcon Name="login" />
+            Sign In
+        </a>
+    }
 </nav>
+
+@code {
+    private AuthSession? _session;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _session = await AuthSession.GetAsync();
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+    private string GetActiveCss(string href)
+    {
+        var relative = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0].Trim('/');
+        var target = href.Trim('/');
+        
+        bool isActive;
+        if (string.IsNullOrEmpty(target))
+        {
+            isActive = string.IsNullOrEmpty(relative);
+        }
+        else
+        {
+            isActive = relative.Equals(target, StringComparison.OrdinalIgnoreCase) || 
+                       (target == "dashboard" && relative.Equals("admin-dashboard", StringComparison.OrdinalIgnoreCase));
+        }
+
+        return isActive ? "active" : "";
+    }
+}
+

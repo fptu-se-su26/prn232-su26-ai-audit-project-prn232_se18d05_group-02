@@ -8,7 +8,7 @@
     <base href="/" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
@@ -37,6 +37,43 @@
 
             if (element) {
                 element.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        };
+        window.wanderXCamera = {
+            startCamera: async function (videoElementId) {
+                try {
+                    const video = document.getElementById(videoElementId);
+                    if (!video) return false;
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: "environment" },
+                        audio: false
+                    });
+                    video.srcObject = stream;
+                    video.setAttribute("playsinline", true);
+                    video.play();
+                    return true;
+                } catch (e) {
+                    console.error("Camera access failed:", e);
+                    return false;
+                }
+            },
+            stopCamera: function (videoElementId) {
+                const video = document.getElementById(videoElementId);
+                if (video && video.srcObject) {
+                    const tracks = video.srcObject.getTracks();
+                    tracks.forEach(track => track.stop());
+                    video.srcObject = null;
+                }
+            },
+            captureFrame: function (videoElementId) {
+                const video = document.getElementById(videoElementId);
+                if (!video || !video.videoWidth) return null;
+                const canvas = document.createElement("canvas");
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                return canvas.toDataURL("image/jpeg", 0.85);
             }
         };
     </script>

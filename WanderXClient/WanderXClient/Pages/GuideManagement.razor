@@ -16,8 +16,8 @@
                 <MaterialIcon Name="dashboard" />
                 Dashboard
             </a>
-            <a class="guide-sidebar__link" href="/">
-                <MaterialIcon Name="explore" />
+            <a class="guide-sidebar__link" href="/admin/tours">
+                <MaterialIcon Name="travel_explore" />
                 Tours
             </a>
             <a class="guide-sidebar__link" href="/">
@@ -328,6 +328,7 @@
             }
         </section>
     </main>
+    <MobileBottomNav />
 </div>
 
 @code {
@@ -375,7 +376,7 @@
     {
         0 => "Select languages",
         1 => _form.SelectedLanguages[0],
-        _ => $"{_form.SelectedLanguages.Count} languages selected"
+        _ => string.Join(", ", _form.SelectedLanguages)
     };
 
     protected override async Task OnInitializedAsync()

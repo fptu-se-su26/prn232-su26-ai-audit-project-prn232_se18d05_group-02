@@ -15,6 +15,10 @@
                 <MaterialIcon Name="dashboard" />
                 Dashboard
             </a>
+            <a class="guide-sidebar__link" href="/admin/tours">
+                <MaterialIcon Name="travel_explore" />
+                Tours
+            </a>
             <a class="guide-sidebar__link" href="/guides">
                 <MaterialIcon Name="badge" />
                 Guides
@@ -42,9 +46,9 @@
         <section class="guide-content">
             <div class="guide-stat-grid">
                 <article class="guide-stat">
-                    <p>Guide Management</p>
+                    <p>Tour Management</p>
                     <strong>01</strong>
-                    <span>Manage guide accounts and profiles</span>
+                    <span>Manage travel tour packages</span>
                 </article>
                 <article class="guide-stat guide-stat--secondary">
                     <p>Assignments</p>
@@ -74,6 +78,10 @@
                             <MaterialIcon Name="badge" />
                             Open Guides
                         </a>
+                        <a class="wx-button" href="/admin/tours">
+                            <MaterialIcon Name="travel_explore" />
+                            Open Tours
+                        </a>
                         <a class="wx-button wx-button--secondary" href="/guide-assignments">
                             <MaterialIcon Name="assignment_ind" />
                             Open Assignments
@@ -84,4 +92,5 @@
             </section>
         </section>
     </main>
+    <MobileBottomNav />
 </div>
