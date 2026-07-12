@@ -29,5 +29,10 @@ builder.Services.AddScoped(_ =>
     var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
     return new TourApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 });
+builder.Services.AddScoped(_ =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    return new TourScheduleApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+});
 
 await builder.Build().RunAsync();

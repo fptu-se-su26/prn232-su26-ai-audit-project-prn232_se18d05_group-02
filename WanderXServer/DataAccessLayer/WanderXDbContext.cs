@@ -23,6 +23,8 @@ public class WanderXDbContext : DbContext
 
     public DbSet<Tour> Tours => Set<Tour>();
 
+    public DbSet<TourSchedule> TourSchedules => Set<TourSchedule>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -142,6 +144,7 @@ public class WanderXDbContext : DbContext
                 Name = tour.Name,
                 Destination = tour.Destination,
                 Region = tour.Region,
+                ScheduleTourId = tour.ScheduleTourId,
                 DurationDays = tour.DurationDays,
                 Price = tour.Price,
                 Capacity = tour.Capacity,
@@ -153,6 +156,20 @@ public class WanderXDbContext : DbContext
             .ToArray();
 
         modelBuilder.Entity<Tour>().HasData(toursToSeed);
+
+        modelBuilder.Entity<Tour>()
+            .HasAlternateKey(tour => tour.ScheduleTourId);
+
+        modelBuilder.Entity<Tour>()
+            .Property(tour => tour.Price)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<TourSchedule>()
+            .HasOne(schedule => schedule.Tour)
+            .WithMany(tour => tour.Schedules)
+            .HasForeignKey(schedule => schedule.TourId)
+            .HasPrincipalKey(tour => tour.ScheduleTourId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static Guid CreateGuidFromEmail(string key, string type)
@@ -165,8 +182,7 @@ public class WanderXDbContext : DbContext
     public void SeedDevelopmentData()
     {
         Database.EnsureCreated();
-        EnsureGuideTourAssignmentsTable();
-        EnsureToursTable();
+        EnsureApplicationSchema();
 
         var passwordHasher = new PasswordHasher<ApplicationUser>();
 
@@ -191,6 +207,18 @@ public class WanderXDbContext : DbContext
             }
             SaveChanges();
         }
+    }
+
+    public void EnsureApplicationSchema()
+    {
+        EnsureGuideTourAssignmentsTable();
+        EnsureTourStorage();
+    }
+
+    public void EnsureTourStorage()
+    {
+        EnsureToursTable();
+        EnsureTourSchedulesTable();
     }
 
     private void EnsureGuideTourAssignmentsTable()
@@ -244,6 +272,7 @@ BEGIN
         [Name] nvarchar(160) NOT NULL,
         [Destination] nvarchar(160) NOT NULL,
         [Region] nvarchar(160) NOT NULL,
+        [ScheduleTourId] int NOT NULL,
         [DurationDays] int NOT NULL,
         [Price] decimal(18,2) NOT NULL,
         [Capacity] int NOT NULL,
@@ -256,6 +285,71 @@ BEGIN
     );
 
     CREATE UNIQUE INDEX [IX_Tours_Code] ON [Tours] ([Code]);
+END
+""");
+
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Tours', 'ScheduleTourId') IS NULL
+BEGIN
+    ALTER TABLE [Tours] ADD [ScheduleTourId] int NULL;
+END
+""");
+
+        Database.ExecuteSqlRaw("""
+;WITH NumberedTours AS (
+    SELECT [Id], ROW_NUMBER() OVER (ORDER BY [CreatedAt], [Code]) AS RowNumber
+    FROM [Tours]
+    WHERE [ScheduleTourId] IS NULL
+)
+UPDATE Tours
+SET [ScheduleTourId] = NumberedTours.RowNumber
+FROM [Tours]
+INNER JOIN NumberedTours ON Tours.[Id] = NumberedTours.[Id]
+WHERE Tours.[ScheduleTourId] IS NULL;
+""");
+
+        Database.ExecuteSqlRaw("""
+IF EXISTS (
+    SELECT 1
+    FROM sys.columns
+    WHERE object_id = OBJECT_ID('Tours')
+        AND name = 'ScheduleTourId'
+        AND is_nullable = 1
+)
+BEGIN
+    ALTER TABLE [Tours] ALTER COLUMN [ScheduleTourId] int NOT NULL;
+END
+""");
+
+        Database.ExecuteSqlRaw("""
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'AK_Tours_ScheduleTourId' AND object_id = OBJECT_ID('Tours'))
+BEGIN
+    CREATE UNIQUE INDEX [AK_Tours_ScheduleTourId] ON [Tours] ([ScheduleTourId]);
+END
+""");
+    }
+
+    private void EnsureTourSchedulesTable()
+    {
+        Database.ExecuteSqlRaw("""
+IF OBJECT_ID(N'[TourSchedules]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [TourSchedules] (
+        [Id] int IDENTITY(1,1) NOT NULL,
+        [TourId] int NOT NULL,
+        [DayNumber] int NOT NULL,
+        [ScheduleDate] datetime2 NOT NULL,
+        [Title] nvarchar(160) NOT NULL,
+        [Description] nvarchar(1200) NOT NULL,
+        [Location] nvarchar(160) NOT NULL,
+        [StartTime] time NOT NULL,
+        [EndTime] time NOT NULL,
+        [SortOrder] int NOT NULL,
+        CONSTRAINT [PK_TourSchedules] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TourSchedules_Tours_TourId] FOREIGN KEY ([TourId]) REFERENCES [Tours] ([ScheduleTourId]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_TourSchedules_TourId_ScheduleDate_DayNumber_SortOrder] ON [TourSchedules] ([TourId], [ScheduleDate], [DayNumber], [SortOrder]);
 END
 """);
     }
@@ -285,6 +379,7 @@ END
                 Name = tour.Name,
                 Destination = tour.Destination,
                 Region = tour.Region,
+                ScheduleTourId = tour.ScheduleTourId,
                 DurationDays = tour.DurationDays,
                 Price = tour.Price,
                 Capacity = tour.Capacity,
@@ -554,6 +649,7 @@ END
     private static readonly DevelopmentTour[] DevelopmentTours =
     {
         new(
+            1,
             "WX-HUE-226",
             "Hue Imperial Heritage",
             "Hue, Vietnam",
@@ -565,6 +661,7 @@ END
             "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
             "A private heritage route through Hue's imperial citadel, royal cuisine, dragon boat moments, and quiet garden houses."),
         new(
+            2,
             "WX-KYO-330",
             "Kyoto Culinary Immersion",
             "Kyoto, Japan",
@@ -576,6 +673,7 @@ END
             "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80",
             "Seasonal market walks, tea ceremony coordination, private kitchens, and a polished kaiseki dining story."),
         new(
+            3,
             "WX-SAF-718",
             "Serengeti Conservation Safari",
             "Serengeti, Tanzania",
@@ -587,6 +685,7 @@ END
             "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=80",
             "Conservation-first safari planning with daily field logistics, wildlife interpretation, and lodge handoffs."),
         new(
+            4,
             "WX-ADR-884",
             "Croatian Islands by Sail",
             "Split, Croatia",
@@ -627,6 +726,7 @@ END
         string? DeclineReason = null);
 
     private sealed record DevelopmentTour(
+        int ScheduleTourId,
         string Code,
         string Name,
         string Destination,

@@ -19,6 +19,8 @@ public class TourService : ITourService
 
     public async Task<IReadOnlyList<TourResponse>> GetAllAsync(string? search, string? status)
     {
+        _dbContext.EnsureTourStorage();
+
         var tours = _dbContext.Tours.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -46,11 +48,15 @@ public class TourService : ITourService
 
     public async Task<TourResponse> GetByIdAsync(Guid id)
     {
+        _dbContext.EnsureTourStorage();
+
         return ToResponse(await FindTourAsync(id));
     }
 
     public async Task<TourResponse> CreateAsync(CreateTourRequest request)
     {
+        _dbContext.EnsureTourStorage();
+
         ValidateStatus(request.Status);
         var code = NormalizeCode(request.Code);
         ValidateTourCode(code);
@@ -75,6 +81,7 @@ public class TourService : ITourService
             Name = request.Name.Trim(),
             Destination = request.Destination.Trim(),
             Region = request.Region.Trim(),
+            ScheduleTourId = await GetNextScheduleTourIdAsync(),
             DurationDays = request.DurationDays,
             Price = request.Price,
             Capacity = request.Capacity,
@@ -92,6 +99,8 @@ public class TourService : ITourService
 
     public async Task<TourResponse> UpdateAsync(Guid id, UpdateTourRequest request)
     {
+        _dbContext.EnsureTourStorage();
+
         ValidateStatus(request.Status);
         var tour = await FindTourAsync(id);
         var code = NormalizeCode(request.Code);
@@ -130,6 +139,8 @@ public class TourService : ITourService
 
     public async Task DeleteAsync(Guid id)
     {
+        _dbContext.EnsureTourStorage();
+
         var tour = await FindTourAsync(id);
         _dbContext.Tours.Remove(tour);
         await _dbContext.SaveChangesAsync();
@@ -238,6 +249,12 @@ public class TourService : ITourService
     private static string NormalizeCode(string code)
     {
         return code.Trim().ToUpperInvariant();
+    }
+
+    private async Task<int> GetNextScheduleTourIdAsync()
+    {
+        var maxId = await _dbContext.Tours.MaxAsync(tour => (int?)tour.ScheduleTourId) ?? 0;
+        return maxId + 1;
     }
 
     private static TourResponse ToResponse(Tour tour)

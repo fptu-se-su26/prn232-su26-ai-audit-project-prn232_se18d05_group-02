@@ -1,0 +1,639 @@
+@page "/admin/tour-schedules"
+@layout AdminLayout
+@using System.ComponentModel.DataAnnotations
+@using System.Globalization
+@inject TourScheduleApiClient ScheduleApi
+
+<PageTitle>Tour Schedules - WanderX</PageTitle>
+
+<header class="guide-topbar">
+    <div>
+        <p class="guide-eyebrow">Tour Itinerary</p>
+        <h1>Manage Schedules</h1>
+        <p class="guide-subtitle">Create, filter, reorder, and review tour itinerary items.</p>
+    </div>
+
+    <div class="guide-topbar__actions">
+        <button class="wx-button wx-button--secondary" type="button" @onclick="OpenCreateForm">
+            <MaterialIcon Name="add" />
+            Add Schedule
+        </button>
+    </div>
+</header>
+
+<section class="guide-content">
+    <section class="tour-planner-filter">
+        <div class="tour-planner-filter__main">
+            <div class="guide-field">
+                <label>Tour</label>
+                <InputSelect class="guide-control" @bind-Value="_filterTourId">
+                    <option value="0">All tours</option>
+                    @foreach (var tour in _tourOptions)
+                    {
+                        <option value="@tour.TourId">@tour.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="guide-field">
+                <label>Calendar date</label>
+                <InputDate class="guide-control" @bind-Value="_filterDate" />
+            </div>
+            <div class="guide-field">
+                <label>Month / Year</label>
+                <input class="guide-control" type="month" value="@_filterMonthValue" @onchange="OnMonthChanged" />
+            </div>
+        </div>
+        <div class="tour-planner-filter__actions">
+            <button class="wx-button" type="button" @onclick="LoadSchedulesAsync">
+                <MaterialIcon Name="filter_alt" />
+                Filter
+            </button>
+            <button class="wx-button wx-button--outline" type="button" @onclick="ClearFilters">
+                Clear
+            </button>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(_message))
+    {
+        <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")">
+            @_message
+        </div>
+    }
+
+    @if (_isFormOpen)
+    {
+        <div class="admin-tour-modal-backdrop" @onclick="CloseForm">
+            <section class="admin-tour-modal" role="dialog" aria-modal="true" aria-labelledby="schedule-form-title" @onclick:stopPropagation="true">
+                <div class="guide-section-heading admin-tour-modal__header">
+                    <div>
+                        <p class="guide-eyebrow">@(_editingScheduleId is null ? "New schedule" : "Edit schedule")</p>
+                        <h2 id="schedule-form-title">@(_editingScheduleId is null ? "Add Tour Schedule" : "Update Tour Schedule")</h2>
+                    </div>
+                    <button class="guide-icon-button" type="button" title="Close popup" @onclick="CloseForm">
+                        <MaterialIcon Name="close" />
+                    </button>
+                </div>
+
+                <EditForm Model="@_form" OnValidSubmit="SaveScheduleAsync" class="guide-form admin-tour-modal__body">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="guide-form-grid">
+                        <div class="guide-field guide-field--wide">
+                            <label>Tour</label>
+                            <InputSelect class="guide-control" @bind-Value="_form.TourId">
+                                <option value="0">Choose tour</option>
+                                @foreach (var tour in _tourOptions)
+                                {
+                                    <option value="@tour.TourId">@tour.Name</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => _form.TourId)" />
+                        </div>
+                        <div class="guide-field">
+                            <label>Schedule date</label>
+                            <InputDate class="guide-control" @bind-Value="_form.ScheduleDate" />
+                            <ValidationMessage For="@(() => _form.ScheduleDate)" />
+                        </div>
+                        <div class="guide-field">
+                            <label>Day number</label>
+                            <InputNumber class="guide-control" @bind-Value="_form.DayNumber" />
+                            <ValidationMessage For="@(() => _form.DayNumber)" />
+                        </div>
+                        <div class="guide-field guide-field--wide">
+                            <label>Title</label>
+                            <InputText class="guide-control" @bind-Value="_form.Title" />
+                            <ValidationMessage For="@(() => _form.Title)" />
+                        </div>
+                        <div class="guide-field">
+                            <label>Location</label>
+                            <InputText class="guide-control" @bind-Value="_form.Location" />
+                            <ValidationMessage For="@(() => _form.Location)" />
+                        </div>
+                        <div class="guide-field">
+                            <label>Start time</label>
+                            <input type="time" class="guide-control" value="@_form.StartTime" @onchange="OnStartTimeChanged" />
+                            <ValidationMessage For="@(() => _form.StartTime)" />
+                        </div>
+                        <div class="guide-field">
+                            <label>End time</label>
+                            <input type="time" class="guide-control" value="@_form.EndTime" @onchange="OnEndTimeChanged" />
+                            <ValidationMessage For="@(() => _form.EndTime)" />
+                        </div>
+                        <div class="guide-field">
+                            <label>Sort order</label>
+                            <InputNumber class="guide-control" @bind-Value="_form.SortOrder" />
+                            <ValidationMessage For="@(() => _form.SortOrder)" />
+                        </div>
+                    </div>
+
+                    <div class="guide-field">
+                        <label>Description</label>
+                        <InputTextArea class="guide-control guide-control--area" @bind-Value="_form.Description" />
+                        <ValidationMessage For="@(() => _form.Description)" />
+                    </div>
+
+                    <div class="guide-form-actions admin-tour-modal__actions">
+                        <button class="wx-button" type="submit" disabled="@_isSaving">
+                            <MaterialIcon Name="save" />
+                            @(_isSaving ? "Saving..." : "Save Schedule")
+                        </button>
+                        <button class="wx-button wx-button--outline" type="button" @onclick="CloseForm">Cancel</button>
+                    </div>
+                </EditForm>
+            </section>
+        </div>
+    }
+
+    @if (_details is not null)
+    {
+        <div class="admin-tour-modal-backdrop" @onclick="CloseDetails">
+            <section class="admin-tour-modal" role="dialog" aria-modal="true" @onclick:stopPropagation="true">
+                <div class="guide-section-heading admin-tour-modal__header">
+                    <div>
+                        <p class="guide-eyebrow">@_details.DayOfWeek, @_details.ScheduleDate.ToString("dd/MM/yyyy")</p>
+                        <h2>@_details.Title</h2>
+                    </div>
+                    <button class="guide-icon-button" type="button" title="Close details" @onclick="CloseDetails">
+                        <MaterialIcon Name="close" />
+                    </button>
+                </div>
+                <div class="admin-tour-modal__body tour-schedule-details">
+                    <p><strong>Tour:</strong> @_details.TourName</p>
+                    <p><strong>Day:</strong> @_details.DayNumber | <strong>Order:</strong> @_details.SortOrder</p>
+                    <p><strong>Location:</strong> @_details.Location</p>
+                    <p><strong>Time:</strong> @FormatTime(_details.StartTime) - @FormatTime(_details.EndTime)</p>
+                    <p>@_details.Description</p>
+                </div>
+            </section>
+        </div>
+    }
+
+    <section class="tour-planner-shell">
+        <div class="tour-planner-toolbar">
+            <div>
+                <p class="guide-eyebrow">Weekly view</p>
+                <strong>@WeekStart.ToString("dd/MM") - @WeekEnd.ToString("dd/MM/yyyy")</strong>
+                <span>@WeekSchedules.Count schedule(s)</span>
+            </div>
+            <div class="tour-planner-toolbar__nav">
+                <button class="guide-icon-button" type="button" title="Previous week" @onclick="PreviousWeek">
+                    <MaterialIcon Name="chevron_left" />
+                </button>
+                <button class="guide-filter" type="button" @onclick="CurrentWeek">This week</button>
+                <button class="guide-icon-button" type="button" title="Next week" @onclick="NextWeek">
+                    <MaterialIcon Name="chevron_right" />
+                </button>
+            </div>
+        </div>
+
+        @if (_isLoading)
+        {
+            <div class="guide-empty guide-empty--compact">Loading schedules...</div>
+        }
+        else
+        {
+            <div class="tour-week-calendar">
+                @foreach (var day in WeekDays)
+                {
+                    var daySchedules = GetSchedulesForDay(day).ToList();
+
+                    <article class="@GetDayColumnClass(day)">
+                        <header class="tour-week-day__header">
+                            <span>@day.ToString("ddd", CultureInfo.InvariantCulture).ToUpperInvariant()</span>
+                            <strong>@day.ToString("dd/MM")</strong>
+                        </header>
+
+                        <div class="tour-week-day__body">
+                            @if (daySchedules.Count == 0)
+                            {
+                                <div class="tour-week-empty">No itinerary</div>
+                            }
+                            else
+                            {
+                                @foreach (var schedule in daySchedules)
+                                {
+                                    <section class="tour-schedule-card">
+                                        <div class="tour-schedule-card__time">
+                                            <MaterialIcon Name="schedule" />
+                                            @FormatTime(schedule.StartTime) - @FormatTime(schedule.EndTime)
+                                        </div>
+                                        <h3>@schedule.Title</h3>
+                                        <p>@schedule.Location</p>
+                                        <span class="tour-schedule-card__tour">@schedule.TourName</span>
+                                        <div class="tour-schedule-card__meta">
+                                            <span>Day @schedule.DayNumber</span>
+                                            <span>Order @schedule.SortOrder</span>
+                                        </div>
+                                        <div class="tour-schedule-card__actions">
+                                            @if (_pendingDeleteScheduleId == schedule.Id)
+                                            {
+                                                <button class="guide-icon-button guide-icon-button--danger" type="button" title="Confirm delete" @onclick="() => DeleteScheduleAsync(schedule.Id)">
+                                                    <MaterialIcon Name="check" />
+                                                </button>
+                                                <button class="guide-icon-button" type="button" title="Cancel delete" @onclick="CancelDelete">
+                                                    <MaterialIcon Name="close" />
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="guide-icon-button" type="button" title="Move up" @onclick="() => MoveAsync(schedule.Id, true)">
+                                                    <MaterialIcon Name="keyboard_arrow_up" />
+                                                </button>
+                                                <button class="guide-icon-button" type="button" title="Move down" @onclick="() => MoveAsync(schedule.Id, false)">
+                                                    <MaterialIcon Name="keyboard_arrow_down" />
+                                                </button>
+                                                <button class="guide-icon-button" type="button" title="Details" @onclick="() => ShowDetails(schedule)">
+                                                    <MaterialIcon Name="visibility" />
+                                                </button>
+                                                <button class="guide-icon-button" type="button" title="Edit" @onclick="() => OpenEditForm(schedule)">
+                                                    <MaterialIcon Name="edit" />
+                                                </button>
+                                                <button class="guide-icon-button guide-icon-button--danger" type="button" title="Delete" @onclick="() => ConfirmDelete(schedule.Id)">
+                                                    <MaterialIcon Name="delete" />
+                                                </button>
+                                            }
+                                        </div>
+                                    </section>
+                                }
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </section>
+</section>
+
+@code {
+    private List<TourScheduleResponse> _schedules = new();
+    private List<TourScheduleTourOptionResponse> _tourOptions = new();
+    private ScheduleFormModel _form = new();
+    private TourScheduleResponse? _details;
+    private int? _editingScheduleId;
+    private int? _pendingDeleteScheduleId;
+    private int _filterTourId;
+    private DateTime? _filterDate;
+    private string? _filterMonthValue;
+    private bool _isLoading = true;
+    private bool _isSaving;
+    private bool _isFormOpen;
+    private bool _isError;
+    private string? _message;
+
+    private DateTime WeekAnchor => _filterDate?.Date ?? DateTime.Today;
+
+    private DateTime WeekStart => WeekAnchor.AddDays(-(((int)WeekAnchor.DayOfWeek + 6) % 7));
+
+    private DateTime WeekEnd => WeekStart.AddDays(6);
+
+    private IEnumerable<DateTime> WeekDays => Enumerable.Range(0, 7).Select(offset => WeekStart.AddDays(offset));
+
+    private List<TourScheduleResponse> WeekSchedules => _schedules
+        .Where(schedule => schedule.ScheduleDate.Date >= WeekStart && schedule.ScheduleDate.Date <= WeekEnd)
+        .OrderBy(schedule => schedule.ScheduleDate)
+        .ThenBy(schedule => schedule.StartTime)
+        .ThenBy(schedule => schedule.SortOrder)
+        .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInitialDataAsync();
+    }
+
+    private async Task LoadInitialDataAsync()
+    {
+        try
+        {
+            _tourOptions = await ScheduleApi.GetTourOptionsAsync();
+            await LoadSchedulesAsync();
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ex.Message;
+            _isLoading = false;
+        }
+    }
+
+    private async Task LoadSchedulesAsync()
+    {
+        _isLoading = true;
+        _message = null;
+
+        try
+        {
+            var (month, year) = ParseMonthFilter();
+            _schedules = await ScheduleApi.GetSchedulesAsync(
+                _filterTourId == 0 ? null : _filterTourId,
+                null,
+                month,
+                year);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task ClearFilters()
+    {
+        _filterTourId = 0;
+        _filterDate = null;
+        _filterMonthValue = null;
+        await LoadSchedulesAsync();
+    }
+
+    private void OnMonthChanged(ChangeEventArgs args)
+    {
+        _filterMonthValue = args.Value?.ToString();
+    }
+
+    private async Task PreviousWeek()
+    {
+        _filterDate = WeekAnchor.AddDays(-7);
+        await LoadSchedulesAsync();
+    }
+
+    private async Task NextWeek()
+    {
+        _filterDate = WeekAnchor.AddDays(7);
+        await LoadSchedulesAsync();
+    }
+
+    private async Task CurrentWeek()
+    {
+        _filterDate = DateTime.Today;
+        await LoadSchedulesAsync();
+    }
+
+    private void OpenCreateForm()
+    {
+        _form = new ScheduleFormModel
+        {
+            TourId = _filterTourId,
+            SortOrder = _schedules.Count + 1
+        };
+        _editingScheduleId = null;
+        _isFormOpen = true;
+        _message = null;
+    }
+
+    private void OpenEditForm(TourScheduleResponse schedule)
+    {
+        _form = ScheduleFormModel.FromSchedule(schedule);
+        _editingScheduleId = schedule.Id;
+        _isFormOpen = true;
+        _message = null;
+    }
+
+    private void CloseForm()
+    {
+        _isFormOpen = false;
+        _editingScheduleId = null;
+        _form = new ScheduleFormModel();
+    }
+
+    private void OnStartTimeChanged(ChangeEventArgs args)
+    {
+        _form.StartTime = args.Value?.ToString() ?? string.Empty;
+    }
+
+    private void OnEndTimeChanged(ChangeEventArgs args)
+    {
+        _form.EndTime = args.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task SaveScheduleAsync()
+    {
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            if (_editingScheduleId is int id)
+            {
+                await ScheduleApi.UpdateAsync(id, _form.ToUpdateRequest());
+                _message = "Tour schedule updated.";
+            }
+            else
+            {
+                await ScheduleApi.CreateAsync(_form.ToCreateRequest());
+                _message = "Tour schedule created.";
+            }
+
+            CloseForm();
+            await LoadSchedulesAsync();
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ex.Message;
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void ShowDetails(TourScheduleResponse schedule)
+    {
+        _details = schedule;
+    }
+
+    private void CloseDetails()
+    {
+        _details = null;
+    }
+
+    private void ConfirmDelete(int id)
+    {
+        _pendingDeleteScheduleId = id;
+        _isError = false;
+        _message = "Click the check button to confirm deleting this schedule.";
+    }
+
+    private void CancelDelete()
+    {
+        _pendingDeleteScheduleId = null;
+        _message = null;
+    }
+
+    private async Task DeleteScheduleAsync(int id)
+    {
+        try
+        {
+            await ScheduleApi.DeleteAsync(id);
+            _pendingDeleteScheduleId = null;
+            _message = "Tour schedule deleted.";
+            _isError = false;
+            await LoadSchedulesAsync();
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ex.Message;
+        }
+    }
+
+    private async Task MoveAsync(int id, bool up)
+    {
+        try
+        {
+            if (up)
+            {
+                await ScheduleApi.MoveUpAsync(id);
+            }
+            else
+            {
+                await ScheduleApi.MoveDownAsync(id);
+            }
+
+            await LoadSchedulesAsync();
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ex.Message;
+        }
+    }
+
+    private static string FormatTime(TimeSpan time)
+    {
+        return time.ToString(@"hh\:mm");
+    }
+
+    private IEnumerable<TourScheduleResponse> GetSchedulesForDay(DateTime day)
+    {
+        return _schedules
+            .Where(schedule => schedule.ScheduleDate.Date == day.Date)
+            .OrderBy(schedule => schedule.StartTime)
+            .ThenBy(schedule => schedule.SortOrder);
+    }
+
+    private string GetDayColumnClass(DateTime day)
+    {
+        return day.Date == DateTime.Today
+            ? "tour-week-day tour-week-day--today"
+            : "tour-week-day";
+    }
+
+    private (int? Month, int? Year) ParseMonthFilter()
+    {
+        if (string.IsNullOrWhiteSpace(_filterMonthValue) ||
+            !DateTime.TryParseExact(_filterMonthValue, "yyyy-MM", CultureInfo.InvariantCulture, DateTimeStyles.None, out var month))
+        {
+            return (null, null);
+        }
+
+        _filterDate ??= month;
+        return (month.Month, month.Year);
+    }
+
+    private sealed class ScheduleFormModel : IValidatableObject
+    {
+        [Range(1, int.MaxValue, ErrorMessage = "Please choose a tour.")]
+        public int TourId { get; set; }
+
+        [Range(1, 365, ErrorMessage = "Day number must be between 1 and 365.")]
+        public int DayNumber { get; set; } = 1;
+
+        [Required(ErrorMessage = "Schedule date is required.")]
+        public DateTime ScheduleDate { get; set; } = DateTime.Today;
+
+        [Required(ErrorMessage = "Title is required.")]
+        [StringLength(160, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 160 characters.")]
+        public string Title { get; set; } = string.Empty;
+
+        [StringLength(1200, ErrorMessage = "Description must be 1200 characters or fewer.")]
+        public string Description { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Location is required.")]
+        [StringLength(160, MinimumLength = 2, ErrorMessage = "Location must be between 2 and 160 characters.")]
+        public string Location { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Start time is required.")]
+        public string StartTime { get; set; } = "08:00";
+
+        [Required(ErrorMessage = "End time is required.")]
+        public string EndTime { get; set; } = "09:00";
+
+        [Range(1, 1000, ErrorMessage = "Sort order must be between 1 and 1000.")]
+        public int SortOrder { get; set; } = 1;
+
+        public static ScheduleFormModel FromSchedule(TourScheduleResponse schedule)
+        {
+            return new ScheduleFormModel
+            {
+                TourId = schedule.TourId,
+                DayNumber = schedule.DayNumber,
+                ScheduleDate = schedule.ScheduleDate,
+                Title = schedule.Title,
+                Description = schedule.Description,
+                Location = schedule.Location,
+                StartTime = schedule.StartTime.ToString(@"hh\:mm"),
+                EndTime = schedule.EndTime.ToString(@"hh\:mm"),
+                SortOrder = schedule.SortOrder
+            };
+        }
+
+        public CreateTourScheduleRequest ToCreateRequest()
+        {
+            return new CreateTourScheduleRequest
+            {
+                TourId = TourId,
+                DayNumber = DayNumber,
+                ScheduleDate = ScheduleDate,
+                Title = Title,
+                Description = Description,
+                Location = Location,
+                StartTime = TimeSpan.Parse(StartTime),
+                EndTime = TimeSpan.Parse(EndTime),
+                SortOrder = SortOrder
+            };
+        }
+
+        public UpdateTourScheduleRequest ToUpdateRequest()
+        {
+            return new UpdateTourScheduleRequest
+            {
+                TourId = TourId,
+                DayNumber = DayNumber,
+                ScheduleDate = ScheduleDate,
+                Title = Title,
+                Description = Description,
+                Location = Location,
+                StartTime = TimeSpan.Parse(StartTime),
+                EndTime = TimeSpan.Parse(EndTime),
+                SortOrder = SortOrder
+            };
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!TimeSpan.TryParse(StartTime, out var startTime))
+            {
+                yield return new ValidationResult("Start time is invalid.", new[] { nameof(StartTime) });
+            }
+
+            if (!TimeSpan.TryParse(EndTime, out var endTime))
+            {
+                yield return new ValidationResult("End time is invalid.", new[] { nameof(EndTime) });
+            }
+
+            if (TimeSpan.TryParse(StartTime, out startTime) &&
+                TimeSpan.TryParse(EndTime, out endTime) &&
+                endTime <= startTime)
+            {
+                yield return new ValidationResult("End time must be later than start time.", new[] { nameof(EndTime) });
+            }
+        }
+    }
+}

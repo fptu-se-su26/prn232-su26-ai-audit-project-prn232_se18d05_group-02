@@ -9,6 +9,8 @@ public class Tour
     [Key]
     public Guid Id { get; set; } = Guid.NewGuid();
 
+    public int ScheduleTourId { get; set; }
+
     [Required]
     [StringLength(32)]
     public string Code { get; set; } = string.Empty;
@@ -47,4 +49,6 @@ public class Tour
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdatedAt { get; set; }
+
+    public ICollection<TourSchedule> Schedules { get; set; } = new List<TourSchedule>();
 }

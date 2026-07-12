@@ -3269,3 +3269,227 @@ code {
     from { transform: translateX(100%); }
     to { transform: translateX(0); }
 }
+
+.tour-planner-filter,
+.tour-planner-shell {
+    border: 1px solid rgba(195, 198, 214, 0.62);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 36px rgba(15, 23, 42, 0.06);
+}
+
+.tour-planner-filter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: end;
+    padding: 18px;
+}
+
+.tour-planner-filter__main {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.2fr) minmax(180px, 0.8fr) minmax(180px, 0.8fr);
+    gap: 16px;
+}
+
+.tour-planner-filter__actions,
+.tour-planner-toolbar,
+.tour-planner-toolbar__nav,
+.tour-schedule-card__actions,
+.tour-schedule-card__meta,
+.tour-schedule-card__time {
+    display: flex;
+    align-items: center;
+}
+
+.tour-planner-filter__actions {
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.tour-planner-shell {
+    overflow: hidden;
+}
+
+.tour-planner-toolbar {
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(195, 198, 214, 0.52);
+}
+
+.tour-planner-toolbar strong {
+    display: block;
+    color: var(--wx-ink);
+    font-size: 22px;
+    line-height: 1.1;
+}
+
+.tour-planner-toolbar span {
+    display: block;
+    margin-top: 6px;
+    color: var(--wx-muted);
+    font-weight: 750;
+}
+
+.tour-planner-toolbar__nav {
+    gap: 8px;
+}
+
+.tour-week-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(180px, 1fr));
+    min-height: 560px;
+    overflow-x: auto;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.tour-week-day {
+    min-width: 180px;
+    border-right: 1px solid rgba(195, 198, 214, 0.52);
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.tour-week-day:last-child {
+    border-right: 0;
+}
+
+.tour-week-day--today {
+    background: linear-gradient(180deg, rgba(255, 86, 97, 0.08), rgba(255, 255, 255, 0.86));
+}
+
+.tour-week-day__header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 14px;
+    border-bottom: 1px solid rgba(195, 198, 214, 0.52);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+}
+
+.tour-week-day__header span {
+    display: block;
+    color: var(--wx-outline-strong);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.tour-week-day__header strong {
+    display: block;
+    margin-top: 5px;
+    color: var(--wx-ink);
+    font-size: 20px;
+}
+
+.tour-week-day__body {
+    min-height: 480px;
+    padding: 12px;
+}
+
+.tour-week-empty {
+    display: grid;
+    min-height: 120px;
+    place-items: center;
+    border: 1px dashed rgba(100, 116, 139, 0.28);
+    border-radius: 12px;
+    color: var(--wx-muted);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.tour-schedule-card {
+    border: 1px solid rgba(195, 198, 214, 0.62);
+    border-left: 4px solid #ff5661;
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 12px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.tour-schedule-card + .tour-schedule-card {
+    margin-top: 10px;
+}
+
+.tour-schedule-card__time {
+    width: fit-content;
+    gap: 6px;
+    border-radius: 999px;
+    background: #fff1f2;
+    color: #b42330;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.tour-schedule-card__time .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.tour-schedule-card h3 {
+    margin: 10px 0 4px;
+    color: var(--wx-ink);
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.tour-schedule-card p {
+    margin: 0;
+    color: var(--wx-muted);
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.tour-schedule-card__tour {
+    display: block;
+    margin-top: 10px;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.tour-schedule-card__meta {
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.tour-schedule-card__meta span {
+    border-radius: 999px;
+    background: #edf2ff;
+    color: #344054;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.tour-schedule-card__actions {
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.tour-schedule-card__actions .guide-icon-button {
+    width: 30px;
+    height: 30px;
+}
+
+@media (max-width: 980px) {
+    .tour-planner-filter {
+        grid-template-columns: 1fr;
+    }
+
+    .tour-planner-filter__main {
+        grid-template-columns: 1fr;
+    }
+
+    .tour-planner-filter__actions,
+    .tour-planner-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .tour-planner-toolbar__nav {
+        justify-content: flex-start;
+    }
+}

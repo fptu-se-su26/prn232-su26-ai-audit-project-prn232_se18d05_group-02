@@ -31,7 +31,14 @@ public sealed class TourApiClient
             ? "api/tours"
             : $"api/tours?{string.Join("&", query)}";
 
-        return await _httpClient.GetFromJsonAsync<List<TourResponse>>(path) ?? new List<TourResponse>();
+        using var response = await _httpClient.GetAsync(path);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<List<TourResponse>>() ?? new List<TourResponse>();
+        }
+
+        throw new InvalidOperationException(await ReadErrorAsync(response));
     }
 
     public Task<TourResponse?> CreateTourAsync(CreateTourRequest request)
@@ -83,14 +90,24 @@ public sealed class TourApiClient
         {
             using var document = JsonDocument.Parse(detail);
 
+            var titleText = document.RootElement.TryGetProperty("title", out var title)
+                ? title.GetString()
+                : null;
+
+            if (response.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable &&
+                string.Equals(titleText, "Database unavailable", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Database is unavailable. Please start SQL Server SQLEXPRESS, restart the server, and refresh this page.";
+            }
+
             if (document.RootElement.TryGetProperty("detail", out var problemDetail))
             {
                 return problemDetail.GetString() ?? "The tour request could not be completed.";
             }
 
-            if (document.RootElement.TryGetProperty("title", out var title))
+            if (!string.IsNullOrWhiteSpace(titleText))
             {
-                return title.GetString() ?? "The tour request could not be completed.";
+                return titleText;
             }
         }
         catch (JsonException)

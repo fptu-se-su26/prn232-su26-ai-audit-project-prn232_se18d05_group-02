@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 using WanderXServer.Dtos.Tours;
 using WanderXServer.Services;
@@ -18,7 +19,14 @@ public class ToursController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<TourResponse>>> GetAll([FromQuery] string? search, [FromQuery] string? status)
     {
-        return Ok(await _tourService.GetAllAsync(search, status));
+        try
+        {
+            return Ok(await _tourService.GetAllAsync(search, status));
+        }
+        catch (SqlException exception)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
+        }
     }
 
     [HttpGet("{id:guid}")]
@@ -31,6 +39,10 @@ public class ToursController : ControllerBase
         catch (KeyNotFoundException exception)
         {
             return NotFound(ToProblem("Tour not found", exception.Message, StatusCodes.Status404NotFound));
+        }
+        catch (SqlException exception)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
         }
     }
 
@@ -45,6 +57,10 @@ public class ToursController : ControllerBase
         catch (InvalidOperationException exception)
         {
             return BadRequest(ToProblem("Tour creation failed", exception.Message, StatusCodes.Status400BadRequest));
+        }
+        catch (SqlException exception)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
         }
     }
 
@@ -63,6 +79,10 @@ public class ToursController : ControllerBase
         {
             return BadRequest(ToProblem("Tour update failed", exception.Message, StatusCodes.Status400BadRequest));
         }
+        catch (SqlException exception)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
+        }
     }
 
     [HttpDelete("{id:guid}")]
@@ -77,6 +97,10 @@ public class ToursController : ControllerBase
         {
             return NotFound(ToProblem("Tour not found", exception.Message, StatusCodes.Status404NotFound));
         }
+        catch (SqlException exception)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
+        }
     }
 
     private static ProblemDetails ToProblem(string title, string detail, int status)
@@ -87,5 +111,10 @@ public class ToursController : ControllerBase
             Detail = detail,
             Status = status
         };
+    }
+
+    private static string ToDatabaseMessage(SqlException exception)
+    {
+        return $"The database could not be reached. Please start SQL Server SQLEXPRESS and try again. Detail: {exception.Message}";
     }
 }

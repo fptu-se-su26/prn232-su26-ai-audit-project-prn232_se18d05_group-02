@@ -9,6 +9,7 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<WanderXDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -19,6 +20,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGuideService, GuideService>();
 builder.Services.AddScoped<IGuideTourService, GuideTourService>();
 builder.Services.AddScoped<ITourService, TourService>();
+builder.Services.AddScoped<ITourScheduleService, TourScheduleService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 builder.Services.AddCors(options =>
@@ -39,7 +41,15 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    scope.ServiceProvider.GetRequiredService<WanderXDbContext>().SeedDevelopmentData();
+    try
+    {
+        scope.ServiceProvider.GetRequiredService<WanderXDbContext>().SeedDevelopmentData();
+    }
+    catch (Exception exception)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning(exception, "Database initialization was skipped because the database is unavailable.");
+    }
 }
 
 if (app.Environment.IsDevelopment())
@@ -49,7 +59,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("WanderXClient");
+app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=AdminTourSchedules}/{action=Index}/{id?}");
 
 app.Run();

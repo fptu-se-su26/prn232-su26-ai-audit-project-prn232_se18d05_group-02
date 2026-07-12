@@ -1,0 +1,21 @@
+@model TourScheduleFormViewModel
+@{
+    ViewData["Title"] = "Edit Tour Schedule";
+}
+
+<div class="mb-4">
+    <div class="text-uppercase small fw-bold text-secondary">Edit schedule</div>
+    <h1 class="h2 mb-1">Update Tour Schedule</h1>
+    <p class="text-secondary mb-0">Adjust the activity date, time, location, and display order.</p>
+</div>
+
+<section class="admin-card bg-white p-3 p-lg-4">
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+        @Html.AntiForgeryToken()
+        <partial name="_Form" model="Model" />
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            <button class="btn btn-danger px-4" type="submit">Save changes</button>
+            <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+        </div>
+    </form>
+</section>
