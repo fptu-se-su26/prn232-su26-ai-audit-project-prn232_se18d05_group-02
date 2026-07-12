@@ -1,0 +1,344 @@
+@page "/my-bookings"
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient UserApi
+@inject AuthSessionService SessionService
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+<PageTitle>WanderX - Đơn hàng của tôi</PageTitle>
+
+<div class="wx-page-shell">
+    <AppHeader />
+
+    @if (_isLoading)
+    {
+        <main class="wx-page-main">
+            <div class="flex justify-center items-center min-h-[60vh]">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 !border-primary"></div>
+            </div>
+        </main>
+    }
+    else
+    {
+        <main class="wx-page-main">
+            <div class="max-w-7xl w-full mx-auto px-6 py-12">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+                    <!-- Left Profile Sidebar -->
+                    <aside class="lg:col-span-4 bg-white border border-hairline rounded-lg p-6 space-y-6 shadow-sm">
+                        <!-- User Card Info -->
+                        <div class="flex flex-col items-center text-center pb-6 border-b border-hairline">
+                            <div class="w-20 h-20 rounded-full overflow-hidden border-2 !border-primary mb-4">
+                                <img alt="User Avatar Large" class="w-full h-full object-cover" src="@_avatarUrl">
+                            </div>
+                            <h3 class="font-title font-bold text-lg !text-primary">@_session?.FullName</h3>
+                            <span class="text-xs font-semibold text-muted-fg">@_session?.Email</span>
+
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-accent-orange-soft text-accent-orange text-[10px] font-bold uppercase tracking-wider mt-3">
+                                <span class="material-symbols-outlined text-[12px]">local_activity</span> Nhà Khám Phá Văn Hóa
+                            </span>
+                        </div>
+
+                        <!-- Nav list links -->
+                        <nav class="flex flex-col gap-1 text-sm font-semibold text-muted-fg">
+                            <a href="my-bookings" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-soft !text-primary">
+                                <span class="material-symbols-outlined text-lg">receipt_long</span>
+                                Đơn hàng của tôi
+                            </a>
+                            <a href="service-requests" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
+                                <span class="material-symbols-outlined text-lg">description</span>
+                                Yêu cầu dịch vụ
+                            </a>
+                            <a href="profile" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
+                                <span class="material-symbols-outlined text-lg">person</span>
+                                Thông tin cá nhân
+                            </a>
+                            <a href="travel-quiz" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
+                                <span class="material-symbols-outlined text-lg">quiz</span>
+                                Trắc nghiệm Travel Style
+                            </a>
+                        </nav>
+                    </aside>
+
+                    <!-- Right list content -->
+                    <section class="lg:col-span-8 space-y-6">
+                        <div class="flex items-center justify-between border-b border-hairline pb-4">
+                            <h1 class="text-2xl font-extrabold tracking-tight font-title !text-primary">Danh sách đặt chỗ</h1>
+                            <span class="text-xs font-semibold text-muted-fg">
+                                @if (_bookings.Count > 0)
+                                {
+                                    var start = (_currentPage - 1) * PageSize + 1;
+                                    var end = Math.Min(_currentPage * PageSize, _bookings.Count);
+                                    <text>Hiển thị @start–@end / @_bookings.Count giao dịch</text>
+                                }
+                                else
+                                {
+                                    <text>0 giao dịch</text>
+                                }
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(_errorMessage))
+                        {
+                            <div class="bg-red-50 text-red-600 p-4 rounded-lg text-sm border border-red-200">
+                                @_errorMessage
+                            </div>
+                        }
+
+                        @if (_bookings.Count == 0)
+                        {
+                            <div class="bg-surface-soft border border-hairline rounded-lg p-10 text-center">
+                                <span class="material-symbols-outlined text-4xl text-muted-fg mb-3">luggage</span>
+                                <h3 class="font-title font-bold text-lg !text-primary">Chưa có chuyến đi nào</h3>
+                                <p class="text-sm text-muted-fg mt-1 mb-4">Bạn chưa thực hiện bất kỳ đặt chỗ nào.</p>
+                                <a href="/" class="inline-flex items-center justify-center bg-primary text-white font-semibold text-sm px-6 py-2.5 rounded-full transition-all">
+                                    Khám phá ngay
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Bookings loop (paged) -->
+                            <div class="space-y-6">
+                                @foreach (var booking in PagedBookings)
+                                {
+                                    var statusStyles = booking.Status switch
+                                    {
+                                        "Paid" => "bg-green-50 text-green-700 border-green-200",
+                                        "Pending" => "bg-amber-50 text-amber-700 border-amber-200",
+                                        "Cancelled" => "bg-red-50 text-red-700 border-red-200",
+                                        _ => "bg-gray-50 text-gray-700 border-gray-200"
+                                    };
+
+                                    var statusText = booking.Status switch
+                                    {
+                                        "Paid" => "Đã thanh toán",
+                                        "Pending" => "Chờ thanh toán",
+                                        "Cancelled" => "Đã hủy",
+                                        _ => booking.Status
+                                    };
+
+                                    var cardClasses = booking.Status == "Cancelled"
+                                        ? "opacity-75 hover:opacity-100"
+                                        : "";
+
+                                    var imgClasses = booking.Status == "Cancelled" ? "grayscale" : "";
+
+                                    <div class="bg-white border border-hairline rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col md:flex-row @cardClasses">
+                                        <div class="w-full md:w-48 aspect-[4/3] md:aspect-auto md:h-auto overflow-hidden bg-surface-mid flex-shrink-0 @imgClasses">
+                                            <img alt="Thumbnail" class="w-full h-full object-cover" src="@(booking.ThumbnailUrl ?? "/images/placeholder.jpg")">
+                                        </div>
+                                        <div class="p-6 flex-grow flex flex-col justify-between">
+                                            <div>
+                                                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                                    <span class="text-xs text-muted-fg font-semibold">Mã đơn hàng: <span class="!text-primary font-bold">@booking.BookingCode</span></span>
+                                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border @statusStyles">@statusText</span>
+                                                </div>
+                                                <h3 class="font-title font-semibold text-base !text-primary leading-snug hover:text-accent-orange transition-colors">
+                                                    @booking.TourName
+                                                </h3>
+                                                <div class="flex gap-4 text-xs font-medium text-muted-fg mt-3">
+                                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_month</span>Khởi hành: @booking.DepartureDate.ToString("dd/MM/yyyy")</span>
+                                                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span>@booking.GuestCount Khách</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-end justify-between border-t border-hairline pt-4 mt-4">
+                                                <div>
+                                                    <span class="text-xs text-muted-fg block">Tổng thanh toán</span>
+                                                    @if (booking.Status == "Cancelled")
+                                                    {
+                                                        <span class="font-bold text-muted-fg font-title text-base line-through">@booking.TotalAmount.ToString("N0")đ</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="font-bold text-accent-orange font-title text-base">@booking.TotalAmount.ToString("N0")đ</span>
+                                                    }
+                                                </div>
+                                                <div class="flex gap-2">
+                                                    @if (booking.Status == "Pending")
+                                                    {
+                                                        <a href="#" class="inline-flex items-center justify-center bg-accent-orange hover:bg-accent-orange/95 text-white font-semibold text-xs px-4 py-2 rounded-full transition-all shadow-sm">Thanh toán ngay</a>
+                                                    }
+                                                    <a href="/booking-detail/@booking.Id" class="inline-flex items-center justify-center border border-hairline hover:bg-surface-soft !text-primary font-semibold text-xs px-4 py-2 rounded-full transition-all">
+                                                        Chi tiết
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Pagination -->
+                            @if (TotalPages >= 1)
+                            {
+                                <div class="flex items-center justify-between pt-4 border-t border-hairline">
+                                    <span class="text-xs text-muted-fg">Trang @_currentPage / @TotalPages</span>
+                                    <div class="flex items-center gap-1">
+                                        <button class="wx-page-btn" disabled="@(_currentPage <= 1)" @onclick="PrevPage" title="Trang trước">
+                                            <span class="material-symbols-outlined text-base">chevron_left</span>
+                                        </button>
+                                        @for (var p = 1; p <= TotalPages; p++)
+                                        {
+                                            var pg = p;
+                                            <button class="wx-page-btn @(_currentPage == pg ? "wx-page-btn--active" : "")"
+                                                    @onclick="() => GoToPage(pg)">@pg</button>
+                                        }
+                                        <button class="wx-page-btn" disabled="@(_currentPage >= TotalPages)" @onclick="NextPage" title="Trang sau">
+                                            <span class="material-symbols-outlined text-base">chevron_right</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </section>
+                </div>
+            </div>
+        </main>
+    }
+
+    <AppFooter />
+</div>
+
+<style>
+    .wx-page-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    .wx-page-main {
+        flex: 1;
+    }
+    /* Pagination */
+    .wx-page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        height: 34px;
+        padding: 0 6px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #0f172a;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .wx-page-btn:hover:not(:disabled) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    .wx-page-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+    .wx-page-btn--active {
+        background: #0f172a !important;
+        color: #fff !important;
+        border-color: #0f172a !important;
+    }
+</style>
+
+@code {
+    private const int PageSize = 5;
+    private int _currentPage = 1;
+
+    private bool _isLoading = true;
+    private string _errorMessage = string.Empty;
+    private AuthSession? _session;
+    private List<BookingSummaryResponse> _bookings = new();
+    private string _avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
+
+    private int TotalPages => (int)Math.Ceiling(_bookings.Count / (double)PageSize);
+    private IEnumerable<BookingSummaryResponse> PagedBookings =>
+        _bookings.Skip((_currentPage - 1) * PageSize).Take(PageSize);
+
+    private void GoToPage(int page) { _currentPage = page; }
+    private void PrevPage() { if (_currentPage > 1) _currentPage--; }
+    private void NextPage() { if (_currentPage < TotalPages) _currentPage++; }
+
+    // Tính năng: Xem danh sách đặt chỗ (Booking)
+    // Bước 1: Khởi tạo trang MyBookings (OnInitializedAsync).
+    // Bước 2: Gọi AuthSessionService.GetAsync() để lấy Session/Email từ localStorage.
+    // Bước 3: Nếu không có session, chuyển hướng về trang /login.  
+    // Bước 4: Gọi UserApiClient.GetBookingsAsync(email) (Client - UserApiClient.cs)
+    // Bước 5: UserApiClient gửi HTTP GET đến 'api/users/bookings?email={email}' (Server - UsersController.cs)
+    // Bước 6: UsersController gọi IUserService.GetBookingsAsync(email) (Server - UserService.cs)
+    // Bước 7: UserService tìm ApplicationUser, lấy ra danh sách Bookings từ CSDL theo UserId, map thành List<BookingSummaryResponse>
+    // Bước 8: Dữ liệu (danh sách tour đã đặt) trả về cho Client.
+    // Bước 9: Gán kết quả vào list _bookings. Vòng lặp foreach duyệt qua _bookings, render ra các Booking Card tương ứng với giao diện đã thiết kế.
+    // Bước 10: Kết thúc.
+
+    protected override async Task OnInitializedAsync()
+    {
+        _session = await SessionService.GetAsync();
+
+        if (_session == null)
+        {
+            NavManager.NavigateTo("/login");
+            return;
+        }
+
+        try
+        {
+            var savedAvatar = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"avatar_{_session.Email}");
+            if (!string.IsNullOrEmpty(savedAvatar))
+            {
+                _avatarUrl = savedAvatar;
+            }
+
+            var result = await UserApi.GetBookingsAsync(_session.Email);
+            if (result != null)
+            {
+                _bookings = result.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "Không thể tải danh sách đặt chỗ: " + ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                (function() {
+                    if (document.getElementById('tailwind-cdn')) return;
+                    var script = document.createElement('script');
+                    script.id = 'tailwind-cdn';
+                    script.src = 'https://cdn.tailwindcss.com?plugins=forms,container-queries';
+                    script.onload = function() {
+                        tailwind.config = {
+                            corePlugins: { preflight: false },
+                            darkMode: 'class',
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        primary: '#0f172a', 'on-primary': '#ffffff', canvas: '#ffffff',
+                                        'surface-soft': '#f8fafc', 'surface-mid': '#f1f5f9', hairline: '#e2e8f0',
+                                        'muted-fg': '#64748b', 'accent-orange': '#ff5a5f',
+                                        'on-accent-orange': '#ffffff', 'accent-orange-soft': '#fff1f2'
+                                    },
+                                    fontFamily: {
+                                        title: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                                        body: ['Inter', 'sans-serif']
+                                    }
+                                }
+                            }
+                        };
+                    };
+                    document.head.appendChild(script);
+                })();
+            ");
+        }
+    }
+}

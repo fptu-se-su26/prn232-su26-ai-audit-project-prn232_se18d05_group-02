@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36203.30 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WanderXServer", "WanderXServer.csproj", "{D7BE6448-137D-CA9B-52D5-F1A8D3CB6A6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7BE6448-137D-CA9B-52D5-F1A8D3CB6A6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7BE6448-137D-CA9B-52D5-F1A8D3CB6A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7BE6448-137D-CA9B-52D5-F1A8D3CB6A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7BE6448-137D-CA9B-52D5-F1A8D3CB6A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {133817A9-9325-446B-8C40-FD0CAF120804}
+	EndGlobalSection
+EndGlobal
