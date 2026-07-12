@@ -1,5 +1,6 @@
 @inject AuthSessionService AuthSession
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
 
 <header class="wx-header">
     <div class="wx-header__inner">
@@ -28,6 +29,13 @@
             else if (_session?.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true)
             {
                 <a class="wx-button wx-button--secondary" href="/dashboard">Dashboard</a>
+                <button class="wx-button wx-button--outline" type="button" @onclick="HandleSignOut">Sign Out</button>
+            }
+            else if (_session is not null)
+            {
+                <a href="/profile" class="wx-avatar" style="display: block;">
+                    <img alt="User Avatar" class="w-full h-full object-cover" src="@_avatarUrl" style="width: 100%; height: 100%; object-fit: cover;">
+                </a>
                 <button class="wx-button wx-button--outline" type="button" @onclick="HandleSignOut">Sign Out</button>
             }
             else
@@ -130,11 +138,25 @@
     private string _brandHref = "/";
     private bool _isDrawerOpen;
     private AuthSession? _session;
+    private string _avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
 
     protected override async Task OnInitializedAsync()
     {
         _session = await AuthSession.GetAsync();
         _brandHref = _session?.IsGuide == true ? "/guide-portal" : "/";
+
+        if (_session != null)
+        {
+            try 
+            {
+                var savedAvatar = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"avatar_{_session.Email}");
+                if (!string.IsNullOrEmpty(savedAvatar))
+                {
+                    _avatarUrl = savedAvatar;
+                }
+            } 
+            catch { }
+        }
     }
 
     private void ToggleDrawer()

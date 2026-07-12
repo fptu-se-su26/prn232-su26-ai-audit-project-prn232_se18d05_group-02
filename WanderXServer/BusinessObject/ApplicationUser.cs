@@ -39,6 +39,9 @@ public class ApplicationUser
 
     public bool IsPhoneConfirmed { get; set; }
 
+    [StringLength(240)]
+    public string? Address { get; set; }
+
     [DataType(DataType.DateTime)]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -53,4 +56,6 @@ public class ApplicationUser
     public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 
     public GuideProfile? GuideProfile { get; set; }
+
+    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 }

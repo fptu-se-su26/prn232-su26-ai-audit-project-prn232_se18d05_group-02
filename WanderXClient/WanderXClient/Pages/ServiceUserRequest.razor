@@ -1,0 +1,329 @@
+@page "/service-requests"
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient UserApi
+@inject AuthSessionService SessionService
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+<PageTitle>WanderX - Yêu cầu dịch vụ đặc biệt</PageTitle>
+
+<div class="wx-page-shell">
+    <AppHeader />
+
+    @if (_isLoading)
+    {
+        <main class="wx-page-main">
+            <div class="flex justify-center items-center min-h-[60vh]">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 !border-primary"></div>
+            </div>
+        </main>
+    }
+    else if (_session == null)
+    {
+        <main class="wx-page-main">
+            <div class="max-w-7xl w-full mx-auto px-6 py-24 text-center">
+                <span class="material-symbols-outlined text-5xl text-muted-fg">login</span>
+                <h2 class="font-title font-bold text-xl !text-primary mt-4">Vui lòng đăng nhập</h2>
+                <a href="/login" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold !text-primary hover:underline">
+                    Đăng nhập
+                </a>
+            </div>
+        </main>
+    }
+    else
+    {
+        <main class="wx-page-main">
+            <div class="max-w-7xl w-full mx-auto px-6 py-12">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+                    <!-- Left Profile Sidebar -->
+                    <aside class="lg:col-span-4 bg-white border border-hairline rounded-lg p-6 space-y-6 shadow-sm">
+                        <div class="flex flex-col items-center text-center pb-6 border-b border-hairline">
+                            <div class="w-20 h-20 rounded-full overflow-hidden border-2 !border-primary mb-4">
+                                <img alt="User Avatar" class="w-full h-full object-cover" src="@_avatarUrl">
+                            </div>
+                            <h3 class="font-title font-bold text-lg !text-primary">@_session.FullName</h3>
+                            <span class="text-xs font-semibold text-muted-fg">@_session.Email</span>
+                        </div>
+                        <nav class="flex flex-col gap-1 text-sm font-semibold text-muted-fg">
+                            <a href="my-bookings" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
+                                <span class="material-symbols-outlined text-lg">receipt_long</span>
+                                Đơn hàng của tôi
+                            </a>
+                            <a href="service-requests" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-soft !text-primary">
+                                <span class="material-symbols-outlined text-lg">description</span>
+                                Yêu cầu dịch vụ
+                            </a>
+                            <a href="profile" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
+                                <span class="material-symbols-outlined text-lg">person</span>
+                                Thông tin cá nhân
+                            </a>
+                            <a href="travel-quiz" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
+                                <span class="material-symbols-outlined text-lg">quiz</span>
+                                Trắc nghiệm Travel Style
+                            </a>
+                        </nav>
+                    </aside>
+
+                    <!-- Right content -->
+                    <section class="lg:col-span-8 space-y-8">
+                        <!-- Header -->
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <a href="/my-bookings" class="flex items-center gap-2 text-sm font-semibold !text-primary hover:underline">
+                                    <span class="material-symbols-outlined text-base">arrow_back</span>
+                                    Quay lại
+                                </a>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h1 class="text-2xl font-extrabold tracking-tight font-title !text-primary">Yêu cầu dịch vụ đặc biệt</h1>
+                                    <p class="text-sm text-muted-fg mt-1">Quản lý và xem trạng thái các yêu cầu dịch vụ đặc biệt của bạn</p>
+                                </div>
+                                @if (_requests != null && _requests.Count > 0)
+                                {
+                                    <span class="text-xs font-semibold text-muted-fg">
+                                        @{
+                                            var start = (_currentPage - 1) * PageSize + 1;
+                                            var end = Math.Min(_currentPage * PageSize, _requests.Count);
+                                        }
+                                        @start–@end / @_requests.Count yêu cầu
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Requests List -->
+                        @if (_requests == null || !_requests.Any())
+                        {
+                            <div class="bg-white border border-hairline rounded-lg p-12 text-center shadow-sm">
+                                <span class="material-symbols-outlined text-6xl text-muted-fg">inbox</span>
+                                <h3 class="font-title font-bold text-lg !text-primary mt-4">Chưa có yêu cầu nào</h3>
+                                <p class="text-sm text-muted-fg mt-2">Bạn chưa gửi yêu cầu dịch vụ đặc biệt nào</p>
+                                <a href="/my-bookings" class="mt-6 inline-flex items-center gap-2 wx-button wx-button--secondary">
+                                    <span class="material-symbols-outlined text-lg">add</span>
+                                    Thêm yêu cầu từ đơn hàng
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="space-y-4">
+                                @foreach (var request in PagedRequests)
+                                {
+                                    var statusColor = request.Status switch
+                                    {
+                                        "Pending" => "bg-amber-100 text-amber-700",
+                                        "Approved" => "bg-green-100 text-green-700",
+                                        "Rejected" => "bg-red-100 text-red-700",
+                                        "Completed" => "bg-blue-100 text-blue-700",
+                                        _ => "bg-gray-100 text-gray-700"
+                                    };
+
+                                    var statusText = request.Status switch
+                                    {
+                                        "Pending" => "Đang chờ",
+                                        "Approved" => "Đã chấp nhận",
+                                        "Rejected" => "Đã từ chối",
+                                        "Completed" => "Đã hoàn thành",
+                                        _ => request.Status
+                                    };
+
+                                    <div class="bg-white border border-hairline rounded-lg p-6 shadow-sm">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <div>
+                                                <div class="flex items-center gap-3 mb-2">
+                                                    <span class="text-xs font-semibold text-muted-fg">@request.BookingCode</span>
+                                                    <span class="px-2 py-1 rounded text-xs font-bold @statusColor">@statusText</span>
+                                                </div>
+                                                <h4 class="font-semibold !text-primary text-sm">@request.TourName</h4>
+                                            </div>
+                                            <span class="text-xs text-muted-fg">@request.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                        </div>
+
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="text-xs font-semibold text-muted-fg">Mô tả yêu cầu:</label>
+                                                <p class="text-sm !text-primary mt-1 whitespace-pre-wrap">@request.Description</p>
+                                            </div>
+
+                                            @if (!string.IsNullOrEmpty(request.AdminResponse))
+                                            {
+                                                <div class="bg-surface-soft rounded-lg p-3">
+                                                    <label class="text-xs font-semibold text-muted-fg">Phản hồi từ admin:</label>
+                                                    <p class="text-sm !text-primary mt-1">@request.AdminResponse</p>
+                                                    @if (request.ReviewedAt.HasValue)
+                                                    {
+                                                        <span class="text-xs text-muted-fg mt-1 block">@request.ReviewedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                                    }
+                                                </div>
+                                            }
+
+                                            @if (request.UpdatedAt.HasValue)
+                                            {
+                                                <span class="text-xs text-muted-fg">Cập nhật lần cuối: @request.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Pagination -->
+                            @if (TotalPages >= 1)
+                            {
+                                <div class="flex items-center justify-between pt-4 border-t border-hairline">
+                                    <span class="text-xs text-muted-fg">Trang @_currentPage / @TotalPages</span>
+                                    <div class="flex items-center gap-1">
+                                        <button class="wx-page-btn" disabled="@(_currentPage <= 1)" @onclick="PrevPage" title="Trang trước">
+                                            <span class="material-symbols-outlined text-base">chevron_left</span>
+                                        </button>
+                                        @for (var p = 1; p <= TotalPages; p++)
+                                        {
+                                            var pg = p;
+                                            <button class="wx-page-btn @(_currentPage == pg ? "wx-page-btn--active" : "")"
+                                                    @onclick="() => GoToPage(pg)">@pg</button>
+                                        }
+                                        <button class="wx-page-btn" disabled="@(_currentPage >= TotalPages)" @onclick="NextPage" title="Trang sau">
+                                            <span class="material-symbols-outlined text-base">chevron_right</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </section>
+                </div>
+            </div>
+        </main>
+    }
+
+    <AppFooter />
+</div>
+
+<style>
+    .wx-page-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    .wx-page-main {
+        flex: 1;
+    }
+    /* Pagination */
+    .wx-page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        height: 34px;
+        padding: 0 6px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #0f172a;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .wx-page-btn:hover:not(:disabled) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    .wx-page-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+    .wx-page-btn--active {
+        background: #0f172a !important;
+        color: #fff !important;
+        border-color: #0f172a !important;
+    }
+</style>
+
+@code {
+    private const int PageSize = 5;
+    private int _currentPage = 1;
+
+    private bool _isLoading = true;
+    private AuthSession? _session;
+    private string _avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
+    private List<UserSpecialRequestResponse>? _requests;
+
+    private int TotalPages => _requests == null || _requests.Count == 0
+        ? 1
+        : (int)Math.Ceiling(_requests.Count / (double)PageSize);
+
+    private IEnumerable<UserSpecialRequestResponse> PagedRequests =>
+        (_requests ?? new()).Skip((_currentPage - 1) * PageSize).Take(PageSize);
+
+    private void GoToPage(int page) { _currentPage = page; }
+    private void PrevPage() { if (_currentPage > 1) _currentPage--; }
+    private void NextPage() { if (_currentPage < TotalPages) _currentPage++; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _session = await SessionService.GetAsync();
+        if (_session == null)
+        {
+            NavManager.NavigateTo("/login");
+            return;
+        }
+
+        try
+        {
+            var savedAvatar = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"avatar_{_session.Email}");
+            if (!string.IsNullOrEmpty(savedAvatar))
+            {
+                _avatarUrl = savedAvatar;
+            }
+
+            var requests = await UserApi.GetUserSpecialRequestsAsync(_session.Email);
+            _requests = requests?.ToList() ?? new List<UserSpecialRequestResponse>();
+        }
+        catch (Exception)
+        {
+            _requests = new List<UserSpecialRequestResponse>();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                (function() {
+                    if (document.getElementById('tailwind-cdn')) return;
+                    var script = document.createElement('script');
+                    script.id = 'tailwind-cdn';
+                    script.src = 'https://cdn.tailwindcss.com?plugins=forms,container-queries';
+                    script.onload = function() {
+                        tailwind.config = {
+                            corePlugins: { preflight: false },
+                            darkMode: 'class',
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        primary: '#0f172a', 'on-primary': '#ffffff', canvas: '#ffffff',
+                                        'surface-soft': '#f8fafc', 'surface-mid': '#f1f5f9', hairline: '#e2e8f0',
+                                        'muted-fg': '#64748b', 'accent-orange': '#ff5a5f',
+                                        'on-accent-orange': '#ffffff', 'accent-orange-soft': '#fff1f2'
+                                    },
+                                    fontFamily: {
+                                        title: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                                        body: ['Inter', 'sans-serif']
+                                    }
+                                }
+                            }
+                        };
+                    };
+                    document.head.appendChild(script);
+                })();
+            ");
+        }
+    }
+}

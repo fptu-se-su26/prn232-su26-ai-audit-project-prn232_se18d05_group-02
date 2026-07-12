@@ -1,0 +1,845 @@
+@page "/admin-service-requests"
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient UserApi
+@inject NavigationManager NavManager
+
+<PageTitle>WanderX Admin - Quản lý yêu cầu dịch vụ</PageTitle>
+
+<div class="guide-admin-page">
+    <!-- Sidebar -->
+    <aside class="guide-sidebar">
+        <div class="guide-sidebar__brand">
+            <a class="brand-mark" href="/">WanderX</a>
+            <p>Admin Suite</p>
+        </div>
+        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
+            <a class="guide-sidebar__link" href="/dashboard">
+                <MaterialIcon Name="dashboard" />
+                Dashboard
+            </a>
+            <a class="guide-sidebar__link" href="/guides">
+                <MaterialIcon Name="badge" />
+                Guides
+            </a>
+            <a class="guide-sidebar__link" href="/guide-assignments">
+                <MaterialIcon Name="assignment_ind" />
+                Assignments
+            </a>
+            <a class="guide-sidebar__link guide-sidebar__link--active" href="/admin-service-requests">
+                <MaterialIcon Name="support_agent" />
+                Service Requests
+            </a>
+            <a class="guide-sidebar__link " href="/tour-reviews" aria-current="page">
+                <MaterialIcon Name="rate_review" />
+                Tour Reviews
+            </a>
+            <a class="guide-sidebar__link" href="/">
+                <MaterialIcon Name="home" />
+                Homepage
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="guide-main">
+
+        @if (_view == "list")
+        {
+            <!-- ===== VIEW 1: Danh sách Booking có yêu cầu ===== -->
+            <header class="guide-topbar">
+                <div>
+                    <p class="guide-eyebrow">Quản lý</p>
+                    <h1>Yêu cầu dịch vụ đặc biệt</h1>
+                    <p class="guide-subtitle">Xem và duyệt yêu cầu dịch vụ thêm của khách hàng theo từng tour.</p>
+                </div>
+                <div class="guide-topbar__actions">
+                    <label class="guide-search" aria-label="Tìm kiếm tour">
+                        <MaterialIcon Name="search" />
+                        <input type="search" placeholder="Tìm theo tour, khách hàng..." value="@_searchTerm" @oninput="OnSearchInput" />
+                    </label>
+                </div>
+            </header>
+
+            <section class="guide-content">
+                @if (_isLoadingList)
+                {
+                    <div class="guide-empty">
+                        <MaterialIcon Name="sync" />
+                        Đang tải danh sách...
+                    </div>
+                }
+                else if (!string.IsNullOrWhiteSpace(_listError))
+                {
+                    <div class="guide-alert guide-alert--error">@_listError</div>
+                }
+                else
+                {
+                    <!-- Stats -->
+                    <div class="guide-stat-grid">
+                        <article class="guide-stat">
+                            <p>Tổng tour có yêu cầu</p>
+                            <strong>@_bookings.Count</strong>
+                            <span>Booking đang có yêu cầu</span>
+                        </article>
+                        <article class="guide-stat guide-stat--secondary">
+                            <p>Chờ duyệt</p>
+                            <strong>@_bookings.Sum(b => b.PendingRequests)</strong>
+                            <span>Cần xử lý ngay</span>
+                        </article>
+                        <article class="guide-stat guide-stat--tertiary">
+                            <p>Đã duyệt</p>
+                            <strong>@_bookings.Sum(b => b.ApprovedRequests)</strong>
+                            <span>Đã chấp nhận</span>
+                        </article>
+                        <article class="guide-stat">
+                            <p>Đã từ chối</p>
+                            <strong>@_bookings.Sum(b => b.RejectedRequests)</strong>
+                            <span>Không được duyệt</span>
+                        </article>
+                    </div>
+
+                    <!-- Table -->
+                    <section class="guide-table-shell">
+                        <div class="guide-table-toolbar">
+                            <div class="guide-filter-group" role="group">
+                                @foreach (var f in new[] { "Tất cả", "Chờ duyệt", "Có kết quả" })
+                                {
+                                    <button class="@(_statusFilter == f ? "guide-filter guide-filter--active" : "guide-filter")"
+                                            type="button" @onclick="() => SetStatusFilter(f)">
+                                        @f
+                                    </button>
+                                }
+                            </div>
+                            <p>
+                                @if (FilteredBookings.Any())
+                                {
+                                    var start = (_currentPage - 1) * PageSize + 1;
+                                    var end = Math.Min(_currentPage * PageSize, FilteredBookings.Count());
+                                    <text>Hiển thị @start–@end / @FilteredBookings.Count() tour</text>
+                                }
+                                else
+                                {
+                                    <text>0 tour</text>
+                                }
+                            </p>
+                        </div>
+
+                        <div class="guide-table-scroll">
+                            <table class="guide-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tour / Khách hàng</th>
+                                        <th>Ngày khởi hành</th>
+                                        <th>Trạng thái booking</th>
+                                        <th style="text-align:center">Tổng YC</th>
+                                        <th style="text-align:center">Chờ duyệt</th>
+                                        <th class="guide-table__actions">Xem chi tiết</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (!PagedFilteredBookings.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="6">
+                                                <div class="guide-empty guide-empty--compact">
+                                                    <MaterialIcon Name="inbox" />
+                                                    Không có tour nào phù hợp.
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var b in PagedFilteredBookings)
+                                        {
+                                            <tr class="@(b.PendingRequests > 0 ? "asr-row--highlight" : "")">
+                                                <td>
+                                                    <div class="guide-person">
+                                                        <div class="guide-avatar" style="background: var(--asr-accent);">
+                                                            @GetInitials(b.CustomerName)
+                                                        </div>
+                                                        <div>
+                                                            <strong>@b.TourName</strong>
+                                                            <span>@b.CustomerName · @b.CustomerEmail</span>
+                                                            <span style="font-size:11px;color:var(--guide-muted)">@b.BookingCode · @b.Destination</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>@b.DepartureDate.ToString("dd/MM/yyyy")</td>
+                                                <td>
+                                                    <span class="@GetBookingStatusClass(b.BookingStatus)">
+                                                        <span></span>@b.BookingStatus
+                                                    </span>
+                                                </td>
+                                                <td style="text-align:center">
+                                                    <span class="asr-badge asr-badge--total">@b.TotalRequests</span>
+                                                </td>
+                                                <td style="text-align:center">
+                                                    @if (b.PendingRequests > 0)
+                                                    {
+                                                        <span class="asr-badge asr-badge--pending">@b.PendingRequests</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="asr-badge asr-badge--done">0</span>
+                                                    }
+                                                </td>
+                                                <td class="guide-table__actions">
+                                                    <button class="wx-button wx-button--secondary" style="font-size:12px;padding:6px 14px"
+                                                            type="button" @onclick="() => OpenBookingRequests(b)">
+                                                        <MaterialIcon Name="open_in_new" />
+                                                        Xem
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if (TotalPages >= 1)
+                        {
+                            <div class="guide-table-pagination" style="padding: 12px 24px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-size: 13px; color: #64748b;">Trang @_currentPage / @TotalPages</span>
+                                <div style="display: flex; gap: 4px;">
+                                    <button class="wx-page-btn" disabled="@(_currentPage <= 1)" @onclick="PrevPage" title="Trang trước">
+                                        <MaterialIcon Name="chevron_left" />
+                                    </button>
+                                    @for (var p = 1; p <= TotalPages; p++)
+                                    {
+                                        var pg = p;
+                                        <button class="wx-page-btn @(_currentPage == pg ? "wx-page-btn--active" : "")"
+                                                @onclick="() => GoToPage(pg)">@pg</button>
+                                    }
+                                    <button class="wx-page-btn" disabled="@(_currentPage >= TotalPages)" @onclick="NextPage" title="Trang sau">
+                                        <MaterialIcon Name="chevron_right" />
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </section>
+                }
+            </section>
+        }
+        else if (_view == "booking")
+        {
+            <!-- ===== VIEW 2: Danh sách khách hàng trong booking đó ===== -->
+            <header class="guide-topbar">
+                <div>
+                    <button class="guide-icon-button" style="margin-bottom:8px" type="button" @onclick="BackToList">
+                        <MaterialIcon Name="arrow_back" />
+                    </button>
+                    <p class="guide-eyebrow">@_selectedBooking!.BookingCode · @_selectedBooking.CustomerName</p>
+                    <h1>@_selectedBooking.TourName</h1>
+                    <p class="guide-subtitle">@_selectedBooking.Destination · Khởi hành @_selectedBooking.DepartureDate.ToString("dd/MM/yyyy")</p>
+                </div>
+            </header>
+
+            <section class="guide-content">
+                @if (_isLoadingRequests)
+                {
+                    <div class="guide-empty">
+                        <MaterialIcon Name="sync" />
+                        Đang tải yêu cầu...
+                    </div>
+                }
+                else if (_bookingRequests == null || !_bookingRequests.Any())
+                {
+                    <div class="guide-empty">
+                        <MaterialIcon Name="inbox" />
+                        Booking này chưa có yêu cầu nào.
+                    </div>
+                }
+                else
+                {
+                    <!-- Mini stats cho booking này -->
+                    <div class="guide-stat-grid" style="margin-bottom:24px">
+                        <article class="guide-stat">
+                            <p>Tổng yêu cầu</p>
+                            <strong>@_bookingRequests.Count</strong>
+                            <span>Từ khách hàng</span>
+                        </article>
+                        <article class="guide-stat guide-stat--secondary">
+                            <p>Chờ duyệt</p>
+                            <strong>@_bookingRequests.Count(r => r.Status == "Pending")</strong>
+                            <span>Cần xử lý</span>
+                        </article>
+                        <article class="guide-stat guide-stat--tertiary">
+                            <p>Đã duyệt</p>
+                            <strong>@_bookingRequests.Count(r => r.Status == "Approved")</strong>
+                            <span>Chấp nhận</span>
+                        </article>
+                        <article class="guide-stat">
+                            <p>Từ chối</p>
+                            <strong>@_bookingRequests.Count(r => r.Status == "Rejected")</strong>
+                            <span>Không duyệt</span>
+                        </article>
+                    </div>
+
+                    <!-- Danh sách yêu cầu của khách này -->
+                    <section class="guide-form-panel">
+                        <div class="guide-section-heading">
+                            <div>
+                                <p class="guide-eyebrow">Khách hàng</p>
+                                <h2>@_selectedBooking!.CustomerName</h2>
+                            </div>
+                            <span style="font-size:13px;color:var(--guide-muted)">@_selectedBooking.CustomerEmail</span>
+                        </div>
+
+                        <div class="asr-requests-list">
+                            @foreach (var req in _bookingRequests.OrderByDescending(r => r.CreatedAt))
+                            {
+                                var isPending = req.Status == "Pending";
+                                <div class="asr-request-card @(isPending ? "asr-request-card--pending" : "")">
+                                    <div class="asr-request-card__header">
+                                        <div class="asr-request-meta">
+                                            <span class="@GetRequestStatusClass(req.Status)">
+                                                <span></span>@GetStatusText(req.Status)
+                                            </span>
+                                            <span class="asr-request-date">@req.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                        </div>
+                                        @if (isPending)
+                                        {
+                                            <div class="asr-request-actions">
+                                                <button class="wx-button" style="font-size:12px;padding:6px 16px;background:#16a34a;border-color:#16a34a"
+                                                        type="button" @onclick="() => OpenReviewModal(req, true)">
+                                                    <MaterialIcon Name="check_circle" />
+                                                    Duyệt
+                                                </button>
+                                                <button class="wx-button wx-button--outline" style="font-size:12px;padding:6px 16px;color:#dc2626;border-color:#dc2626"
+                                                        type="button" @onclick="() => OpenReviewModal(req, false)">
+                                                    <MaterialIcon Name="cancel" />
+                                                    Từ chối
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="asr-request-body">
+                                        <label class="asr-label">Nội dung yêu cầu:</label>
+                                        <p class="asr-description">@req.Description</p>
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(req.AdminResponse))
+                                    {
+                                        <div class="asr-admin-response">
+                                            <label class="asr-label">Phản hồi của admin:</label>
+                                            <p>@req.AdminResponse</p>
+                                            @if (req.ReviewedAt.HasValue)
+                                            {
+                                                <span class="asr-request-date">Xét duyệt lúc: @req.ReviewedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </section>
+                }
+            </section>
+        }
+
+        <!-- ===== MODAL Duyệt / Từ chối ===== -->
+        @if (_showModal && _reviewingRequest != null)
+        {
+            <div class="asr-modal-overlay" @onclick="CloseModal">
+                <div class="asr-modal" @onclick:stopPropagation="true">
+                    <div class="asr-modal__header">
+                        <div>
+                            <h2>@(_isApproving ? "✅ Duyệt yêu cầu" : "❌ Từ chối yêu cầu")</h2>
+                            <p class="guide-subtitle" style="margin-top:4px">@_selectedBooking?.TourName · @_selectedBooking?.CustomerName</p>
+                        </div>
+                        <button class="guide-icon-button" type="button" @onclick="CloseModal">
+                            <MaterialIcon Name="close" />
+                        </button>
+                    </div>
+
+                    <div class="asr-modal__body">
+                        <div class="asr-modal-desc-box">
+                            <label class="asr-label">Nội dung yêu cầu của khách:</label>
+                            <p>@_reviewingRequest.Description</p>
+                        </div>
+
+                        <div class="guide-field" style="margin-top:16px">
+                            <label for="admin-response" class="asr-label">
+                                @(_isApproving ? "Ghi chú cho khách (tuỳ chọn):" : "Lý do từ chối (bắt buộc):")
+                            </label>
+                            <textarea id="admin-response"
+                                      class="guide-control guide-control--area"
+                                      rows="4"
+                                      placeholder="@(_isApproving ? "VD: Chúng tôi sẽ sắp xếp dịch vụ theo yêu cầu của bạn..." : "VD: Dịch vụ này không có sẵn trong gói tour của bạn...")"
+                                      @bind="_adminResponse"></textarea>
+                            @if (!_isApproving && string.IsNullOrWhiteSpace(_adminResponse) && _showValidation)
+                            {
+                                <span style="color:#dc2626;font-size:12px">Vui lòng nhập lý do từ chối.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="asr-modal__footer">
+                        @if (!string.IsNullOrWhiteSpace(_modalError))
+                        {
+                            <span class="guide-alert guide-alert--error" style="font-size:13px;margin-bottom:0;flex:1">@_modalError</span>
+                        }
+                        <div style="display:flex;gap:12px;justify-content:flex-end">
+                            <button class="wx-button wx-button--outline" type="button" @onclick="CloseModal" disabled="@_isSaving">
+                                Huỷ
+                            </button>
+                            <button class="wx-button @(_isApproving ? "" : "asr-btn-reject")"
+                                    type="button" @onclick="SubmitReview" disabled="@_isSaving">
+                                <MaterialIcon Name="@(_isApproving ? "check_circle" : "cancel")" />
+                                @(_isSaving ? "Đang xử lý..." : (_isApproving ? "Xác nhận duyệt" : "Xác nhận từ chối"))
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </main>
+    <MobileBottomNav />
+</div>
+
+<style>
+    :root {
+        --asr-accent: #4f46e5;
+        --asr-pending-bg: #fffbeb;
+        --asr-pending-border: #fbbf24;
+    }
+
+    /* ---- Badge ---- */
+    .asr-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 0 8px;
+    }
+    .asr-badge--total  { background: #e0e7ff; color: #4338ca; }
+    .asr-badge--pending { background: #fef3c7; color: #b45309; }
+    .asr-badge--done   { background: #f0fdf4; color: #15803d; }
+
+    /* ---- Highlight row ---- */
+    .asr-row--highlight { background: #fffbeb !important; }
+    .asr-row--highlight:hover { background: #fef9c3 !important; }
+
+    /* ---- Status badges ---- */
+    .asr-status-pending  { background: #fef3c7; color: #b45309; }
+    .asr-status-approved { background: #dcfce7; color: #15803d; }
+    .asr-status-rejected { background: #fee2e2; color: #b91c1c; }
+    .asr-status-completed { background: #dbeafe; color: #1d4ed8; }
+
+    /* ---- Requests list ---- */
+    .asr-requests-list { display: flex; flex-direction: column; gap: 16px; margin-top: 12px; }
+
+    .asr-request-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        transition: box-shadow 0.2s;
+    }
+    .asr-request-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+    .asr-request-card--pending {
+        border-left: 4px solid var(--asr-pending-border);
+        background: var(--asr-pending-bg);
+    }
+
+    .asr-request-card__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .asr-request-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    .asr-request-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .asr-request-date {
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .asr-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .asr-description {
+        font-size: 14px;
+        color: #1e293b;
+        white-space: pre-wrap;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .asr-admin-response {
+        margin-top: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 13px;
+        color: #475569;
+    }
+
+    /* ---- Modal ---- */
+    .asr-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 16px;
+        backdrop-filter: blur(4px);
+        animation: asr-fade-in 0.18s ease;
+    }
+
+    @@keyframes asr-fade-in {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    .asr-modal {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 560px;
+        box-shadow: 0 24px 64px rgba(15,23,42,0.2);
+        animation: asr-slide-up 0.2s ease;
+        overflow: hidden;
+    }
+
+    @@keyframes asr-slide-up {
+        from { transform: translateY(24px); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .asr-modal__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 24px 24px 16px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .asr-modal__header h2 { font-size: 18px; font-weight: 700; margin: 0; color: #0f172a; }
+
+    .asr-modal__body { padding: 20px 24px; }
+
+    .asr-modal-desc-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 14px;
+        font-size: 14px;
+        color: #334155;
+        white-space: pre-wrap;
+        line-height: 1.6;
+    }
+
+    .asr-modal__footer {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 24px;
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .asr-btn-reject {
+        background: #dc2626 !important;
+        border-color: #dc2626 !important;
+        color: #fff !important;
+    }
+    .asr-btn-reject:hover:not(:disabled) {
+        background: #b91c1c !important;
+        border-color: #b91c1c !important;
+    }
+
+    /* Status badges in guide table style */
+    .asr-status-pending, .asr-status-approved, .asr-status-rejected, .asr-status-completed {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .asr-status-pending span, .asr-status-approved span,
+    .asr-status-rejected span, .asr-status-completed span {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: currentColor; display: inline-block;
+    }
+
+    /* Pagination */
+    .wx-page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        height: 34px;
+        padding: 0 6px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #0f172a;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .wx-page-btn:hover:not(:disabled) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    .wx-page-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+    .wx-page-btn--active {
+        background: #0f172a !important;
+        color: #fff !important;
+        border-color: #0f172a !important;
+    }
+</style>
+
+@code {
+    // Pagination state
+    private const int PageSize = 7;
+    private int _currentPage = 1;
+
+    // State
+    private string _view = "list";  // "list" | "booking"
+    private bool _isLoadingList = true;
+    private bool _isLoadingRequests;
+    private string? _listError;
+    private string _searchTerm = string.Empty;
+    private string _statusFilter = "Tất cả";
+
+    // Data
+    private List<BookingWithRequestCountResponse> _bookings = new();
+    private List<UserSpecialRequestResponse> _bookingRequests = new();
+    private BookingWithRequestCountResponse? _selectedBooking;
+
+    // Review modal
+    private bool _showModal;
+    private bool _isApproving;
+    private UserSpecialRequestResponse? _reviewingRequest;
+    private string _adminResponse = string.Empty;
+    private bool _isSaving;
+    private bool _showValidation;
+    private string? _modalError;
+
+    // Computed
+    private IEnumerable<BookingWithRequestCountResponse> FilteredBookings => _bookings
+        .Where(b =>
+        {
+            if (!string.IsNullOrWhiteSpace(_searchTerm))
+            {
+                var t = _searchTerm.Trim();
+                if (!b.TourName.Contains(t, StringComparison.OrdinalIgnoreCase) &&
+                    !b.CustomerName.Contains(t, StringComparison.OrdinalIgnoreCase) &&
+                    !b.CustomerEmail.Contains(t, StringComparison.OrdinalIgnoreCase) &&
+                    !b.BookingCode.Contains(t, StringComparison.OrdinalIgnoreCase) &&
+                    !b.Destination.Contains(t, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            return _statusFilter switch
+            {
+                "Chờ duyệt"  => b.PendingRequests > 0,
+                "Có kết quả" => b.ApprovedRequests > 0 || b.RejectedRequests > 0,
+                _            => true
+            };
+        });
+
+    private int TotalPages => FilteredBookings.Any()
+        ? (int)Math.Ceiling(FilteredBookings.Count() / (double)PageSize)
+        : 1;
+
+    private IEnumerable<BookingWithRequestCountResponse> PagedFilteredBookings =>
+        FilteredBookings.Skip((_currentPage - 1) * PageSize).Take(PageSize);
+
+    private void GoToPage(int page) { _currentPage = page; }
+    private void PrevPage() { if (_currentPage > 1) _currentPage--; }
+    private void NextPage() { if (_currentPage < TotalPages) _currentPage++; }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        _searchTerm = e.Value?.ToString() ?? string.Empty;
+        _currentPage = 1; // reset page when searching
+    }
+
+    private void SetStatusFilter(string filter)
+    {
+        _statusFilter = filter;
+        _currentPage = 1; // reset page when filtering
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBookingsAsync();
+    }
+
+    private async Task LoadBookingsAsync()
+    {
+        _isLoadingList = true;
+        _listError = null;
+        try
+        {
+            var result = await UserApi.GetAllBookingsWithRequestCountsAsync();
+            _bookings = result?.ToList() ?? new();
+        }
+        catch (Exception ex)
+        {
+            _listError = "Không thể tải danh sách: " + ex.Message;
+        }
+        finally
+        {
+            _isLoadingList = false;
+        }
+    }
+
+    private async Task OpenBookingRequests(BookingWithRequestCountResponse booking)
+    {
+        _selectedBooking = booking;
+        _view = "booking";
+        _isLoadingRequests = true;
+        _bookingRequests = new();
+        StateHasChanged();
+
+        try
+        {
+            var result = await UserApi.GetSpecialRequestsByBookingAsync(booking.BookingId);
+            _bookingRequests = result?.ToList() ?? new();
+        }
+        catch
+        {
+            _bookingRequests = new();
+        }
+        finally
+        {
+            _isLoadingRequests = false;
+        }
+    }
+
+    private void BackToList()
+    {
+        _view = "list";
+        _selectedBooking = null;
+        _bookingRequests = new();
+    }
+
+    private void OpenReviewModal(UserSpecialRequestResponse req, bool approve)
+    {
+        _reviewingRequest = req;
+        _isApproving = approve;
+        _adminResponse = string.Empty;
+        _showValidation = false;
+        _modalError = null;
+        _showModal = true;
+    }
+
+    private void CloseModal()
+    {
+        if (_isSaving) return;
+        _showModal = false;
+        _reviewingRequest = null;
+        _modalError = null;
+    }
+
+    private async Task SubmitReview()
+    {
+        if (_reviewingRequest == null) return;
+
+        // Validate: reject cần lý do
+        if (!_isApproving && string.IsNullOrWhiteSpace(_adminResponse))
+        {
+            _showValidation = true;
+            return;
+        }
+
+        _isSaving = true;
+        _modalError = null;
+
+        try
+        {
+            var newStatus = _isApproving ? "Approved" : "Rejected";
+            var updated = await UserApi.ReviewSpecialRequestAsync(_reviewingRequest.Id, new UpdateUserSpecialRequestRequest
+            {
+                Status = newStatus,
+                AdminResponse = string.IsNullOrWhiteSpace(_adminResponse) ? null : _adminResponse.Trim()
+            });
+
+            // Update local list
+            var idx = _bookingRequests.FindIndex(r => r.Id == _reviewingRequest.Id);
+            if (idx >= 0 && updated != null)
+                _bookingRequests[idx] = updated;
+
+            // Refresh booking summary counts
+            await LoadBookingsAsync();
+
+            _showModal = false;
+            _reviewingRequest = null;
+        }
+        catch (Exception ex)
+        {
+            _modalError = ex.Message.Contains('{') ? "Đã xảy ra lỗi. Vui lòng thử lại." : ex.Message;
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    // Helpers
+    private static string GetInitials(string name)
+    {
+        var parts = name.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                        .Take(2).Select(p => p[0]);
+        return string.Concat(parts).ToUpperInvariant();
+    }
+
+    private static string GetBookingStatusClass(string status) => status.ToLower() switch
+    {
+        "paid"      => "guide-status guide-status--active",
+        "pending"   => "guide-status guide-status--busy",
+        "cancelled" => "guide-status guide-status--muted",
+        _           => "guide-status"
+    };
+
+    private static string GetRequestStatusClass(string status) => status switch
+    {
+        "Pending"   => "asr-status-pending",
+        "Approved"  => "asr-status-approved",
+        "Rejected"  => "asr-status-rejected",
+        "Completed" => "asr-status-completed",
+        _           => "asr-status-pending"
+    };
+
+    private static string GetStatusText(string status) => status switch
+    {
+        "Pending"   => "Đang chờ",
+        "Approved"  => "Đã duyệt",
+        "Rejected"  => "Đã từ chối",
+        "Completed" => "Đã hoàn thành",
+        _           => status
+    };
+}
