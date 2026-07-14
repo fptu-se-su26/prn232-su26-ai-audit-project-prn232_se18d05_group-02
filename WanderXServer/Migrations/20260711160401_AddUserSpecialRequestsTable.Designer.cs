@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WanderXServer.DataAccessLayer;
 
@@ -11,9 +12,11 @@ using WanderXServer.DataAccessLayer;
 namespace WanderXServer.Migrations
 {
     [DbContext(typeof(WanderXDbContext))]
-    partial class WanderXDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260711160401_AddUserSpecialRequestsTable")]
+    partial class AddUserSpecialRequestsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,7 +83,7 @@ namespace WanderXServer.Migrations
                     b.HasIndex("NormalizedEmail")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -232,7 +235,7 @@ namespace WanderXServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("VerificationCodes", (string)null);
+                    b.ToTable("VerificationCodes");
                 });
 
             modelBuilder.Entity("WanderXServer.BusinessObject.Booking", b =>
@@ -311,7 +314,7 @@ namespace WanderXServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("WanderXServer.BusinessObject.BookingPassenger", b =>
@@ -342,7 +345,7 @@ namespace WanderXServer.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.ToTable("BookingPassengers", (string)null);
+                    b.ToTable("BookingPassengers");
                 });
 
             modelBuilder.Entity("WanderXServer.BusinessObject.GuideProfile", b =>
@@ -393,7 +396,7 @@ namespace WanderXServer.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("GuideProfiles", (string)null);
+                    b.ToTable("GuideProfiles");
 
                     b.HasData(
                         new
@@ -570,7 +573,7 @@ namespace WanderXServer.Migrations
 
                     b.HasIndex("GuideProfileId");
 
-                    b.ToTable("GuideTourAssignments", (string)null);
+                    b.ToTable("GuideTourAssignments");
 
                     b.HasData(
                         new
@@ -1048,7 +1051,7 @@ namespace WanderXServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PasswordResetTokens", (string)null);
+                    b.ToTable("PasswordResetTokens");
                 });
 
             modelBuilder.Entity("WanderXServer.BusinessObject.UserSpecialRequest", b =>
@@ -1087,7 +1090,7 @@ namespace WanderXServer.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.ToTable("UserSpecialRequests", (string)null);
+                    b.ToTable("UserSpecialRequests");
                 });
 
             modelBuilder.Entity("WanderXServer.BusinessObject.AuthVerificationCode", b =>

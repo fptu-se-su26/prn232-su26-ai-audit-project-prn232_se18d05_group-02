@@ -20,6 +20,13 @@ builder.Services.AddScoped(sp =>
     handler.InnerHandler = new HttpClientHandler();
     return new AuthApiClient(new HttpClient(handler) { BaseAddress = new Uri(apiBaseUrl) });
 });
+builder.Services.AddScoped(sp =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    var httpClient = new HttpClient { BaseAddress = new Uri(apiBaseUrl) };
+    var sessionService = sp.GetRequiredService<AuthSessionService>();
+    return new UserApiClient(httpClient, sessionService);
+});
 
 builder.Services.AddScoped(sp =>
 {

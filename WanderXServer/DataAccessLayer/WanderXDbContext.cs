@@ -21,6 +21,11 @@ public class WanderXDbContext : DbContext
 
     public DbSet<GuideTourAssignment> GuideTourAssignments => Set<GuideTourAssignment>();
 
+    public DbSet<Booking> Bookings => Set<Booking>();
+    public DbSet<BookingPassenger> BookingPassengers => Set<BookingPassenger>();
+    public DbSet<UserSpecialRequest> UserSpecialRequests => Set<UserSpecialRequest>();
+    public DbSet<TourReview> TourReviews => Set<TourReview>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -143,7 +148,11 @@ public class WanderXDbContext : DbContext
     public void SeedDevelopmentData()
     {
         Database.EnsureCreated();
+        EnsureUserAddressColumn();
         EnsureGuideTourAssignmentsTable();
+        EnsureBookingsTable();
+        EnsureUserSpecialRequestsTable();
+        EnsureTourReviewsTable();
 
         var passwordHasher = new PasswordHasher<ApplicationUser>();
 
@@ -152,6 +161,7 @@ public class WanderXDbContext : DbContext
 
         SaveChanges();
         SeedGuideTourAssignments();
+        SeedBookings();
         SaveChanges();
 
         // Update existing Finished assignments that don't have an evidence image
@@ -167,6 +177,16 @@ public class WanderXDbContext : DbContext
             }
             SaveChanges();
         }
+    }
+
+    private void EnsureUserAddressColumn()
+    {
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Users', 'Address') IS NULL
+BEGIN
+    ALTER TABLE [Users] ADD [Address] nvarchar(240) NULL;
+END
+""");
     }
 
     private void EnsureGuideTourAssignmentsTable()
@@ -208,7 +228,140 @@ BEGIN
 END
 """);
     }
+// TV3
+    private void EnsureBookingsTable()
+    {
+        Database.ExecuteSqlRaw("""
+IF OBJECT_ID(N'[Bookings]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [Bookings] (
+        [Id] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [BookingCode] nvarchar(32) NOT NULL,
+        [TourName] nvarchar(200) NOT NULL,
+        [Destination] nvarchar(200) NOT NULL,
+        [ThumbnailUrl] nvarchar(500) NULL,
+        [DepartureDate] datetime2 NOT NULL,
+        [GuestCount] int NOT NULL,
+        [TotalAmount] decimal(18, 2) NOT NULL,
+        [Status] nvarchar(32) NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NULL,
+        [PaidAt] datetime2 NULL,
+        [ConfirmedAt] datetime2 NULL,
+        [CompletedAt] datetime2 NULL,
+        CONSTRAINT [PK_Bookings] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Bookings_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+    );
 
+    CREATE INDEX [IX_Bookings_UserId] ON [Bookings] ([UserId]);
+END
+""");
+
+        // Add columns if the table already existed without them
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'PaidAt') IS NULL
+    ALTER TABLE [Bookings] ADD [PaidAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'ConfirmedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [ConfirmedAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'CompletedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [CompletedAt] datetime2 NULL;
+""");
+
+        // Add new approval and failure columns
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'ApprovedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [ApprovedAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'RequestFailedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [RequestFailedAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'PaymentFailedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [PaymentFailedAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'ConfirmationFailedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [ConfirmationFailedAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'CompletionFailedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [CompletionFailedAt] datetime2 NULL;
+""");
+
+        Database.ExecuteSqlRaw("""
+IF OBJECT_ID(N'[BookingPassengers]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [BookingPassengers] (
+        [Id] uniqueidentifier NOT NULL,
+        [BookingId] uniqueidentifier NOT NULL,
+        [FullName] nvarchar(100) NOT NULL,
+        [PhoneNumber] nvarchar(20) NOT NULL,
+        [TicketType] nvarchar(50) NOT NULL,
+        CONSTRAINT [PK_BookingPassengers] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_BookingPassengers_Bookings_BookingId] FOREIGN KEY ([BookingId]) REFERENCES [Bookings] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_BookingPassengers_BookingId] ON [BookingPassengers] ([BookingId]);
+END
+""");
+    }
+
+    private void EnsureUserSpecialRequestsTable()
+    {
+        Database.ExecuteSqlRaw(@"
+IF OBJECT_ID(N'[UserSpecialRequests]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [UserSpecialRequests] (
+        [Id] uniqueidentifier NOT NULL,
+        [BookingId] uniqueidentifier NOT NULL,
+        [Description] nvarchar(2000) NOT NULL,
+        [Status] nvarchar(32) NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NULL,
+        [ReviewedAt] datetime2 NULL,
+        [AdminResponse] nvarchar(1000) NULL,
+        CONSTRAINT [PK_UserSpecialRequests] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_UserSpecialRequests_Bookings_BookingId] FOREIGN KEY ([BookingId]) REFERENCES [Bookings] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_UserSpecialRequests_BookingId] ON [UserSpecialRequests] ([BookingId]);
+END
+");
+    }
+
+    private void EnsureTourReviewsTable()
+    {
+        Database.ExecuteSqlRaw(@"
+IF OBJECT_ID(N'[TourReviews]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [TourReviews] (
+        [Id] uniqueidentifier NOT NULL,
+        [BookingId] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [Rating] int NOT NULL,
+        [Comment] nvarchar(2000) NULL,
+        [TravelPhotos] nvarchar(max) NULL,
+        [Status] nvarchar(32) NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NULL,
+        [ModeratedAt] datetime2 NULL,
+        [ModerationReason] nvarchar(1000) NULL,
+        [ModeratedBy] uniqueidentifier NULL,
+        CONSTRAINT [PK_TourReviews] PRIMARY KEY ([Id])
+    );
+
+    CREATE INDEX [IX_TourReviews_BookingId] ON [TourReviews] ([BookingId]);
+    CREATE INDEX [IX_TourReviews_UserId] ON [TourReviews] ([UserId]);
+END
+");
+    }
+// end TV3
     private void SeedGuideTourAssignments()
     {
         var today = DateTime.Today;
@@ -218,7 +371,96 @@ END
             AddAssignment(today, assignment);
         }
     }
-
+// TV3
+    private void SeedBookings()
+    {
+        var adminEmail = NormalizeEmail("ad@ad.123");
+        var admin = Users.FirstOrDefault(u => u.NormalizedEmail == adminEmail);
+        
+        if (admin == null) return;
+        
+        if (Bookings.Any() && BookingPassengers.Any()) return;
+        
+        var today = DateTime.UtcNow.Date;
+        
+        // Tour 1: Đã thanh toán đầy đủ - Paid, ConfirmedAt có, chưa hoàn thành
+        var tour1 = Bookings.FirstOrDefault(b => b.BookingCode == "WX987346");
+        if (tour1 == null)
+        {
+            tour1 = new Booking
+            {
+                UserId = admin.Id,
+                BookingCode = "WX987346",
+                TourName = "Hành Trình Venice Lãng Mạn & Trải Nghiệm Thuyền Gondola Độc Bản",
+                Destination = "Venice, Italy",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?auto=format&fit=crop&q=80&w=300",
+                DepartureDate = today.AddDays(15),
+                GuestCount = 2,
+                TotalAmount = 99000000m,
+                Status = "Paid",
+                CreatedAt = today.AddDays(-5),
+                PaidAt = today.AddDays(-5).AddHours(2),        // Đã thanh toán
+                ConfirmedAt = today.AddDays(-4),               // Hướng dẫn viên xác nhận
+                CompletedAt = null                             // Chưa hoàn thành (chưa đến ngày đi)
+            };
+            Bookings.Add(tour1);
+        }
+        
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Người lớn (Trưởng đoàn)" });
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "Nguyễn Văn B", PhoneNumber = "0901234568", TicketType = "Người lớn" });
+        
+        // Tour 2: Đang chờ thanh toán - Pending, cả 3 tiến trình bước 2,3,4 đều null
+        var tour2 = Bookings.FirstOrDefault(b => b.BookingCode == "WX348612");
+        if (tour2 == null)
+        {
+            tour2 = new Booking
+            {
+                UserId = admin.Id,
+                BookingCode = "WX348612",
+                TourName = "Kyoto Cổ Kính & Trải Nghiệm Trà Đạo Truyền Thống",
+                Destination = "Kyoto, Japan",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=300",
+                DepartureDate = today.AddDays(60),
+                GuestCount = 1,
+                TotalAmount = 38900000m,
+                Status = "Pending",
+                CreatedAt = today.AddDays(-2),
+                PaidAt = null,      // Chưa thanh toán - đang quay vòng
+                ConfirmedAt = null, // Mờ
+                CompletedAt = null  // Mờ
+            };
+            Bookings.Add(tour2);
+        }
+        
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour2.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Người lớn (Trưởng đoàn)" });
+        
+        // Tour 3: Đã hủy - Cancelled
+        var tour3 = Bookings.FirstOrDefault(b => b.BookingCode == "WX102874");
+        if (tour3 == null)
+        {
+            tour3 = new Booking
+            {
+                UserId = admin.Id,
+                BookingCode = "WX102874",
+                TourName = "Thiên Đường Maldives - Biệt Thự Mặt Nước Cao Cấp",
+                Destination = "Maldives",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=300",
+                DepartureDate = today.AddDays(-30),
+                GuestCount = 2,
+                TotalAmount = 124000000m,
+                Status = "Cancelled",
+                CreatedAt = today.AddDays(-40),
+                PaidAt = null,      // Bị hủy - hiển dấu X đỏ
+                ConfirmedAt = null,
+                CompletedAt = null
+            };
+            Bookings.Add(tour3);
+        }
+        
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Người lớn (Trưởng đoàn)" });
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "Trần Thị C", PhoneNumber = "0901234569", TicketType = "Người lớn" });
+    }
+// end TV3
     private void AddAssignment(DateTime today, DevelopmentAssignment assignment)
     {
         if (GuideTourAssignments.Any(item => item.TourCode == assignment.TourCode))

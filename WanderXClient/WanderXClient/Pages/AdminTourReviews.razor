@@ -1,0 +1,554 @@
+@page "/tour-reviews"
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient UserApi
+@inject AuthSessionService SessionService
+@inject NavigationManager NavManager
+
+<PageTitle>WanderX Admin - Quản lý đánh giá tour</PageTitle>
+
+<div class="guide-admin-page">
+    <!-- Sidebar -->
+    <aside class="guide-sidebar">
+        <div class="guide-sidebar__brand">
+            <a class="brand-mark" href="/">WanderX</a>
+            <p>Admin Suite</p>
+        </div>
+        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
+            <a class="guide-sidebar__link" href="/dashboard">
+                <MaterialIcon Name="dashboard" />
+                Dashboard
+            </a>
+            <a class="guide-sidebar__link" href="/guides">
+                <MaterialIcon Name="badge" />
+                Guides
+            </a>
+            <a class="guide-sidebar__link" href="/guide-assignments">
+                <MaterialIcon Name="assignment_ind" />
+                Assignments
+            </a>
+            <a class="guide-sidebar__link" href="/admin-service-requests">
+                <MaterialIcon Name="support_agent" />
+                Service Requests
+            </a>
+            <a class="guide-sidebar__link guide-sidebar__link--active" href="/tour-reviews" aria-current="page">
+                <MaterialIcon Name="rate_review" />
+                Tour Reviews
+            </a>
+            <a class="guide-sidebar__link" href="/">
+                <MaterialIcon Name="home" />
+                Homepage
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="guide-main">
+        @if (_isLoading)
+        {
+            <div class="guide-empty">
+                <MaterialIcon Name="sync" />
+                Đang tải dữ liệu...
+            </div>
+        }
+        else if (_session == null || _session.Role != "Admin")
+        {
+            <div class="guide-empty">
+                <MaterialIcon Name="admin_panel_settings" />
+                <h2>Truy cập bị từ chối</h2>
+                <p>Bạn cần quyền admin để truy cập trang này.</p>
+                <a class="wx-button wx-button--secondary" href="/">
+                    <MaterialIcon Name="home" />
+                    Về trang chủ
+                </a>
+            </div>
+        }
+        else
+        {
+            <!-- Header -->
+            <header class="guide-topbar">
+                <div>
+                    <p class="guide-eyebrow">Quản lý</p>
+                    <h1>Đánh giá tour</h1>
+                    <p class="guide-subtitle">Xem và quản lý các đánh giá của khách hàng</p>
+                </div>
+            </header>
+
+            <section class="guide-content">
+                <!-- Stats -->
+                <div class="guide-stat-grid">
+                    <article class="guide-stat">
+                        <p>Tổng đánh giá</p>
+                        <strong>@(_reviews?.Count ?? 0)</strong>
+                        <span>Tất cả đánh giá</span>
+                    </article>
+                    <article class="guide-stat guide-stat--secondary">
+                        <p>Hiển thị</p>
+                        <strong>@(_reviews?.Count(r => r.Status == "Visible") ?? 0)</strong>
+                        <span>Đang công khai</span>
+                    </article>
+                    <article class="guide-stat guide-stat--tertiary">
+                        <p>Đã ẩn</p>
+                        <strong>@(_reviews?.Count(r => r.Status == "Hidden") ?? 0)</strong>
+                        <span>Không hiển thị</span>
+                    </article>
+                    <article class="guide-stat">
+                        <p>Đã xóa</p>
+                        <strong>@(_reviews?.Count(r => r.Status == "Deleted") ?? 0)</strong>
+                        <span>Đã bị xóa</span>
+                    </article>
+                </div>
+
+                <!-- Filters -->
+                <section class="guide-form-panel">
+                    <div class="guide-section-heading">
+                        <div>
+                            <p class="guide-eyebrow">Bộ lọc</p>
+                            <h2>Lọc đánh giá</h2>
+                        </div>
+                        <div class="guide-topbar__actions">
+                            <label class="guide-search" aria-label="Tìm kiếm">
+                                <MaterialIcon Name="search" />
+                                <input type="search" placeholder="Tìm theo tour, người dùng..." value="@_searchQuery" @oninput="OnSearchInput" />
+                            </label>
+                        </div>
+                    </div>
+                    <div class="guide-filter-group" role="group">
+                        @foreach (var f in new[] { "Tất cả", "Hiển thị", "Đã ẩn", "Đã xóa" })
+                        {
+                            <button class="@(_statusFilter == f ? "guide-filter guide-filter--active" : "guide-filter")"
+                                    type="button" @onclick="() => SetStatusFilter(f)">
+                                @f
+                            </button>
+                        }
+                    </div>
+                    <div class="guide-filter-group" role="group" style="margin-top: 12px;">
+                        @foreach (var f in new[] { "Tất cả", "5 sao", "4 sao", "3 sao", "2 sao", "1 sao" })
+                        {
+                            <button class="@(_ratingFilter == f ? "guide-filter guide-filter--active" : "guide-filter")"
+                                    type="button" @onclick="() => SetRatingFilter(f)">
+                                @f
+                            </button>
+                        }
+                    </div>
+                </section>
+
+                <!-- Reviews List -->
+                @if (_reviews == null || !FilteredReviews.Any())
+                {
+                    <div class="guide-empty">
+                        <MaterialIcon Name="rate_review" />
+                        <h3>Không tìm thấy đánh giá nào</h3>
+                        <p>Thử thay đổi bộ lọc tìm kiếm</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="atr-reviews-list">
+                        @foreach (var review in FilteredReviews)
+                        {
+                            <div class="atr-review-card @(GetReviewCardClass(review.Status))">
+                                <div class="atr-review-card__header">
+                                    <div class="guide-person">
+                                        <div class="guide-avatar atr-avatar">
+                                            @GetInitials(review.UserName)
+                                        </div>
+                                        <div>
+                                            <strong>@review.UserName</strong>
+                                            <span>@review.BookingCode</span>
+                                            <span class="atr-meta-small">@review.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                        </div>
+                                    </div>
+                                    <div class="atr-review-status">
+                                        <span class="@GetStatusClass(review.Status)">
+                                            <span></span>@GetStatusText(review.Status)
+                                        </span>
+                                        <div class="atr-rating">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <span class="material-symbols-outlined @(i <= review.Rating ? "atr-rating--filled" : "atr-rating--empty")">
+                                                    @(i <= review.Rating ? "star" : "star_border")
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="atr-review-card__body">
+                                    <div class="atr-review-field">
+                                        <label class="atr-label">Tour:</label>
+                                        <p class="atr-value">@review.TourName</p>
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(review.Comment))
+                                    {
+                                        <div class="atr-review-field">
+                                            <label class="atr-label">Nhận xét:</label>
+                                            <p class="atr-value atr-comment">@review.Comment</p>
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(review.TravelPhotos))
+                                    {
+                                        <div class="atr-review-field">
+                                            <label class="atr-label">Ảnh đi du lịch:</label>
+                                            <p class="atr-value" style="font-size: 13px; color: var(--guide-muted);">@review.TravelPhotos</p>
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(review.ModerationReason))
+                                    {
+                                        <div class="atr-moderation-info">
+                                            <label class="atr-label">Lý do xử lý:</label>
+                                            <p>@review.ModerationReason</p>
+                                            @if (review.ModeratedAt.HasValue)
+                                            {
+                                                <span class="atr-meta">Xử lý lúc: @review.ModeratedAt.Value.ToString("dd/MM/yyyy HH:mm") bởi @review.ModeratorName</span>
+                                            }
+                                        </div>
+                                    }
+
+                                    @if (review.UpdatedAt.HasValue)
+                                    {
+                                        <span class="atr-meta">Cập nhật lần cuối: @review.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                    }
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="atr-review-card__actions">
+                                    @if (review.Status == "Visible")
+                                    {
+                                        <button class="wx-button wx-button--outline" style="font-size:12px;padding:6px 14px"
+                                                type="button" @onclick="@(() => ShowModerateModal(review.Id, "Hidden"))">
+                                            <MaterialIcon Name="visibility_off" />
+                                            Ẩn đánh giá
+                                        </button>
+                                    }
+                                    else if (review.Status == "Hidden")
+                                    {
+                                        <button class="wx-button wx-button--outline" style="font-size:12px;padding:6px 14px"
+                                                type="button" @onclick="@(() => ShowModerateModal(review.Id, "Visible"))">
+                                            <MaterialIcon Name="visibility" />
+                                            Hiển thị lại
+                                        </button>
+                                    }
+                                    @if (review.Status != "Deleted")
+                                    {
+                                        <button class="wx-button wx-button--outline atr-btn-delete" style="font-size:12px;padding:6px 14px"
+                                                type="button" @onclick="@(() => ShowModerateModal(review.Id, "Deleted"))">
+                                            <MaterialIcon Name="delete" />
+                                            Xóa đánh giá
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (TotalPages >= 1)
+                    {
+                        <div class="atr-pagination">
+                            <span class="atr-pagination-info">Trang @_currentPage / @TotalPages (@AllFilteredReviews.Count() kết quả)</span>
+                            <div class="atr-pagination-controls">
+                                <button class="atr-pagination-btn" disabled="@(_currentPage <= 1)" @onclick="PrevPage" title="Trang trước">
+                                    <MaterialIcon Name="chevron_left" />
+                                </button>
+                                @for (var p = 1; p <= TotalPages; p++)
+                                {
+                                    var pg = p;
+                                    <button class="atr-pagination-btn @(_currentPage == pg ? "atr-pagination-btn--active" : "")"
+                                            @onclick="() => GoToPage(pg)">@pg</button>
+                                }
+                                <button class="atr-pagination-btn" disabled="@(_currentPage >= TotalPages)" @onclick="NextPage" title="Trang sau">
+                                    <MaterialIcon Name="chevron_right" />
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+            </section>
+        }
+    </main>
+    <MobileBottomNav />
+</div>
+
+<!-- Moderate Modal - Outside guide-admin-page for proper positioning -->
+@if (_showModerateModal)
+{
+    <div class="atr-modal-overlay" @onclick="HideModerateModal">
+        <div class="atr-modal" @onclick:stopPropagation="true">
+            <div class="atr-modal__header">
+                <div>
+                    <h2>Xử lý đánh giá</h2>
+                    <p class="guide-subtitle atr-modal-subtitle">@(_moderationAction == "Hidden" ? "Ẩn đánh giá khỏi hiển thị công khai" : _moderationAction == "Deleted" ? "Xóa đánh giá vĩnh viễn" : "Hiển thị lại đánh giá")</p>
+                </div>
+                <button class="guide-icon-button" type="button" @onclick="HideModerateModal">
+                    <MaterialIcon Name="close" />
+                </button>
+            </div>
+
+            <div class="atr-modal__body">
+                @if (_moderationAction != "Visible")
+                {
+                    <div class="guide-field">
+                        <label for="moderation-reason" class="atr-label">Lý do xử lý:</label>
+                        <textarea id="moderation-reason"
+                                  class="guide-control guide-control--area"
+                                  rows="4"
+                                  placeholder="Nhập lý do xử lý đánh giá..."
+                                  @bind="_moderationReason"></textarea>
+                    </div>
+                }
+                else
+                {
+                    <p class="atr-confirm-text">Bạn có chắc chắn muốn hiển thị lại đánh giá này?</p>
+                }
+            </div>
+
+            <div class="atr-modal__footer">
+                <div class="atr-modal__actions">
+                    <button class="wx-button wx-button--outline" type="button" @onclick="HideModerateModal" disabled="@_isSubmitting">
+                        Huỷ
+                    </button>
+                    <button class="wx-button wx-button--secondary" type="button" @onclick="SubmitModeration" disabled="@_isSubmitting">
+                        @if (_isSubmitting)
+                        {
+                            <MaterialIcon Name="sync" class="atr-spin" />
+                            <span>Đang xử lý...</span>
+                        }
+                        else
+                        {
+                            <MaterialIcon Name="check_circle" />
+                            <span>Xác nhận</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _isLoading = true;
+    private bool _isSubmitting = false;
+    private bool _showModerateModal = false;
+    private AuthSession? _session;
+    private List<TourReviewResponse>? _reviews;
+    private string _searchQuery = string.Empty;
+    private string _statusFilter = "Tất cả";
+    private string _ratingFilter = "Tất cả";
+    private Guid _selectedReviewId;
+    private string _moderationAction = string.Empty;
+    private string _moderationReason = string.Empty;
+
+    // Pagination
+    private const int PageSize = 10;
+    private int _currentPage = 1;
+
+    // Computed property for filtered reviews (before pagination)
+    private IEnumerable<TourReviewResponse> AllFilteredReviews => _reviews?
+        .Where(r =>
+        {
+            if (!string.IsNullOrWhiteSpace(_searchQuery))
+            {
+                var t = _searchQuery.Trim();
+                if (!r.TourName.Contains(t, StringComparison.OrdinalIgnoreCase) &&
+                    !r.UserName.Contains(t, StringComparison.OrdinalIgnoreCase) &&
+                    !r.BookingCode.Contains(t, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            return _statusFilter switch
+            {
+                "Hiển thị" => r.Status == "Visible",
+                "Đã ẩn" => r.Status == "Hidden",
+                "Đã xóa" => r.Status == "Deleted",
+                _ => true
+            };
+        })
+        .Where(r =>
+        {
+            return _ratingFilter switch
+            {
+                "5 sao" => r.Rating == 5,
+                "4 sao" => r.Rating == 4,
+                "3 sao" => r.Rating == 3,
+                "2 sao" => r.Rating == 2,
+                "1 sao" => r.Rating == 1,
+                _ => true
+            };
+        })
+        .OrderByDescending(r => r.CreatedAt) ?? Enumerable.Empty<TourReviewResponse>();
+
+    // Computed property for paginated reviews
+    private IEnumerable<TourReviewResponse> FilteredReviews => AllFilteredReviews
+        .Skip((_currentPage - 1) * PageSize)
+        .Take(PageSize);
+
+    // Total pages calculation
+    private int TotalPages => AllFilteredReviews.Any()
+        ? (int)Math.Ceiling(AllFilteredReviews.Count() / (double)PageSize)
+        : 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _session = await SessionService.GetAsync();
+        if (_session == null || _session.Role != "Admin")
+        {
+            _isLoading = false;
+            return;
+        }
+
+        await LoadReviews();
+    }
+
+    private async Task LoadReviews()
+    {
+        _isLoading = true;
+        try
+        {
+            var allReviews = await UserApi.GetAllReviewsAsync();
+            _reviews = allReviews?.ToList() ?? new List<TourReviewResponse>();
+        }
+        catch (Exception)
+        {
+            _reviews = new List<TourReviewResponse>();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        _searchQuery = e.Value?.ToString() ?? string.Empty;
+        _currentPage = 1; // Reset to page 1 when searching
+        StateHasChanged();
+    }
+
+    private void SetStatusFilter(string filter)
+    {
+        _statusFilter = filter;
+        _currentPage = 1; // Reset to page 1 when filtering
+    }
+
+    private void SetRatingFilter(string filter)
+    {
+        _ratingFilter = filter;
+        _currentPage = 1; // Reset to page 1 when filtering
+    }
+
+    private void GoToPage(int page)
+    {
+        _currentPage = page;
+        StateHasChanged();
+    }
+
+    private void PrevPage()
+    {
+        if (_currentPage > 1)
+        {
+            _currentPage--;
+            StateHasChanged();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (_currentPage < TotalPages)
+        {
+            _currentPage++;
+            StateHasChanged();
+        }
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+        {
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        }
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private string GetReviewCardClass(string status)
+    {
+        return status switch
+        {
+            "Visible" => "atr-review-card--visible",
+            "Hidden" => "atr-review-card--hidden",
+            "Deleted" => "atr-review-card--deleted",
+            _ => ""
+        };
+    }
+
+    private string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "Visible" => "atr-status-visible",
+            "Hidden" => "atr-status-hidden",
+            "Deleted" => "atr-status-deleted",
+            _ => ""
+        };
+    }
+
+    private string GetStatusText(string status)
+    {
+        return status switch
+        {
+            "Visible" => "Hiển thị",
+            "Hidden" => "Đã ẩn",
+            "Deleted" => "Đã xóa",
+            _ => status
+        };
+    }
+
+    private void ShowModerateModal(Guid reviewId, string action)
+    {
+        _selectedReviewId = reviewId;
+        _moderationAction = action;
+        _moderationReason = string.Empty;
+        _showModerateModal = true;
+    }
+
+    private void HideModerateModal()
+    {
+        _showModerateModal = false;
+        _selectedReviewId = Guid.Empty;
+        _moderationAction = string.Empty;
+        _moderationReason = string.Empty;
+    }
+
+    private async Task SubmitModeration()
+    {
+        if (_selectedReviewId == Guid.Empty) return;
+
+        _isSubmitting = true;
+        try
+        {
+            var request = new ModerateReviewRequest
+            {
+                Status = _moderationAction,
+                Reason = _moderationAction == "Visible" ? null : _moderationReason
+            };
+
+            await UserApi.ModerateReviewAsync(_selectedReviewId, request);
+
+            HideModerateModal();
+            await LoadReviews();
+        }
+        catch (Exception)
+        {
+            // Handle error - could show a toast notification
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}

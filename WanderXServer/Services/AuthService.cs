@@ -1,6 +1,9 @@
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using WanderXServer.BusinessObject;
 using WanderXServer.BusinessObject.Enums;
 using WanderXServer.DataAccessLayer;
@@ -12,10 +15,12 @@ public class AuthService : IAuthService
 {
     private readonly WanderXDbContext _dbContext;
     private readonly PasswordHasher<ApplicationUser> _passwordHasher = new();
+    private readonly IConfiguration _configuration;
 
-    public AuthService(WanderXDbContext dbContext)
+    public AuthService(WanderXDbContext dbContext, IConfiguration configuration)
     {
         _dbContext = dbContext;
+        _configuration = configuration;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
@@ -164,12 +169,35 @@ public class AuthService : IAuthService
         };
     }
 
-    private static AuthResponse CreateAuthResponse(ApplicationUser user, string message, string? verificationCode = null)
+    private AuthResponse CreateAuthResponse(ApplicationUser user, string message, string? verificationCode = null)
     {
+        var jwtKey = _configuration["Jwt:Key"] ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong!";
+        var jwtIssuer = _configuration["Jwt:Issuer"] ?? "WanderX";
+        var jwtAudience = _configuration["Jwt:Audience"] ?? "WanderXClient";
+
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Name, user.FullName),
+            new Claim(ClaimTypes.Role, user.Role.ToString())
+        };
+
+        var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(
+            issuer: jwtIssuer,
+            audience: jwtAudience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddDays(7),
+            signingCredentials: credentials
+        );
+
         return new AuthResponse
         {
             Message = message,
-            Token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant(),
+            Token = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(token),
             Email = user.Email,
             FullName = user.FullName,
             Role = user.Role.ToString(),
