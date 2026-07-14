@@ -9,20 +9,16 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<AuthSessionService>();
-builder.Services.AddScoped(_ =>
+
+// Register the custom CsrfHeaderHandler
+builder.Services.AddTransient<CsrfHeaderHandler>();
+
+builder.Services.AddScoped(sp =>
 {
     var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
-    return new AuthApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
-});
-builder.Services.AddScoped(_ =>
-{
-    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
-    return new GuideApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
-});
-builder.Services.AddScoped(_ =>
-{
-    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
-    return new GuideTourApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+    var handler = sp.GetRequiredService<CsrfHeaderHandler>();
+    handler.InnerHandler = new HttpClientHandler();
+    return new AuthApiClient(new HttpClient(handler) { BaseAddress = new Uri(apiBaseUrl) });
 });
 builder.Services.AddScoped(sp =>
 {
@@ -32,4 +28,27 @@ builder.Services.AddScoped(sp =>
     return new UserApiClient(httpClient, sessionService);
 });
 
-await builder.Build().RunAsync();
+builder.Services.AddScoped(sp =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    var handler = sp.GetRequiredService<CsrfHeaderHandler>();
+    handler.InnerHandler = new HttpClientHandler();
+    return new GuideApiClient(new HttpClient(handler) { BaseAddress = new Uri(apiBaseUrl) });
+});
+
+builder.Services.AddScoped(sp =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    var handler = sp.GetRequiredService<CsrfHeaderHandler>();
+    handler.InnerHandler = new HttpClientHandler();
+    return new GuideTourApiClient(new HttpClient(handler) { BaseAddress = new Uri(apiBaseUrl) });
+});
+
+var host = builder.Build();
+
+// Retrieve CSRF token from server response headers and store it on startup
+var authApi = host.Services.GetRequiredService<AuthApiClient>();
+await authApi.InitializeCsrfAsync();
+
+await host.RunAsync();
+
