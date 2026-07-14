@@ -39,6 +39,12 @@
                 element.scrollIntoView({ behavior: "smooth", block: "center" });
             }
         };
+        window.wanderX.getCookie = function (name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        };
         window.wanderXCamera = {
             startCamera: async function (videoElementId) {
                 try {

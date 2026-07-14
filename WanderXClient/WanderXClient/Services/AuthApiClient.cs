@@ -51,4 +51,16 @@ public sealed class AuthApiClient
             ? "The request could not be completed."
             : detail);
     }
+
+    public async Task InitializeCsrfAsync()
+    {
+        try
+        {
+            await _httpClient.GetAsync("api/auth/csrf");
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"[AuthApiClient] Failed to initialize CSRF token: {ex.Message}");
+        }
+    }
 }
