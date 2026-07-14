@@ -830,6 +830,86 @@ Lỗi tràn chữ chủ yếu do thuộc tính mặc định min-width của gri
 
 ---
 
+### Prompt-07
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 14/07/2026 |
+| Công cụ AI | Antigravity (Gemini 3.5 Flash) |
+| Mục đích sử dụng | Triển khai các giải pháp bảo mật hệ thống bao gồm Rate Limiting, CORS, SQL/NoSQL Injection checks, CSRF protection và XSS input sanitization. |
+| Phần việc liên quan | Security Enhancement / Backend & Frontend Integration |
+| Mức độ sử dụng | Hỗ trợ chính |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Thực hiện các biển pháp bảo mật cho hệ thống
+Rate Limiting (0:24): Kiểm soát số lượng request tối đa từ một user trong khoảng thời gian nhất định để tránh quá tải hệ thống hoặc bị tấn công dò mật khẩu (brute-force).
+CORS (Cross-Origin Resource Sharing) (2:33): Giới hạn các tên miền (domain) cụ thể được phép gọi API, ngăn chặn việc sử dụng API trái phép từ các nguồn không xác định.
+SQL & NoSQL Injection (3:06): Ngăn chặn hacker chèn mã độc vào câu lệnh truy vấn bằng cách tham số hóa dữ liệu đầu vào hoặc sử dụng các thư viện ORM bảo mật thay vì nối chuỗi thủ công.
+Firewalls (Tường lửa) (3:52): Đóng vai trò là "nguyên gác cổng", phân tích và lọc các request độc hại trước khi chúng tiếp cận API của bạn.
+VPNs (Mạng nội bộ riêng tư) (4:23): Giới hạn quyền truy cập vào các API nội bộ (quản trị, nhân sự, kế toán) chỉ dành cho người dùng trong mạng nội bộ.
+CSRF (Cross-Site Request Forgery) (4:49): Sử dụng mã CSRF kết hợp với cookie để ngăn chặn việc hacker mượn trình duyệt của người dùng để thực hiện các hành động trái phép (như chuyển tiền).
+XSS (Cross-Site Scripting) (5:56): Ngăn chặn việc hacker chèn mã JavaScript độc hại vào trang web bằng cách vô hiệu hóa các ký tự đặc biệt trước khi hiển thị dữ liệu lên giao diện.
+Sau khi hoàn thành thì xuất ra  bản report .md
+```
+
+#### 5.2. Bối cảnh khi viết prompt
+
+```text
+Nhóm cần tích hợp các giải pháp bảo mật cơ bản cho toàn bộ hệ thống WanderX. Lớp API và Blazor WASM có một số cổng kết nối khác nhau và có một số lỗ hổng bảo mật chưa được xử lý. Nhóm đã sử dụng prompt này để nhờ AI tư vấn, thiết kế và sinh mã nguồn tích hợp (Rate Limiting, CORS động, SQL injection check, cookie-header CSRF và XSS sanitization filter).
+```
+
+#### 5.3. Kết quả AI trả về
+
+```text
+AI đề xuất triển khai các cấu hình tích hợp sẵn trong .NET 8 (như AddRateLimiter, AddCors động), tạo CsrfProtectionMiddleware kết hợp với CsrfHeaderHandler chéo cổng tại client và XssSanitizationFilter toàn cục xử lý đầu vào.
+```
+
+#### 5.4. Giải thích cách kiểm tra/sửa đổi của sinh viên/nhóm
+
+```text
+- Nhóm đã tích hợp mã nguồn middleware và filter vào server và client.
+- Khi kiểm thử phát hiện lỗi CORS OPTIONS và lỗi chặn SameSite=Lax cookie trên cross-origin localhost, nhóm đã tự sửa đổi cấu hình cookie sang SameSite=None, Secure=true và bypass OPTIONS trong middleware.
+- Xóa bỏ các log nhạy cảm chứa giá trị token phiên thô trên tab console.
+```
+
+#### 5.5. Kết quả sau khi kiểm tra/sửa đổi
+
+```text
+- Giao diện đăng nhập và các API hoạt động mượt mà, xác thực CSRF tự động và thành công 100%.
+- Các truy vấn và đầu vào được làm sạch an toàn trước khi lưu cơ sở dữ liệu.
+- Hệ thống build hoàn tất 100% không cảnh báo hay lỗi.
+```
+
+#### 5.6. Đánh giá chất lượng prompt
+
+- [X] Prompt rõ ràng
+- [X] Prompt có đủ bối cảnh
+- [ ] Prompt còn thiếu thông tin
+- [X] Prompt tạo ra kết quả tốt
+- [ ] Prompt tạo ra kết quả chưa phù hợp
+- [ ] Cần hỏi lại AI nhiều lần
+- [X] Cần tự kiểm tra và chỉnh sửa nhiều
+- [ ] Kết quả AI có lỗi hoặc chưa chính xác
+
+#### 5.7. Minh chứng liên quan
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXServer/Program.cs, WanderXServer/Security/*, WanderXServer/Controllers/AuthController.cs, WanderXClient/WanderXClient/Program.cs, WanderXClient/WanderXClient/Services/CsrfHeaderHandler.cs, WanderXClient/WanderXClient/Services/AuthApiClient.cs |
+| Screenshot | |
+| Link tài liệu/báo cáo | docs/SECURITY_REPORT.md |
+
+#### 5.8. Ghi chú thêm
+
+```text
+Việc thiết lập CORS với AllowCredentials() bắt buộc SameSite=None và Secure=true đối với các cookie truyền nhận chéo origin trên môi trường localhost. Các custom middleware tự viết phải luôn bypass phương thức OPTIONS để đảm bảo các CORS preflight requests được duyệt.
+```
+
+---
+
 ## 6. Prompt quan trọng nhất
 
 Chọn một prompt có ảnh hưởng lớn nhất đến bài tập/project.

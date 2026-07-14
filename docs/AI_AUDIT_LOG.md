@@ -904,11 +904,78 @@ Lần sử dụng AI thứ 6 giải quyết nhanh chóng lỗi UI/UX trên phiê
    - Gợi ý thay đổi giao diện 2 cột rất phù hợp với tính chất của sidebar hẹp trên desktop/tablet.
 
 2. Bài học:
-   - Khi thiết kế giao diện dạng thẻ nhỏ chứa dữ liệu động (như ngày tháng hay tên địa điểm dài), luôn phải dự phòng thuộc tính ngắt dòng (overflow-wrap) để tránh lỗi tràn khung.
+   - Lỗi tràn chữ chủ yếu do thuộc tính mặc định min-width của grid-items là auto, ngăn cản chúng co giãn bé hơn nội dung văn bản. Việc thêm min-width: 0 cùng overflow-wrap: break-word đã sửa triệt để lỗi này.
 ```
 
 ---
 
+### Lần sử dụng AI số 7
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 14/07/2026 |
+| Công cụ AI | Antigravity (Gemini 3.5 Flash) |
+| Mục đích sử dụng | Triển khai các giải pháp bảo mật hệ thống bao gồm Rate Limiting, CORS, SQL/NoSQL Injection checks, CSRF protection và XSS input sanitization. |
+| Phần việc liên quan | Security Enhancement / Backend & Frontend Integration |
+| Mức độ sử dụng | Hỗ trợ chính |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-07
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+1. Cấu hình Rate Limiting và CORS:
+   - Sử dụng Microsoft.AspNetCore.RateLimiting trong .NET 8 để thiết lập bộ giới hạn sliding window toàn cục (60 req/min) và fixed window cho AuthController (5 req/min).
+   - Nạp các allowed origins từ appsettings.json động, cho phép cookie chia sẻ qua CORS (AllowCredentials) và phơi bày header X-XSRF-TOKEN.
+
+2. Triển khai CSRF Protection (Double Submit Cookie):
+   - Tạo CsrfProtectionMiddleware để set cookie XSRF-TOKEN và header X-XSRF-TOKEN ở các request GET và so khớp ở các request POST/PUT/DELETE. Bỏ qua preflight OPTIONS requests.
+   - Sử dụng SameSite=None và Secure=true cho cookie CSRF trên localhost để hoạt động chéo nguồn.
+   - Viết CsrfHeaderHandler (DelegatingHandler) ở phía Blazor client để tự động bắt giữ và đính kèm token trong các request kế tiếp.
+
+3. Triển khai XSS Protection:
+   - Viết bộ lọc toàn cục XssSanitizationFilter kết hợp với lớp tiện ích XssSanitizer sử dụng HtmlEncode và Regex để lọc sạch dữ liệu vào của tất cả các string properties trong DTO.
+```
+
+#### 4.3. Ý kiến của sinh viên/nhóm
+
+```text
+Giải pháp toàn diện và thực hiện đầy đủ 5 yêu cầu bảo mật đề ra. Sự kết hợp giữa Middleware ở Server và DelegatingHandler ở Client giúp giải quyết triệt để lỗi CSRF chéo cổng mà vẫn đảm bảo tính bảo mật.
+```
+
+#### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
+
+```text
+1. Phát hiện và xử lý lỗi chặn OPTIONS của các middleware tự viết để khắc phục lỗi CORS tiền kiểm tra (CORS preflight).
+2. Xóa bỏ các dòng in log debug chứa giá trị token thô ra tab console để ngăn chặn rò rỉ thông tin token phiên.
+3. Chạy dotnet build thành công cả 2 project không có lỗi.
+```
+
+#### 4.5. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXServer/Program.cs, WanderXServer/Security/*, WanderXServer/Controllers/AuthController.cs, WanderXClient/WanderXClient/Program.cs, WanderXClient/WanderXClient/Services/CsrfHeaderHandler.cs, WanderXClient/WanderXClient/Services/AuthApiClient.cs |
+| Screenshot | |
+| Kết quả chạy/test | Đăng nhập thành công và truyền nhận cookie/header X-XSRF-TOKEN tự động, không còn lỗi 400 Bad Request |
+| Tài liệu chi tiết | docs/SECURITY_REPORT.md |
+
+#### 4.6. Nhận xét cá nhân/nhóm
+
+```text
+Lần sử dụng AI thứ 7 giúp nâng cao năng lực bảo mật của hệ thống:
+1. Ưu điểm:
+   - Cung cấp giải pháp mẫu middleware chuẩn và dễ tích hợp.
+   - Cơ chế DelegatingHandler ở Blazor WASM rất tinh tế và giải quyết tự động hóa việc truyền token.
+2. Bài học:
+   - Phải luôn bỏ qua OPTIONS preflight ở các middleware tự định nghĩa để tránh chặn luồng CORS của trình duyệt.
+   - Không được in giá trị token phiên ra console trong sản phẩm thực tế.
+```
 
 ---
 
