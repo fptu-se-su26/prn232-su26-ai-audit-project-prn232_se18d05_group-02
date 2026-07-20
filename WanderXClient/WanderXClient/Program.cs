@@ -29,6 +29,16 @@ builder.Services.AddScoped(sp =>
     var sessionService = sp.GetRequiredService<AuthSessionService>();
     return new UserApiClient(httpClient, sessionService);
 });
+builder.Services.AddScoped(_ =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    return new TourApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+});
+builder.Services.AddScoped(_ =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    return new TourScheduleApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+});
 
 builder.Services.AddScoped(sp =>
 {

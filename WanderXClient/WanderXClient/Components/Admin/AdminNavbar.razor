@@ -1,0 +1,49 @@
+@inject NavigationManager Navigation
+
+<aside class="guide-sidebar">
+    <div class="guide-sidebar__brand">
+        <a class="brand-mark" href="/">WanderX</a>
+        <p>Admin Suite</p>
+    </div>
+
+    <nav class="guide-sidebar__nav" aria-label="Admin navigation">
+        <a class="@GetLinkClass("/dashboard")" href="/dashboard">
+            <MaterialIcon Name="dashboard" />
+            Dashboard
+        </a>
+        <a class="@GetLinkClass("/admin/tours")" href="/admin/tours">
+            <MaterialIcon Name="travel_explore" />
+            Tours
+        </a>
+        <a class="@GetLinkClass("/admin/tour-schedules")" href="/admin/tour-schedules">
+            <MaterialIcon Name="event_note" />
+            Schedules
+        </a>
+        <a class="@GetLinkClass("/guides")" href="/guides">
+            <MaterialIcon Name="badge" />
+            Guides
+        </a>
+        <a class="@GetLinkClass("/guide-assignments")" href="/guide-assignments">
+            <MaterialIcon Name="assignment_ind" />
+            Assignments
+        </a>
+        <a class="guide-sidebar__link" href="/">
+            <MaterialIcon Name="home" />
+            Homepage
+        </a>
+    </nav>
+</aside>
+
+@code {
+    private string GetLinkClass(string href)
+    {
+        var relative = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0].Trim('/');
+        var target = href.Trim('/');
+        var isActive = relative.Equals(target, StringComparison.OrdinalIgnoreCase) ||
+            (target == "dashboard" && relative.Equals("admin-dashboard", StringComparison.OrdinalIgnoreCase));
+
+        return isActive
+            ? "guide-sidebar__link guide-sidebar__link--active"
+            : "guide-sidebar__link";
+    }
+}

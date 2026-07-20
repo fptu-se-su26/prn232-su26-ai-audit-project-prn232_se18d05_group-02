@@ -1,0 +1,35 @@
+@model TourScheduleDetailsViewModel
+@{
+    ViewData["Title"] = "Delete Tour Schedule";
+}
+
+<div class="mb-4">
+    <div class="text-uppercase small fw-bold text-danger">Delete confirmation</div>
+    <h1 class="h2 mb-1">Delete Tour Schedule</h1>
+    <p class="text-secondary mb-0">Please confirm before removing this itinerary item.</p>
+</div>
+
+<section class="admin-card bg-white p-3 p-lg-4">
+    <div class="alert alert-warning">
+        Are you sure you want to delete <strong>@Model.Title</strong> from <strong>@Model.TourName</strong>?
+    </div>
+
+    <dl class="row g-3">
+        <dt class="col-sm-3">Date</dt>
+        <dd class="col-sm-9">@Model.DayOfWeek, @Model.ScheduleDate.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Location</dt>
+        <dd class="col-sm-9">@Model.Location</dd>
+
+        <dt class="col-sm-3">Time</dt>
+        <dd class="col-sm-9">@Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Delete this schedule permanently?');">
+        @Html.AntiForgeryToken()
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-danger px-4" type="submit">Delete</button>
+            <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+        </div>
+    </form>
+</section>

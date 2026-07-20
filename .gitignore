@@ -3,3 +3,4 @@ bin/
 obj/
 .sln
 *.log
+WanderXServer/appsettings.json
