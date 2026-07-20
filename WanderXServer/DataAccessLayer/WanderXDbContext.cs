@@ -238,6 +238,8 @@ BEGIN
         [Id] uniqueidentifier NOT NULL,
         [UserId] uniqueidentifier NOT NULL,
         [BookingCode] nvarchar(32) NOT NULL,
+        [TourCode] nvarchar(32) NULL,
+        [DepartureScheduleId] uniqueidentifier NULL,
         [TourName] nvarchar(200) NOT NULL,
         [Destination] nvarchar(200) NOT NULL,
         [ThumbnailUrl] nvarchar(500) NULL,
@@ -259,6 +261,78 @@ END
 """);
 
         // Add columns if the table already existed without them
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'TourCode') IS NULL
+    ALTER TABLE [Bookings] ADD [TourCode] nvarchar(32) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'DepartureScheduleId') IS NULL
+    ALTER TABLE [Bookings] ADD [DepartureScheduleId] uniqueidentifier NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'StatusUpdatedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [StatusUpdatedAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'StatusUpdatedBy') IS NULL
+    ALTER TABLE [Bookings] ADD [StatusUpdatedBy] nvarchar(120) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'CancellationStatus') IS NULL
+    ALTER TABLE [Bookings] ADD [CancellationStatus] nvarchar(32) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'CancellationReason') IS NULL
+    ALTER TABLE [Bookings] ADD [CancellationReason] nvarchar(1000) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'CancellationRequestedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [CancellationRequestedAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'CancellationReviewedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [CancellationReviewedAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'CancellationReviewedBy') IS NULL
+    ALTER TABLE [Bookings] ADD [CancellationReviewedBy] nvarchar(120) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'CancellationReviewNote') IS NULL
+    ALTER TABLE [Bookings] ADD [CancellationReviewNote] nvarchar(1000) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'PaymentOption') IS NULL
+    ALTER TABLE [Bookings] ADD [PaymentOption] nvarchar(32) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'PaymentMethod') IS NULL
+    ALTER TABLE [Bookings] ADD [PaymentMethod] nvarchar(64) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'PaymentReference') IS NULL
+    ALTER TABLE [Bookings] ADD [PaymentReference] nvarchar(120) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'PaidAmount') IS NULL
+    ALTER TABLE [Bookings] ADD [PaidAmount] decimal(18, 2) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'RemainingAmount') IS NULL
+    ALTER TABLE [Bookings] ADD [RemainingAmount] decimal(18, 2) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'PaymentUpdatedAt') IS NULL
+    ALTER TABLE [Bookings] ADD [PaymentUpdatedAt] datetime2 NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'PaymentUpdatedBy') IS NULL
+    ALTER TABLE [Bookings] ADD [PaymentUpdatedBy] nvarchar(120) NULL;
+""");
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Bookings', 'PaymentNote') IS NULL
+    ALTER TABLE [Bookings] ADD [PaymentNote] nvarchar(1000) NULL;
+""");
         Database.ExecuteSqlRaw("""
 IF COL_LENGTH('Bookings', 'PaidAt') IS NULL
     ALTER TABLE [Bookings] ADD [PaidAt] datetime2 NULL;
@@ -391,6 +465,7 @@ END
             {
                 UserId = admin.Id,
                 BookingCode = "WX987346",
+                TourCode = "WX-VEN-214",
                 TourName = "Hành Trình Venice Lãng Mạn & Trải Nghiệm Thuyền Gondola Độc Bản",
                 Destination = "Venice, Italy",
                 ThumbnailUrl = "https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?auto=format&fit=crop&q=80&w=300",
@@ -406,8 +481,8 @@ END
             Bookings.Add(tour1);
         }
         
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Người lớn (Trưởng đoàn)" });
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "Nguyễn Văn B", PhoneNumber = "0901234568", TicketType = "Người lớn" });
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "Nguyễn Văn B", PhoneNumber = "0901234568", TicketType = "Adult" });
         
         // Tour 2: Đang chờ thanh toán - Pending, cả 3 tiến trình bước 2,3,4 đều null
         var tour2 = Bookings.FirstOrDefault(b => b.BookingCode == "WX348612");
@@ -417,6 +492,7 @@ END
             {
                 UserId = admin.Id,
                 BookingCode = "WX348612",
+                TourCode = "WX-KYO-330",
                 TourName = "Kyoto Cổ Kính & Trải Nghiệm Trà Đạo Truyền Thống",
                 Destination = "Kyoto, Japan",
                 ThumbnailUrl = "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=300",
@@ -432,7 +508,7 @@ END
             Bookings.Add(tour2);
         }
         
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour2.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Người lớn (Trưởng đoàn)" });
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour2.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
         
         // Tour 3: Đã hủy - Cancelled
         var tour3 = Bookings.FirstOrDefault(b => b.BookingCode == "WX102874");
@@ -442,6 +518,7 @@ END
             {
                 UserId = admin.Id,
                 BookingCode = "WX102874",
+                TourCode = "WX-SAF-718",
                 TourName = "Thiên Đường Maldives - Biệt Thự Mặt Nước Cao Cấp",
                 Destination = "Maldives",
                 ThumbnailUrl = "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=300",
@@ -457,8 +534,8 @@ END
             Bookings.Add(tour3);
         }
         
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Người lớn (Trưởng đoàn)" });
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "Trần Thị C", PhoneNumber = "0901234569", TicketType = "Người lớn" });
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "Trần Thị C", PhoneNumber = "0901234569", TicketType = "Adult" });
     }
 // end TV3
     private void AddAssignment(DateTime today, DevelopmentAssignment assignment)

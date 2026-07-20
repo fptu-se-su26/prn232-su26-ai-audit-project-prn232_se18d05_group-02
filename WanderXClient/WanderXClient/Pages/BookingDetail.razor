@@ -28,6 +28,13 @@ else if (_booking == null)
 }
 else
 {
+    var cancellationPending = string.Equals(_booking.CancellationStatus, "Pending", StringComparison.OrdinalIgnoreCase);
+    var cancellationRejected = string.Equals(_booking.CancellationStatus, "Rejected", StringComparison.OrdinalIgnoreCase);
+    var canRequestCancellation = _booking.Status != "Cancelled"
+        && _booking.Status != "Finished"
+        && !_booking.PaidAt.HasValue
+        && !cancellationPending;
+
     var statusStyles = _booking.Status switch
     {
         "Paid"      => "bg-green-100 text-green-700",
@@ -89,6 +96,14 @@ else
                             <span class="text-xs text-muted-fg font-semibold">Mã đơn hàng: <span class="!text-primary font-bold">@_booking.BookingCode</span></span>
                             <h1 class="text-2xl font-extrabold tracking-tight font-title !text-primary mt-1">@_booking.TourName</h1>
                             <span class="px-3 py-1 rounded text-xs font-bold @statusStyles inline-block mt-2">@statusText</span>
+                            @if (cancellationPending)
+                            {
+                                <span class="ml-2 px-3 py-1 rounded text-xs font-bold bg-blue-100 text-blue-700 inline-block mt-2">Cancellation pending</span>
+                            }
+                            else if (cancellationRejected)
+                            {
+                                <span class="ml-2 px-3 py-1 rounded text-xs font-bold bg-slate-100 text-slate-700 inline-block mt-2">Cancellation rejected</span>
+                            }
                         </div>
                     </div>
                 </div>
@@ -371,7 +386,7 @@ else
                                     Xuất Hóa Đơn
                                 </button>
                             }
-                            @if (_booking.Status != "Cancelled" && !_booking.PaidAt.HasValue)
+                            @if (canRequestCancellation)
                             {
                                 <button class="border border-hairline hover:bg-surface-soft !text-primary font-semibold text-sm px-6 py-3 rounded-full transition-all flex items-center gap-2" @onclick="ShowCancelModal">
                                     Yêu cầu hủy
@@ -386,34 +401,45 @@ else
     </main>
     <AppFooter />
 
-    <!-- Cancellation Confirmation Modal -->
+    <!-- Cancellation Request Modal -->
     @if (_showCancelModal)
     {
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 space-y-4">
                 <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-3xl text-red-500">warning</span>
-                    <h3 class="text-xl font-bold !text-primary">Xác nhận hủy đặt chỗ</h3>
+                    <span class="material-symbols-outlined text-3xl text-amber-500">assignment_late</span>
+                    <h3 class="text-xl font-bold !text-primary">Request booking cancellation</h3>
                 </div>
                 <p class="text-sm text-muted-fg">
-                    Bạn có chắc chắn muốn hủy đặt chỗ <span class="font-semibold !text-primary">@_booking?.BookingCode</span> cho tour <span class="font-semibold !text-primary">@_booking?.TourName</span>?
+                    Your request for booking <span class="font-semibold !text-primary">@_booking?.BookingCode</span> will be reviewed by WanderX staff before the booking is cancelled.
                 </p>
-                <p class="text-xs text-muted-fg">
-                    Hành động này không thể hoàn tác. Sau khi hủy, trạng thái đơn hàng sẽ được cập nhật thành "Đã hủy".
-                </p>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold !text-primary">Reason</label>
+                    <textarea class="w-full border border-hairline rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/15"
+                              rows="4"
+                              maxlength="1000"
+                              @bind="_cancelReason"
+                              placeholder="Tell us why you want to cancel this booking."></textarea>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(_cancelError))
+                {
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <p class="text-xs text-red-700">@_cancelError</p>
+                    </div>
+                }
                 <div class="flex gap-3 justify-end pt-2">
                     <button class="px-4 py-2 rounded-lg border border-hairline hover:bg-surface-soft text-sm font-semibold !text-primary transition-colors" @onclick="HideCancelModal">
-                        Hủy bỏ
+                        Keep booking
                     </button>
                     <button class="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors flex items-center gap-2" @onclick="ConfirmCancel" disabled="@_isCancelling">
                         @if (_isCancelling)
                         {
                             <span class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                            <span>Đang xử lý...</span>
+                            <span>Sending...</span>
                         }
                         else
                         {
-                            <span>Xác nhận hủy</span>
+                            <span>Send request</span>
                         }
                     </button>
                 </div>
@@ -481,6 +507,8 @@ else
     private bool _isLoading = true;
     private bool _showCancelModal = false;
     private bool _isCancelling = false;
+    private string _cancelReason = string.Empty;
+    private string _cancelError = string.Empty;
     private bool _showSpecialRequestModal = false;
     private bool _isSubmittingRequest = false;
     private string _specialRequestDescription = string.Empty;
@@ -532,12 +560,15 @@ else
 
     private void ShowCancelModal()
     {
+        _cancelError = string.Empty;
         _showCancelModal = true;
     }
 
     private void HideCancelModal()
     {
         _showCancelModal = false;
+        _cancelReason = string.Empty;
+        _cancelError = string.Empty;
     }
 
     private void ShowSpecialRequestModal()
@@ -604,19 +635,29 @@ else
     {
         if (_booking == null) return;
 
+        if (string.IsNullOrWhiteSpace(_cancelReason) || _cancelReason.Trim().Length < 10)
+        {
+            _cancelError = "Please enter a cancellation reason with at least 10 characters.";
+            return;
+        }
+
         _isCancelling = true;
+        _cancelError = string.Empty;
         try
         {
-            var updatedBooking = await UserApi.CancelBookingAsync(_booking.Id);
+            var updatedBooking = await UserApi.CancelBookingAsync(_booking.Id, new CreateCancellationRequest
+            {
+                Reason = _cancelReason.Trim()
+            });
             if (updatedBooking != null)
             {
                 _booking = updatedBooking;
             }
-            _showCancelModal = false;
+            HideCancelModal();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Handle error - could show a toast notification
+            _cancelError = ex.Message;
         }
         finally
         {

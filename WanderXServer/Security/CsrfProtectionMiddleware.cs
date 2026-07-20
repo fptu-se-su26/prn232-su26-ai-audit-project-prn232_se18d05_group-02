@@ -40,8 +40,8 @@ public class CsrfProtectionMiddleware
                 context.Response.Cookies.Append(CsrfCookieName, token, new CookieOptions
                 {
                     HttpOnly = false, // Must be readable by client-side JavaScript / Blazor WASM
-                    Secure = true, // Must be true for SameSite = None
-                    SameSite = SameSiteMode.None, // Allow cross-origin cookie sharing
+                    Secure = context.Request.IsHttps,
+                    SameSite = context.Request.IsHttps ? SameSiteMode.None : SameSiteMode.Lax,
                     Path = "/"
                 });
             }

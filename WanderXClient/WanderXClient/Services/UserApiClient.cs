@@ -35,9 +35,57 @@ public sealed class UserApiClient
         return GetAsync<BookingSummaryResponse>($"api/users/bookings/{id}");
     }
 
-    public Task<BookingSummaryResponse?> CancelBookingAsync(Guid id)
+    public Task<BookingSummaryResponse?> CancelBookingAsync(Guid id, CreateCancellationRequest request)
     {
-        return PutAsync<object, BookingSummaryResponse>($"api/users/bookings/{id}/cancel", new { });
+        return PutAsync<CreateCancellationRequest, BookingSummaryResponse>($"api/users/bookings/{id}/cancel", request);
+    }
+
+    public Task<IEnumerable<BookingResponse>?> GetAllBookingsAsync(string? status = null, string? search = null)
+    {
+        var query = BuildQuery(("status", status), ("search", search));
+        return GetAsync<IEnumerable<BookingResponse>>($"api/bookings{query}");
+    }
+
+    public Task<BookingResponse?> GetManagedBookingByIdAsync(Guid id)
+    {
+        return GetAsync<BookingResponse>($"api/bookings/{id}");
+    }
+
+    public Task<BookingResponse?> CreateBookingAsync(CreateBookingRequest request)
+    {
+        return PostAsync<CreateBookingRequest, BookingResponse>("api/bookings", request);
+    }
+
+    public Task<BookingResponse?> UpdateBookingAsync(Guid id, UpdateBookingRequest request)
+    {
+        return PutAsync<UpdateBookingRequest, BookingResponse>($"api/bookings/{id}", request);
+    }
+
+    public Task<BookingResponse?> UpdateBookingStatusAsync(Guid id, UpdateBookingStatusRequest request)
+    {
+        return PutAsync<UpdateBookingStatusRequest, BookingResponse>($"api/bookings/{id}/status", request);
+    }
+
+    public Task<IEnumerable<BookingResponse>?> GetCancellationRequestsAsync(string? status = null, string? search = null)
+    {
+        var query = BuildQuery(("status", status), ("search", search));
+        return GetAsync<IEnumerable<BookingResponse>>($"api/bookings/cancellations{query}");
+    }
+
+    public Task<BookingResponse?> ReviewCancellationRequestAsync(Guid id, ReviewCancellationRequest request)
+    {
+        return PutAsync<ReviewCancellationRequest, BookingResponse>($"api/bookings/{id}/cancellation/review", request);
+    }
+
+    public Task<IEnumerable<BookingResponse>?> GetPaymentsAsync(string? paymentStatus = null, string? search = null)
+    {
+        var query = BuildQuery(("paymentStatus", paymentStatus), ("search", search));
+        return GetAsync<IEnumerable<BookingResponse>>($"api/bookings/payments{query}");
+    }
+
+    public Task<BookingResponse?> UpdatePaymentAsync(Guid id, UpdatePaymentRequest request)
+    {
+        return PutAsync<UpdatePaymentRequest, BookingResponse>($"api/bookings/{id}/payment", request);
     }
 
     public Task<UserSpecialRequestResponse?> CreateSpecialRequestAsync(CreateUserSpecialRequestRequest request)
@@ -224,5 +272,15 @@ public sealed class UserApiClient
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session.Token);
         }
+    }
+
+    private static string BuildQuery(params (string Key, string? Value)[] values)
+    {
+        var parts = values
+            .Where(item => !string.IsNullOrWhiteSpace(item.Value))
+            .Select(item => $"{Uri.EscapeDataString(item.Key)}={Uri.EscapeDataString(item.Value!)}")
+            .ToArray();
+
+        return parts.Length == 0 ? string.Empty : $"?{string.Join("&", parts)}";
     }
 }

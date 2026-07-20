@@ -20,7 +20,7 @@ public class BookingPassenger
 
     [Required]
     [MaxLength(50)]
-    public string TicketType { get; set; } = "Người lớn";
+    public string TicketType { get; set; } = "Adult";
 
     [ForeignKey(nameof(BookingId))]
     public Booking? Booking { get; set; }

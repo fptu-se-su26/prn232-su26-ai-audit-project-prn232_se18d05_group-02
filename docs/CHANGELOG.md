@@ -25,7 +25,7 @@ Nguyên tắc ghi changelog:
 | Học kỳ | SU26 |
 | Tên bài tập / Project | Group Project - WanderX Tour Management System |
 | Tên sinh viên / Nhóm | Group 2 |
-| MSSV / Danh sách MSSV | DE180158 |
+| MSSV / Danh sách MSSV | DE180158, DE180166 |
 | Giảng viên hướng dẫn | Lê Thiện Nhật Quang |
 | Repository URL | https://github.com/group-02/wanderx-tour-management |
 | Ngày bắt đầu | 17/05/2026 |
@@ -41,6 +41,7 @@ Nguyên tắc ghi changelog:
 | Phase 02 | 17/05 - 20/05/2026 | Phân tích yêu cầu & Design | Completed |
 | Phase 03 | 20/05 - ... | Thiết kế hệ thống | In Progress |
 | Phase 04 | 25/05 - ... | Implementation - Guide Management | In Progress |
+| Phase 04.2 | 20/07/2026 | Implementation - Member 2 Admin/Staff Booking Operations | Completed |
 | Phase 05 |  | Testing & Debug | Not Started |
 | Phase 06 |  | Hoàn thiện báo cáo và demo | Not Started |
 
@@ -288,60 +289,81 @@ Viết tại đây...
 
 ---
 
-# [Phase 04] Implementation
+# [Phase 04.2] Implementation - Member 2 Admin/Staff Booking Operations
 
 ## Ngày thực hiện
 
 ```text
-DD/MM/YYYY
+20/07/2026
 ```
 
 ## Đã hoàn thành
 
-- [ ] Tạo project structure
-- [ ] Cài đặt database connection
-- [ ] Xây dựng backend
-- [ ] Xây dựng frontend
-- [ ] Xây dựng authentication/authorization
-- [ ] Xử lý CRUD
-- [ ] Xử lý validation
-- [ ] Tích hợp API
-- [ ] Xử lý upload/download file
-- [ ] Xử lý lỗi
-- [ ] Tối ưu giao diện
-- [ ] Cập nhật README hướng dẫn chạy
+- [X] Xây dựng backend API cho Booking Management
+- [X] Xây dựng backend API cho Booking Status Management
+- [X] Xây dựng backend API cho Cancellation Request Management
+- [X] Xây dựng backend API cho Payment Management
+- [X] Bổ sung DTO request/response cần thiết
+- [X] Tận dụng database hiện có và bổ sung cột vào bảng Bookings
+- [X] Xây dựng frontend Blazor cho Admin Bookings
+- [X] Xây dựng frontend Blazor cho Admin Cancellation Requests
+- [X] Xây dựng frontend Blazor cho Admin Payments
+- [X] Xử lý validation và business rules
+- [X] Xử lý lỗi tích hợp frontend/backend
+- [X] Tối ưu giao diện, popup/modal và phân trang 5 dòng/trang
 
 ## Thay đổi chi tiết
 
 | STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
 |---:|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Implement FE1 Booking Management: danh sách booking, tạo/sửa booking, guest list, ticket type Adult/Child, search/filter và phân trang | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXServer/Controllers/BookingsController.cs; WanderXServer/Services/BookingService.cs | Test trực tiếp màn hình Admin Bookings |
+| 2 | Implement FE2 Booking Status Management với business rule khóa Finished/Cancelled và giới hạn dropdown trạng thái hợp lệ | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXServer/Dtos/Bookings/UpdateBookingStatusRequest.cs; WanderXServer/Services/BookingService.cs | Test đổi status Pending/Confirmed/Finished/Cancelled |
+| 3 | Implement FE3 Cancellation Request Management: user gửi request, admin approve/reject bằng popup, đồng bộ giao diện và phân trang | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminCancellationRequests.razor; WanderXClient/WanderXClient/Pages/BookingDetail.razor; WanderXServer/Controllers/UsersController.cs; WanderXServer/Controllers/BookingsController.cs | Test tạo và review cancellation request |
+| 4 | Implement FE4 Payment Management: quản lý unpaid/deposit paid/paid/failed, full/deposit/balance payment, reference, invoice/receipt và khóa booking đã paid | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminPayments.razor; WanderXServer/Dtos/Bookings/UpdatePaymentRequest.cs; WanderXServer/Services/BookingService.cs | Test record payment và view invoice |
+| 5 | Bổ sung các cột booking/status/cancellation/payment vào bảng Bookings bằng logic đảm bảo schema khi chạy app | Trần Hồng Quân - DE180166 | WanderXServer/BusinessObject/Booking.cs; WanderXServer/DataAccessLayer/WanderXDbContext.cs | Kiểm tra app chạy với database hiện có |
+| 6 | Chuẩn bị gửi email tự động cho cancellation request received/approved/rejected và direct cancellation | Trần Hồng Quân - DE180166 | WanderXServer/Services/SmtpEmailSender.cs; WanderXServer/Services/UserService.cs; WanderXServer/Services/BookingService.cs | Email hook đã sẵn sàng, chỉ cần cấu hình SMTP thật |
+| 7 | Fix lỗi CSRF token, route đổi link nhưng không render form, concurrency khi đổi ngày tour, Failed to fetch và lỗi số tiền bị tràn UI | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Services/UserApiClient.cs; WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXClient/WanderXClient/Pages/AdminPayments.razor; WanderXServer/Services/BookingService.cs | Build và test thủ công sau khi sửa |
 
 ## AI có hỗ trợ không?
 
-- [ ] Có
+- [X] Có
 - [ ] Không
 
 Nếu có, mô tả AI đã hỗ trợ phần nào:
 
 ```text
-Viết tại đây...
+ChatGPT/Codex hỗ trợ:
+1. Phân tích nghiệp vụ Member 2 theo từng feature FE1-FE4.
+2. Đề xuất DTO/API/service cần bổ sung dựa trên cấu trúc project có sẵn.
+3. Hỗ trợ viết và chỉnh Blazor UI cho các màn hình Admin/Staff.
+4. Hỗ trợ debug lỗi runtime và build phát sinh khi tích hợp frontend/backend.
+5. Hỗ trợ rà soát để tận dụng database hiện có, không tạo bảng mới ngoài phạm vi yêu cầu.
+
+Chi tiết trong PROMPTS.md - Prompt-06 và AI_AUDIT_LOG.md - Lần sử dụng AI số 6.
 ```
 
 ## Commit/Screenshot minh chứng
 
 ```text
-Dán link commit, screenshot hoặc mô tả minh chứng tại đây...
+Files implemented/tested:
+- WanderXClient/WanderXClient/Pages/AdminBookings.razor
+- WanderXClient/WanderXClient/Pages/AdminCancellationRequests.razor
+- WanderXClient/WanderXClient/Pages/AdminPayments.razor
+- WanderXServer/Controllers/BookingsController.cs
+- WanderXServer/Controllers/UsersController.cs
+- WanderXServer/Services/BookingService.cs
+- WanderXServer/Services/UserService.cs
+- WanderXServer/DataAccessLayer/WanderXDbContext.cs
+
+Kết quả kiểm tra:
+- Build backend/frontend thành công sau khi fix lỗi.
+- Test thủ công các luồng booking, status, cancellation request và payment.
 ```
 
 ## Ghi chú
 
 ```text
-Viết tại đây...
+Các chức năng FE1-FE4 phục vụ phía Admin/Staff. Database không tạo thêm bảng mới cho cancellation/payment; hệ thống bổ sung các cột cần thiết vào bảng Bookings để lưu trạng thái, yêu cầu hủy và thông tin thanh toán. Email đã được chuẩn bị theo dạng SMTP configuration, khi điền thông tin mail thật trong appsettings thì các luồng tự động có thể gửi email.
 ```
 
 ---

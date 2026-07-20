@@ -29,6 +29,7 @@ builder.Services.AddDbContext<WanderXDbContext>(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IGuideService, GuideService>();
 builder.Services.AddScoped<IGuideTourService, GuideTourService>();
 builder.Services.AddScoped<UserSpecialRequestService>();
