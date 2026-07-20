@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WanderXServer.BusinessObject;
 using WanderXServer.BusinessObject.Enums;
@@ -25,6 +25,9 @@ public class WanderXDbContext : DbContext
     public DbSet<BookingPassenger> BookingPassengers => Set<BookingPassenger>();
     public DbSet<UserSpecialRequest> UserSpecialRequests => Set<UserSpecialRequest>();
     public DbSet<TourReview> TourReviews => Set<TourReview>();
+    public DbSet<Tour> Tours => Set<Tour>();
+
+    public DbSet<TourSchedule> TourSchedules => Set<TourSchedule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -136,6 +139,41 @@ public class WanderXDbContext : DbContext
         }
 
         modelBuilder.Entity<GuideTourAssignment>().HasData(assignmentsToSeed.ToArray());
+
+        var toursToSeed = DevelopmentTours
+            .Select(tour => new Tour
+            {
+                Id = CreateGuidFromEmail(tour.Code, "Tour"),
+                Code = tour.Code,
+                Name = tour.Name,
+                Destination = tour.Destination,
+                Region = tour.Region,
+                ScheduleTourId = tour.ScheduleTourId,
+                DurationDays = tour.DurationDays,
+                Price = tour.Price,
+                Capacity = tour.Capacity,
+                Status = tour.Status,
+                ImageUrl = tour.ImageUrl,
+                Description = tour.Description,
+                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            })
+            .ToArray();
+
+        modelBuilder.Entity<Tour>().HasData(toursToSeed);
+
+        modelBuilder.Entity<Tour>()
+            .HasAlternateKey(tour => tour.ScheduleTourId);
+
+        modelBuilder.Entity<Tour>()
+            .Property(tour => tour.Price)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<TourSchedule>()
+            .HasOne(schedule => schedule.Tour)
+            .WithMany(tour => tour.Schedules)
+            .HasForeignKey(schedule => schedule.TourId)
+            .HasPrincipalKey(tour => tour.ScheduleTourId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static Guid CreateGuidFromEmail(string key, string type)
@@ -153,6 +191,7 @@ public class WanderXDbContext : DbContext
         EnsureBookingsTable();
         EnsureUserSpecialRequestsTable();
         EnsureTourReviewsTable();
+        EnsureApplicationSchema();
 
         var passwordHasher = new PasswordHasher<ApplicationUser>();
 
@@ -162,6 +201,7 @@ public class WanderXDbContext : DbContext
         SaveChanges();
         SeedGuideTourAssignments();
         SeedBookings();
+        SeedTours();
         SaveChanges();
 
         // Update existing Finished assignments that don't have an evidence image
@@ -187,6 +227,18 @@ BEGIN
     ALTER TABLE [Users] ADD [Address] nvarchar(240) NULL;
 END
 """);
+    }
+
+    public void EnsureApplicationSchema()
+    {
+        EnsureGuideTourAssignmentsTable();
+        EnsureTourStorage();
+    }
+
+    public void EnsureTourStorage()
+    {
+        EnsureToursTable();
+        EnsureTourSchedulesTable();
     }
 
     private void EnsureGuideTourAssignmentsTable()
@@ -228,7 +280,7 @@ BEGIN
 END
 """);
     }
-// TV3
+    // TV3
     private void EnsureBookingsTable()
     {
         Database.ExecuteSqlRaw("""
@@ -386,6 +438,99 @@ END
 """);
     }
 
+    private void EnsureToursTable()
+    {
+        Database.ExecuteSqlRaw("""
+IF OBJECT_ID(N'[Tours]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [Tours] (
+        [Id] uniqueidentifier NOT NULL,
+        [Code] nvarchar(32) NOT NULL,
+        [Name] nvarchar(160) NOT NULL,
+        [Destination] nvarchar(160) NOT NULL,
+        [Region] nvarchar(160) NOT NULL,
+        [ScheduleTourId] int NOT NULL,
+        [DurationDays] int NOT NULL,
+        [Price] decimal(18,2) NOT NULL,
+        [Capacity] int NOT NULL,
+        [Status] nvarchar(32) NOT NULL,
+        [ImageUrl] nvarchar(500) NOT NULL,
+        [Description] nvarchar(1200) NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NULL,
+        CONSTRAINT [PK_Tours] PRIMARY KEY ([Id])
+    );
+
+    CREATE UNIQUE INDEX [IX_Tours_Code] ON [Tours] ([Code]);
+END
+""");
+
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Tours', 'ScheduleTourId') IS NULL
+BEGIN
+    ALTER TABLE [Tours] ADD [ScheduleTourId] int NULL;
+END
+""");
+
+        Database.ExecuteSqlRaw("""
+;WITH NumberedTours AS (
+    SELECT [Id], ROW_NUMBER() OVER (ORDER BY [CreatedAt], [Code]) AS RowNumber
+    FROM [Tours]
+    WHERE [ScheduleTourId] IS NULL
+)
+UPDATE Tours
+SET [ScheduleTourId] = NumberedTours.RowNumber
+FROM [Tours]
+INNER JOIN NumberedTours ON Tours.[Id] = NumberedTours.[Id]
+WHERE Tours.[ScheduleTourId] IS NULL;
+""");
+
+        Database.ExecuteSqlRaw("""
+IF EXISTS (
+    SELECT 1
+    FROM sys.columns
+    WHERE object_id = OBJECT_ID('Tours')
+        AND name = 'ScheduleTourId'
+        AND is_nullable = 1
+)
+BEGIN
+    ALTER TABLE [Tours] ALTER COLUMN [ScheduleTourId] int NOT NULL;
+END
+""");
+
+        Database.ExecuteSqlRaw("""
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'AK_Tours_ScheduleTourId' AND object_id = OBJECT_ID('Tours'))
+BEGIN
+    CREATE UNIQUE INDEX [AK_Tours_ScheduleTourId] ON [Tours] ([ScheduleTourId]);
+END
+""");
+    }
+
+    private void EnsureTourSchedulesTable()
+    {
+        Database.ExecuteSqlRaw("""
+IF OBJECT_ID(N'[TourSchedules]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [TourSchedules] (
+        [Id] int IDENTITY(1,1) NOT NULL,
+        [TourId] int NOT NULL,
+        [DayNumber] int NOT NULL,
+        [ScheduleDate] datetime2 NOT NULL,
+        [Title] nvarchar(160) NOT NULL,
+        [Description] nvarchar(1200) NOT NULL,
+        [Location] nvarchar(160) NOT NULL,
+        [StartTime] time NOT NULL,
+        [EndTime] time NOT NULL,
+        [SortOrder] int NOT NULL,
+        CONSTRAINT [PK_TourSchedules] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TourSchedules_Tours_TourId] FOREIGN KEY ([TourId]) REFERENCES [Tours] ([ScheduleTourId]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_TourSchedules_TourId_ScheduleDate_DayNumber_SortOrder] ON [TourSchedules] ([TourId], [ScheduleDate], [DayNumber], [SortOrder]);
+END
+""");
+    }
+
     private void EnsureUserSpecialRequestsTable()
     {
         Database.ExecuteSqlRaw(@"
@@ -435,7 +580,7 @@ BEGIN
 END
 ");
     }
-// end TV3
+    // end TV3
     private void SeedGuideTourAssignments()
     {
         var today = DateTime.Today;
@@ -445,19 +590,19 @@ END
             AddAssignment(today, assignment);
         }
     }
-// TV3
+    // TV3
     private void SeedBookings()
     {
         var adminEmail = NormalizeEmail("ad@ad.123");
         var admin = Users.FirstOrDefault(u => u.NormalizedEmail == adminEmail);
-        
+
         if (admin == null) return;
-        
+
         if (Bookings.Any() && BookingPassengers.Any()) return;
-        
+
         var today = DateTime.UtcNow.Date;
-        
-        // Tour 1: Đã thanh toán đầy đủ - Paid, ConfirmedAt có, chưa hoàn thành
+
+        // Tour 1: ÄÃ£ thanh toÃ¡n Ä‘áº§y Ä‘á»§ - Paid, ConfirmedAt cÃ³, chÆ°a hoÃ n thÃ nh
         var tour1 = Bookings.FirstOrDefault(b => b.BookingCode == "WX987346");
         if (tour1 == null)
         {
@@ -466,7 +611,7 @@ END
                 UserId = admin.Id,
                 BookingCode = "WX987346",
                 TourCode = "WX-VEN-214",
-                TourName = "Hành Trình Venice Lãng Mạn & Trải Nghiệm Thuyền Gondola Độc Bản",
+                TourName = "HÃ nh TrÃ¬nh Venice LÃ£ng Máº¡n & Tráº£i Nghiá»‡m Thuyá»n Gondola Äá»™c Báº£n",
                 Destination = "Venice, Italy",
                 ThumbnailUrl = "https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?auto=format&fit=crop&q=80&w=300",
                 DepartureDate = today.AddDays(15),
@@ -474,17 +619,17 @@ END
                 TotalAmount = 99000000m,
                 Status = "Paid",
                 CreatedAt = today.AddDays(-5),
-                PaidAt = today.AddDays(-5).AddHours(2),        // Đã thanh toán
-                ConfirmedAt = today.AddDays(-4),               // Hướng dẫn viên xác nhận
-                CompletedAt = null                             // Chưa hoàn thành (chưa đến ngày đi)
+                PaidAt = today.AddDays(-5).AddHours(2),        // ÄÃ£ thanh toÃ¡n
+                ConfirmedAt = today.AddDays(-4),               // HÆ°á»›ng dáº«n viÃªn xÃ¡c nháº­n
+                CompletedAt = null                             // ChÆ°a hoÃ n thÃ nh (chÆ°a Ä‘áº¿n ngÃ y Ä‘i)
             };
             Bookings.Add(tour1);
         }
-        
+
         BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "Nguyễn Văn B", PhoneNumber = "0901234568", TicketType = "Adult" });
-        
-        // Tour 2: Đang chờ thanh toán - Pending, cả 3 tiến trình bước 2,3,4 đều null
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "Nguyá»…n VÄƒn B", PhoneNumber = "0901234568", TicketType = "Adult" });
+
+        // Tour 2: Äang chá» thanh toÃ¡n - Pending, cáº£ 3 tiáº¿n trÃ¬nh bÆ°á»›c 2,3,4 Ä‘á»u null
         var tour2 = Bookings.FirstOrDefault(b => b.BookingCode == "WX348612");
         if (tour2 == null)
         {
@@ -493,7 +638,7 @@ END
                 UserId = admin.Id,
                 BookingCode = "WX348612",
                 TourCode = "WX-KYO-330",
-                TourName = "Kyoto Cổ Kính & Trải Nghiệm Trà Đạo Truyền Thống",
+                TourName = "Kyoto Cá»• KÃ­nh & Tráº£i Nghiá»‡m TrÃ  Äáº¡o Truyá»n Thá»‘ng",
                 Destination = "Kyoto, Japan",
                 ThumbnailUrl = "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=300",
                 DepartureDate = today.AddDays(60),
@@ -501,16 +646,16 @@ END
                 TotalAmount = 38900000m,
                 Status = "Pending",
                 CreatedAt = today.AddDays(-2),
-                PaidAt = null,      // Chưa thanh toán - đang quay vòng
-                ConfirmedAt = null, // Mờ
-                CompletedAt = null  // Mờ
+                PaidAt = null,      // ChÆ°a thanh toÃ¡n - Ä‘ang quay vÃ²ng
+                ConfirmedAt = null, // Má»
+                CompletedAt = null  // Má»
             };
             Bookings.Add(tour2);
         }
-        
+
         BookingPassengers.Add(new BookingPassenger { BookingId = tour2.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
-        
-        // Tour 3: Đã hủy - Cancelled
+
+        // Tour 3: ÄÃ£ há»§y - Cancelled
         var tour3 = Bookings.FirstOrDefault(b => b.BookingCode == "WX102874");
         if (tour3 == null)
         {
@@ -519,7 +664,7 @@ END
                 UserId = admin.Id,
                 BookingCode = "WX102874",
                 TourCode = "WX-SAF-718",
-                TourName = "Thiên Đường Maldives - Biệt Thự Mặt Nước Cao Cấp",
+                TourName = "ThiÃªn ÄÆ°á»ng Maldives - Biá»‡t Thá»± Máº·t NÆ°á»›c Cao Cáº¥p",
                 Destination = "Maldives",
                 ThumbnailUrl = "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=300",
                 DepartureDate = today.AddDays(-30),
@@ -527,17 +672,44 @@ END
                 TotalAmount = 124000000m,
                 Status = "Cancelled",
                 CreatedAt = today.AddDays(-40),
-                PaidAt = null,      // Bị hủy - hiển dấu X đỏ
+                PaidAt = null,      // Bá»‹ há»§y - hiá»ƒn dáº¥u X Ä‘á»
                 ConfirmedAt = null,
                 CompletedAt = null
             };
             Bookings.Add(tour3);
         }
-        
+
         BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "Trần Thị C", PhoneNumber = "0901234569", TicketType = "Adult" });
+        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "Tráº§n Thá»‹ C", PhoneNumber = "0901234569", TicketType = "Adult" });
     }
-// end TV3
+    // end TV3
+
+    private void SeedTours()
+    {
+        foreach (var tour in DevelopmentTours)
+        {
+            if (Tours.Any(item => item.Code == tour.Code))
+            {
+                continue;
+            }
+
+            Tours.Add(new Tour
+            {
+                Code = tour.Code,
+                Name = tour.Name,
+                Destination = tour.Destination,
+                Region = tour.Region,
+                ScheduleTourId = tour.ScheduleTourId,
+                DurationDays = tour.DurationDays,
+                Price = tour.Price,
+                Capacity = tour.Capacity,
+                Status = tour.Status,
+                ImageUrl = tour.ImageUrl,
+                Description = tour.Description
+            });
+        }
+    }
+
     private void AddAssignment(DateTime today, DevelopmentAssignment assignment)
     {
         if (GuideTourAssignments.Any(item => item.TourCode == assignment.TourCode))
@@ -794,6 +966,58 @@ END
         new("mira.guide@wanderx.com", "WX-HVR-520", "Hvar Wine and Sail", "Hvar, Croatia", "Adriatic Coast", 4, 7, 6, "Hvar harbor customs pier", "Declined", "Sailing day with vineyard visit and island dinner booking.", "Boat captain schedule changed; guide requested operations review.")
     };
 
+    private static readonly DevelopmentTour[] DevelopmentTours =
+    {
+        new(
+            1,
+            "WX-HUE-226",
+            "Hue Imperial Heritage",
+            "Hue, Vietnam",
+            "Central Vietnam",
+            4,
+            1290,
+            12,
+            "Published",
+            "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+            "A private heritage route through Hue's imperial citadel, royal cuisine, dragon boat moments, and quiet garden houses."),
+        new(
+            2,
+            "WX-KYO-330",
+            "Kyoto Culinary Immersion",
+            "Kyoto, Japan",
+            "Kyoto and Kansai",
+            5,
+            2380,
+            10,
+            "Published",
+            "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80",
+            "Seasonal market walks, tea ceremony coordination, private kitchens, and a polished kaiseki dining story."),
+        new(
+            3,
+            "WX-SAF-718",
+            "Serengeti Conservation Safari",
+            "Serengeti, Tanzania",
+            "Southern Africa",
+            8,
+            5200,
+            12,
+            "Draft",
+            "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=80",
+            "Conservation-first safari planning with daily field logistics, wildlife interpretation, and lodge handoffs."),
+        new(
+            4,
+            "WX-ADR-884",
+            "Croatian Islands by Sail",
+            "Split, Croatia",
+            "Adriatic Coast",
+            8,
+            3420,
+            8,
+            "Archived",
+            "https://images.unsplash.com/photo-1555990538-c48dbe6465d7?auto=format&fit=crop&w=1200&q=80",
+            "Island-hopping by sail with marina coordination, coastal culture, swim stops, and relaxed private hosting.")
+    };
+
     private const string SampleEvidenceImageBase64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y0ZjZmOCIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjEyMCIgcj0iNDUiIGZpbGw9IiNlOGY1ZTkiLz48cGF0aCBkPSJNMTg1LDEyMCBMMTk1LDEzMCBMMjE1LDExMCIgc3Ryb2tlPSIjMmU3ZDMyIiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjIwMCIgeT0iMjAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZm9udC1zdHlsZT0ibm9ybWFsIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzJjM2U1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VG91ciBFdmlkZW5jZSBQcm9vZjwvdGV4dD48dGV4dCB4PSIyMDAiIHk9IjIyNSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTUiIGZpbGw9IiM3ZjhjOGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPldhbmRlclggVmVyaWZpZWQgRmluaXNoPC90ZXh0Pjwvc3ZnPg==";
 
     private sealed record DevelopmentGuide(
@@ -820,4 +1044,17 @@ END
         string Status,
         string ItinerarySummary,
         string? DeclineReason = null);
+
+    private sealed record DevelopmentTour(
+        int ScheduleTourId,
+        string Code,
+        string Name,
+        string Destination,
+        string Region,
+        int DurationDays,
+        decimal Price,
+        int Capacity,
+        string Status,
+        string ImageUrl,
+        string Description);
 }
