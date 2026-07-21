@@ -1,82 +1,81 @@
-﻿# Changelog
+# Changelog
 
-## 1. Quy Ä‘á»‹nh ghi Changelog
+## 1. Quy định ghi Changelog
 
-File nÃ y dÃ¹ng Ä‘á»ƒ ghi láº¡i cÃ¡c thay Ä‘á»•i quan trá»ng trong quÃ¡ trÃ¬nh thá»±c hiá»‡n bÃ i táº­p, lab, assignment hoáº·c project.
+File này dùng để ghi lại các thay đổi quan trọng trong quá trình thực hiện bài tập, lab, assignment hoặc project.
 
-NguyÃªn táº¯c ghi changelog:
+Nguyên tắc ghi changelog:
 
-- Chá»‰ ghi nhá»¯ng gÃ¬ Ä‘Ã£ hoÃ n thÃ nh tháº­t sá»±.
-- KhÃ´ng ghi káº¿ hoáº¡ch náº¿u chÆ°a thá»±c hiá»‡n.
-- Má»—i thay Ä‘á»•i nÃªn cÃ³ ngÃ y, ná»™i dung, ngÆ°á»i thá»±c hiá»‡n vÃ  minh chá»©ng.
-- Náº¿u cÃ³ AI há»— trá»£, cáº§n ghi rÃµ AI Ä‘Ã£ há»— trá»£ pháº§n nÃ o.
-- Náº¿u cÃ³ commit GitHub, cáº§n ghi link commit.
-- Náº¿u cÃ³ lá»—i Ä‘Ã£ sá»­a, cáº§n ghi rÃµ lá»—i, nguyÃªn nhÃ¢n vÃ  cÃ¡ch xá»­ lÃ½.
+- Chỉ ghi những gì đã hoàn thành thật sự.
+- Không ghi kế hoạch nếu chưa thực hiện.
+- Mỗi thay đổi nên có ngày, nội dung, người thực hiện và minh chứng.
+- Nếu có AI hỗ trợ, cần ghi rõ AI đã hỗ trợ phần nào.
+- Nếu có commit GitHub, cần ghi link commit.
+- Nếu có lỗi đã sửa, cần ghi rõ lỗi, nguyên nhân và cách xử lý.
 
 ---
 
-## 2. ThÃ´ng tin project
+## 2. Thông tin project
 
-| ThÃ´ng tin | Ná»™i dung |
+| Thông tin | Nội dung |
 |---|---|
-| MÃ´n há»c | Building Cross-Platform Back-End Application With .NET |
-| MÃ£ mÃ´n há»c | PRN232 |
-| Lá»›p | SE18D05 |
-| Há»c ká»³ | SU26 |
-| TÃªn bÃ i táº­p / Project | Group Project - WanderX Tour Management System |
-| TÃªn sinh viÃªn / NhÃ³m | Group 2 |
-| MSSV / Danh sÃ¡ch MSSV | DE180158, DE180166 |
-| MSSV / Danh sÃ¡ch MSSV | DE180158 |
-| Giáº£ng viÃªn hÆ°á»›ng dáº«n | LÃª Thiá»‡n Nháº­t Quang |
+| Môn học | Building Cross-Platform Back-End Application With .NET |
+| Mã môn học | PRN232 |
+| Lớp | SE18D05 |
+| Học kỳ | SU26 |
+| Tên bài tập / Project | Group Project - WanderX Tour Management System |
+| Tên sinh viên / Nhóm | Group 2 |
+| MSSV / Danh sách MSSV | DE180158, DE180166 |
+| Giảng viên hướng dẫn | Lê Thiện Nhật Quang |
 | Repository URL | https://github.com/group-02/wanderx-tour-management |
-| NgÃ y báº¯t Ä‘áº§u | 17/05/2026 |
-| NgÃ y hoÃ n thÃ nh |  |
+| Ngày bắt đầu | 17/05/2026 |
+| Ngày hoàn thành |  |
 
 ---
 
-## 3. Tá»•ng quan cÃ¡c phiÃªn báº£n/giai Ä‘oáº¡n
+## 3. Tổng quan các phiên bản/giai đoạn
 
-| PhiÃªn báº£n/Giai Ä‘oáº¡n | Thá»i gian | Ná»™i dung chÃ­nh | Tráº¡ng thÃ¡i |
+| Phiên bản/Giai đoạn | Thời gian | Nội dung chính | Trạng thái |
 |---|---|---|---|
-| Phase 01 | 17/05/2026 | Khá»Ÿi táº¡o project | Completed |
-| Phase 02 | 17/05 - 20/05/2026 | PhÃ¢n tÃ­ch yÃªu cáº§u & Design | Completed |
-| Phase 03 | 20/05 - ... | Thiáº¿t káº¿ há»‡ thá»‘ng | In Progress |
+| Phase 01 | 17/05/2026 | Khởi tạo project | Completed |
+| Phase 02 | 17/05 - 20/05/2026 | Phân tích yêu cầu & Design | Completed |
+| Phase 03 | 20/05 - ... | Thiết kế hệ thống | In Progress |
 | Phase 04 | 25/05 - ... | Implementation - Guide Management | In Progress |
 | Phase 04.2 | 20/07/2026 | Implementation - Member 2 Admin/Staff Booking Operations | Completed |
 | Phase 05 |  | Testing & Debug | Not Started |
-| Phase 06 |  | HoÃ n thiá»‡n bÃ¡o cÃ¡o vÃ  demo | Not Started |
+| Phase 06 |  | Hoàn thiện báo cáo và demo | Not Started |
 
 ---
 
 # [Phase 04] Implementation - Guide Management & Guide Portal
 
-## NgÃ y thá»±c hiá»‡n
+## Ngày thực hiện
 
 ```text
 02/06/2026
 ```
 
-## ÄÃ£ hoÃ n thÃ nh
+## Đã hoàn thành
 
-- [X] Thiáº¿t káº¿ Guide database model
-- [X] Táº¡o Guide entity model class
-- [X] Táº¡o GuideLanguage relationship table
-- [X] Táº¡o GuideServiceArea relationship table
+- [X] Thiết kế Guide database model
+- [X] Tạo Guide entity model class
+- [X] Tạo GuideLanguage relationship table
+- [X] Tạo GuideServiceArea relationship table
 - [X] Implement IGuideRepository interface
 - [X] Implement GuideRepository class (data access layer)
 - [X] Implement GuideService class (business logic layer)
-- [X] Táº¡o GuideController vá»›i endpoints
-- [X] Implement authorization checks (Guide chá»‰ update own profile)
-- [X] ThÃªm validation logic cho inputs
+- [X] Tạo GuideController với endpoints
+- [X] Implement authorization checks (Guide chỉ update own profile)
+- [X] Thêm validation logic cho inputs
 - [X] Implement Guide Portal endpoints
-- [X] Test API endpoints vá»›i Postman/Swagger
+- [X] Test API endpoints với Postman/Swagger
 
-## Thay Ä‘á»•i chi tiáº¿t
+## Thay đổi chi tiết
 
-| STT | Ná»™i dung thay Ä‘á»•i | NgÆ°á»i thá»±c hiá»‡n | File/Module liÃªn quan | Minh chá»©ng |
+| STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
 |---:|---|---|---|---|
-| 1 | Táº¡o Guide domain model | Group 2 | WanderXServer/Models/Guide.cs | Commit: feat/guide-model |
-| 2 | Táº¡o GuideLanguage & GuideServiceArea entities | Group 2 | WanderXServer/Models/GuideLanguage.cs, GuideServiceArea.cs | Commit: feat/guide-relationships |
+| 1 | Tạo Guide domain model | Group 2 | WanderXServer/Models/Guide.cs | Commit: feat/guide-model |
+| 2 | Tạo GuideLanguage & GuideServiceArea entities | Group 2 | WanderXServer/Models/GuideLanguage.cs, GuideServiceArea.cs | Commit: feat/guide-relationships |
 | 3 | Implement GuideRepository | Group 2 | WanderXServer/Repositories/GuideRepository.cs | Commit: feat/guide-repository |
 | 4 | Implement GuideService | Group 2 | WanderXServer/Services/GuideService.cs | Commit: feat/guide-service |
 | 5 | Implement GuideController | Group 2 | WanderXServer/Controllers/GuideController.cs | Commit: feat/guide-controller |
@@ -84,27 +83,27 @@ NguyÃªn táº¯c ghi changelog:
 | 7 | Add authorization & validation | Group 2 | WanderXServer/Controllers/GuideController.cs | Commit: feat/guide-auth-validation |
 | 8 | Implement filtering, search, pagination | Group 2 | WanderXServer/Services/GuideService.cs | Commit: feat/guide-advanced-queries |
 
-## AI cÃ³ há»— trá»£ khÃ´ng?
+## AI có hỗ trợ không?
 
-- [X] CÃ³
-- [ ] KhÃ´ng
+- [X] Có
+- [ ] Không
 
-Náº¿u cÃ³, mÃ´ táº£ AI Ä‘Ã£ há»— trá»£ pháº§n nÃ o:
+Nếu có, mô tả AI đã hỗ trợ phần nào:
 
 ```text
-GitHub Copilot & ChatGPT há»— trá»£:
+GitHub Copilot & ChatGPT hỗ trợ:
 1. Database schema design - suggest proper normalization with separate tables for Languages & Areas
 2. API endpoint design - RESTful convention suggestions
 3. DTO models structure - request/response models organization
 4. Authorization strategy - implement role-based access control
 5. Code generation - scaffold repository, service, controller classes
-6. Validation logic - input validation patterns vÃ  error handling
+6. Validation logic - input validation patterns và error handling
 7. Best practices - async/await patterns, error handling, logging
 
-Chi tiáº¿t trong PROMPTS.md - Prompt sá»‘ 2
+Chi tiết trong PROMPTS.md - Prompt số 2
 ```
 
-## Commit/Screenshot minh chá»©ng
+## Commit/Screenshot minh chứng
 
 ```text
 Commits:
@@ -125,7 +124,7 @@ Screenshots:
 Repository: https://github.com/group-02/wanderx-tour-management
 ```
 
-## Ghi chÃº
+## Ghi chú
 
 ```text
 ### Key Features Implemented:
@@ -134,7 +133,7 @@ Repository: https://github.com/group-02/wanderx-tour-management
    - CRUD operations cho guide information
    - Manage guide languages with proficiency levels
    - Manage guide service areas
-   - Track guide experience (sá»‘ tour Ä‘Ã£ hÆ°á»›ng dáº«n)
+   - Track guide experience (số tour đã hướng dẫn)
    - Guide status management (Active, Inactive, OnLeave)
 
 2. Authorization & Security:
@@ -158,9 +157,9 @@ Repository: https://github.com/group-02/wanderx-tour-management
 ### Architecture Decisions:
 
 1. Database Normalization:
-   - Separate GuideLanguage table thay vÃ¬ JSON array
-   - Separate GuideServiceArea table thay vÃ¬ JSON array
-   - LÃ½ do: Better normalization, easier querying, scalable
+   - Separate GuideLanguage table thay vì JSON array
+   - Separate GuideServiceArea table thay vì JSON array
+   - Lý do: Better normalization, easier querying, scalable
 
 2. Design Patterns:
    - Repository Pattern: Abstraction data access
@@ -182,168 +181,168 @@ Repository: https://github.com/group-02/wanderx-tour-management
 
 ---
 
-# [Phase 02] PhÃ¢n tÃ­ch yÃªu cáº§u
+# [Phase 02] Phân tích yêu cầu
 
-## NgÃ y thá»±c hiá»‡n
+## Ngày thực hiện
 
 ```text
 DD/MM/YYYY
 ```
 
-## ÄÃ£ hoÃ n thÃ nh
+## Đã hoàn thành
 
-- [ ] XÃ¡c Ä‘á»‹nh problem statement
-- [ ] XÃ¡c Ä‘á»‹nh user roles
-- [ ] Viáº¿t user stories
-- [ ] Viáº¿t use cases
-- [ ] XÃ¡c Ä‘á»‹nh functional requirements
-- [ ] XÃ¡c Ä‘á»‹nh non-functional requirements
-- [ ] XÃ¡c Ä‘á»‹nh business rules
-- [ ] XÃ¡c Ä‘á»‹nh acceptance criteria
-- [ ] Review yÃªu cáº§u vá»›i giáº£ng viÃªn/nhÃ³m
-- [ ] Chá»‰nh sá»­a yÃªu cáº§u sau feedback
+- [ ] Xác định problem statement
+- [ ] Xác định user roles
+- [ ] Viết user stories
+- [ ] Viết use cases
+- [ ] Xác định functional requirements
+- [ ] Xác định non-functional requirements
+- [ ] Xác định business rules
+- [ ] Xác định acceptance criteria
+- [ ] Review yêu cầu với giảng viên/nhóm
+- [ ] Chỉnh sửa yêu cầu sau feedback
 
-## Thay Ä‘á»•i chi tiáº¿t
+## Thay đổi chi tiết
 
-| STT | Ná»™i dung thay Ä‘á»•i | NgÆ°á»i thá»±c hiá»‡n | File/Module liÃªn quan | Minh chá»©ng |
+| STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
 |---:|---|---|---|---|
 | 1 |  |  |  |  |
 | 2 |  |  |  |  |
 | 3 |  |  |  |  |
 
-## AI cÃ³ há»— trá»£ khÃ´ng?
+## AI có hỗ trợ không?
 
-- [ ] CÃ³
-- [ ] KhÃ´ng
+- [ ] Có
+- [ ] Không
 
-Náº¿u cÃ³, mÃ´ táº£ AI Ä‘Ã£ há»— trá»£ pháº§n nÃ o:
+Nếu có, mô tả AI đã hỗ trợ phần nào:
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
-## Commit/Screenshot minh chá»©ng
+## Commit/Screenshot minh chứng
 
 ```text
-DÃ¡n link commit, screenshot hoáº·c mÃ´ táº£ minh chá»©ng táº¡i Ä‘Ã¢y...
+Dán link commit, screenshot hoặc mô tả minh chứng tại đây...
 ```
 
-## Ghi chÃº
+## Ghi chú
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
 ---
 
-# [Phase 03] Thiáº¿t káº¿ há»‡ thá»‘ng
+# [Phase 03] Thiết kế hệ thống
 
-## NgÃ y thá»±c hiá»‡n
+## Ngày thực hiện
 
 ```text
 DD/MM/YYYY
 ```
 
-## ÄÃ£ hoÃ n thÃ nh
+## Đã hoàn thành
 
-- [ ] Thiáº¿t káº¿ kiáº¿n trÃºc tá»•ng quan
-- [ ] Thiáº¿t káº¿ database/ERD
-- [ ] Thiáº¿t káº¿ API
-- [ ] Thiáº¿t káº¿ giao diá»‡n/wireframe
-- [ ] Thiáº¿t káº¿ flow xá»­ lÃ½
-- [ ] Thiáº¿t káº¿ class diagram
-- [ ] Thiáº¿t káº¿ sequence diagram
-- [ ] Thiáº¿t káº¿ security/authorization flow
-- [ ] Review thiáº¿t káº¿
-- [ ] Chá»‰nh sá»­a thiáº¿t káº¿ sau feedback
+- [ ] Thiết kế kiến trúc tổng quan
+- [ ] Thiết kế database/ERD
+- [ ] Thiết kế API
+- [ ] Thiết kế giao diện/wireframe
+- [ ] Thiết kế flow xử lý
+- [ ] Thiết kế class diagram
+- [ ] Thiết kế sequence diagram
+- [ ] Thiết kế security/authorization flow
+- [ ] Review thiết kế
+- [ ] Chỉnh sửa thiết kế sau feedback
 
-## Thay Ä‘á»•i chi tiáº¿t
+## Thay đổi chi tiết
 
-| STT | Ná»™i dung thay Ä‘á»•i | NgÆ°á»i thá»±c hiá»‡n | File/Module liÃªn quan | Minh chá»©ng |
+| STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
 |---:|---|---|---|---|
 | 1 |  |  |  |  |
 | 2 |  |  |  |  |
 | 3 |  |  |  |  |
 
-## AI cÃ³ há»— trá»£ khÃ´ng?
+## AI có hỗ trợ không?
 
-- [ ] CÃ³
-- [ ] KhÃ´ng
+- [ ] Có
+- [ ] Không
 
-Náº¿u cÃ³, mÃ´ táº£ AI Ä‘Ã£ há»— trá»£ pháº§n nÃ o:
+Nếu có, mô tả AI đã hỗ trợ phần nào:
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
-## Commit/Screenshot minh chá»©ng
+## Commit/Screenshot minh chứng
 
 ```text
-DÃ¡n link commit, screenshot hoáº·c mÃ´ táº£ minh chá»©ng táº¡i Ä‘Ã¢y...
+Dán link commit, screenshot hoặc mô tả minh chứng tại đây...
 ```
 
-## Ghi chÃº
+## Ghi chú
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
 ---
 
 # [Phase 04.2] Implementation - Member 2 Admin/Staff Booking Operations
 
-## NgÃ y thá»±c hiá»‡n
+## Ngày thực hiện
 
 ```text
 20/07/2026
 ```
 
-## ÄÃ£ hoÃ n thÃ nh
+## Đã hoàn thành
 
-- [X] XÃ¢y dá»±ng backend API cho Booking Management
-- [X] XÃ¢y dá»±ng backend API cho Booking Status Management
-- [X] XÃ¢y dá»±ng backend API cho Cancellation Request Management
-- [X] XÃ¢y dá»±ng backend API cho Payment Management
-- [X] Bá»• sung DTO request/response cáº§n thiáº¿t
-- [X] Táº­n dá»¥ng database hiá»‡n cÃ³ vÃ  bá»• sung cá»™t vÃ o báº£ng Bookings
-- [X] XÃ¢y dá»±ng frontend Blazor cho Admin Bookings
-- [X] XÃ¢y dá»±ng frontend Blazor cho Admin Cancellation Requests
-- [X] XÃ¢y dá»±ng frontend Blazor cho Admin Payments
-- [X] Xá»­ lÃ½ validation vÃ  business rules
-- [X] Xá»­ lÃ½ lá»—i tÃ­ch há»£p frontend/backend
-- [X] Tá»‘i Æ°u giao diá»‡n, popup/modal vÃ  phÃ¢n trang 5 dÃ²ng/trang
+- [X] Xây dựng backend API cho Booking Management
+- [X] Xây dựng backend API cho Booking Status Management
+- [X] Xây dựng backend API cho Cancellation Request Management
+- [X] Xây dựng backend API cho Payment Management
+- [X] Bổ sung DTO request/response cần thiết
+- [X] Tận dụng database hiện có và bổ sung cột vào bảng Bookings
+- [X] Xây dựng frontend Blazor cho Admin Bookings
+- [X] Xây dựng frontend Blazor cho Admin Cancellation Requests
+- [X] Xây dựng frontend Blazor cho Admin Payments
+- [X] Xử lý validation và business rules
+- [X] Xử lý lỗi tích hợp frontend/backend
+- [X] Tối ưu giao diện, popup/modal và phân trang 5 dòng/trang
 
-## Thay Ä‘á»•i chi tiáº¿t
+## Thay đổi chi tiết
 
-| STT | Ná»™i dung thay Ä‘á»•i | NgÆ°á»i thá»±c hiá»‡n | File/Module liÃªn quan | Minh chá»©ng |
+| STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
 |---:|---|---|---|---|
-| 1 | Implement FE1 Booking Management: danh sÃ¡ch booking, táº¡o/sá»­a booking, guest list, ticket type Adult/Child, search/filter vÃ  phÃ¢n trang | Tráº§n Há»“ng QuÃ¢n - DE180166 | WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXServer/Controllers/BookingsController.cs; WanderXServer/Services/BookingService.cs | Test trá»±c tiáº¿p mÃ n hÃ¬nh Admin Bookings |
-| 2 | Implement FE2 Booking Status Management vá»›i business rule khÃ³a Finished/Cancelled vÃ  giá»›i háº¡n dropdown tráº¡ng thÃ¡i há»£p lá»‡ | Tráº§n Há»“ng QuÃ¢n - DE180166 | WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXServer/Dtos/Bookings/UpdateBookingStatusRequest.cs; WanderXServer/Services/BookingService.cs | Test Ä‘á»•i status Pending/Confirmed/Finished/Cancelled |
-| 3 | Implement FE3 Cancellation Request Management: user gá»­i request, admin approve/reject báº±ng popup, Ä‘á»“ng bá»™ giao diá»‡n vÃ  phÃ¢n trang | Tráº§n Há»“ng QuÃ¢n - DE180166 | WanderXClient/WanderXClient/Pages/AdminCancellationRequests.razor; WanderXClient/WanderXClient/Pages/BookingDetail.razor; WanderXServer/Controllers/UsersController.cs; WanderXServer/Controllers/BookingsController.cs | Test táº¡o vÃ  review cancellation request |
-| 4 | Implement FE4 Payment Management: quáº£n lÃ½ unpaid/deposit paid/paid/failed, full/deposit/balance payment, reference, invoice/receipt vÃ  khÃ³a booking Ä‘Ã£ paid | Tráº§n Há»“ng QuÃ¢n - DE180166 | WanderXClient/WanderXClient/Pages/AdminPayments.razor; WanderXServer/Dtos/Bookings/UpdatePaymentRequest.cs; WanderXServer/Services/BookingService.cs | Test record payment vÃ  view invoice |
-| 5 | Bá»• sung cÃ¡c cá»™t booking/status/cancellation/payment vÃ o báº£ng Bookings báº±ng logic Ä‘áº£m báº£o schema khi cháº¡y app | Tráº§n Há»“ng QuÃ¢n - DE180166 | WanderXServer/BusinessObject/Booking.cs; WanderXServer/DataAccessLayer/WanderXDbContext.cs | Kiá»ƒm tra app cháº¡y vá»›i database hiá»‡n cÃ³ |
-| 6 | Chuáº©n bá»‹ gá»­i email tá»± Ä‘á»™ng cho cancellation request received/approved/rejected vÃ  direct cancellation | Tráº§n Há»“ng QuÃ¢n - DE180166 | WanderXServer/Services/SmtpEmailSender.cs; WanderXServer/Services/UserService.cs; WanderXServer/Services/BookingService.cs | Email hook Ä‘Ã£ sáºµn sÃ ng, chá»‰ cáº§n cáº¥u hÃ¬nh SMTP tháº­t |
-| 7 | Fix lá»—i CSRF token, route Ä‘á»•i link nhÆ°ng khÃ´ng render form, concurrency khi Ä‘á»•i ngÃ y tour, Failed to fetch vÃ  lá»—i sá»‘ tiá»n bá»‹ trÃ n UI | Tráº§n Há»“ng QuÃ¢n - DE180166 | WanderXClient/WanderXClient/Services/UserApiClient.cs; WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXClient/WanderXClient/Pages/AdminPayments.razor; WanderXServer/Services/BookingService.cs | Build vÃ  test thá»§ cÃ´ng sau khi sá»­a |
+| 1 | Implement FE1 Booking Management: danh sách booking, tạo/sửa booking, guest list, ticket type Adult/Child, search/filter và phân trang | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXServer/Controllers/BookingsController.cs; WanderXServer/Services/BookingService.cs | Test trực tiếp màn hình Admin Bookings |
+| 2 | Implement FE2 Booking Status Management với business rule khóa Finished/Cancelled và giới hạn dropdown trạng thái hợp lệ | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXServer/Dtos/Bookings/UpdateBookingStatusRequest.cs; WanderXServer/Services/BookingService.cs | Test đổi status Pending/Confirmed/Finished/Cancelled |
+| 3 | Implement FE3 Cancellation Request Management: user gửi request, admin approve/reject bằng popup, đồng bộ giao diện và phân trang | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminCancellationRequests.razor; WanderXClient/WanderXClient/Pages/BookingDetail.razor; WanderXServer/Controllers/UsersController.cs; WanderXServer/Controllers/BookingsController.cs | Test tạo và review cancellation request |
+| 4 | Implement FE4 Payment Management: quản lý unpaid/deposit paid/paid/failed, full/deposit/balance payment, reference, invoice/receipt và khóa booking đã paid | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminPayments.razor; WanderXServer/Dtos/Bookings/UpdatePaymentRequest.cs; WanderXServer/Services/BookingService.cs | Test record payment và view invoice |
+| 5 | Bổ sung các cột booking/status/cancellation/payment vào bảng Bookings bằng logic đảm bảo schema khi chạy app | Trần Hồng Quân - DE180166 | WanderXServer/BusinessObject/Booking.cs; WanderXServer/DataAccessLayer/WanderXDbContext.cs | Kiểm tra app chạy với database hiện có |
+| 6 | Chuẩn bị gửi email tự động cho cancellation request received/approved/rejected và direct cancellation | Trần Hồng Quân - DE180166 | WanderXServer/Services/SmtpEmailSender.cs; WanderXServer/Services/UserService.cs; WanderXServer/Services/BookingService.cs | Email hook đã sẵn sàng, chỉ cần cấu hình SMTP thật |
+| 7 | Fix lỗi CSRF token, route đổi link nhưng không render form, concurrency khi đổi ngày tour, Failed to fetch và lỗi số tiền bị tràn UI | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Services/UserApiClient.cs; WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXClient/WanderXClient/Pages/AdminPayments.razor; WanderXServer/Services/BookingService.cs | Build và test thủ công sau khi sửa |
 
-## AI cÃ³ há»— trá»£ khÃ´ng?
+## AI có hỗ trợ không?
 
-- [X] CÃ³
-- [ ] KhÃ´ng
+- [X] Có
+- [ ] Không
 
-Náº¿u cÃ³, mÃ´ táº£ AI Ä‘Ã£ há»— trá»£ pháº§n nÃ o:
+Nếu có, mô tả AI đã hỗ trợ phần nào:
 
 ```text
-ChatGPT/Codex há»— trá»£:
-1. PhÃ¢n tÃ­ch nghiá»‡p vá»¥ Member 2 theo tá»«ng feature FE1-FE4.
-2. Äá» xuáº¥t DTO/API/service cáº§n bá»• sung dá»±a trÃªn cáº¥u trÃºc project cÃ³ sáºµn.
-3. Há»— trá»£ viáº¿t vÃ  chá»‰nh Blazor UI cho cÃ¡c mÃ n hÃ¬nh Admin/Staff.
-4. Há»— trá»£ debug lá»—i runtime vÃ  build phÃ¡t sinh khi tÃ­ch há»£p frontend/backend.
-5. Há»— trá»£ rÃ  soÃ¡t Ä‘á»ƒ táº­n dá»¥ng database hiá»‡n cÃ³, khÃ´ng táº¡o báº£ng má»›i ngoÃ i pháº¡m vi yÃªu cáº§u.
+ChatGPT/Codex hỗ trợ:
+1. Phân tích nghiệp vụ Member 2 theo từng feature FE1-FE4.
+2. Đề xuất DTO/API/service cần bổ sung dựa trên cấu trúc project có sẵn.
+3. Hỗ trợ viết và chỉnh Blazor UI cho các màn hình Admin/Staff.
+4. Hỗ trợ debug lỗi runtime và build phát sinh khi tích hợp frontend/backend.
+5. Hỗ trợ rà soát để tận dụng database hiện có, không tạo bảng mới ngoài phạm vi yêu cầu.
 
-Chi tiáº¿t trong PROMPTS.md - Prompt-06 vÃ  AI_AUDIT_LOG.md - Láº§n sá»­ dá»¥ng AI sá»‘ 6.
+Chi tiết trong PROMPTS.md - Prompt-06 và AI_AUDIT_LOG.md - Lần sử dụng AI số 6.
 ```
 
-## Commit/Screenshot minh chá»©ng
+## Commit/Screenshot minh chứng
 
 ```text
 Files implemented/tested:
@@ -356,44 +355,44 @@ Files implemented/tested:
 - WanderXServer/Services/UserService.cs
 - WanderXServer/DataAccessLayer/WanderXDbContext.cs
 
-Káº¿t quáº£ kiá»ƒm tra:
-- Build backend/frontend thÃ nh cÃ´ng sau khi fix lá»—i.
-- Test thá»§ cÃ´ng cÃ¡c luá»“ng booking, status, cancellation request vÃ  payment.
+Kết quả kiểm tra:
+- Build backend/frontend thành công sau khi fix lỗi.
+- Test thủ công các luồng booking, status, cancellation request và payment.
 ```
 
-## Ghi chÃº
+## Ghi chú
 
 ```text
-CÃ¡c chá»©c nÄƒng FE1-FE4 phá»¥c vá»¥ phÃ­a Admin/Staff. Database khÃ´ng táº¡o thÃªm báº£ng má»›i cho cancellation/payment; há»‡ thá»‘ng bá»• sung cÃ¡c cá»™t cáº§n thiáº¿t vÃ o báº£ng Bookings Ä‘á»ƒ lÆ°u tráº¡ng thÃ¡i, yÃªu cáº§u há»§y vÃ  thÃ´ng tin thanh toÃ¡n. Email Ä‘Ã£ Ä‘Æ°á»£c chuáº©n bá»‹ theo dáº¡ng SMTP configuration, khi Ä‘iá»n thÃ´ng tin mail tháº­t trong appsettings thÃ¬ cÃ¡c luá»“ng tá»± Ä‘á»™ng cÃ³ thá»ƒ gá»­i email.
+Các chức năng FE1-FE4 phục vụ phía Admin/Staff. Database không tạo thêm bảng mới cho cancellation/payment; hệ thống bổ sung các cột cần thiết vào bảng Bookings để lưu trạng thái, yêu cầu hủy và thông tin thanh toán. Email đã được chuẩn bị theo dạng SMTP configuration, khi điền thông tin mail thật trong appsettings thì các luồng tự động có thể gửi email.
 ```
 
 ---
 
 # [Phase 05] Testing & Debug
 
-## NgÃ y thá»±c hiá»‡n
+## Ngày thực hiện
 
 ```text
 DD/MM/YYYY
 ```
 
-## ÄÃ£ hoÃ n thÃ nh
+## Đã hoàn thành
 
-- [ ] Viáº¿t test case
-- [ ] Cháº¡y test chá»©c nÄƒng chÃ­nh
-- [ ] Kiá»ƒm tra output
-- [ ] Kiá»ƒm tra validation
-- [ ] Kiá»ƒm tra lá»—i giao diá»‡n
-- [ ] Kiá»ƒm tra lá»—i database
-- [ ] Kiá»ƒm tra phÃ¢n quyá»n
-- [ ] Kiá»ƒm tra báº£o máº­t cÆ¡ báº£n
+- [ ] Viết test case
+- [ ] Chạy test chức năng chính
+- [ ] Kiểm tra output
+- [ ] Kiểm tra validation
+- [ ] Kiểm tra lỗi giao diện
+- [ ] Kiểm tra lỗi database
+- [ ] Kiểm tra phân quyền
+- [ ] Kiểm tra bảo mật cơ bản
 - [ ] Fix bug
-- [ ] Cháº¡y láº¡i sau khi fix bug
-- [ ] Ghi nháº­n káº¿t quáº£ test
+- [ ] Chạy lại sau khi fix bug
+- [ ] Ghi nhận kết quả test
 
-## Danh sÃ¡ch lá»—i Ä‘Ã£ xá»­ lÃ½
+## Danh sách lỗi đã xử lý
 
-| STT | Lá»—i phÃ¡t hiá»‡n | NguyÃªn nhÃ¢n | CÃ¡ch xá»­ lÃ½ | Tráº¡ng thÃ¡i |
+| STT | Lỗi phát hiện | Nguyên nhân | Cách xử lý | Trạng thái |
 |---:|---|---|---|---|
 | 1 |  |  |  | Open / Fixed / Pending |
 | 2 |  |  |  | Open / Fixed / Pending |
@@ -401,98 +400,98 @@ DD/MM/YYYY
 | 4 |  |  |  | Open / Fixed / Pending |
 | 5 |  |  |  | Open / Fixed / Pending |
 
-## Thay Ä‘á»•i chi tiáº¿t
+## Thay đổi chi tiết
 
-| STT | Ná»™i dung thay Ä‘á»•i | NgÆ°á»i thá»±c hiá»‡n | File/Module liÃªn quan | Minh chá»©ng |
+| STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
 |---:|---|---|---|---|
 | 1 |  |  |  |  |
 | 2 |  |  |  |  |
 | 3 |  |  |  |  |
 
-## AI cÃ³ há»— trá»£ khÃ´ng?
+## AI có hỗ trợ không?
 
-- [ ] CÃ³
-- [ ] KhÃ´ng
+- [ ] Có
+- [ ] Không
 
-Náº¿u cÃ³, mÃ´ táº£ AI Ä‘Ã£ há»— trá»£ pháº§n nÃ o:
+Nếu có, mô tả AI đã hỗ trợ phần nào:
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
-## Commit/Screenshot minh chá»©ng
+## Commit/Screenshot minh chứng
 
 ```text
-DÃ¡n link commit, screenshot hoáº·c mÃ´ táº£ minh chá»©ng táº¡i Ä‘Ã¢y...
+Dán link commit, screenshot hoặc mô tả minh chứng tại đây...
 ```
 
-## Ghi chÃº
+## Ghi chú
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
 ---
 
-# [Phase 06] HoÃ n thiá»‡n bÃ¡o cÃ¡o vÃ  demo
+# [Phase 06] Hoàn thiện báo cáo và demo
 
-## NgÃ y thá»±c hiá»‡n
+## Ngày thực hiện
 
 ```text
 DD/MM/YYYY
 ```
 
-## ÄÃ£ hoÃ n thÃ nh
+## Đã hoàn thành
 
-- [ ] HoÃ n thiá»‡n source code
-- [ ] HoÃ n thiá»‡n README.md
-- [ ] HoÃ n thiá»‡n report
-- [ ] HoÃ n thiá»‡n slide
-- [ ] HoÃ n thiá»‡n video demo
-- [ ] Kiá»ƒm tra láº¡i `AI_AUDIT_LOG.md`
-- [ ] Kiá»ƒm tra láº¡i `PROMPTS.md`
-- [ ] HoÃ n thiá»‡n `REFLECTION.md`
-- [ ] Kiá»ƒm tra láº¡i `CHANGELOG.md`
-- [ ] ÄÃ³ng gÃ³i bÃ i ná»™p
+- [ ] Hoàn thiện source code
+- [ ] Hoàn thiện README.md
+- [ ] Hoàn thiện report
+- [ ] Hoàn thiện slide
+- [ ] Hoàn thiện video demo
+- [ ] Kiểm tra lại `AI_AUDIT_LOG.md`
+- [ ] Kiểm tra lại `PROMPTS.md`
+- [ ] Hoàn thiện `REFLECTION.md`
+- [ ] Kiểm tra lại `CHANGELOG.md`
+- [ ] Đóng gói bài nộp
 
-## Thay Ä‘á»•i chi tiáº¿t
+## Thay đổi chi tiết
 
-| STT | Ná»™i dung thay Ä‘á»•i | NgÆ°á»i thá»±c hiá»‡n | File/Module liÃªn quan | Minh chá»©ng |
+| STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
 |---:|---|---|---|---|
 | 1 |  |  |  |  |
 | 2 |  |  |  |  |
 | 3 |  |  |  |  |
 
-## AI cÃ³ há»— trá»£ khÃ´ng?
+## AI có hỗ trợ không?
 
-- [ ] CÃ³
-- [ ] KhÃ´ng
+- [ ] Có
+- [ ] Không
 
-Náº¿u cÃ³, mÃ´ táº£ AI Ä‘Ã£ há»— trá»£ pháº§n nÃ o:
+Nếu có, mô tả AI đã hỗ trợ phần nào:
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
-## Commit/Screenshot minh chá»©ng
+## Commit/Screenshot minh chứng
 
 ```text
-DÃ¡n link commit, screenshot hoáº·c mÃ´ táº£ minh chá»©ng táº¡i Ä‘Ã¢y...
+Dán link commit, screenshot hoặc mô tả minh chứng tại đây...
 ```
 
-## Ghi chÃº
+## Ghi chú
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
 ---
 
-# 4. Tá»•ng káº¿t thay Ä‘á»•i cuá»‘i project
+# 4. Tổng kết thay đổi cuối project
 
-## 4.1. CÃ¡c chá»©c nÄƒng Ä‘Ã£ hoÃ n thÃ nh
+## 4.1. Các chức năng đã hoàn thành
 
-| STT | Chá»©c nÄƒng | Tráº¡ng thÃ¡i | Minh chá»©ng | Ghi chÃº |
+| STT | Chức năng | Trạng thái | Minh chứng | Ghi chú |
 |---:|---|---|---|---|
 | 1 |  | Completed / Partial / Not Completed |  |  |
 | 2 |  | Completed / Partial / Not Completed |  |  |
@@ -502,9 +501,9 @@ Viáº¿t táº¡i Ä‘Ã¢y...
 
 ---
 
-## 4.2. CÃ¡c chá»©c nÄƒng chÆ°a hoÃ n thÃ nh
+## 4.2. Các chức năng chưa hoàn thành
 
-| STT | Chá»©c nÄƒng | LÃ½ do chÆ°a hoÃ n thÃ nh | HÆ°á»›ng cáº£i thiá»‡n |
+| STT | Chức năng | Lý do chưa hoàn thành | Hướng cải thiện |
 |---:|---|---|---|
 | 1 |  |  |  |
 | 2 |  |  |  |
@@ -512,41 +511,41 @@ Viáº¿t táº¡i Ä‘Ã¢y...
 
 ---
 
-## 4.3. Tá»•ng há»£p AI há»— trá»£ trong project
+## 4.3. Tổng hợp AI hỗ trợ trong project
 
-| Háº¡ng má»¥c | AI cÃ³ há»— trá»£ khÃ´ng? | Má»©c Ä‘á»™ há»— trá»£ | Ghi chÃº |
+| Hạng mục | AI có hỗ trợ không? | Mức độ hỗ trợ | Ghi chú |
 |---|---|---|---|
-| Requirement | CÃ³ / KhÃ´ng | Ãt / Trung bÃ¬nh / Nhiá»u |  |
-| Design | CÃ³ / KhÃ´ng | Ãt / Trung bÃ¬nh / Nhiá»u |  |
-| Database | CÃ³ / KhÃ´ng | Ãt / Trung bÃ¬nh / Nhiá»u |  |
-| Coding | CÃ³ / KhÃ´ng | Ãt / Trung bÃ¬nh / Nhiá»u |  |
-| Debug | CÃ³ / KhÃ´ng | Ãt / Trung bÃ¬nh / Nhiá»u |  |
-| Testing | CÃ³ / KhÃ´ng | Ãt / Trung bÃ¬nh / Nhiá»u |  |
-| Report | CÃ³ / KhÃ´ng | Ãt / Trung bÃ¬nh / Nhiá»u |  |
-| Presentation | CÃ³ / KhÃ´ng | Ãt / Trung bÃ¬nh / Nhiá»u |  |
+| Requirement | Có / Không | Ít / Trung bình / Nhiều |  |
+| Design | Có / Không | Ít / Trung bình / Nhiều |  |
+| Database | Có / Không | Ít / Trung bình / Nhiều |  |
+| Coding | Có / Không | Ít / Trung bình / Nhiều |  |
+| Debug | Có / Không | Ít / Trung bình / Nhiều |  |
+| Testing | Có / Không | Ít / Trung bình / Nhiều |  |
+| Report | Có / Không | Ít / Trung bình / Nhiều |  |
+| Presentation | Có / Không | Ít / Trung bình / Nhiều |  |
 
 ---
 
-## 4.4. BÃ i há»c rÃºt ra
+## 4.4. Bài học rút ra
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
 ---
 
-## 4.5. HÆ°á»›ng cáº£i thiá»‡n tiáº¿p theo
+## 4.5. Hướng cải thiện tiếp theo
 
 ```text
-Viáº¿t táº¡i Ä‘Ã¢y...
+Viết tại đây...
 ```
 
 ---
 
-# 5. Cam káº¿t cáº­p nháº­t Changelog
+# 5. Cam kết cập nhật Changelog
 
-Sinh viÃªn/nhÃ³m cam káº¿t ráº±ng ná»™i dung changelog pháº£n Ã¡nh Ä‘Ãºng cÃ¡c thay Ä‘á»•i Ä‘Ã£ thá»±c hiá»‡n trong quÃ¡ trÃ¬nh lÃ m bÃ i táº­p/project.
+Sinh viên/nhóm cam kết rằng nội dung changelog phản ánh đúng các thay đổi đã thực hiện trong quá trình làm bài tập/project.
 
-| Äáº¡i diá»‡n sinh viÃªn/nhÃ³m | NgÃ y xÃ¡c nháº­n |
+| Đại diện sinh viên/nhóm | Ngày xác nhận |
 |---|---|
 |  |  |
