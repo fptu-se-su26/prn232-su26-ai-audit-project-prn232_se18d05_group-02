@@ -51,4 +51,8 @@ public class Tour
     public DateTime? UpdatedAt { get; set; }
 
     public ICollection<TourSchedule> Schedules { get; set; } = new List<TourSchedule>();
+
+    public ICollection<TourSeasonPrice> SeasonPrices { get; set; } = new List<TourSeasonPrice>();
+
+    public ICollection<TourPromotion> Promotions { get; set; } = new List<TourPromotion>();
 }

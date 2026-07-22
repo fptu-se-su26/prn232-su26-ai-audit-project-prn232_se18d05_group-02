@@ -51,6 +51,18 @@ public sealed class TourApiClient
         return SendAsync<UpdateTourRequest, TourResponse>(HttpMethod.Put, $"api/tours/{id}", request);
     }
 
+    public async Task<TourResponse?> HideTourAsync(Guid id)
+    {
+        using var response = await _httpClient.PatchAsync($"api/tours/{id}/hide", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<TourResponse>();
+        }
+
+        throw new InvalidOperationException(await ReadErrorAsync(response));
+    }
+
     public async Task DeleteTourAsync(Guid id)
     {
         using var response = await _httpClient.DeleteAsync($"api/tours/{id}");

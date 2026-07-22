@@ -29,6 +29,10 @@ public class WanderXDbContext : DbContext
 
     public DbSet<TourSchedule> TourSchedules => Set<TourSchedule>();
 
+    public DbSet<TourSeasonPrice> TourSeasonPrices => Set<TourSeasonPrice>();
+
+    public DbSet<TourPromotion> TourPromotions => Set<TourPromotion>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -174,6 +178,26 @@ public class WanderXDbContext : DbContext
             .HasForeignKey(schedule => schedule.TourId)
             .HasPrincipalKey(tour => tour.ScheduleTourId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TourSeasonPrice>()
+            .Property(item => item.Price)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<TourSeasonPrice>()
+            .HasOne(item => item.Tour)
+            .WithMany(tour => tour.SeasonPrices)
+            .HasForeignKey(item => item.TourId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TourPromotion>()
+            .Property(item => item.DiscountValue)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<TourPromotion>()
+            .HasOne(item => item.Tour)
+            .WithMany(tour => tour.Promotions)
+            .HasForeignKey(item => item.TourId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static Guid CreateGuidFromEmail(string key, string type)
@@ -192,6 +216,7 @@ public class WanderXDbContext : DbContext
         EnsureUserSpecialRequestsTable();
         EnsureTourReviewsTable();
         EnsureApplicationSchema();
+        EnsureTourPricingStorage();
 
         var passwordHasher = new PasswordHasher<ApplicationUser>();
 
@@ -239,6 +264,18 @@ END
     {
         EnsureToursTable();
         EnsureTourSchedulesTable();
+    }
+
+    public void EnsureTourPricingStorage()
+    {
+        EnsureTourStorage();
+        EnsureTourSeasonPricesTable();
+        EnsureTourPromotionsTable();
+    }
+
+    public void EnsureBookingStorage()
+    {
+        EnsureBookingsTable();
     }
 
     private void EnsureGuideTourAssignmentsTable()
@@ -531,6 +568,55 @@ END
 """);
     }
 
+    private void EnsureTourSeasonPricesTable()
+    {
+        Database.ExecuteSqlRaw("""
+IF OBJECT_ID(N'[TourSeasonPrices]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [TourSeasonPrices] (
+        [Id] uniqueidentifier NOT NULL,
+        [TourId] uniqueidentifier NOT NULL,
+        [SeasonName] nvarchar(120) NOT NULL,
+        [StartDate] datetime2 NOT NULL,
+        [EndDate] datetime2 NOT NULL,
+        [Price] decimal(18,2) NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NULL,
+        CONSTRAINT [PK_TourSeasonPrices] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TourSeasonPrices_Tours_TourId] FOREIGN KEY ([TourId]) REFERENCES [Tours] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_TourSeasonPrices_TourId_StartDate_EndDate] ON [TourSeasonPrices] ([TourId], [StartDate], [EndDate]);
+END
+""");
+    }
+
+    private void EnsureTourPromotionsTable()
+    {
+        Database.ExecuteSqlRaw("""
+IF OBJECT_ID(N'[TourPromotions]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [TourPromotions] (
+        [Id] uniqueidentifier NOT NULL,
+        [TourId] uniqueidentifier NOT NULL,
+        [Name] nvarchar(120) NOT NULL,
+        [DiscountType] nvarchar(16) NOT NULL,
+        [DiscountValue] decimal(18,2) NOT NULL,
+        [StartDate] datetime2 NOT NULL,
+        [EndDate] datetime2 NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NULL,
+        CONSTRAINT [PK_TourPromotions] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TourPromotions_Tours_TourId] FOREIGN KEY ([TourId]) REFERENCES [Tours] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_TourPromotions_TourId_StartDate_EndDate] ON [TourPromotions] ([TourId], [StartDate], [EndDate]);
+END
+""");
+    }
+
     private void EnsureUserSpecialRequestsTable()
     {
         Database.ExecuteSqlRaw(@"
@@ -598,11 +684,9 @@ END
 
         if (admin == null) return;
 
-        if (Bookings.Any() && BookingPassengers.Any()) return;
-
         var today = DateTime.UtcNow.Date;
 
-        // Tour 1: ÄÃ£ thanh toÃ¡n Ä‘áº§y Ä‘á»§ - Paid, ConfirmedAt cÃ³, chÆ°a hoÃ n thÃ nh
+        // Tour 1: Paid and confirmed, not completed yet.
         var tour1 = Bookings.FirstOrDefault(b => b.BookingCode == "WX987346");
         if (tour1 == null)
         {
@@ -610,26 +694,51 @@ END
             {
                 UserId = admin.Id,
                 BookingCode = "WX987346",
-                TourCode = "WX-VEN-214",
-                TourName = "HÃ nh TrÃ¬nh Venice LÃ£ng Máº¡n & Tráº£i Nghiá»‡m Thuyá»n Gondola Äá»™c Báº£n",
-                Destination = "Venice, Italy",
-                ThumbnailUrl = "https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?auto=format&fit=crop&q=80&w=300",
+                TourCode = "WX-HUE-226",
+                TourName = "Hue Imperial Heritage",
+                Destination = "Hue, Vietnam",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=300",
                 DepartureDate = today.AddDays(15),
                 GuestCount = 2,
                 TotalAmount = 99000000m,
                 Status = "Paid",
                 CreatedAt = today.AddDays(-5),
-                PaidAt = today.AddDays(-5).AddHours(2),        // ÄÃ£ thanh toÃ¡n
-                ConfirmedAt = today.AddDays(-4),               // HÆ°á»›ng dáº«n viÃªn xÃ¡c nháº­n
-                CompletedAt = null                             // ChÆ°a hoÃ n thÃ nh (chÆ°a Ä‘áº¿n ngÃ y Ä‘i)
+                PaidAt = today.AddDays(-5).AddHours(2),
+                ConfirmedAt = today.AddDays(-4),
+                CompletedAt = null
             };
             Bookings.Add(tour1);
         }
+        else
+        {
+            tour1.TourCode = "WX-HUE-226";
+            tour1.TourName = "Hue Imperial Heritage";
+            tour1.Destination = "Hue, Vietnam";
+            tour1.ThumbnailUrl = "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=300";
+            tour1.DepartureDate = today.AddDays(15);
+            tour1.GuestCount = 2;
+            tour1.TotalAmount = 99000000m;
+            tour1.Status = "Paid";
+            tour1.PaidAt = today.AddDays(-5).AddHours(2);
+            tour1.ConfirmedAt = today.AddDays(-4);
+            tour1.CompletedAt = null;
+        }
 
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "Nguyá»…n VÄƒn B", PhoneNumber = "0901234568", TicketType = "Adult" });
+        if (!BookingPassengers.Any(passenger => passenger.BookingId == tour1.Id))
+        {
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "Nguyễn Văn B", PhoneNumber = "0901234568", TicketType = "Adult" });
+        }
+        else
+        {
+            var passenger = BookingPassengers.FirstOrDefault(item => item.BookingId == tour1.Id && item.PhoneNumber == "0901234568");
+            if (passenger is not null)
+            {
+                passenger.FullName = "Nguyễn Văn B";
+            }
+        }
 
-        // Tour 2: Äang chá» thanh toÃ¡n - Pending, cáº£ 3 tiáº¿n trÃ¬nh bÆ°á»›c 2,3,4 Ä‘á»u null
+        // Tour 2: Pending payment.
         var tour2 = Bookings.FirstOrDefault(b => b.BookingCode == "WX348612");
         if (tour2 == null)
         {
@@ -638,7 +747,7 @@ END
                 UserId = admin.Id,
                 BookingCode = "WX348612",
                 TourCode = "WX-KYO-330",
-                TourName = "Kyoto Cá»• KÃ­nh & Tráº£i Nghiá»‡m TrÃ  Äáº¡o Truyá»n Thá»‘ng",
+                TourName = "Kyoto Culinary Immersion",
                 Destination = "Kyoto, Japan",
                 ThumbnailUrl = "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=300",
                 DepartureDate = today.AddDays(60),
@@ -646,16 +755,33 @@ END
                 TotalAmount = 38900000m,
                 Status = "Pending",
                 CreatedAt = today.AddDays(-2),
-                PaidAt = null,      // ChÆ°a thanh toÃ¡n - Ä‘ang quay vÃ²ng
-                ConfirmedAt = null, // Má»
-                CompletedAt = null  // Má»
+                PaidAt = null,
+                ConfirmedAt = null,
+                CompletedAt = null
             };
             Bookings.Add(tour2);
         }
+        else
+        {
+            tour2.TourCode = "WX-KYO-330";
+            tour2.TourName = "Kyoto Culinary Immersion";
+            tour2.Destination = "Kyoto, Japan";
+            tour2.ThumbnailUrl = "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=300";
+            tour2.DepartureDate = today.AddDays(60);
+            tour2.GuestCount = 1;
+            tour2.TotalAmount = 38900000m;
+            tour2.Status = "Pending";
+            tour2.PaidAt = null;
+            tour2.ConfirmedAt = null;
+            tour2.CompletedAt = null;
+        }
 
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour2.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+        if (!BookingPassengers.Any(passenger => passenger.BookingId == tour2.Id))
+        {
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour2.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+        }
 
-        // Tour 3: ÄÃ£ há»§y - Cancelled
+        // Tour 3: Cancelled.
         var tour3 = Bookings.FirstOrDefault(b => b.BookingCode == "WX102874");
         if (tour3 == null)
         {
@@ -664,23 +790,48 @@ END
                 UserId = admin.Id,
                 BookingCode = "WX102874",
                 TourCode = "WX-SAF-718",
-                TourName = "ThiÃªn ÄÆ°á»ng Maldives - Biá»‡t Thá»± Máº·t NÆ°á»›c Cao Cáº¥p",
-                Destination = "Maldives",
-                ThumbnailUrl = "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=300",
+                TourName = "Serengeti Conservation Safari",
+                Destination = "Serengeti, Tanzania",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=300",
                 DepartureDate = today.AddDays(-30),
                 GuestCount = 2,
                 TotalAmount = 124000000m,
                 Status = "Cancelled",
                 CreatedAt = today.AddDays(-40),
-                PaidAt = null,      // Bá»‹ há»§y - hiá»ƒn dáº¥u X Ä‘á»
+                PaidAt = null,
                 ConfirmedAt = null,
                 CompletedAt = null
             };
             Bookings.Add(tour3);
         }
+        else
+        {
+            tour3.TourCode = "WX-SAF-718";
+            tour3.TourName = "Serengeti Conservation Safari";
+            tour3.Destination = "Serengeti, Tanzania";
+            tour3.ThumbnailUrl = "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=300";
+            tour3.DepartureDate = today.AddDays(-30);
+            tour3.GuestCount = 2;
+            tour3.TotalAmount = 124000000m;
+            tour3.Status = "Cancelled";
+            tour3.PaidAt = null;
+            tour3.ConfirmedAt = null;
+            tour3.CompletedAt = null;
+        }
 
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "Tráº§n Thá»‹ C", PhoneNumber = "0901234569", TicketType = "Adult" });
+        if (!BookingPassengers.Any(passenger => passenger.BookingId == tour3.Id))
+        {
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "Trần Thị C", PhoneNumber = "0901234569", TicketType = "Adult" });
+        }
+        else
+        {
+            var passenger = BookingPassengers.FirstOrDefault(item => item.BookingId == tour3.Id && item.PhoneNumber == "0901234569");
+            if (passenger is not null)
+            {
+                passenger.FullName = "Trần Thị C";
+            }
+        }
     }
     // end TV3
 

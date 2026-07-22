@@ -36,6 +36,8 @@ builder.Services.AddScoped<UserSpecialRequestService>();
 builder.Services.AddScoped<TourReviewService>();
 builder.Services.AddScoped<ITourService, TourService>();
 builder.Services.AddScoped<ITourScheduleService, TourScheduleService>();
+builder.Services.AddScoped<IBookedTourService, BookedTourService>();
+builder.Services.AddScoped<ITourPricingService, TourPricingService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 

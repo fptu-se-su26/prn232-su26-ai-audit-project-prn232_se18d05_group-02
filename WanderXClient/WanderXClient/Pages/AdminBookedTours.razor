@@ -1,0 +1,340 @@
+@page "/admin/booked-tours"
+@layout AdminLayout
+@implements IDisposable
+@inject BookedTourApiClient BookedTourApi
+
+<PageTitle>Booked Tours - WanderX</PageTitle>
+
+<header class="guide-topbar">
+    <div>
+        <p class="guide-eyebrow">Booked Tour Schedule</p>
+        <h1>Booked Tours</h1>
+        <p class="guide-subtitle">Review active tour bookings by departure date, destination, and status.</p>
+    </div>
+
+    <div class="guide-topbar__actions">
+        <button class="wx-button wx-button--outline" type="button" @onclick="LoadBookedToursAsync">
+            <MaterialIcon Name="refresh" />
+            Refresh
+        </button>
+    </div>
+</header>
+
+<section class="guide-content">
+    @if (!string.IsNullOrWhiteSpace(_message))
+    {
+        <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")">
+            @_message
+        </div>
+    }
+
+    <div class="guide-stat-grid">
+        <article class="guide-stat">
+            <p>Booked rows</p>
+            <strong>@_bookedTours.Count</strong>
+            <span>Tour/date groups</span>
+        </article>
+        <article class="guide-stat guide-stat--secondary">
+            <p>Total bookings</p>
+            <strong>@TotalBookings</strong>
+            <span>Customer orders</span>
+        </article>
+        <article class="guide-stat guide-stat--tertiary">
+            <p>Total guests</p>
+            <strong>@TotalGuests</strong>
+            <span>Seats booked</span>
+        </article>
+        <article class="guide-stat">
+            <p>Revenue</p>
+            <strong>@TotalAmount.ToString("C0")</strong>
+            <span>From matched bookings</span>
+        </article>
+    </div>
+
+    <section class="admin-booked-filter-bar" aria-label="Booked tour filters">
+        <div class="admin-booked-filter-bar__main">
+            <label class="admin-booked-filter-field admin-booked-filter-field--search" aria-label="Search booked tours">
+                <div>
+                    <MaterialIcon Name="search" />
+                    <input type="search" placeholder="Tour code, name..." value="@_searchTerm" @oninput="OnSearchChanged" />
+                </div>
+            </label>
+
+            <label class="admin-booked-filter-field admin-booked-filter-field--compact" aria-label="Booking status">
+                <div>
+                    <MaterialIcon Name="fact_check" />
+                    <select value="@_statusFilter" @onchange="OnStatusChanged">
+                        @foreach (var status in BookingStatuses)
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                </div>
+            </label>
+
+            <label class="admin-booked-filter-field admin-booked-filter-field--destination" aria-label="Destination">
+                <div>
+                    <MaterialIcon Name="place" />
+                    <input type="search" placeholder="Destination" value="@_destinationFilter" @oninput="OnDestinationChanged" />
+                </div>
+            </label>
+
+            <label class="admin-booked-filter-field admin-booked-filter-field--compact" aria-label="Departure date">
+                <div>
+                    <MaterialIcon Name="calendar_month" />
+                    <input type="date" value="@DepartureDateValue" @onchange="OnDepartureDateChanged" />
+                </div>
+            </label>
+        </div>
+
+        <div class="admin-booked-filter-bar__actions">
+            <button class="admin-booked-filter-reset" type="button" title="Clear filters" aria-label="Clear filters" @onclick="ClearFiltersAsync">
+                <MaterialIcon Name="close" />
+            </button>
+        </div>
+    </section>
+
+    <section class="guide-table-shell">
+        <div class="guide-table-toolbar">
+            <div>
+                <strong>@_bookedTours.Count booked tour row(s)</strong>
+            </div>
+            <p>Sorted by departure date</p>
+        </div>
+
+        <div class="guide-table-scroll">
+            <table class="guide-table admin-booked-table">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Departure</th>
+                        <th>Tour</th>
+                        <th>Destination</th>
+                        <th>Bookings</th>
+                        <th>Guests</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th class="guide-table__actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (_isLoading)
+                    {
+                        <tr>
+                            <td colspan="9">
+                                <div class="guide-empty guide-empty--compact">
+                                    <MaterialIcon Name="sync" />
+                                    Loading booked tours...
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else if (_bookedTours.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="9">
+                                <div class="guide-empty guide-empty--compact">
+                                    <MaterialIcon Name="event_busy" />
+                                    No booked tours match the current filters.
+                                    <span class="guide-field-hint">Restart the server once if you expect seed bookings to appear.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var row in _bookedTours)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="admin-booked-day">@row.DepartureDate.ToString("ddd")</span>
+                                </td>
+                                <td>
+                                    <strong>@row.DepartureDate.ToString("dd/MM/yyyy")</strong>
+                                </td>
+                                <td>
+                                    <div class="guide-tour-cell">
+                                        <strong>@row.TourName</strong>
+                                        <span>@(string.IsNullOrWhiteSpace(row.TourCode) ? "No tour code" : row.TourCode)</span>
+                                    </div>
+                                </td>
+                                <td>@row.Destination</td>
+                                <td>@row.BookingCount</td>
+                                <td>@row.GuestCount</td>
+                                <td>@row.TotalAmount.ToString("C0")</td>
+                                <td>
+                                    <div class="admin-booked-statuses">
+                                        <span class="@GetBookingStatusClass(row.BookingStatus)">
+                                            <span></span>
+                                            @row.BookingStatus
+                                        </span>
+                                        <span class="@GetTourStatusClass(row.TourStatus)">
+                                            <span></span>
+                                            @row.TourStatus
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="guide-table__actions">
+                                    <button class="guide-icon-button" type="button" title="Hide is blocked because this tour has bookings" disabled>
+                                        <MaterialIcon Name="visibility_off" />
+                                    </button>
+                                    <button class="guide-icon-button guide-icon-button--danger" type="button" title="Delete is blocked because this tour has bookings" disabled>
+                                        <MaterialIcon Name="delete" />
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+
+@code {
+    private static readonly string[] BookingStatuses = { "All", "Pending", "Paid", "Confirmed", "Finished", "Cancelled" };
+
+    private List<BookedTourResponse> _bookedTours = new();
+    private bool _isLoading = true;
+    private bool _isError;
+    private string? _message;
+    private string _searchTerm = string.Empty;
+    private string _statusFilter = "All";
+    private string _destinationFilter = string.Empty;
+    private DateTime? _departureDate;
+    private CancellationTokenSource? _filterDebounce;
+
+    private int TotalBookings => _bookedTours.Sum(item => item.BookingCount);
+
+    private int TotalGuests => _bookedTours.Sum(item => item.GuestCount);
+
+    private decimal TotalAmount => _bookedTours.Sum(item => item.TotalAmount);
+
+    private string DepartureDateValue => _departureDate?.ToString("yyyy-MM-dd") ?? string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBookedToursAsync();
+    }
+
+    private async Task LoadBookedToursAsync()
+    {
+        _isLoading = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            _bookedTours = await BookedTourApi.GetBookedToursAsync(
+                _searchTerm,
+                _statusFilter,
+                _destinationFilter,
+                _departureDate);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ex.Message;
+            _bookedTours = new List<BookedTourResponse>();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task ClearFiltersAsync()
+    {
+        CancelPendingFilter();
+        _searchTerm = string.Empty;
+        _statusFilter = "All";
+        _destinationFilter = string.Empty;
+        _departureDate = null;
+        await LoadBookedToursAsync();
+    }
+
+    private Task OnSearchChanged(ChangeEventArgs args)
+    {
+        _searchTerm = args.Value?.ToString() ?? string.Empty;
+        return DebounceLoadAsync();
+    }
+
+    private Task OnDestinationChanged(ChangeEventArgs args)
+    {
+        _destinationFilter = args.Value?.ToString() ?? string.Empty;
+        return DebounceLoadAsync();
+    }
+
+    private async Task OnStatusChanged(ChangeEventArgs args)
+    {
+        CancelPendingFilter();
+        _statusFilter = args.Value?.ToString() ?? "All";
+        await LoadBookedToursAsync();
+    }
+
+    private async Task OnDepartureDateChanged(ChangeEventArgs args)
+    {
+        CancelPendingFilter();
+        var value = args.Value?.ToString();
+        _departureDate = DateTime.TryParse(value, out var parsedDate)
+            ? parsedDate.Date
+            : null;
+
+        await LoadBookedToursAsync();
+    }
+
+    private Task DebounceLoadAsync()
+    {
+        CancelPendingFilter();
+        var source = new CancellationTokenSource();
+        _filterDebounce = source;
+        _ = LoadAfterDelayAsync(source.Token);
+        return Task.CompletedTask;
+    }
+
+    private async Task LoadAfterDelayAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(350, cancellationToken);
+            await InvokeAsync(LoadBookedToursAsync);
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
+
+    private void CancelPendingFilter()
+    {
+        _filterDebounce?.Cancel();
+        _filterDebounce?.Dispose();
+        _filterDebounce = null;
+    }
+
+    public void Dispose()
+    {
+        CancelPendingFilter();
+    }
+
+    private static string GetBookingStatusClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "paid" or "confirmed" or "finished" => "guide-status guide-status--active",
+            "pending" => "guide-status guide-status--busy",
+            "cancelled" => "guide-status guide-status--muted",
+            _ => "guide-status"
+        };
+    }
+
+    private static string GetTourStatusClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "published" => "guide-status guide-status--active",
+            "draft" => "guide-status guide-status--busy",
+            "archived" or "hidden" or "unmapped" => "guide-status guide-status--muted",
+            _ => "guide-status"
+        };
+    }
+}

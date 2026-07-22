@@ -39,6 +39,16 @@ builder.Services.AddScoped(_ =>
     var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
     return new TourScheduleApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 });
+builder.Services.AddScoped(_ =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    return new BookedTourApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+});
+builder.Services.AddScoped(_ =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    return new TourPricingApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+});
 
 builder.Services.AddScoped(sp =>
 {
