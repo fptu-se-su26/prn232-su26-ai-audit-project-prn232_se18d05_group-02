@@ -35,6 +35,8 @@ public sealed class BookingSummaryResponse
 {
     public Guid Id { get; set; }
     public string BookingCode { get; set; } = string.Empty;
+    public string? TourCode { get; set; }
+    public Guid? DepartureScheduleId { get; set; }
     public string TourName { get; set; } = string.Empty;
     public string Destination { get; set; } = string.Empty;
     public string? ThumbnailUrl { get; set; }
@@ -42,7 +44,21 @@ public sealed class BookingSummaryResponse
     public int GuestCount { get; set; }
     public decimal TotalAmount { get; set; }
     public string Status { get; set; } = string.Empty;
+    public string? CancellationStatus { get; set; }
+    public string? CancellationReason { get; set; }
+    public DateTime? CancellationRequestedAt { get; set; }
+    public DateTime? CancellationReviewedAt { get; set; }
+    public string? CancellationReviewedBy { get; set; }
+    public string? CancellationReviewNote { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? PaymentOption { get; set; }
+    public string? PaymentMethod { get; set; }
+    public string? PaymentReference { get; set; }
+    public decimal? PaidAmount { get; set; }
+    public decimal? RemainingAmount { get; set; }
+    public DateTime? PaymentUpdatedAt { get; set; }
+    public string? PaymentUpdatedBy { get; set; }
+    public string? PaymentNote { get; set; }
 
     // Tiến trình đơn hàng (null = chưa xử lý)
     public DateTime? PaidAt { get; set; }
@@ -65,6 +81,12 @@ public class BookingPassengerDto
     public string FullName { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public string TicketType { get; set; } = string.Empty;
+}
+
+public sealed class CreateCancellationRequest
+{
+    [StringLength(1000)]
+    public string? Reason { get; set; }
 }
 
 // end TV3

@@ -10,7 +10,7 @@
 | Học kỳ                  | SU26                                                                |
 | Tên bài tập / Project   | Group Project                                                       |
 | Tên sinh viên / Nhóm    | Group 2                                                             |
-| MSSV / Danh sách MSSV   | DE180158                                                            |
+| MSSV / Danh sách MSSV   | DE180158, DE180166                                                  |
 | Giảng viên hướng dẫn    | Lê Thiện Nhật Quang                                                 |
 | Ngày bắt đầu            | 2026-05-18                                                          |
 | Ngày hoàn thành         |                                                                     |
@@ -57,7 +57,7 @@ Sinh viên/nhóm cần ghi lại:
 | 3 | 05/06/2026 | ChatGPT / Antigravity | Guide Portal Calendar & Filter UX | Khi nhấn vào tour trên calendar, nhảy xuống + filter theo status & date | Calendar click handling, smooth scroll, multi-criteria filter | Có | PROMPTS.md - Prompt số 3 |
 | 4 | 16/06/2026 | Gemini | Responsive Design Implementation | Làm responsive cho trang web cho cả laptop và mobile với nâng cao UI/UX | Responsive UI/UX implementation, mobile-first design | Có | PROMPTS.md - Prompt-04 |
 | 5 | 23/06/2026 | Antigravity / Gemini | Redesign Travel Website UI/UX | Tái cấu trúc toàn diện UI/UX (Homepage, Listing, Detail) theo Design System | Đề xuất UX và mã nguồn mẫu React/Tailwind cho các trang cốt lõi | Có | PROMPTS.md - Prompt-05 |
-| 6 |  |  |  |  |  | Có / Không |  |
+| 6 | 20/07/2026 | ChatGPT / Codex | Member 2 Admin/Staff Booking Operations | Triển khai FE1-FE4: Booking Management, Booking Status, Cancellation Requests, Payment Management | Hoàn thiện API, DTO, Blazor UI, business rules, email hooks và debug lỗi tích hợp | Có | PROMPTS.md - Prompt-06 |
 | 7 |  |  |  |  |  | Có / Không |  |
 | 8 |  |  |  |  |  | Có / Không |  |
 | 9 |  |  |  |  |  | Có / Không |  |
@@ -747,6 +747,122 @@ AI đã phân tích các điểm yếu UX thường gặp và đưa ra giải ph
 
 ```text
 Mã nguồn mẫu do AI cung cấp rất sạch và chuẩn cấu trúc Tailwind CSS, giúp nhóm tiết kiệm hàng chục giờ thiết kế bộ cục và viết CSS responsive thủ công. Việc tối ưu hóa bằng cách chia nhỏ component giúp code dễ bảo trì hơn rất nhiều.
+```
+
+---
+
+### Prompt-06
+
+| Nội dung                    | Thông tin                                                         |
+|-----------------------------|-------------------------------------------------------------------|
+| Ngày sử dụng                | 20/07/2026                                                        |
+| Công cụ AI                  | ChatGPT / Codex                                                   |
+| Mục đích sử dụng            | Member 2 Admin/Staff Booking Operations Implementation            |
+| Phần việc liên quan         | Backend API / Blazor Frontend / Database update / Debug           |
+| Mức độ sử dụng              | Hỗ trợ một phần                                                   |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Tôi là thành viên 2, hãy làm từng feature của thành viên 2, đi từ trên xuống, bám sát cấu trúc của project, hãy bắt đầu từ feature 1 đi.
+
+Các yêu cầu bổ sung trong quá trình làm:
+- Booking list phải vừa khít, không có thanh kéo ngang và có phân trang 5 booking/trang.
+- Ticket type dùng tiếng Anh, gồm Adult và Child, form tạo booking dùng dropdown.
+- FE2 phải ràng buộc trạng thái: Pending chỉ sang Confirmed/Cancelled; Confirmed chỉ sang Finished/Cancelled; Finished/Cancelled không được đổi nữa.
+- Updated by cố định theo tài khoản hiện tại, không cho sửa.
+- Cancellation request phải mở popup, giao diện đồng nhất với web và có phân trang như bookings.
+- Xử lý gửi email cho các luồng hủy booking/reject/approve để chỉ cần cấu hình mail là hoạt động.
+- FE4 Payment Management phải quản lý full payment, 40% deposit, remaining balance, reference, invoice/receipt và khóa sửa khi đã paid.
+- Debug các lỗi phát sinh như CSRF token, route đổi link nhưng không render form, DbUpdateConcurrencyException, Failed to fetch và UI bị tràn số.
+```
+
+#### 5.2. Bối cảnh khi viết prompt
+
+```text
+Thành viên 2 phụ trách nhóm chức năng Admin/Staff liên quan đến quản lý booking, trạng thái booking, yêu cầu hủy booking và thanh toán trong dự án WanderX. Project đã có sẵn cấu trúc backend ASP.NET Core, Entity Framework Core, Blazor frontend và database hiện tại, nên yêu cầu là tận dụng cấu trúc sẵn có, hạn chế tạo mới không cần thiết và triển khai từng feature từ trên xuống.
+```
+
+#### 5.3. Kết quả AI trả về
+
+```text
+AI hỗ trợ phân tích và triển khai các phần chính:
+1. Backend:
+   - Bổ sung DTO request/response cho booking, guest/passenger, status update, cancellation review và payment update.
+   - Mở rộng BookingsController với các endpoint CRUD booking, status update, cancellation review và payment management.
+   - Bổ sung logic trong BookingService/UserService cho nghiệp vụ status, cancellation và payment.
+   - Chuẩn bị SmtpEmailSender để gửi email tự động khi có cấu hình SMTP thật.
+2. Database:
+   - Tận dụng bảng Bookings hiện có, bổ sung các cột cần thiết cho tour code, audit status, cancellation và payment.
+   - Không tạo thêm bảng mới cho payment/cancellation trong phạm vi FE1-FE4.
+3. Frontend:
+   - Tạo/cập nhật các trang AdminBookings, AdminCancellationRequests và AdminPayments.
+   - Thiết kế popup/modal cho create/edit booking, đổi status, review cancellation và record payment.
+   - Thêm phân trang 5 dòng/trang, filter, search và chỉnh UI tránh overflow.
+4. Debug:
+   - Xử lý anti-CSRF token mismatch bằng cách dùng API client phù hợp.
+   - Sửa lỗi route đổi URL nhưng không render form.
+   - Sửa lỗi concurrency khi cập nhật ngày tour đã đặt.
+   - Sửa lỗi Failed to fetch và lỗi số tiền bị tràn trên dashboard payment.
+```
+
+#### 5.4. Kết quả đã áp dụng vào bài
+
+```text
+Đã áp dụng vào project WanderX:
+1. FE1 Booking Management:
+   - Admin/Staff xem danh sách booking, tạo booking, sửa booking, quản lý guest list, ticket type Adult/Child và phân trang.
+2. FE2 Booking Status Management:
+   - Dropdown trạng thái chỉ hiển thị lựa chọn hợp lệ theo nghiệp vụ.
+   - Finished/Cancelled bị khóa đổi trạng thái và hiển thị thông báo nhẹ nhàng.
+   - Updated by lấy theo tài khoản hiện tại, không cho chỉnh thủ công.
+3. FE3 Cancellation Request Management:
+   - User gửi yêu cầu hủy booking.
+   - Admin/Staff xem danh sách request, mở popup review, approve/reject và có phân trang đồng bộ với bookings.
+   - Chuẩn bị email tự động cho request received, approved và rejected.
+4. FE4 Payment Management:
+   - Admin/Staff quản lý unpaid/deposit paid/paid/failed.
+   - Ghi nhận full payment, 40% deposit hoặc remaining balance.
+   - Lưu payment reference, method, note, updated by và hiển thị invoice/receipt.
+   - Booking đã paid thì ẩn nút record payment và backend cũng chặn cập nhật.
+```
+
+#### 5.5. Phần sinh viên/nhóm đã chỉnh sửa hoặc cải tiến
+
+```text
+Trần Hồng Quân (DE180166) kiểm tra từng feature theo nghiệp vụ thực tế và yêu cầu AI sửa nhiều vòng:
+1. Điều chỉnh UI từ form chèn trong list sang popup/modal để thao tác gọn hơn.
+2. Tinh chỉnh bảng list và phân trang để đồng nhất giữa Bookings, Cancel Requests và Payments.
+3. Ràng buộc status/payment theo quy tắc nghiệp vụ thay vì cho đổi tự do.
+4. Đổi ticket type sang tiếng Anh và dùng dropdown để giảm lỗi nhập liệu.
+5. Kiểm tra lại việc tận dụng database hiện có và tổng hợp các cột đã bổ sung.
+```
+
+#### 5.6. Đánh giá chất lượng prompt
+
+- [X] Prompt rõ ràng
+- [X] Prompt có đủ bối cảnh
+- [ ] Prompt còn thiếu thông tin
+- [X] Prompt tạo ra kết quả tốt
+- [ ] Prompt tạo ra kết quả chưa phù hợp
+- [X] Cần hỏi lại AI nhiều lần
+- [X] Cần tự kiểm tra và chỉnh sửa nhiều
+- [ ] Kết quả AI có lỗi hoặc chưa chính xác
+
+#### 5.7. Minh chứng liên quan
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXServer/Controllers/BookingsController.cs; WanderXServer/Services/BookingService.cs; WanderXServer/Services/UserService.cs; WanderXServer/DataAccessLayer/WanderXDbContext.cs; WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXClient/WanderXClient/Pages/AdminCancellationRequests.razor; WanderXClient/WanderXClient/Pages/AdminPayments.razor |
+| Screenshot | Test UI trực tiếp các trang Admin Bookings, Cancel Requests và Payments |
+| Kết quả chạy/test | Backend/frontend build thành công sau khi sửa lỗi; test thủ công các luồng chính |
+| Link tài liệu/báo cáo | AI_AUDIT_LOG.md - Lần sử dụng AI số 6; CHANGELOG.md - Phase 04 Member 2 Implementation |
+
+#### 5.8. Ghi chú thêm
+
+```text
+AI được dùng như công cụ hỗ trợ phân tích, code, debug và rà soát. Sinh viên chịu trách nhiệm kiểm tra nghiệp vụ, chỉnh UI, xác nhận dữ liệu thực tế và đảm bảo các feature phù hợp với cấu trúc project WanderX.
 ```
 
 ---

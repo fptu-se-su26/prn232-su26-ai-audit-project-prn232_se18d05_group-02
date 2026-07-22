@@ -1,0 +1,1445 @@
+@page "/admin-bookings"
+@page "/admin-bookings/new"
+@page "/admin-bookings/{BookingId:guid}/edit"
+@using System.ComponentModel.DataAnnotations
+@using System.Globalization
+@inject UserApiClient UserApi
+@inject GuideTourApiClient GuideTourApi
+@inject NavigationManager NavManager
+@inject AuthSessionService SessionService
+
+<PageTitle>WanderX Admin - Booking Management</PageTitle>
+
+<div class="guide-admin-page">
+    <aside class="guide-sidebar">
+        <div class="guide-sidebar__brand">
+            <a class="brand-mark" href="/">WanderX</a>
+            <p>Admin Suite</p>
+        </div>
+        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
+            <a class="guide-sidebar__link" href="/dashboard">
+                <MaterialIcon Name="dashboard" />
+                Dashboard
+            </a>
+            <a class="guide-sidebar__link guide-sidebar__link--active" href="/admin-bookings" aria-current="page">
+                <MaterialIcon Name="receipt_long" />
+                Bookings
+            </a>
+            <a class="guide-sidebar__link" href="/admin-cancellations">
+                <MaterialIcon Name="rule" />
+                Cancel Requests
+            </a>
+            <a class="guide-sidebar__link" href="/admin-payments">
+                <MaterialIcon Name="payments" />
+                Payments
+            </a>
+            <a class="guide-sidebar__link" href="/guide-assignments">
+                <MaterialIcon Name="assignment_ind" />
+                Assignments
+            </a>
+            <a class="guide-sidebar__link" href="/admin-service-requests">
+                <MaterialIcon Name="support_agent" />
+                Service Requests
+            </a>
+            <a class="guide-sidebar__link" href="/tour-reviews">
+                <MaterialIcon Name="rate_review" />
+                Tour Reviews
+            </a>
+            <a class="guide-sidebar__link" href="/">
+                <MaterialIcon Name="home" />
+                Homepage
+            </a>
+        </nav>
+    </aside>
+
+    <main class="guide-main">
+        <header class="guide-topbar">
+            <div>
+                <p class="guide-eyebrow">Member 2 / Feature 1</p>
+                <h1>Booking Management</h1>
+                <p class="guide-subtitle">Create bookings, link them to a tour departure, and update passenger details.</p>
+            </div>
+            <div class="guide-topbar__actions">
+                <label class="guide-search" aria-label="Search bookings">
+                    <MaterialIcon Name="search" />
+                    <input type="search" placeholder="Search booking, tour, customer..." value="@_searchTerm" @oninput="OnSearchInput" />
+                </label>
+                <button class="wx-button wx-button--secondary" type="button" @onclick="OpenCreateForm">
+                    <MaterialIcon Name="add" />
+                    New booking
+                </button>
+            </div>
+        </header>
+
+        <section class="guide-content">
+            @if (!string.IsNullOrWhiteSpace(_message))
+            {
+                <div class="guide-alert">@_message</div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="guide-alert guide-alert--error">@_error</div>
+            }
+
+            <div class="guide-stat-grid">
+                <article class="guide-stat">
+                    <p>Total bookings</p>
+                    <strong>@_bookings.Count</strong>
+                    <span>All managed bookings</span>
+                </article>
+                <article class="guide-stat guide-stat--secondary">
+                    <p>Pending</p>
+                    <strong>@_bookings.Count(item => item.Status == "Pending")</strong>
+                    <span>Waiting for payment</span>
+                </article>
+                <article class="guide-stat guide-stat--tertiary">
+                    <p>Linked schedules</p>
+                    <strong>@_bookings.Count(item => item.DepartureScheduleId.HasValue || !string.IsNullOrWhiteSpace(item.TourCode))</strong>
+                    <span>Tour/departure attached</span>
+                </article>
+                <article class="guide-stat">
+                    <p>Passengers</p>
+                    <strong>@_bookings.Sum(item => item.GuestCount)</strong>
+                    <span>Total guest count</span>
+                </article>
+            </div>
+
+            <div class="booking-grid booking-grid--list-only">
+                <section class="guide-table-shell booking-table-shell">
+                    <div class="guide-table-toolbar">
+                        <div class="guide-filter-group" role="group">
+                            @foreach (var status in _statusFilters)
+                            {
+                                <button class="@(_statusFilter == status ? "guide-filter guide-filter--active" : "guide-filter")"
+                                        type="button"
+                                        @onclick="() => SetStatusFilter(status)">
+                                    @status
+                                </button>
+                            }
+                        </div>
+                        <p>@FilteredBookingCount bookings</p>
+                    </div>
+
+                    @if (_isLoading)
+                    {
+                        <div class="guide-empty">
+                            <MaterialIcon Name="sync" />
+                            Loading bookings...
+                        </div>
+                    }
+                    else if (FilteredBookingCount == 0)
+                    {
+                        <div class="guide-empty">
+                            <MaterialIcon Name="inbox" />
+                            No bookings found.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="guide-table-scroll booking-table-scroll">
+                            <table class="guide-table booking-table">
+                                <colgroup>
+                                    <col class="booking-table__col-booking" />
+                                    <col class="booking-table__col-date" />
+                                    <col class="booking-table__col-guests" />
+                                    <col class="booking-table__col-total" />
+                                    <col class="booking-table__col-status" />
+                                    <col class="booking-table__col-actions" />
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>Booking</th>
+                                        <th>Departure</th>
+                                        <th>Guests</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th class="guide-table__actions">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in PagedBookings)
+                                    {
+                                        <tr class="@(_selectedBooking?.Id == booking.Id ? "booking-row--active" : "")">
+                                            <td data-label="Booking">
+                                                <div class="booking-cell-title">
+                                                    <strong>@booking.TourName</strong>
+                                                    <span>@booking.BookingCode · @(booking.TourCode ?? "No tour code")</span>
+                                                    <span>@booking.CustomerName · @booking.CustomerEmail</span>
+                                                </div>
+                                            </td>
+                                            <td data-label="Departure">@booking.DepartureDate.ToString("dd/MM/yyyy")</td>
+                                            <td data-label="Guests">@booking.GuestCount</td>
+                                            <td data-label="Total">@booking.TotalAmount.ToString("N0", CultureInfo.InvariantCulture) VND</td>
+                                            <td data-label="Status">
+                                                <div class="booking-status-cell">
+                                                    <span class="@GetStatusClass(booking.Status)">
+                                                        <span></span>@booking.Status
+                                                    </span>
+                                                    @if (booking.StatusUpdatedAt.HasValue || !string.IsNullOrWhiteSpace(booking.StatusUpdatedBy))
+                                                    {
+                                                        <small>@FormatStatusAudit(booking)</small>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td class="guide-table__actions" data-label="Actions">
+                                                <button class="guide-icon-button"
+                                                        type="button"
+                                                        title="@GetStatusActionTitle(booking.Status)"
+                                                        @onclick="() => OpenStatusForm(booking)">
+                                                    <MaterialIcon Name="published_with_changes" />
+                                                </button>
+                                                <button class="guide-icon-button" type="button" title="Edit booking" @onclick="() => OpenEditForm(booking)">
+                                                    <MaterialIcon Name="edit" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="booking-pagination">
+                            <p>Showing @PageStart-@PageEnd of @FilteredBookingCount</p>
+                            <div class="booking-pagination__controls" role="navigation" aria-label="Booking pages">
+                                <button class="guide-icon-button"
+                                        type="button"
+                                        title="Previous page"
+                                        disabled="@(_currentPage <= 1)"
+                                        @onclick="PreviousPage">
+                                    <MaterialIcon Name="chevron_left" />
+                                </button>
+
+                                @foreach (var pageNumber in Enumerable.Range(1, TotalPages))
+                                {
+                                    <button class="booking-page-button @(pageNumber == _currentPage ? "booking-page-button--active" : string.Empty)"
+                                            type="button"
+                                            aria-current="@(pageNumber == _currentPage ? "page" : null)"
+                                            @onclick="() => SetPage(pageNumber)">
+                                        @pageNumber
+                                    </button>
+                                }
+
+                                <button class="guide-icon-button"
+                                        type="button"
+                                        title="Next page"
+                                        disabled="@(_currentPage >= TotalPages)"
+                                        @onclick="NextPage">
+                                    <MaterialIcon Name="chevron_right" />
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </section>
+
+                @if (_isFormOpen)
+                {
+                <div class="booking-modal-overlay" @onclick="CloseForm">
+                <section class="guide-form-panel booking-form-panel booking-modal" @onclick:stopPropagation="true">
+                    <div class="guide-section-heading">
+                        <div>
+                            <p class="guide-eyebrow">@(_selectedBooking is null ? "Create" : _selectedBooking.BookingCode)</p>
+                            <h2>@(_selectedBooking is null ? "New Booking" : "Update Booking")</h2>
+                        </div>
+                    </div>
+
+                    <EditForm Model="_form" OnValidSubmit="SaveBookingAsync">
+                        <DataAnnotationsValidator />
+
+                        <div class="booking-form-grid">
+                            <div class="guide-field booking-field-wide">
+                                <label for="booking-customer-email">Customer email</label>
+                                <InputText id="booking-customer-email" class="guide-control" @bind-Value="_form.UserEmail" disabled="@(_selectedBooking is not null)" />
+                                <ValidationMessage For="@(() => _form.UserEmail)" />
+                            </div>
+
+                            <div class="guide-field booking-field-wide">
+                                <label for="booking-schedule">Departure schedule</label>
+                                <select id="booking-schedule" class="guide-control" value="@_selectedScheduleId" @onchange="OnScheduleChanged">
+                                    <option value="">Manual booking information</option>
+                                    @foreach (var schedule in _schedules)
+                                    {
+                                        <option value="@schedule.Id">@schedule.TourCode · @schedule.TourName · @schedule.StartDate.ToString("dd/MM/yyyy")</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="booking-tour-code">Tour code</label>
+                                <InputText id="booking-tour-code" class="guide-control" @bind-Value="_form.TourCode" />
+                                <ValidationMessage For="@(() => _form.TourCode)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="booking-departure">Departure date</label>
+                                <InputDate id="booking-departure" class="guide-control" @bind-Value="_departureDate" />
+                            </div>
+
+                            <div class="guide-field booking-field-wide">
+                                <label for="booking-tour-name">Tour name</label>
+                                <InputText id="booking-tour-name" class="guide-control" @bind-Value="_form.TourName" />
+                                <ValidationMessage For="@(() => _form.TourName)" />
+                            </div>
+
+                            <div class="guide-field booking-field-wide">
+                                <label for="booking-destination">Destination</label>
+                                <InputText id="booking-destination" class="guide-control" @bind-Value="_form.Destination" />
+                                <ValidationMessage For="@(() => _form.Destination)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="booking-total">Total amount</label>
+                                <InputNumber id="booking-total" class="guide-control" @bind-Value="_form.TotalAmount" />
+                                <ValidationMessage For="@(() => _form.TotalAmount)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="booking-thumbnail">Thumbnail URL</label>
+                                <InputText id="booking-thumbnail" class="guide-control" @bind-Value="_form.ThumbnailUrl" />
+                                <ValidationMessage For="@(() => _form.ThumbnailUrl)" />
+                            </div>
+                        </div>
+
+                        <div class="booking-passenger-header">
+                            <div>
+                                <p class="guide-eyebrow">Passengers</p>
+                                <h3>Guest list</h3>
+                            </div>
+                            <button class="guide-icon-button" type="button" title="Add passenger" @onclick="AddPassenger">
+                                <MaterialIcon Name="person_add" />
+                            </button>
+                        </div>
+
+                        <div class="booking-passenger-list">
+                            @for (var index = 0; index < _form.Passengers.Count; index++)
+                            {
+                                var passenger = _form.Passengers[index];
+                                var rowIndex = index;
+                                <div class="booking-passenger-row">
+                                    <InputText class="guide-control" placeholder="Full name" @bind-Value="passenger.FullName" />
+                                    <InputText class="guide-control" placeholder="Phone" @bind-Value="passenger.PhoneNumber" />
+                                    <InputSelect class="guide-control" @bind-Value="passenger.TicketType">
+                                        @foreach (var ticketType in _ticketTypes)
+                                        {
+                                            <option value="@ticketType">@ticketType</option>
+                                        }
+                                    </InputSelect>
+                                    <button class="guide-icon-button" type="button" title="Remove passenger" disabled="@(_form.Passengers.Count <= 1)" @onclick="() => RemovePassenger(rowIndex)">
+                                        <MaterialIcon Name="delete" />
+                                    </button>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="booking-form-actions">
+                            <button class="wx-button wx-button--outline" type="button" @onclick="CloseForm">
+                                Cancel
+                            </button>
+                            <button class="wx-button wx-button--secondary" type="submit" disabled="@_isSaving">
+                                <MaterialIcon Name="save" />
+                                @(_isSaving ? "Saving..." : "Save booking")
+                            </button>
+                        </div>
+                    </EditForm>
+                </section>
+                </div>
+                }
+            </div>
+
+            @if (_isStatusFormOpen && _statusBooking is not null)
+            {
+                <div class="booking-modal-overlay" @onclick="CloseStatusForm">
+                    <section class="guide-form-panel booking-status-modal" @onclick:stopPropagation="true">
+                        <div class="guide-section-heading">
+                            <div>
+                                <p class="guide-eyebrow">@_statusBooking.BookingCode</p>
+                                <h2>Update Status</h2>
+                                <p class="guide-subtitle">@_statusBooking.TourName</p>
+                            </div>
+                        </div>
+
+                        <EditForm Model="_statusForm" OnValidSubmit="SaveStatusAsync">
+                            <DataAnnotationsValidator />
+
+                            <div class="booking-form-grid booking-status-form-grid">
+                                <div class="guide-field">
+                                    <label for="booking-status-select">Booking status</label>
+                                    <InputSelect id="booking-status-select" class="guide-control" @bind-Value="_statusForm.Status">
+                                        @foreach (var status in AvailableStatusOptions)
+                                        {
+                                            <option value="@status">@status</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => _statusForm.Status)" />
+                                </div>
+
+                                <div class="guide-field">
+                                    <label>Updated by</label>
+                                    <div class="booking-readonly-value">@(_statusForm.UpdatedBy ?? "Admin staff")</div>
+                                </div>
+                            </div>
+
+                            <div class="booking-status-preview">
+                                <span class="@GetStatusClass(_statusBooking.Status)">
+                                    <span></span>Current: @_statusBooking.Status
+                                </span>
+                                @if (_statusForm.Status == "Cancelled")
+                                {
+                                    <p>Cancellation will trigger an email notification to @_statusBooking.CustomerEmail.</p>
+                                }
+                            </div>
+
+                            <div class="booking-form-actions">
+                                <button class="wx-button wx-button--outline" type="button" @onclick="CloseStatusForm">
+                                    Cancel
+                                </button>
+                                <button class="wx-button wx-button--secondary" type="submit" disabled="@_isStatusSaving">
+                                    <MaterialIcon Name="save" />
+                                    @(_isStatusSaving ? "Saving..." : "Save status")
+                                </button>
+                            </div>
+                        </EditForm>
+                    </section>
+                </div>
+            }
+
+            @if (_isStatusNoticeOpen)
+            {
+                <div class="booking-modal-overlay" @onclick="CloseStatusNotice">
+                    <section class="guide-form-panel booking-status-notice" @onclick:stopPropagation="true">
+                        <button class="booking-status-notice__close" type="button" title="Close" @onclick="CloseStatusNotice">
+                            <MaterialIcon Name="close" />
+                        </button>
+                        <div class="booking-status-notice__hero">
+                            <div class="booking-status-notice__icon">
+                                <MaterialIcon Name="@_statusNoticeIcon" />
+                            </div>
+                            <span class="@_statusNoticeChipClass">@_statusNoticeChipText</span>
+                        </div>
+                        <div class="booking-status-notice__body">
+                            <p class="guide-eyebrow">Status locked</p>
+                            <h2>@_statusNoticeTitle</h2>
+                            <div class="booking-status-notice__message">
+                                <MaterialIcon Name="lock" />
+                                <p>@_statusNoticeMessage</p>
+                            </div>
+                        </div>
+                        <div class="booking-status-notice__actions">
+                            <button class="wx-button wx-button--secondary" type="button" @onclick="CloseStatusNotice">
+                                Got it
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            }
+        </section>
+    </main>
+    <MobileBottomNav />
+</div>
+
+<style>
+    .booking-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+        gap: 24px;
+        align-items: start;
+    }
+
+    .booking-grid--list-only {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .booking-grid--form-open {
+        grid-template-columns: minmax(360px, 0.8fr) minmax(0, 1.2fr);
+    }
+
+    .booking-table-shell {
+        min-width: 0;
+    }
+
+    .booking-table-scroll {
+        overflow-x: visible;
+        max-width: 100%;
+    }
+
+    .booking-table {
+        min-width: 0;
+        table-layout: fixed;
+    }
+
+    .booking-table__col-booking { width: 38%; }
+    .booking-table__col-date { width: 12%; }
+    .booking-table__col-guests { width: 9%; }
+    .booking-table__col-total { width: 16%; }
+    .booking-table__col-status { width: 13%; }
+    .booking-table__col-actions { width: 12%; }
+
+    .booking-table th,
+    .booking-table td {
+        padding: 14px 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .booking-table .guide-table__actions {
+        text-align: right;
+    }
+
+    .booking-status-cell {
+        display: grid;
+        gap: 6px;
+        justify-items: start;
+    }
+
+    .booking-status-cell small {
+        color: #64748b;
+        font-size: 11px;
+        line-height: 1.35;
+    }
+
+    .booking-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 18px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .booking-pagination p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .booking-pagination__controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .booking-page-button {
+        min-width: 34px;
+        height: 34px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .booking-page-button--active {
+        border-color: #2563eb;
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+    .booking-cell-title {
+        display: grid;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    .booking-cell-title strong,
+    .booking-cell-title span {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .booking-cell-title strong {
+        color: #0f172a;
+        line-height: 1.35;
+    }
+
+    .booking-cell-title span {
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .booking-row--active {
+        background: #f8fafc;
+    }
+
+    .booking-form-panel {
+        position: static;
+    }
+
+    .booking-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        overflow: auto;
+        padding: 32px 20px;
+        background: rgba(15, 23, 42, 0.58);
+        backdrop-filter: blur(4px);
+    }
+
+    .booking-modal {
+        width: min(920px, 100%);
+        max-height: calc(100vh - 64px);
+        overflow: auto;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+    }
+
+    .booking-status-modal {
+        width: min(560px, 100%);
+        max-height: calc(100vh - 64px);
+        overflow: auto;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+    }
+
+    .booking-status-notice {
+        position: relative;
+        width: min(480px, 100%);
+        display: grid;
+        gap: 20px;
+        overflow: hidden;
+        padding: 0;
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.28);
+    }
+
+    .booking-status-notice::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+            linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent 42%),
+            linear-gradient(315deg, rgba(248, 113, 113, 0.1), transparent 38%);
+    }
+
+    .booking-status-notice__close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        z-index: 1;
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(148, 163, 184, 0.36);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.86);
+        color: #64748b;
+    }
+
+    .booking-status-notice__hero {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 28px 28px 0;
+    }
+
+    .booking-status-notice__icon {
+        width: 58px;
+        height: 58px;
+        display: grid;
+        place-items: center;
+        border-radius: 16px;
+        background: #0f172a;
+        color: #ffffff;
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.22);
+    }
+
+    .booking-status-notice__chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 850;
+    }
+
+    .booking-status-notice__chip--finished {
+        background: #ede9fe;
+        color: #6d28d9;
+    }
+
+    .booking-status-notice__chip--cancelled {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .booking-status-notice__body {
+        position: relative;
+        display: grid;
+        gap: 12px;
+        padding: 0 28px;
+    }
+
+    .booking-status-notice h2 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 24px;
+        line-height: 1.2;
+    }
+
+    .booking-status-notice__message {
+        display: grid;
+        grid-template-columns: 22px minmax(0, 1fr);
+        gap: 10px;
+        align-items: start;
+        padding: 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: rgba(248, 250, 252, 0.86);
+    }
+
+    .booking-status-notice__message .material-symbols-rounded {
+        color: #64748b;
+        font-size: 20px;
+        margin-top: 1px;
+    }
+
+    .booking-status-notice__message p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.55;
+    }
+
+    .booking-status-notice__actions {
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 28px 28px;
+    }
+
+    .booking-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .booking-status-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .booking-status-preview {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+        padding: 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+
+    .booking-status-preview p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .booking-readonly-value {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+        color: #0f172a;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .booking-field-wide {
+        grid-column: 1 / -1;
+    }
+
+    .booking-passenger-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 24px 0 12px;
+    }
+
+    .booking-passenger-header h3 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 16px;
+    }
+
+    .booking-passenger-list {
+        display: grid;
+        gap: 10px;
+    }
+
+    .booking-passenger-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 0.9fr) 40px;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .booking-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .booking-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .booking-status span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .booking-status--pending { background: #fef3c7; color: #b45309; }
+    .booking-status--paid { background: #dcfce7; color: #15803d; }
+    .booking-status--confirmed { background: #dbeafe; color: #1d4ed8; }
+    .booking-status--cancelled { background: #fee2e2; color: #b91c1c; }
+    .booking-status--finished { background: #ede9fe; color: #6d28d9; }
+    .booking-status--default { background: #e2e8f0; color: #475569; }
+
+    @@media (max-width: 1100px) {
+        .booking-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .booking-modal-overlay {
+            padding: 16px;
+        }
+    }
+
+    @@media (max-width: 720px) {
+        .booking-form-grid,
+        .booking-passenger-row {
+            grid-template-columns: 1fr;
+        }
+
+        .booking-table-scroll {
+            overflow-x: visible;
+        }
+
+        .booking-table,
+        .booking-table colgroup,
+        .booking-table thead,
+        .booking-table tbody,
+        .booking-table tr,
+        .booking-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .booking-table thead,
+        .booking-table colgroup {
+            display: none;
+        }
+
+        .booking-table tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 0;
+        }
+
+        .booking-table tbody tr:last-child {
+            border-bottom: 0;
+        }
+
+        .booking-table td {
+            border-bottom: 0;
+            display: grid;
+            grid-template-columns: 92px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            padding: 8px 16px;
+        }
+
+        .booking-table td::before {
+            content: attr(data-label);
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .booking-table .guide-table__actions {
+            text-align: left;
+            white-space: normal;
+        }
+
+        .booking-pagination {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 14px 16px 16px;
+        }
+
+        .booking-pagination__controls {
+            justify-content: flex-start;
+        }
+    }
+</style>
+
+@code {
+    [Parameter] public Guid? BookingId { get; set; }
+
+    private const int PageSize = 5;
+
+    private readonly string[] _statusFilters = ["All", "Pending", "Confirmed", "Paid", "Cancelled", "Finished"];
+    private readonly string[] _ticketTypes = ["Adult", "Child"];
+    private List<BookingResponse> _bookings = new();
+    private List<GuideTourAssignmentResponse> _schedules = new();
+    private BookingResponse? _selectedBooking;
+    private BookingResponse? _statusBooking;
+    private BookingFormModel _form = NewForm();
+    private StatusFormModel _statusForm = new();
+    private DateTime _departureDate = DateTime.Today.AddDays(7);
+    private string _selectedScheduleId = string.Empty;
+    private string _statusFilter = "All";
+    private string _searchTerm = string.Empty;
+    private string? _message;
+    private string? _error;
+    private bool _isLoading = true;
+    private bool _isSaving;
+    private bool _isFormOpen;
+    private bool _isStatusFormOpen;
+    private bool _isStatusNoticeOpen;
+    private bool _isStatusSaving;
+    private int _currentPage = 1;
+    private string _statusNoticeTitle = string.Empty;
+    private string _statusNoticeMessage = string.Empty;
+    private string _statusNoticeIcon = "info";
+    private string _statusNoticeChipText = string.Empty;
+    private string _statusNoticeChipClass = "booking-status-notice__chip";
+
+    private List<BookingResponse> FilteredBookings => _bookings.Where(MatchesCurrentFilters).ToList();
+    private int FilteredBookingCount => FilteredBookings.Count;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredBookingCount / (double)PageSize));
+    private int PageStart => FilteredBookingCount == 0 ? 0 : ((_currentPage - 1) * PageSize) + 1;
+    private int PageEnd => Math.Min(_currentPage * PageSize, FilteredBookingCount);
+    private IEnumerable<BookingResponse> PagedBookings => FilteredBookings
+        .Skip((_currentPage - 1) * PageSize)
+        .Take(PageSize);
+    private IReadOnlyList<string> AvailableStatusOptions => _statusBooking is null
+        ? Array.Empty<string>()
+        : GetAllowedNextStatuses(_statusBooking.Status);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        ApplyRouteState(allowReset: false);
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _isLoading = true;
+        _error = null;
+
+        try
+        {
+            var bookingsTask = UserApi.GetAllBookingsAsync();
+            var schedulesTask = GuideTourApi.GetAssignmentsAsync();
+            await Task.WhenAll(bookingsTask, schedulesTask);
+            _bookings = (bookingsTask.Result ?? Enumerable.Empty<BookingResponse>()).ToList();
+            _schedules = schedulesTask.Result;
+        }
+        catch (Exception ex)
+        {
+            _error = "Could not load booking data: " + ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+            ClampCurrentPage();
+            ApplyRouteState(allowReset: true);
+        }
+    }
+
+    private void ApplyRouteState(bool allowReset)
+    {
+        var relativePath = NavManager.ToBaseRelativePath(NavManager.Uri).TrimEnd('/');
+        if (relativePath.Equals("admin-bookings/new", StringComparison.OrdinalIgnoreCase))
+        {
+            OpenCreateForm();
+            return;
+        }
+
+        if (BookingId.HasValue)
+        {
+            var booking = _bookings.FirstOrDefault(item => item.Id == BookingId.Value);
+            if (booking is not null)
+            {
+                OpenEditForm(booking);
+                return;
+            }
+
+            if (allowReset)
+            {
+                _isFormOpen = false;
+            }
+            return;
+        }
+
+        if (allowReset)
+        {
+            _isFormOpen = false;
+            _selectedBooking = null;
+        }
+    }
+
+    private void OnSearchInput(ChangeEventArgs args)
+    {
+        _searchTerm = args.Value?.ToString() ?? string.Empty;
+        _currentPage = 1;
+    }
+
+    private void SetStatusFilter(string status)
+    {
+        _statusFilter = status;
+        _currentPage = 1;
+    }
+
+    private void SetPage(int page)
+    {
+        _currentPage = Math.Clamp(page, 1, TotalPages);
+    }
+
+    private void PreviousPage()
+    {
+        SetPage(_currentPage - 1);
+    }
+
+    private void NextPage()
+    {
+        SetPage(_currentPage + 1);
+    }
+
+    private void ClampCurrentPage()
+    {
+        _currentPage = Math.Clamp(_currentPage, 1, TotalPages);
+    }
+
+    private bool MatchesCurrentFilters(BookingResponse booking)
+    {
+        if (_statusFilter != "All" && !string.Equals(booking.Status, _statusFilter, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            return true;
+        }
+
+        var term = _searchTerm.Trim();
+        return booking.BookingCode.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+            booking.TourName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+            booking.Destination.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+            booking.CustomerName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+            booking.CustomerEmail.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+            (booking.TourCode?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false);
+    }
+
+    private void OpenCreateForm()
+    {
+        _isStatusFormOpen = false;
+        _isStatusNoticeOpen = false;
+        _isFormOpen = true;
+        ResetForm();
+        _message = null;
+        _error = null;
+    }
+
+    private void ResetForm()
+    {
+        _selectedBooking = null;
+        _form = NewForm();
+        _departureDate = DateTime.Today.AddDays(7);
+        _selectedScheduleId = string.Empty;
+    }
+
+    private void CloseForm()
+    {
+        _isFormOpen = false;
+        ResetForm();
+        NavManager.NavigateTo("/admin-bookings");
+    }
+
+    private void OpenEditForm(BookingResponse booking)
+    {
+        _isStatusFormOpen = false;
+        _isStatusNoticeOpen = false;
+        _isFormOpen = true;
+        _selectedBooking = booking;
+        _selectedScheduleId = booking.DepartureScheduleId?.ToString() ?? string.Empty;
+        _departureDate = booking.DepartureDate.Date;
+        _message = null;
+        _error = null;
+        _form = new BookingFormModel
+        {
+            UserId = booking.UserId,
+            UserEmail = booking.CustomerEmail,
+            TourCode = booking.TourCode,
+            DepartureScheduleId = booking.DepartureScheduleId,
+            TourName = booking.TourName,
+            Destination = booking.Destination,
+            ThumbnailUrl = booking.ThumbnailUrl,
+            TotalAmount = booking.TotalAmount,
+            Passengers = booking.Passengers.Select(passenger => new BookingPassengerRequest
+            {
+                FullName = passenger.FullName,
+                PhoneNumber = passenger.PhoneNumber,
+                TicketType = NormalizeTicketType(passenger.TicketType)
+            }).ToList()
+        };
+
+        if (_form.Passengers.Count == 0)
+        {
+            _form.Passengers.Add(NewPassenger());
+        }
+    }
+
+    private async Task OpenStatusForm(BookingResponse booking)
+    {
+        if (IsTerminalStatus(booking.Status))
+        {
+            OpenStatusNotice(booking.Status);
+            return;
+        }
+
+        _isFormOpen = false;
+        _isStatusNoticeOpen = false;
+        _isStatusFormOpen = true;
+        _statusBooking = booking;
+        _message = null;
+        _error = null;
+
+        var session = await SessionService.GetAsync();
+        var options = GetAllowedNextStatuses(booking.Status);
+        _statusForm = new StatusFormModel
+        {
+            Status = options.FirstOrDefault() ?? NormalizeStatusForForm(booking.Status),
+            UpdatedBy = !string.IsNullOrWhiteSpace(session?.FullName)
+                ? session.FullName
+                : session?.Email ?? "Admin staff"
+        };
+    }
+
+    private void CloseStatusForm()
+    {
+        _isStatusFormOpen = false;
+        _statusBooking = null;
+        _statusForm = new StatusFormModel();
+    }
+
+    private void OpenStatusNotice(string status)
+    {
+        _isFormOpen = false;
+        _isStatusFormOpen = false;
+        _statusBooking = null;
+        _statusForm = new StatusFormModel();
+        _message = null;
+        _error = null;
+
+        var normalizedStatus = NormalizeStatusForForm(status);
+        _statusNoticeTitle = normalizedStatus == "Finished"
+            ? "Tour already finished"
+            : "Booking already cancelled";
+        _statusNoticeMessage = normalizedStatus == "Finished"
+            ? "This booking cannot be changed because the tour has already finished."
+            : "This booking cannot be changed because it has already been cancelled.";
+        _statusNoticeIcon = normalizedStatus == "Finished" ? "flag" : "block";
+        _statusNoticeChipText = normalizedStatus;
+        _statusNoticeChipClass = normalizedStatus == "Finished"
+            ? "booking-status-notice__chip booking-status-notice__chip--finished"
+            : "booking-status-notice__chip booking-status-notice__chip--cancelled";
+        _isStatusNoticeOpen = true;
+    }
+
+    private void CloseStatusNotice()
+    {
+        _isStatusNoticeOpen = false;
+        _statusNoticeTitle = string.Empty;
+        _statusNoticeMessage = string.Empty;
+        _statusNoticeIcon = "info";
+        _statusNoticeChipText = string.Empty;
+        _statusNoticeChipClass = "booking-status-notice__chip";
+    }
+
+    private async Task SaveStatusAsync()
+    {
+        if (_statusBooking is null)
+        {
+            return;
+        }
+
+        if (IsTerminalStatus(_statusBooking.Status))
+        {
+            _error = "Finished or cancelled bookings cannot change status.";
+            return;
+        }
+
+        if (!AvailableStatusOptions.Contains(_statusForm.Status))
+        {
+            _error = "This status is not allowed for the current booking state.";
+            return;
+        }
+
+        _isStatusSaving = true;
+        _message = null;
+        _error = null;
+
+        try
+        {
+            var updated = await UserApi.UpdateBookingStatusAsync(_statusBooking.Id, new UpdateBookingStatusRequest
+            {
+                Status = _statusForm.Status,
+                UpdatedBy = _statusForm.UpdatedBy
+            });
+
+            _message = $"Updated status for {updated?.BookingCode} to {updated?.Status}.";
+            await LoadDataAsync();
+            CloseStatusForm();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isStatusSaving = false;
+        }
+    }
+
+    private void OnScheduleChanged(ChangeEventArgs args)
+    {
+        _selectedScheduleId = args.Value?.ToString() ?? string.Empty;
+        _form.DepartureScheduleId = Guid.TryParse(_selectedScheduleId, out var scheduleId) ? scheduleId : null;
+
+        var schedule = _schedules.FirstOrDefault(item => item.Id == _form.DepartureScheduleId);
+        if (schedule is null)
+        {
+            return;
+        }
+
+        _form.TourCode = schedule.TourCode;
+        _form.TourName = schedule.TourName;
+        _form.Destination = schedule.Destination;
+        _departureDate = schedule.StartDate.Date;
+    }
+
+    private void AddPassenger()
+    {
+        _form.Passengers.Add(NewPassenger());
+    }
+
+    private void RemovePassenger(int index)
+    {
+        if (_form.Passengers.Count > 1 && index >= 0 && index < _form.Passengers.Count)
+        {
+            _form.Passengers.RemoveAt(index);
+        }
+    }
+
+    private async Task SaveBookingAsync()
+    {
+        _isSaving = true;
+        _message = null;
+        _error = null;
+
+        try
+        {
+            if (_selectedBooking is null)
+            {
+                var created = await UserApi.CreateBookingAsync(new CreateBookingRequest
+                {
+                    UserId = _form.UserId,
+                    UserEmail = _form.UserEmail,
+                    TourCode = _form.TourCode,
+                    DepartureScheduleId = _form.DepartureScheduleId,
+                    TourName = _form.TourName,
+                    Destination = _form.Destination,
+                    ThumbnailUrl = _form.ThumbnailUrl,
+                    DepartureDate = _departureDate,
+                    GuestCount = _form.Passengers.Count,
+                    TotalAmount = _form.TotalAmount,
+                    Passengers = _form.Passengers
+                });
+
+                _message = $"Created booking {created?.BookingCode}.";
+            }
+            else
+            {
+                var updated = await UserApi.UpdateBookingAsync(_selectedBooking.Id, new UpdateBookingRequest
+                {
+                    TourCode = _form.TourCode,
+                    DepartureScheduleId = _form.DepartureScheduleId,
+                    TourName = _form.TourName,
+                    Destination = _form.Destination,
+                    ThumbnailUrl = _form.ThumbnailUrl,
+                    DepartureDate = _departureDate,
+                    GuestCount = _form.Passengers.Count,
+                    TotalAmount = _form.TotalAmount,
+                    Passengers = _form.Passengers
+                });
+
+                _message = $"Updated booking {updated?.BookingCode}.";
+            }
+
+            await LoadDataAsync();
+            CloseForm();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private static BookingFormModel NewForm()
+    {
+        return new BookingFormModel
+        {
+            Passengers = [NewPassenger()]
+        };
+    }
+
+    private static BookingPassengerRequest NewPassenger()
+    {
+        return new BookingPassengerRequest
+        {
+            TicketType = "Adult"
+        };
+    }
+
+    private static string NormalizeTicketType(string? ticketType)
+    {
+        if (string.Equals(ticketType, "Child", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(ticketType, "Tre em", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(ticketType, "Trẻ em", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Child";
+        }
+
+        return "Adult";
+    }
+
+    private static string GetStatusClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "pending" => "booking-status booking-status--pending",
+            "paid" => "booking-status booking-status--paid",
+            "confirmed" or "confirm" => "booking-status booking-status--confirmed",
+            "cancelled" => "booking-status booking-status--cancelled",
+            "finished" or "finish" => "booking-status booking-status--finished",
+            _ => "booking-status booking-status--default"
+        };
+    }
+
+    private static string NormalizeStatusForForm(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "confirmed" or "confirm" => "Confirmed",
+            "finished" or "finish" => "Finished",
+            "cancelled" or "cancel" => "Cancelled",
+            _ => "Pending"
+        };
+    }
+
+    private static IReadOnlyList<string> GetAllowedNextStatuses(string currentStatus)
+    {
+        return NormalizeStatusForForm(currentStatus) switch
+        {
+            "Pending" => ["Confirmed", "Cancelled"],
+            "Confirmed" => ["Finished", "Cancelled"],
+            _ => Array.Empty<string>()
+        };
+    }
+
+    private static bool IsTerminalStatus(string status)
+    {
+        var normalizedStatus = NormalizeStatusForForm(status);
+        return normalizedStatus is "Finished" or "Cancelled";
+    }
+
+    private static string GetStatusActionTitle(string status)
+    {
+        return IsTerminalStatus(status)
+            ? "Why status is locked"
+            : "Update status";
+    }
+
+    private static string FormatStatusAudit(BookingResponse booking)
+    {
+        var updatedBy = string.IsNullOrWhiteSpace(booking.StatusUpdatedBy)
+            ? "Unknown"
+            : booking.StatusUpdatedBy;
+
+        if (!booking.StatusUpdatedAt.HasValue)
+        {
+            return $"By {updatedBy}";
+        }
+
+        return $"By {updatedBy} · {booking.StatusUpdatedAt.Value:dd/MM/yyyy HH:mm}";
+    }
+
+    private sealed class BookingFormModel
+    {
+        public Guid? UserId { get; set; }
+
+        [EmailAddress]
+        public string? UserEmail { get; set; }
+
+        [StringLength(32)]
+        public string? TourCode { get; set; }
+
+        public Guid? DepartureScheduleId { get; set; }
+
+        [StringLength(200)]
+        public string? TourName { get; set; }
+
+        [StringLength(200)]
+        public string? Destination { get; set; }
+
+        [StringLength(500)]
+        public string? ThumbnailUrl { get; set; }
+
+        [Range(0.01, 999999999999)]
+        public decimal TotalAmount { get; set; } = 1000000;
+
+        public List<BookingPassengerRequest> Passengers { get; set; } = new();
+    }
+
+    private sealed class StatusFormModel
+    {
+        [Required]
+        public string Status { get; set; } = "Pending";
+
+        [StringLength(120)]
+        public string? UpdatedBy { get; set; }
+    }
+}

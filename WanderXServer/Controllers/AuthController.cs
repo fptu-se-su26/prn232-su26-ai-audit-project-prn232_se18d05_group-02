@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using WanderXServer.Dtos.Auth;
 using WanderXServer.Services;
 
 namespace WanderXServer.Controllers;
 
+[EnableRateLimiting("AuthLimiter")]
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
@@ -91,5 +93,12 @@ public class AuthController : ControllerBase
                 Status = StatusCodes.Status400BadRequest
             });
         }
+    }
+
+    [HttpGet("csrf")]
+    public IActionResult InitializeCsrf()
+    {
+        // CsrfProtectionMiddleware will automatically add the XSRF-TOKEN cookie and header on GET
+        return Ok(new { message = "CSRF token initialized" });
     }
 }
