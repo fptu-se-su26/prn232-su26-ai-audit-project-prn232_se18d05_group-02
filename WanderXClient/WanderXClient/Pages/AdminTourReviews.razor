@@ -1,4 +1,5 @@
 @page "/tour-reviews"
+@layout AdminLayout
 @using WanderXClient.Models
 @using WanderXClient.Services
 @inject UserApiClient UserApi
@@ -7,55 +8,7 @@
 
 <PageTitle>WanderX Admin - Quản lý đánh giá tour</PageTitle>
 
-<div class="guide-admin-page">
-    <!-- Sidebar -->
-    <aside class="guide-sidebar">
-        <div class="guide-sidebar__brand">
-            <a class="brand-mark" href="/">WanderX</a>
-            <p>Admin Suite</p>
-        </div>
-        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
-            <a class="guide-sidebar__link" href="/dashboard">
-                <MaterialIcon Name="dashboard" />
-                Dashboard
-            </a>
-            <a class="guide-sidebar__link" href="/guides">
-                <MaterialIcon Name="badge" />
-                Guides
-            </a>
-            <a class="guide-sidebar__link" href="/admin-bookings">
-                <MaterialIcon Name="receipt_long" />
-                Bookings
-            </a>
-            <a class="guide-sidebar__link" href="/admin-cancellations">
-                <MaterialIcon Name="rule" />
-                Cancel Requests
-            </a>
-            <a class="guide-sidebar__link" href="/admin-payments">
-                <MaterialIcon Name="payments" />
-                Payments
-            </a>
-            <a class="guide-sidebar__link" href="/guide-assignments">
-                <MaterialIcon Name="assignment_ind" />
-                Assignments
-            </a>
-            <a class="guide-sidebar__link" href="/admin-service-requests">
-                <MaterialIcon Name="support_agent" />
-                Service Requests
-            </a>
-            <a class="guide-sidebar__link guide-sidebar__link--active" href="/tour-reviews" aria-current="page">
-                <MaterialIcon Name="rate_review" />
-                Tour Reviews
-            </a>
-            <a class="guide-sidebar__link" href="/">
-                <MaterialIcon Name="home" />
-                Homepage
-            </a>
-        </nav>
-    </aside>
 
-    <!-- Main content -->
-    <main class="guide-main">
         @if (_isLoading)
         {
             <div class="guide-empty">
@@ -281,11 +234,7 @@
                 }
             </section>
         }
-    </main>
-    <MobileBottomNav />
-</div>
-
-<!-- Moderate Modal - Outside guide-admin-page for proper positioning -->
+<!-- Moderate modal sits outside the list content for proper positioning. -->
 @if (_showModerateModal)
 {
     <div class="atr-modal-overlay" @onclick="HideModerateModal">
@@ -564,3 +513,4 @@
         }
     }
 }
+

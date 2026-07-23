@@ -16,6 +16,16 @@ public class TourResponse
 
     public decimal Price { get; set; }
 
+    public decimal OriginalPrice { get; set; }
+
+    public decimal EffectivePrice { get; set; }
+
+    public decimal DiscountAmount { get; set; }
+
+    public int DiscountPercent { get; set; }
+
+    public string? AppliedPromotionName { get; set; }
+
     public int Capacity { get; set; }
 
     public string Status { get; set; } = string.Empty;

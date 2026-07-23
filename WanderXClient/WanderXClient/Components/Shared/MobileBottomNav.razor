@@ -89,7 +89,8 @@
         }
         else
         {
-            isActive = relative.Equals(target, StringComparison.OrdinalIgnoreCase) || 
+            isActive = relative.Equals(target, StringComparison.OrdinalIgnoreCase) ||
+                       relative.StartsWith($"{target}/", StringComparison.OrdinalIgnoreCase) ||
                        (target == "dashboard" && relative.Equals("admin-dashboard", StringComparison.OrdinalIgnoreCase));
         }
 

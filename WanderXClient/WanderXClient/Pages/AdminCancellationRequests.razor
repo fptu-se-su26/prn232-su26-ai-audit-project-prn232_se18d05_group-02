@@ -1,4 +1,5 @@
 @page "/admin-cancellations"
+@layout AdminLayout
 @using System.Globalization
 @using WanderXClient.Models
 @using WanderXClient.Services
@@ -7,49 +8,7 @@
 
 <PageTitle>WanderX Admin - Cancellation Requests</PageTitle>
 
-<div class="guide-admin-page">
-    <aside class="guide-sidebar">
-        <div class="guide-sidebar__brand">
-            <a class="brand-mark" href="/">WanderX</a>
-            <p>Admin Suite</p>
-        </div>
-        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
-            <a class="guide-sidebar__link" href="/dashboard">
-                <MaterialIcon Name="dashboard" />
-                Dashboard
-            </a>
-            <a class="guide-sidebar__link" href="/admin-bookings">
-                <MaterialIcon Name="receipt_long" />
-                Bookings
-            </a>
-            <a class="guide-sidebar__link guide-sidebar__link--active" href="/admin-cancellations" aria-current="page">
-                <MaterialIcon Name="rule" />
-                Cancel Requests
-            </a>
-            <a class="guide-sidebar__link" href="/admin-payments">
-                <MaterialIcon Name="payments" />
-                Payments
-            </a>
-            <a class="guide-sidebar__link" href="/guide-assignments">
-                <MaterialIcon Name="assignment_ind" />
-                Assignments
-            </a>
-            <a class="guide-sidebar__link" href="/admin-service-requests">
-                <MaterialIcon Name="support_agent" />
-                Service Requests
-            </a>
-            <a class="guide-sidebar__link" href="/tour-reviews">
-                <MaterialIcon Name="rate_review" />
-                Tour Reviews
-            </a>
-            <a class="guide-sidebar__link" href="/">
-                <MaterialIcon Name="home" />
-                Homepage
-            </a>
-        </nav>
-    </aside>
 
-    <main class="guide-main">
         <header class="guide-topbar">
             <div>
                 <p class="guide-eyebrow">Member 2 / Feature 3</p>
@@ -222,11 +181,6 @@
                 }
             </section>
         </section>
-    </main>
-
-    <MobileBottomNav />
-</div>
-
 @if (_selectedRequest is not null)
 {
     var readOnly = !string.Equals(_selectedRequest.CancellationStatus, "Pending", StringComparison.OrdinalIgnoreCase);
@@ -930,3 +884,5 @@
         return value.HasValue ? value.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "Not recorded";
     }
 }
+
+
