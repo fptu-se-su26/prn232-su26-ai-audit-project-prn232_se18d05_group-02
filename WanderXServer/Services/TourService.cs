@@ -8,7 +8,7 @@ namespace WanderXServer.Services;
 
 public class TourService : ITourService
 {
-    private static readonly string[] AllowedStatuses = { "Draft", "Published", "Archived" };
+    private static readonly string[] AllowedStatuses = { "Draft", "Published", "Archived", "Hidden" };
 
     private readonly WanderXDbContext _dbContext;
 
@@ -142,8 +142,25 @@ public class TourService : ITourService
         _dbContext.EnsureTourStorage();
 
         var tour = await FindTourAsync(id);
+        await EnsureTourHasNoBookingsAsync(tour);
+
         _dbContext.Tours.Remove(tour);
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<TourResponse> HideAsync(Guid id)
+    {
+        _dbContext.EnsureTourStorage();
+
+        var tour = await FindTourAsync(id);
+        await EnsureTourHasNoBookingsAsync(tour);
+
+        tour.Status = "Hidden";
+        tour.UpdatedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+
+        return ToResponse(tour);
     }
 
     private async Task<Tour> FindTourAsync(Guid id)
@@ -163,6 +180,17 @@ public class TourService : ITourService
         if (!AllowedStatuses.Contains(status.Trim(), StringComparer.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException("Tour status is not supported.");
+        }
+    }
+
+    private async Task EnsureTourHasNoBookingsAsync(Tour tour)
+    {
+        var hasBookings = await _dbContext.Bookings
+            .AnyAsync(item => item.TourCode != null && item.TourCode == tour.Code);
+
+        if (hasBookings)
+        {
+            throw new InvalidOperationException("This tour already has bookings. It cannot be deleted or hidden.");
         }
     }
 

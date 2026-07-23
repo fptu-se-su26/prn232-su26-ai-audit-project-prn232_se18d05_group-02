@@ -41,6 +41,18 @@ public sealed class TourApiClient
         throw new InvalidOperationException(await ReadErrorAsync(response));
     }
 
+    public async Task<TourResponse> GetTourAsync(Guid id)
+    {
+        using var response = await _httpClient.GetAsync($"api/tours/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<TourResponse>() ?? new TourResponse();
+        }
+
+        throw new InvalidOperationException(await ReadErrorAsync(response));
+    }
+
     public Task<TourResponse?> CreateTourAsync(CreateTourRequest request)
     {
         return SendAsync<CreateTourRequest, TourResponse>(HttpMethod.Post, "api/tours", request);
@@ -49,6 +61,18 @@ public sealed class TourApiClient
     public Task<TourResponse?> UpdateTourAsync(Guid id, UpdateTourRequest request)
     {
         return SendAsync<UpdateTourRequest, TourResponse>(HttpMethod.Put, $"api/tours/{id}", request);
+    }
+
+    public async Task<TourResponse?> HideTourAsync(Guid id)
+    {
+        using var response = await _httpClient.PatchAsync($"api/tours/{id}/hide", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<TourResponse>();
+        }
+
+        throw new InvalidOperationException(await ReadErrorAsync(response));
     }
 
     public async Task DeleteTourAsync(Guid id)

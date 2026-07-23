@@ -12,5 +12,7 @@ public interface ITourService
 
     Task<TourResponse> UpdateAsync(Guid id, UpdateTourRequest request);
 
+    Task<TourResponse> HideAsync(Guid id);
+
     Task DeleteAsync(Guid id);
 }

@@ -288,6 +288,9 @@
                                             <button class="guide-icon-button" type="button" title="Edit tour" @onclick="() => OpenEditForm(tour)">
                                                 <MaterialIcon Name="edit" />
                                             </button>
+                                            <button class="guide-icon-button" type="button" title="Hide tour" @onclick="() => HideTourAsync(tour.Id)" disabled="@IsHidden(tour)">
+                                                <MaterialIcon Name="visibility_off" />
+                                            </button>
                                             <button class="guide-icon-button guide-icon-button--danger" type="button" title="Delete tour" @onclick="() => ConfirmDelete(tour.Id)">
                                                 <MaterialIcon Name="delete" />
                                             </button>
@@ -304,8 +307,8 @@
 </section>
 
 @code {
-    private static readonly string[] StatusOptions = { "Draft", "Published", "Archived" };
-    private static readonly string[] FilterOptions = { "All", "Draft", "Published", "Archived" };
+    private static readonly string[] StatusOptions = { "Draft", "Published", "Archived", "Hidden" };
+    private static readonly string[] FilterOptions = { "All", "Draft", "Published", "Archived", "Hidden" };
     private static readonly BuiltInTourImage[] BuiltInTourImages =
     {
         new("Ha Noi Heritage", "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80"),
@@ -466,6 +469,29 @@
         }
     }
 
+    private async Task HideTourAsync(Guid tourId)
+    {
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            await TourApi.HideTourAsync(tourId);
+            _message = "Tour package hidden.";
+            await LoadToursAsync(clearMessage: false);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
     private void SetStatusFilter(string filter)
     {
         _statusFilter = filter;
@@ -544,13 +570,18 @@
         return tour.Status.Equals(status, StringComparison.OrdinalIgnoreCase);
     }
 
+    private static bool IsHidden(TourResponse tour)
+    {
+        return IsStatus(tour, "Hidden");
+    }
+
     private static string GetTourStatusClass(string status)
     {
         return status.ToLowerInvariant() switch
         {
             "published" => "guide-status guide-status--active",
             "draft" => "guide-status guide-status--busy",
-            "archived" => "guide-status guide-status--muted",
+            "archived" or "hidden" => "guide-status guide-status--muted",
             _ => "guide-status"
         };
     }

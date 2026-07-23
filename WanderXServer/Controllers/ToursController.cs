@@ -97,6 +97,31 @@ public class ToursController : ControllerBase
         {
             return NotFound(ToProblem("Tour not found", exception.Message, StatusCodes.Status404NotFound));
         }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(ToProblem("Tour delete failed", exception.Message, StatusCodes.Status400BadRequest));
+        }
+        catch (SqlException exception)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
+        }
+    }
+
+    [HttpPatch("{id:guid}/hide")]
+    public async Task<ActionResult<TourResponse>> Hide(Guid id)
+    {
+        try
+        {
+            return Ok(await _tourService.HideAsync(id));
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(ToProblem("Tour not found", exception.Message, StatusCodes.Status404NotFound));
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(ToProblem("Tour hide failed", exception.Message, StatusCodes.Status400BadRequest));
+        }
         catch (SqlException exception)
         {
             return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
