@@ -18,7 +18,7 @@
                 <span class="hero-search__label">From</span>
                 <div class="tour-card__price">@Price <small>/pp</small></div>
             </div>
-            <a class="wx-button wx-button--outline" href="/tour-detail/@Uri.EscapeDataString(Title)">Details</a>
+            <a class="wx-button wx-button--outline" href="@DetailsHref">Details</a>
         </div>
     </div>
 </article>
@@ -41,4 +41,11 @@
 
     [Parameter, EditorRequired]
     public string ImageUrl { get; set; } = string.Empty;
+
+    [Parameter]
+    public Guid? TourId { get; set; }
+
+    private string DetailsHref => TourId.HasValue
+        ? $"/tour-detail/{TourId.Value}"
+        : $"/tour-detail/{Uri.EscapeDataString(Title)}";
 }

@@ -533,6 +533,181 @@ button {
     gap: 28px;
 }
 
+.featured-tours__view-all {
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.featured-tours__view-all .material-symbols-outlined {
+    font-size: 19px;
+}
+
+.tours-page {
+    padding-top: 56px;
+}
+
+.tour-detail-hero {
+    min-height: 560px;
+    display: flex;
+    align-items: flex-end;
+    background-position: center;
+    background-size: cover;
+    color: #ffffff;
+    padding: 140px 0 72px;
+}
+
+.tour-detail-hero--loading {
+    min-height: 360px;
+    background: #f8fafc;
+    color: var(--wx-ink);
+}
+
+.tour-detail-hero__inner {
+    display: grid;
+    gap: 18px;
+    max-width: 880px;
+}
+
+.tour-detail-back {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    padding: 9px 13px;
+    font-weight: 900;
+    backdrop-filter: blur(12px);
+}
+
+.tour-detail-back:hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
+.tour-detail-hero h1 {
+    max-width: 760px;
+    margin: 0;
+    font-size: clamp(42px, 6vw, 74px);
+    line-height: 0.98;
+}
+
+.tour-detail-hero p {
+    max-width: 720px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 18px;
+    line-height: 1.65;
+}
+
+.tour-detail-hero__meta,
+.tour-detail-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tour-detail-hero__meta span,
+.tour-detail-highlights span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    padding: 8px 12px;
+    font-weight: 850;
+}
+
+.tour-detail-section {
+    padding-top: 54px;
+}
+
+.tour-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 28px;
+    align-items: start;
+}
+
+.tour-detail-main {
+    display: grid;
+    gap: 18px;
+}
+
+.tour-detail-panel,
+.tour-detail-booking {
+    border: 1px solid rgba(195, 198, 214, 0.72);
+    border-radius: 18px;
+    background: #ffffff;
+    padding: 24px;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+}
+
+.tour-detail-panel h2 {
+    margin: 0 0 12px;
+    color: var(--wx-ink);
+    font-size: 28px;
+}
+
+.tour-detail-panel p {
+    margin: 0;
+    color: var(--wx-muted);
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.tour-detail-highlights span {
+    background: #f8fafc;
+    color: var(--wx-outline-strong);
+}
+
+.tour-detail-booking {
+    position: sticky;
+    top: 24px;
+}
+
+.tour-detail-booking strong {
+    display: inline-block;
+    color: var(--wx-primary);
+    font-size: 42px;
+    line-height: 1;
+}
+
+.tour-detail-booking > span {
+    color: var(--wx-muted);
+    font-weight: 800;
+}
+
+.tour-detail-booking dl {
+    display: grid;
+    gap: 12px;
+    margin: 24px 0;
+}
+
+.tour-detail-booking dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid rgba(195, 198, 214, 0.52);
+    padding-bottom: 12px;
+}
+
+.tour-detail-booking dt {
+    color: var(--wx-muted);
+    font-weight: 850;
+}
+
+.tour-detail-booking dd {
+    margin: 0;
+    color: var(--wx-ink);
+    font-weight: 950;
+    text-align: right;
+}
+
+.tour-detail-booking .wx-button {
+    width: 100%;
+}
+
 .feature-item {
     text-align: center;
 }
@@ -584,6 +759,34 @@ button {
 .tour-card:hover {
     transform: translateY(-3px);
     box-shadow: var(--wx-shadow);
+}
+
+.tour-card--loading {
+    pointer-events: none;
+}
+
+.tour-card--loading .tour-card__image,
+.tour-card--loading h3,
+.tour-card--loading .tour-card__meta span {
+    background: linear-gradient(90deg, #eef2f7, #f8fafc, #eef2f7);
+    background-size: 200% 100%;
+    color: transparent;
+    animation: wx-skeleton 1.4s ease-in-out infinite;
+}
+
+.tour-card--loading h3 {
+    min-height: 58px;
+    border-radius: 10px;
+}
+
+@keyframes wx-skeleton {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
 }
 
 .tour-card__image {
@@ -3741,5 +3944,13 @@ code {
     .pricing-layout,
     .pricing-form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .tour-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .tour-detail-booking {
+        position: static;
     }
 }
