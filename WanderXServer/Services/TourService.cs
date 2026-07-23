@@ -20,6 +20,7 @@ public class TourService : ITourService
     public async Task<IReadOnlyList<TourResponse>> GetAllAsync(string? search, string? status)
     {
         _dbContext.EnsureTourStorage();
+        _dbContext.EnsureTourPricingStorage();
 
         var tours = _dbContext.Tours.AsNoTracking().AsQueryable();
 
@@ -43,14 +44,17 @@ public class TourService : ITourService
             .ThenBy(item => item.Code)
             .ToListAsync();
 
-        return result.Select(ToResponse).ToList();
+        var pricing = await GetPricingSnapshotsAsync(result);
+        return result.Select(tour => ToResponse(tour, pricing.GetValueOrDefault(tour.Id))).ToList();
     }
 
     public async Task<TourResponse> GetByIdAsync(Guid id)
     {
         _dbContext.EnsureTourStorage();
+        _dbContext.EnsureTourPricingStorage();
 
-        return ToResponse(await FindTourAsync(id));
+        var tour = await FindTourAsync(id);
+        return ToResponse(tour, await GetPricingSnapshotAsync(tour));
     }
 
     public async Task<TourResponse> CreateAsync(CreateTourRequest request)
@@ -285,8 +289,103 @@ public class TourService : ITourService
         return maxId + 1;
     }
 
-    private static TourResponse ToResponse(Tour tour)
+    private async Task<Dictionary<Guid, TourPricingSnapshot>> GetPricingSnapshotsAsync(IReadOnlyCollection<Tour> tours)
     {
+        var tourIds = tours.Select(tour => tour.Id).ToList();
+        var date = DateTime.UtcNow.Date;
+
+        var seasonPrices = await _dbContext.TourSeasonPrices
+            .AsNoTracking()
+            .Where(item => tourIds.Contains(item.TourId) &&
+                item.IsActive &&
+                item.StartDate.Date <= date &&
+                item.EndDate.Date >= date)
+            .ToListAsync();
+
+        var promotions = await _dbContext.TourPromotions
+            .AsNoTracking()
+            .Where(item => tourIds.Contains(item.TourId) &&
+                item.IsActive &&
+                item.StartDate.Date <= date &&
+                item.EndDate.Date >= date)
+            .ToListAsync();
+
+        return tours.ToDictionary(
+            tour => tour.Id,
+            tour =>
+            {
+                var appliedSeason = seasonPrices
+                    .Where(item => item.TourId == tour.Id)
+                    .OrderByDescending(item => item.Price)
+                    .FirstOrDefault();
+
+                var priceBeforeDiscount = appliedSeason?.Price ?? tour.Price;
+                var appliedPromotion = promotions
+                    .Where(item => item.TourId == tour.Id)
+                    .OrderByDescending(item => CalculateDiscount(priceBeforeDiscount, item))
+                    .FirstOrDefault();
+
+                return CreatePricingSnapshot(priceBeforeDiscount, appliedPromotion);
+            });
+    }
+
+    private async Task<TourPricingSnapshot> GetPricingSnapshotAsync(Tour tour)
+    {
+        var date = DateTime.UtcNow.Date;
+        var appliedSeason = await _dbContext.TourSeasonPrices
+            .AsNoTracking()
+            .Where(item => item.TourId == tour.Id &&
+                item.IsActive &&
+                item.StartDate.Date <= date &&
+                item.EndDate.Date >= date)
+            .OrderByDescending(item => item.Price)
+            .FirstOrDefaultAsync();
+
+        var priceBeforeDiscount = appliedSeason?.Price ?? tour.Price;
+        var promotions = await _dbContext.TourPromotions
+            .AsNoTracking()
+            .Where(item => item.TourId == tour.Id &&
+                item.IsActive &&
+                item.StartDate.Date <= date &&
+                item.EndDate.Date >= date)
+            .ToListAsync();
+
+        var appliedPromotion = promotions
+            .OrderByDescending(item => CalculateDiscount(priceBeforeDiscount, item))
+            .FirstOrDefault();
+
+        return CreatePricingSnapshot(priceBeforeDiscount, appliedPromotion);
+    }
+
+    private static TourPricingSnapshot CreatePricingSnapshot(decimal priceBeforeDiscount, TourPromotion? promotion)
+    {
+        var discountAmount = promotion is null ? 0 : CalculateDiscount(priceBeforeDiscount, promotion);
+        var effectivePrice = Math.Max(0, priceBeforeDiscount - discountAmount);
+        var discountPercent = priceBeforeDiscount <= 0 || discountAmount <= 0
+            ? 0
+            : (int)Math.Round(discountAmount / priceBeforeDiscount * 100, MidpointRounding.AwayFromZero);
+
+        return new TourPricingSnapshot(
+            priceBeforeDiscount,
+            effectivePrice,
+            discountAmount,
+            discountPercent,
+            promotion?.Name);
+    }
+
+    private static decimal CalculateDiscount(decimal price, TourPromotion promotion)
+    {
+        var discount = promotion.DiscountType.Equals("Percent", StringComparison.OrdinalIgnoreCase)
+            ? price * promotion.DiscountValue / 100
+            : promotion.DiscountValue;
+
+        return Math.Min(price, discount);
+    }
+
+    private static TourResponse ToResponse(Tour tour, TourPricingSnapshot? pricing = null)
+    {
+        var resolvedPricing = pricing ?? new TourPricingSnapshot(tour.Price, tour.Price, 0, 0, null);
+
         return new TourResponse
         {
             Id = tour.Id,
@@ -296,6 +395,11 @@ public class TourService : ITourService
             Region = tour.Region,
             DurationDays = tour.DurationDays,
             Price = tour.Price,
+            OriginalPrice = resolvedPricing.OriginalPrice,
+            EffectivePrice = resolvedPricing.EffectivePrice,
+            DiscountAmount = resolvedPricing.DiscountAmount,
+            DiscountPercent = resolvedPricing.DiscountPercent,
+            AppliedPromotionName = resolvedPricing.AppliedPromotionName,
             Capacity = tour.Capacity,
             Status = tour.Status,
             ImageUrl = tour.ImageUrl,
@@ -304,4 +408,11 @@ public class TourService : ITourService
             UpdatedAt = tour.UpdatedAt
         };
     }
+
+    private sealed record TourPricingSnapshot(
+        decimal OriginalPrice,
+        decimal EffectivePrice,
+        decimal DiscountAmount,
+        int DiscountPercent,
+        string? AppliedPromotionName);
 }

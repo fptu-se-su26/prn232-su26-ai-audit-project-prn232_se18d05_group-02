@@ -1,4 +1,5 @@
 @page "/admin-service-requests"
+@layout AdminLayout
 @using WanderXClient.Models
 @using WanderXClient.Services
 @inject UserApiClient UserApi
@@ -6,55 +7,7 @@
 
 <PageTitle>WanderX Admin - Quản lý yêu cầu dịch vụ</PageTitle>
 
-<div class="guide-admin-page">
-    <!-- Sidebar -->
-    <aside class="guide-sidebar">
-        <div class="guide-sidebar__brand">
-            <a class="brand-mark" href="/">WanderX</a>
-            <p>Admin Suite</p>
-        </div>
-        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
-            <a class="guide-sidebar__link" href="/dashboard">
-                <MaterialIcon Name="dashboard" />
-                Dashboard
-            </a>
-            <a class="guide-sidebar__link" href="/guides">
-                <MaterialIcon Name="badge" />
-                Guides
-            </a>
-            <a class="guide-sidebar__link" href="/admin-bookings">
-                <MaterialIcon Name="receipt_long" />
-                Bookings
-            </a>
-            <a class="guide-sidebar__link" href="/admin-cancellations">
-                <MaterialIcon Name="rule" />
-                Cancel Requests
-            </a>
-            <a class="guide-sidebar__link" href="/admin-payments">
-                <MaterialIcon Name="payments" />
-                Payments
-            </a>
-            <a class="guide-sidebar__link" href="/guide-assignments">
-                <MaterialIcon Name="assignment_ind" />
-                Assignments
-            </a>
-            <a class="guide-sidebar__link guide-sidebar__link--active" href="/admin-service-requests">
-                <MaterialIcon Name="support_agent" />
-                Service Requests
-            </a>
-            <a class="guide-sidebar__link " href="/tour-reviews" aria-current="page">
-                <MaterialIcon Name="rate_review" />
-                Tour Reviews
-            </a>
-            <a class="guide-sidebar__link" href="/">
-                <MaterialIcon Name="home" />
-                Homepage
-            </a>
-        </nav>
-    </aside>
 
-    <!-- Main content -->
-    <main class="guide-main">
 
         @if (_view == "list")
         {
@@ -128,7 +81,7 @@
                                 {
                                     var start = (_currentPage - 1) * PageSize + 1;
                                     var end = Math.Min(_currentPage * PageSize, FilteredBookings.Count());
-                                    <text>Hiển thị @start–@end / @FilteredBookings.Count() tour</text>
+                                    <text>Showing @start-@end / @FilteredBookings.Count() tour</text>
                                 }
                                 else
                                 {
@@ -410,11 +363,6 @@
                 </div>
             </div>
         }
-
-    </main>
-    <MobileBottomNav />
-</div>
-
 <style>
     :root {
         --asr-accent: #4f46e5;
@@ -855,3 +803,5 @@
         _           => status
     };
 }
+
+

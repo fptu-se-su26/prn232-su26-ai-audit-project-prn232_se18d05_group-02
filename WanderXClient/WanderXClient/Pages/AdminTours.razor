@@ -69,21 +69,24 @@
 
         @if (_isFormOpen)
         {
-            <div class="admin-tour-modal-backdrop" @onclick="CloseForm">
+            <div class="admin-tour-modal-backdrop">
                 <section class="admin-tour-modal" role="dialog" aria-modal="true" aria-labelledby="tour-form-title" @onclick:stopPropagation="true">
                     <div class="guide-section-heading admin-tour-modal__header">
                         <div>
                             <p class="guide-eyebrow">@(_editingTourId is null ? "New tour" : "Edit tour")</p>
                             <h2 id="tour-form-title">@(_editingTourId is null ? "Add Tour Package" : "Update Tour Package")</h2>
                         </div>
-                        <button class="guide-icon-button" type="button" title="Close popup" @onclick="CloseForm">
+                        <button class="wx-button wx-button--outline admin-tour-modal__close" type="button" title="Close popup" @onclick="CloseForm">
                             <MaterialIcon Name="close" />
+                            Close
                         </button>
                     </div>
 
                     <EditForm Model="@_form" OnValidSubmit="@SaveTourAsync" class="guide-form admin-tour-modal__body">
                         <DataAnnotationsValidator />
-                        <ValidationSummary />
+                        <div class="admin-tour-validation">
+                            <ValidationSummary />
+                        </div>
 
                         <div class="guide-form-grid">
                             <div class="guide-field">
