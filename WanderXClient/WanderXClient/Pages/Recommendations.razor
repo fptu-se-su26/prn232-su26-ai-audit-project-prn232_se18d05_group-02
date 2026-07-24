@@ -1,0 +1,79 @@
+@page "/recommendations"
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient Api
+@inject AuthSessionService Session
+
+<PageTitle>Gợi ý tour cho bạn - WanderX</PageTitle>
+<AppHeader />
+
+<main class="rec-page">
+    <section class="rec-hero">
+        <div>
+            <span class="rec-kicker">WANDERX PERSONAL PICKS</span>
+            <h1>Hành trình dành riêng cho bạn</h1>
+            <p>Tour đủ điều kiện được xếp hạng theo phong cách, ngân sách, điểm đến, đánh giá và lịch khởi hành thực tế.</p>
+        </div>
+        <button class="wx-button wx-button--secondary" @onclick="TryAnotherAsync" disabled="@_loading">
+            <MaterialIcon Name="casino" /> Thử tour khác
+        </button>
+    </section>
+
+    @if (_result is { HasQuizResult: false })
+    {
+        <section class="rec-quiz-cta">
+            <div><strong>Chưa có hồ sơ Travel Style</strong><p>Làm quiz 2 phút để nhận thứ tự gợi ý cá nhân hóa.</p></div>
+            <a class="wx-button" href="/travel-quiz">Làm Travel Style Quiz</a>
+        </section>
+    }
+
+    <section class="rec-layout">
+        <aside class="rec-filters">
+            <div class="rec-filter-head"><h2>Bộ lọc</h2><button @onclick="ResetAsync">Đặt lại</button></div>
+            <label>Ngân sách tối thiểu<InputNumber @bind-Value="_filter.BudgetMin" placeholder="0" /></label>
+            <label>Ngân sách tối đa<InputNumber @bind-Value="_filter.BudgetMax" placeholder="Ví dụ 10000000" /></label>
+            <label>Điểm đến<input @bind="_filter.Destination" placeholder="Huế, Dubai..." /></label>
+            <label>Loại tour
+                <select @bind="_filter.TourType"><option value="">Tất cả</option><option value="Adventure">Phiêu lưu</option><option value="Cultural">Văn hóa</option><option value="Relaxation">Nghỉ dưỡng</option><option value="Luxury">Cao cấp</option></select>
+            </label>
+            <label>Khởi hành từ<InputDate @bind-Value="_filter.StartDateFrom" /></label>
+            <label>Khởi hành đến<InputDate @bind-Value="_filter.StartDateTo" /></label>
+            <label>Đánh giá tối thiểu<select @bind="_filter.RatingMin"><option value="">Tất cả</option><option value="3">3+</option><option value="4">4+</option><option value="4.5">4.5+</option></select></label>
+            <button class="wx-button" @onclick="ApplyAsync" disabled="@_loading">Áp dụng bộ lọc</button>
+        </aside>
+
+        <div class="rec-results">
+            <div class="rec-toolbar">
+                <div><h2>@(_result?.TotalCount ?? 0) tour phù hợp</h2>@if (!string.IsNullOrEmpty(_result?.PrimaryStyle)){<span>Phong cách chính: @_result.PrimaryStyle</span>}</div>
+                <select @bind="_filter.Sort" @bind:after="SortChangedAsync"><option value="Recommended">Đề xuất tốt nhất</option><option value="PriceAsc">Giá tăng dần</option><option value="PriceDesc">Giá giảm dần</option><option value="Rating">Đánh giá</option><option value="StartDate">Khởi hành gần</option></select>
+            </div>
+
+            @if (_loading) { <div class="rec-state">Đang phân tích các tour phù hợp...</div> }
+            else if (!string.IsNullOrEmpty(_error)) { <div class="rec-state rec-error">@_error</div> }
+            else if (_randomTour != null) { <TourRecommendationCard Tour="_randomTour" Highlight="true" /> }
+            else if (_result?.Items.Count == 0) { <div class="rec-state"><h3>Chưa tìm thấy tour phù hợp</h3><p>@_result.Message</p></div> }
+            else
+            {
+                <div class="rec-grid">@foreach (var tour in _result?.Items ?? new()){<TourRecommendationCard Tour="@tour" />}</div>
+                @if ((_result?.TotalPages ?? 0) > 1)
+                {
+                    <nav class="rec-pages"><button @onclick="PreviousPageAsync" disabled="@(_filter.Page <= 1)">Trước</button><span>Trang @_filter.Page / @_result!.TotalPages</span><button @onclick="NextPageAsync" disabled="@(_filter.Page >= _result.TotalPages)">Sau</button></nav>
+                }
+            }
+        </div>
+    </section>
+</main>
+<AppFooter />
+
+<style>
+.rec-page{max-width:1280px;margin:0 auto;padding:44px 24px 80px;color:#0f172a}.rec-hero{display:flex;align-items:end;justify-content:space-between;gap:28px;padding:44px;border-radius:24px;background:linear-gradient(135deg,#0f172a,#243b53);color:white;margin-bottom:24px}.rec-hero h1{font-size:clamp(32px,5vw,58px);max-width:760px;margin:10px 0}.rec-hero p{max-width:760px;color:#cbd5e1}.rec-kicker{font-size:12px;font-weight:800;letter-spacing:.16em;color:#ff8a8e}.rec-quiz-cta{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 26px;border:1px solid #fed7aa;background:#fff7ed;border-radius:16px;margin-bottom:24px}.rec-quiz-cta p{margin:5px 0 0;color:#64748b}.rec-layout{display:grid;grid-template-columns:280px 1fr;gap:28px}.rec-filters{height:max-content;position:sticky;top:88px;border:1px solid #e2e8f0;border-radius:18px;padding:22px;background:white;display:grid;gap:16px}.rec-filter-head,.rec-toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px}.rec-filter-head button{border:0;background:none;color:#ff5a5f;cursor:pointer}.rec-filters label{display:grid;gap:7px;font-size:12px;font-weight:700;color:#475569}.rec-filters input,.rec-filters select,.rec-toolbar select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:white}.rec-toolbar{margin-bottom:18px}.rec-toolbar h2{margin:0}.rec-toolbar span{font-size:13px;color:#64748b}.rec-toolbar select{width:auto}.rec-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.rec-state{text-align:center;padding:80px 24px;border:1px dashed #cbd5e1;border-radius:18px;color:#64748b}.rec-error{color:#b91c1c;background:#fef2f2}.rec-pages{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:28px}.rec-pages button{padding:9px 16px;border:1px solid #cbd5e1;background:white;border-radius:999px}.rec-pages button:disabled{opacity:.4}@@media(max-width:850px){.rec-layout{grid-template-columns:1fr}.rec-filters{position:static}.rec-grid{grid-template-columns:1fr}.rec-hero{align-items:start;flex-direction:column}.rec-quiz-cta{align-items:start;flex-direction:column}}
+</style>
+
+@code {
+    private RecommendationFilter _filter = new(){StartDateFrom=DateTime.Today,PageSize=8}; private RecommendationPageResponse? _result; private RecommendedTourResponse? _randomTour; private bool _loading; private bool _personalized; private string _error=string.Empty; private readonly HashSet<Guid> _excluded=new();
+    protected override async Task OnInitializedAsync(){_personalized=(await Session.GetAsync()) != null; await LoadAsync();}
+    private async Task LoadAsync(){_loading=true;_error="";_randomTour=null;try{_result=await Api.GetRecommendationsAsync(_filter,_personalized)??new();}catch(Exception ex){_error=ex.Message;}finally{_loading=false;}}
+    private async Task ApplyAsync(){_filter.Page=1;await LoadAsync();} private async Task ResetAsync(){_filter=new(){StartDateFrom=DateTime.Today,PageSize=8};await LoadAsync();} private Task SortChangedAsync()=>ApplyAsync();
+    private async Task PreviousPageAsync(){if(_filter.Page>1){_filter.Page--;await LoadAsync();}} private async Task NextPageAsync(){if(_result!=null&&_filter.Page<_result.TotalPages){_filter.Page++;await LoadAsync();}}
+    private async Task TryAnotherAsync(){_loading=true;_error="";try{if(_randomTour!=null)_excluded.Add(_randomTour.TourId);_randomTour=await Api.GetRandomTourAsync(_filter,_excluded);if(_randomTour!=null)_excluded.Add(_randomTour.TourId);else _error="Không còn tour phù hợp khác.";}catch(Exception ex){_error=ex.Message;}finally{_loading=false;}}
+}

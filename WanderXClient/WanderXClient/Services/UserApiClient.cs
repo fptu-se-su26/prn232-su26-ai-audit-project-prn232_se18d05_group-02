@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using WanderXClient.Models;
 
@@ -309,6 +309,36 @@ public sealed class UserApiClient
         }
     }
 
+    public Task<RecommendationPageResponse?> GetRecommendationsAsync(RecommendationFilter filter, bool personalized)
+    {
+        var endpoint = personalized ? "api/recommendations/me" : "api/tours/search";
+        return GetAsync<RecommendationPageResponse>($"{endpoint}?{BuildRecommendationQuery(filter)}");
+    }
+
+    public Task<RecommendedTourResponse?> GetRandomTourAsync(RecommendationFilter filter, IEnumerable<Guid> excludedTourIds)
+    {
+        var exclude = string.Join("&", excludedTourIds.Select(id => $"ExcludeTourIds={id}"));
+        var query = BuildRecommendationQuery(filter);
+        return GetAsync<RecommendedTourResponse>($"api/tours/random?{query}{(string.IsNullOrEmpty(exclude) ? "" : "&" + exclude)}");
+    }
+
+    private static string BuildRecommendationQuery(RecommendationFilter filter)
+    {
+        var values = new List<string>
+        {
+            $"Page={filter.Page}", $"PageSize={filter.PageSize}", $"Sort={Uri.EscapeDataString(filter.Sort)}", "AvailableOnly=true"
+        };
+        if (filter.BudgetMin.HasValue) values.Add($"BudgetMin={filter.BudgetMin.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
+        if (filter.BudgetMax.HasValue) values.Add($"BudgetMax={filter.BudgetMax.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
+        if (!string.IsNullOrWhiteSpace(filter.Destination)) values.Add($"Destination={Uri.EscapeDataString(filter.Destination.Trim())}");
+        if (!string.IsNullOrWhiteSpace(filter.TourType)) values.Add($"TourType={Uri.EscapeDataString(filter.TourType.Trim())}");
+        if (filter.StartDateFrom.HasValue) values.Add($"StartDateFrom={filter.StartDateFrom.Value:yyyy-MM-dd}");
+        if (filter.StartDateTo.HasValue) values.Add($"StartDateTo={filter.StartDateTo.Value:yyyy-MM-dd}");
+        if (filter.DurationMin.HasValue) values.Add($"DurationMin={filter.DurationMin.Value}");
+        if (filter.DurationMax.HasValue) values.Add($"DurationMax={filter.DurationMax.Value}");
+        if (filter.RatingMin.HasValue) values.Add($"RatingMin={filter.RatingMin.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
+        return string.Join("&", values);
+    }
     private async Task AddAuthorizationHeaderAsync()
     {
         var session = await _sessionService.GetAsync();

@@ -1,0 +1,42 @@
+@using WanderXClient.Models
+
+<article class="rec-card @(Highlight ? "rec-card--highlight" : "")">
+    <div class="rec-card__image" style="@ImageStyle">
+        <span class="rec-card__score">@Tour.MatchScore điểm phù hợp</span>
+        @if (Highlight) { <span class="rec-card__random">Lựa chọn ngẫu nhiên</span> }
+    </div>
+    <div class="rec-card__body">
+        <div class="rec-card__heading">
+            <div><p>@Tour.Destination · @Tour.TourType</p><h3>@Tour.Name</h3></div>
+            <span class="rec-card__rating">★ @Tour.AverageRating.ToString("0.0") <small>(@Tour.ReviewCount)</small></span>
+        </div>
+        <div class="rec-card__meta">
+            <span><MaterialIcon Name="calendar_month" /> @Tour.StartDate.ToString("dd/MM/yyyy")</span>
+            <span><MaterialIcon Name="schedule" /> @Tour.DurationDays ngày</span>
+            <span><MaterialIcon Name="groups" /> Còn @Tour.AvailableSlots chỗ</span>
+        </div>
+        @if (Tour.MatchReasons.Count > 0)
+        {
+            <ul class="rec-card__reasons">
+                @foreach (var reason in Tour.MatchReasons.Take(3)) { <li><MaterialIcon Name="check_circle" /> @reason</li> }
+            </ul>
+        }
+        <div class="rec-card__footer">
+            <div>@if (Tour.DiscountAmount > 0) { <del>@Money(Tour.BasePrice)</del> }<strong>@Money(Tour.FinalPrice)</strong><small>/ khách</small></div>
+            <a class="wx-button" href="@($"/tour-detail/{Tour.TourId}")">Xem tour</a>
+        </div>
+    </div>
+</article>
+
+<style>
+.rec-card{overflow:hidden;border:1px solid #e2e8f0;border-radius:18px;background:#fff;box-shadow:0 6px 24px rgba(15,23,42,.06);transition:.2s}.rec-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(15,23,42,.11)}.rec-card--highlight{border:2px solid #ff5a5f}.rec-card__image{position:relative;min-height:210px;background:#334155 center/cover no-repeat}.rec-card__score,.rec-card__random{position:absolute;top:14px;padding:7px 11px;border-radius:999px;font-size:11px;font-weight:800}.rec-card__score{left:14px;background:#ff5a5f;color:#fff}.rec-card__random{right:14px;background:rgba(255,255,255,.92);color:#0f172a}.rec-card__body{padding:19px}.rec-card__heading{display:flex;justify-content:space-between;gap:14px}.rec-card__heading p{margin:0 0 5px;color:#64748b;font-size:12px}.rec-card__heading h3{margin:0;font-size:19px}.rec-card__rating{white-space:nowrap;color:#f59e0b;font-weight:800}.rec-card__rating small{color:#94a3b8}.rec-card__meta{display:flex;flex-wrap:wrap;gap:11px;margin:16px 0;color:#475569;font-size:12px}.rec-card__meta span{display:flex;align-items:center;gap:4px}.rec-card__reasons{display:grid;gap:7px;margin:0;padding:13px 0;border-top:1px solid #f1f5f9;list-style:none;color:#334155;font-size:12px}.rec-card__reasons li{display:flex;align-items:center;gap:6px}.rec-card__reasons .material-symbols-outlined{color:#10b981;font-size:17px}.rec-card__footer{display:flex;justify-content:space-between;align-items:end;gap:12px;padding-top:14px;border-top:1px solid #f1f5f9}.rec-card__footer div{display:grid}.rec-card__footer del{font-size:11px;color:#94a3b8}.rec-card__footer strong{font-size:20px;color:#ff5a5f}.rec-card__footer small{color:#64748b}
+</style>
+
+@code {
+    [Parameter, EditorRequired] public RecommendedTourResponse Tour { get; set; } = default!;
+    [Parameter] public bool Highlight { get; set; }
+    private string ImageStyle => string.IsNullOrWhiteSpace(Tour.ImageUrl)
+        ? "background-image:linear-gradient(135deg,#0f172a,#475569)"
+        : $"background-image:url({Tour.ImageUrl})";
+    private static string Money(decimal value) => $"{value:N0} ₫";
+}
