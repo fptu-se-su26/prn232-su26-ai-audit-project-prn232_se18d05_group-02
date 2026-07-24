@@ -217,6 +217,51 @@ public sealed class UserApiClient
             : detail);
     }
 
+    // Travel Style Quiz APIs
+    public Task<TravelStyleQuizResultResponse?> GetLatestQuizResultAsync()
+    {
+        return GetAsync<TravelStyleQuizResultResponse>("api/travelstylequiz/latest");
+    }
+
+    public Task<IEnumerable<TravelStyleQuizResultResponse>?> GetQuizHistoryAsync()
+    {
+        return GetAsync<IEnumerable<TravelStyleQuizResultResponse>>("api/travelstylequiz/history");
+    }
+
+    public Task<TravelStyleQuizResultResponse?> SubmitQuizResultAsync(TravelStyleQuizSubmitRequest request)
+    {
+        return PostAsync<TravelStyleQuizSubmitRequest, TravelStyleQuizResultResponse>("api/travelstylequiz", request);
+    }
+
+    // Admin: Quiz Questions CRUD APIs
+    public Task<IEnumerable<QuizQuestionClientDto>?> GetQuizQuestionsAsync()
+    {
+        return GetAsync<IEnumerable<QuizQuestionClientDto>>("api/travelstylequiz/questions");
+    }
+
+    public Task<QuizQuestionClientDto?> CreateQuizQuestionAsync(QuizQuestionClientDto dto)
+    {
+        return PostAsync<QuizQuestionClientDto, QuizQuestionClientDto>("api/travelstylequiz/questions", dto);
+    }
+
+    public Task<QuizQuestionClientDto?> UpdateQuizQuestionAsync(Guid id, QuizQuestionClientDto dto)
+    {
+        return PutAsync<QuizQuestionClientDto, QuizQuestionClientDto>($"api/travelstylequiz/questions/{id}", dto);
+    }
+
+    public async Task DeleteQuizQuestionAsync(Guid id)
+    {
+        await AddAuthorizationHeaderAsync();
+        var response = await _httpClient.DeleteAsync($"api/travelstylequiz/questions/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            var detail = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(string.IsNullOrWhiteSpace(detail)
+                ? "The request could not be completed."
+                : detail);
+        }
+    }
+
     private async Task AddAuthorizationHeaderAsync()
     {
         var session = await _sessionService.GetAsync();

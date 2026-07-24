@@ -838,6 +838,85 @@ Lần sử dụng AI thứ 5 giúp định hình phong cách thiết kế UI/UX 
 
 ---
 
+### Lần sử dụng AI số 6
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 24/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục đích sử dụng | Review requirement, hoàn thiện bảo mật, validation và UI cho Travel Style Quiz |
+| Phần việc liên quan | M5-F01 Travel Style Quiz / Backend / Frontend / Security / Testing |
+| Mức độ sử dụng | Hỗ trợ một phần |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-06
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+AI đối chiếu mã nguồn Travel Style Quiz với requirement M5-F01 và bộ giao diện redesign, sau đó chỉ ra các vấn đề chính:
+
+1. Endpoint quiz và CRUD cấu hình chưa kiểm tra authorization ở server.
+2. API tin cậy email do client truyền lên, có nguy cơ đọc hoặc ghi kết quả của người dùng khác.
+3. Frontend dùng index/DisplayOrder thay cho QuestionId thật nên có thể liên kết sai đáp án khi đổi thứ tự câu hỏi.
+4. Backend bỏ qua câu hỏi hoặc option không hợp lệ thay vì trả lỗi nghiệp vụ.
+5. CompletedAt do client cung cấp thay vì được tạo theo UTC ở backend.
+6. Cần giữ giao diện Blazor đồng bộ với quiz1.html, quiz2.html, Quiz3.html và quizresult.html.
+7. Nên tách file khi commit để giảm xung đột tại Program.cs, WanderXDbContext.cs và các component dùng chung.
+```
+
+#### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
+
+```text
+1. Áp dụng [Authorize(Roles = "Customer")] cho API lưu/xem kết quả quiz.
+2. Áp dụng [Authorize(Roles = "Admin")] cho API CRUD câu hỏi và lựa chọn.
+3. Lấy UserId từ JWT NameIdentifier thay vì nhận email từ request.
+4. Chuyển QuizAnswerDto sang QuestionId và OptionId kiểu Guid.
+5. Bổ sung validation cho thiếu câu trả lời, câu hỏi trùng, question không tồn tại và option không thuộc question.
+6. Để backend tự tạo CompletedAt bằng DateTime.UtcNow.
+7. Cập nhật TravelQuiz.razor và UserApiClient để sử dụng contract mới.
+8. Dùng kết quả review để xác định danh sách file cần commit và các file cấu hình cá nhân không nên đưa lên repository.
+```
+
+#### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
+
+```text
+1. Kiểm tra lại requirement M5-F01 và quyết định giữ GET questions là public để Guest có thể mở và làm thử quiz.
+2. Giữ giao diện quiz trong một Blazor page động thay vì tách thành nhiều HTML page độc lập.
+3. Kết hợp các layout quiz1, quiz2, Quiz3 và quizresult thành ba phase Splash, Question và Result.
+4. Giữ lại cấu trúc authentication/session sẵn có của WanderX thay vì tạo hệ thống đăng nhập mới.
+5. Kiểm tra các thay đổi với dữ liệu câu hỏi được seed trong WanderXDbContext.
+6. Tách các phần chưa đủ hợp đồng liên module như QuizAttempt/versioning và tour recommendation thật để tiếp tục thống nhất với nhóm.
+7. Rà soát danh sách staged files trước khi commit nhằm tránh đưa .vscode và tài liệu tạm vào source code runtime.
+```
+
+#### 4.5. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | Commit message đề xuất: `feat: implement secure travel style quiz flow` |
+| File liên quan | WanderXServer/Controllers/TravelStyleQuizController.cs; WanderXServer/Services/TravelStyleQuizService.cs; WanderXServer/Dtos/Users/QuizAnswerDto.cs; WanderXClient/WanderXClient/Pages/TravelQuiz.razor; WanderXClient/WanderXClient/Models/QuizContracts.cs; WanderXClient/WanderXClient/Services/UserApiClient.cs |
+| Screenshot | Ảnh Git Changes với 19 file Function 1 được stage |
+| Kết quả chạy/test | `dotnet build WanderXServer/WanderXServer.sln --no-restore`: thành công, 0 error; `dotnet build WanderXClient/WanderXClient.sln --no-restore`: thành công, 0 error |
+| Link video demo | Chưa có |
+| Ghi chú khác | Chưa xác nhận end-to-end với database và browser; QuizAttempt/versioning và recommendation API chưa nằm trong lần triển khai này |
+
+#### 4.6. Nhận xét cá nhân/nhóm
+
+```text
+Qua lần sử dụng AI này, em nhận thấy việc sinh code chỉ là một phần nhỏ; bước quan trọng hơn là đối chiếu code với requirement và kiểm tra các ranh giới bảo mật.
+
+AI giúp phát hiện nhanh việc dùng email từ client và DisplayOrder làm định danh, nhưng em vẫn phải kiểm tra lại kiến trúc JWT, DTO, DbContext và UI hiện có trước khi áp dụng. Em đã chủ động giữ luồng Guest xem câu hỏi, Customer lưu kết quả và Admin quản lý cấu hình theo đúng vai trò của hệ thống.
+
+Kết quả cuối cùng được kiểm chứng bằng build server/client. Các phần chưa đủ thông tin liên module được ghi nhận rõ thay vì triển khai bằng dữ liệu giả. Bài học chính là cần review, hiểu và kiểm chứng mọi thay đổi do AI hỗ trợ trước khi commit hoặc merge vào nhánh chung.
+```
+
+---
 ## 5. Bảng tổng hợp mức độ sử dụng AI
 
 Đánh dấu mức độ AI hỗ trợ ở từng hạng mục.

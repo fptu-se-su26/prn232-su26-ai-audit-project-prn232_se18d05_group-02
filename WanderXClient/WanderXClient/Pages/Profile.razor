@@ -80,21 +80,50 @@ else if (_profile != null)
                 }
 
                 <!-- Travel Badge Showcase -->
-                <div class="bg-gradient-to-r from-accent-orange/10 to-orange-400/5 border border-accent-orange/20 rounded-lg p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div class="space-y-2 text-center md:text-left">
-                        <span class="text-xs font-bold text-accent-orange uppercase tracking-wider">Travel Style của bạn</span>
-                        <h3 class="font-title font-bold text-xl !text-primary flex items-center justify-center md:justify-start gap-2">
-                            <span class="material-symbols-outlined text-accent-orange">local_activity</span>
-                            Nhà Khám Phá Văn Hóa
-                        </h3>
-                        <p class="text-xs text-muted-fg max-w-lg leading-relaxed">
-                            Bạn yêu thích việc tìm hiểu sâu xa lịch sử, ẩm thực và nếp sống của con người bản địa. Bạn thích những chuyến hành trình chậm rãi, giàu chất văn thơ hơn là check-in vội vàng.
-                        </p>
+                @if (_latestQuiz != null)
+                {
+                    <div class="bg-gradient-to-r from-accent-orange/10 to-orange-400/5 border border-accent-orange/20 rounded-lg p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div class="space-y-2 text-center md:text-left">
+                            <span class="text-xs font-bold text-accent-orange uppercase tracking-wider">Travel Style của bạn</span>
+                            <h3 class="font-title font-bold text-xl !text-primary flex items-center justify-center md:justify-start gap-2">
+                                <span class="material-symbols-outlined text-accent-orange">
+                                    @(GetIconForStyle(_latestQuiz.DominantStyle))
+                                </span>
+                                @(GetTitleForStyle(_latestQuiz.DominantStyle))
+                            </h3>
+                            <p class="text-xs text-muted-fg max-w-lg leading-relaxed">
+                                @(GetDescriptionForStyle(_latestQuiz.DominantStyle))
+                            </p>
+                            <div class="flex flex-wrap gap-3 mt-2 text-xs font-semibold text-muted-fg">
+                                <span class="bg-surface-mid px-2.5 py-1 rounded">Mạo hiểm: @_latestQuiz.AdventureScore</span>
+                                <span class="bg-surface-mid px-2.5 py-1 rounded">Văn hóa: @_latestQuiz.CulturalScore</span>
+                                <span class="bg-surface-mid px-2.5 py-1 rounded">Nghỉ dưỡng: @_latestQuiz.RelaxationScore</span>
+                                <span class="bg-surface-mid px-2.5 py-1 rounded">Thượng lưu: @_latestQuiz.LuxuryScore</span>
+                            </div>
+                        </div>
+                        <a href="travel-quiz" class="!bg-primary hover:bg-primary/95 text-white font-semibold text-xs px-5 py-3 rounded-full transition-all flex-shrink-0">
+                            Làm lại trắc nghiệm
+                        </a>
                     </div>
-                    <a href="travel-quiz" class="!bg-primary hover:bg-primary/95 text-white font-semibold text-xs px-5 py-3 rounded-full transition-all flex-shrink-0">
-                        Làm lại trắc nghiệm
-                    </a>
-                </div>
+                }
+                else
+                {
+                    <div class="bg-gradient-to-r from-surface-mid to-surface-soft border border-hairline rounded-lg p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div class="space-y-2 text-center md:text-left">
+                            <span class="text-xs font-bold text-muted-fg uppercase tracking-wider">Travel Style</span>
+                            <h3 class="font-title font-bold text-xl !text-primary flex items-center justify-center md:justify-start gap-2">
+                                <span class="material-symbols-outlined text-muted-fg">psychology</span>
+                                Khám phá phong cách du lịch của bạn
+                            </h3>
+                            <p class="text-xs text-muted-fg max-w-lg leading-relaxed">
+                                Hãy thực hiện bài trắc nghiệm nhanh để hệ thống đề xuất các tour du lịch phù hợp nhất với sở thích cá nhân của bạn.
+                            </p>
+                        </div>
+                        <a href="travel-quiz" class="!bg-primary hover:bg-primary/95 text-white font-semibold text-xs px-5 py-3 rounded-full transition-all flex-shrink-0">
+                            Bắt đầu trắc nghiệm
+                        </a>
+                    </div>
+                }
 
                 <!-- Settings edit form -->
                 <EditForm Model="_updateModel" OnValidSubmit="HandleSubmit" class="bg-white border border-hairline rounded-lg p-6 md:p-8 space-y-6">
@@ -164,6 +193,7 @@ else if (_profile != null)
     
     private AuthSession? _session;
     private UserProfileResponse? _profile;
+    private TravelStyleQuizResultResponse? _latestQuiz;
     private UpdateProfileRequest _updateModel = new();
     private string _avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
     private const string AvatarLocalStorageKey = "wanderx.user.avatar";
@@ -204,6 +234,15 @@ else if (_profile != null)
                 {
                     _avatarUrl = savedAvatar;
                 }
+            }
+
+            try
+            {
+                _latestQuiz = await UserApi.GetLatestQuizResultAsync();
+            }
+            catch (Exception)
+            {
+                // Ignore failure loading quiz result
             }
         }
         catch (Exception ex)
@@ -349,5 +388,41 @@ else if (_profile != null)
         {
             _isSubmitting = false;
         }
+    }
+
+    private string GetIconForStyle(string style)
+    {
+        return style.ToLowerInvariant() switch
+        {
+            "adventure" => "hiking",
+            "cultural" => "local_activity",
+            "relaxation" => "spa",
+            "luxury" => "diamond",
+            _ => "explore"
+        };
+    }
+
+    private string GetTitleForStyle(string style)
+    {
+        return style.ToLowerInvariant() switch
+        {
+            "adventure" => "Tín Đồ Mạo Hiểm (Adventure)",
+            "cultural" => "Nhà Khám Phá Văn Hóa (Cultural)",
+            "relaxation" => "Chuyên Gia Nghỉ Dưỡng (Relaxation)",
+            "luxury" => "Khách Du Lịch Thượng Lưu (Luxury)",
+            _ => "Khách du lịch WanderX"
+        };
+    }
+
+    private string GetDescriptionForStyle(string style)
+    {
+        return style.ToLowerInvariant() switch
+        {
+            "adventure" => "Bạn yêu thích những thử thách, leo núi, chèo thuyền, khám phá thiên nhiên hoang dã và không ngại vượt qua giới hạn của bản thân để trải nghiệm những điều mới lạ.",
+            "cultural" => "Bạn yêu thích việc tìm hiểu sâu xa lịch sử, ẩm thực và nếp sống của con người bản địa. Bạn thích những chuyến hành trình chậm rãi, giàu chất văn thơ hơn là check-in vội vàng.",
+            "relaxation" => "Bạn tìm kiếm sự bình yên, thư thái để tái tạo năng lượng. Những bãi biển cát trắng, spa cao cấp hay nằm đọc sách bên hồ bơi là thiên đường du lịch lý tưởng của bạn.",
+            "luxury" => "Bạn trân trọng những dịch vụ đẳng cấp 5 sao, ẩm thực fine-dining độc bản và những trải nghiệm xa xỉ, tinh tế, chăm sóc chu đáo suốt hành trình.",
+            _ => "Hệ thống đang phân tích phong cách du lịch của bạn."
+        };
     }
 }
