@@ -1,50 +1,12 @@
 @page "/guide-assignments"
+@layout AdminLayout
 @using System.ComponentModel.DataAnnotations
 @inject GuideApiClient GuideApi
 @inject GuideTourApiClient GuideTourApi
 
 <PageTitle>Guide Assignments - WanderX</PageTitle>
 
-<div class="guide-admin-page">
-    <aside class="guide-sidebar">
-        <div class="guide-sidebar__brand">
-            <a class="brand-mark" href="/">WanderX</a>
-            <p>Admin Suite</p>
-        </div>
 
-        <nav class="guide-sidebar__nav" aria-label="Guide assignment management">
-            <a class="guide-sidebar__link" href="/dashboard">
-                <MaterialIcon Name="dashboard" />
-                Dashboard
-            </a>
-            <a class="guide-sidebar__link" href="/guides">
-                <MaterialIcon Name="badge" />
-                Guides
-            </a>
-            <a class="guide-sidebar__link" href="/admin-bookings">
-                <MaterialIcon Name="receipt_long" />
-                Bookings
-            </a>
-            <a class="guide-sidebar__link" href="/admin-cancellations">
-                <MaterialIcon Name="rule" />
-                Cancel Requests
-            </a>
-            <a class="guide-sidebar__link" href="/admin-payments">
-                <MaterialIcon Name="payments" />
-                Payments
-            </a>
-            <a class="guide-sidebar__link guide-sidebar__link--active" href="/guide-assignments" aria-current="page">
-                <MaterialIcon Name="assignment_ind" />
-                Assignments
-            </a>
-            <a class="guide-sidebar__link" href="/">
-                <MaterialIcon Name="home" />
-                Homepage
-            </a>
-        </nav>
-    </aside>
-
-    <main class="guide-main">
         <header class="guide-topbar">
             <div>
                 <p class="guide-eyebrow">Guide Operations</p>
@@ -398,10 +360,6 @@
                 </section>
             }
         </section>
-    </main>
-    <MobileBottomNav />
-</div>
-
 @code {
     private static readonly string[] StatusOptions = { "Assigned", "Confirmed", "Declined", "Finished" };
 
@@ -841,3 +799,5 @@
         }
     }
 }
+
+

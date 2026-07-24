@@ -15,7 +15,7 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 // Register controllers with global XssSanitizationFilter
-builder.Services.AddControllers(options =>
+builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<XssSanitizationFilter>();
 });
@@ -34,6 +34,10 @@ builder.Services.AddScoped<IGuideService, GuideService>();
 builder.Services.AddScoped<IGuideTourService, GuideTourService>();
 builder.Services.AddScoped<UserSpecialRequestService>();
 builder.Services.AddScoped<TourReviewService>();
+builder.Services.AddScoped<ITourService, TourService>();
+builder.Services.AddScoped<ITourScheduleService, TourScheduleService>();
+builder.Services.AddScoped<IBookedTourService, BookedTourService>();
+builder.Services.AddScoped<ITourPricingService, TourPricingService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
@@ -113,7 +117,15 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    scope.ServiceProvider.GetRequiredService<WanderXDbContext>().SeedDevelopmentData();
+    try
+    {
+        scope.ServiceProvider.GetRequiredService<WanderXDbContext>().SeedDevelopmentData();
+    }
+    catch (Exception exception)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning(exception, "Database initialization was skipped because the database is unavailable.");
+    }
 }
 
 if (app.Environment.IsDevelopment())
@@ -126,9 +138,12 @@ if (app.Environment.IsDevelopment())
 app.UseCors("WanderXClient");
 app.UseRateLimiter();
 app.UseMiddleware<CsrfProtectionMiddleware>();
-
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=AdminTourSchedules}/{action=Index}/{id?}");
 
 app.Run();

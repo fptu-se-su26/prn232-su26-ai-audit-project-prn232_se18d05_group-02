@@ -1,53 +1,11 @@
 @page "/guides"
+@layout AdminLayout
 @using System.ComponentModel.DataAnnotations
 @inject GuideApiClient GuideApi
 
 <PageTitle>Guide Management - WanderX</PageTitle>
 
-<div class="guide-admin-page">
-    <aside class="guide-sidebar">
-        <div class="guide-sidebar__brand">
-            <a class="brand-mark" href="/">WanderX</a>
-            <p>Admin Suite</p>
-        </div>
 
-        <nav class="guide-sidebar__nav" aria-label="Guide management">
-            <a class="guide-sidebar__link" href="/dashboard">
-                <MaterialIcon Name="dashboard" />
-                Dashboard
-            </a>
-            <a class="guide-sidebar__link" href="/">
-                <MaterialIcon Name="explore" />
-                Tours
-            </a>
-            <a class="guide-sidebar__link" href="/admin-bookings">
-                <MaterialIcon Name="receipt_long" />
-                Bookings
-            </a>
-            <a class="guide-sidebar__link" href="/admin-cancellations">
-                <MaterialIcon Name="rule" />
-                Cancel Requests
-            </a>
-            <a class="guide-sidebar__link" href="/admin-payments">
-                <MaterialIcon Name="payments" />
-                Payments
-            </a>
-            <a class="guide-sidebar__link guide-sidebar__link--active" href="/guides" aria-current="page">
-                <MaterialIcon Name="badge" />
-                Guides
-            </a>
-            <a class="guide-sidebar__link" href="/guide-assignments">
-                <MaterialIcon Name="assignment_ind" />
-                Assignments
-            </a>
-            <a class="guide-sidebar__link" href="/guide-profile">
-                <MaterialIcon Name="manage_accounts" />
-                Self Update
-            </a>
-        </nav>
-    </aside>
-
-    <main class="guide-main">
         <header class="guide-topbar">
             <div>
                 <p class="guide-eyebrow">Guide Operations</p>
@@ -335,10 +293,6 @@
                 </section>
             }
         </section>
-    </main>
-    <MobileBottomNav />
-</div>
-
 @code {
     private static readonly string[] StatusOptions = { "Active", "On Tour", "Unavailable" };
     private static readonly string[] FilterOptions = { "All", "Active", "On Tour", "Unavailable" };
@@ -721,3 +675,5 @@
         }
     }
 }
+
+

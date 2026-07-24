@@ -1,6 +1,10 @@
 <article class="tour-card">
     <div class="tour-card__image">
         <img alt="@Title" src="@ImageUrl" />
+        @if (HasDiscount)
+        {
+            <span class="tour-card__discount">Discount @DiscountPercent%</span>
+        }
         <span class="tour-card__rating">
             <MaterialIcon Name="star" />
             @Rating
@@ -16,9 +20,23 @@
         <div class="tour-card__footer">
             <div>
                 <span class="hero-search__label">From</span>
-                <div class="tour-card__price">@Price <small>/pp</small></div>
+                @if (HasDiscount)
+                {
+                    <div class="tour-card__price-row">
+                        <span class="tour-card__price tour-card__price--sale">@FormatMoney(EffectivePrice)</span>
+                        <span class="tour-card__price-original">@FormatMoney(OriginalPrice)</span>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(PromotionName))
+                    {
+                        <span class="tour-card__promo">@PromotionName</span>
+                    }
+                }
+                else
+                {
+                    <div class="tour-card__price">@ResolvedPrice <small>/pp</small></div>
+                }
             </div>
-            <a class="wx-button wx-button--outline" href="/tour-detail/@Uri.EscapeDataString(Title)">Details</a>
+            <a class="wx-button wx-button--outline" href="@DetailsHref">Details</a>
         </div>
     </div>
 </article>
@@ -36,9 +54,37 @@
     [Parameter, EditorRequired]
     public string Price { get; set; } = string.Empty;
 
+    [Parameter]
+    public decimal OriginalPrice { get; set; }
+
+    [Parameter]
+    public decimal EffectivePrice { get; set; }
+
+    [Parameter]
+    public int DiscountPercent { get; set; }
+
+    [Parameter]
+    public string? PromotionName { get; set; }
+
     [Parameter, EditorRequired]
     public string Rating { get; set; } = string.Empty;
 
     [Parameter, EditorRequired]
     public string ImageUrl { get; set; } = string.Empty;
+
+    [Parameter]
+    public Guid? TourId { get; set; }
+
+    private string DetailsHref => TourId.HasValue
+        ? $"/tour-detail/{TourId.Value}"
+        : $"/tour-detail/{Uri.EscapeDataString(Title)}";
+
+    private bool HasDiscount => DiscountPercent > 0 && OriginalPrice > EffectivePrice;
+
+    private string ResolvedPrice => EffectivePrice > 0 ? FormatMoney(EffectivePrice) : Price;
+
+    private static string FormatMoney(decimal value)
+    {
+        return $"{value:N0} đ";
+    }
 }

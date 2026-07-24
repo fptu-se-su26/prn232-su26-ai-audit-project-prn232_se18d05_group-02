@@ -1,0 +1,162 @@
+@page "/tour-detail/{TourId:guid}"
+@inject TourApiClient TourApi
+
+<PageTitle>@PageTitleText</PageTitle>
+
+<div class="wx-page">
+    <AppHeader />
+    <main>
+        @if (_isLoading)
+        {
+            <section class="tour-detail-hero tour-detail-hero--loading">
+                <div class="wx-container">
+                    <div class="guide-empty">Loading tour details...</div>
+                </div>
+            </section>
+        }
+        else if (_tour is null)
+        {
+            <section class="section">
+                <div class="wx-container">
+                    <div class="guide-empty">
+                        Tour was not found.
+                    </div>
+                </div>
+            </section>
+        }
+        else
+        {
+            <section class="tour-detail-hero" style="background-image: linear-gradient(90deg, rgba(7,18,45,.82), rgba(7,18,45,.22)), url('@ImageUrl');">
+                <div class="wx-container tour-detail-hero__inner">
+                    <a class="tour-detail-back" href="/tours">
+                        <MaterialIcon Name="arrow_back" />
+                        All tours
+                    </a>
+                    <span class="@GetStatusClass(_tour.Status)"><span></span>@_tour.Status</span>
+                    <h1>@_tour.Name</h1>
+                    <p>@_tour.Description</p>
+                    <div class="tour-detail-hero__meta">
+                        <span><MaterialIcon Name="place" /> @_tour.Destination</span>
+                        <span><MaterialIcon Name="map" /> @_tour.Region</span>
+                        <span><MaterialIcon Name="calendar_month" /> @FormatDuration(_tour.DurationDays)</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section tour-detail-section">
+                <div class="wx-container tour-detail-layout">
+                    <div class="tour-detail-main">
+                        <section class="tour-detail-panel">
+                            <p class="guide-eyebrow">Overview</p>
+                            <h2>About this experience</h2>
+                            <p>@_tour.Description</p>
+                        </section>
+
+                        <section class="tour-detail-panel">
+                            <p class="guide-eyebrow">What to expect</p>
+                            <div class="tour-detail-highlights">
+                                <span><MaterialIcon Name="verified" /> Curated private itinerary</span>
+                                <span><MaterialIcon Name="groups" /> Capacity up to @_tour.Capacity guests</span>
+                                <span><MaterialIcon Name="support_agent" /> WanderX support before departure</span>
+                            </div>
+                        </section>
+                    </div>
+
+                    <aside class="tour-detail-booking">
+                        <p class="guide-eyebrow">From</p>
+                        @if (HasDiscount)
+                        {
+                            <span class="tour-detail-discount">Discount @_tour.DiscountPercent%</span>
+                            <div class="tour-detail-price-row">
+                                <strong>@FormatMoney(_tour.EffectivePrice)</strong>
+                                <del>@FormatMoney(_tour.OriginalPrice)</del>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(_tour.AppliedPromotionName))
+                            {
+                                <span class="tour-detail-promo">@_tour.AppliedPromotionName</span>
+                            }
+                        }
+                        else
+                        {
+                            <strong>@FormatMoney(_tour.EffectivePrice > 0 ? _tour.EffectivePrice : _tour.Price)</strong>
+                        }
+                        <span>/ person</span>
+                        <dl>
+                            <div>
+                                <dt>Tour code</dt>
+                                <dd>@_tour.Code</dd>
+                            </div>
+                            <div>
+                                <dt>Duration</dt>
+                                <dd>@FormatDuration(_tour.DurationDays)</dd>
+                            </div>
+                            <div>
+                                <dt>Capacity</dt>
+                                <dd>@_tour.Capacity guests</dd>
+                            </div>
+                        </dl>
+                        <a class="wx-button" href="/login">
+                            Book this tour
+                        </a>
+                    </aside>
+                </div>
+            </section>
+        }
+    </main>
+    <AppFooter />
+    <MobileBottomNav />
+</div>
+
+@code {
+    [Parameter]
+    public Guid TourId { get; set; }
+
+    private TourResponse? _tour;
+    private bool _isLoading = true;
+
+    private string PageTitleText => _tour is null ? "Tour Details - WanderX" : $"{_tour.Name} - WanderX";
+
+    private string ImageUrl => string.IsNullOrWhiteSpace(_tour?.ImageUrl)
+        ? "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80"
+        : _tour.ImageUrl;
+
+    private bool HasDiscount => _tour is not null && _tour.DiscountPercent > 0 && _tour.OriginalPrice > _tour.EffectivePrice;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+
+        try
+        {
+            _tour = await TourApi.GetTourAsync(TourId);
+        }
+        catch
+        {
+            _tour = null;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static string FormatDuration(int durationDays)
+    {
+        return durationDays == 1 ? "1 Day" : $"{durationDays} Days";
+    }
+
+    private static string GetStatusClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "published" => "guide-status guide-status--active",
+            "draft" => "guide-status guide-status--busy",
+            _ => "guide-status guide-status--muted"
+        };
+    }
+
+    private static string FormatMoney(decimal value)
+    {
+        return $"{value:N0} đ";
+    }
+}

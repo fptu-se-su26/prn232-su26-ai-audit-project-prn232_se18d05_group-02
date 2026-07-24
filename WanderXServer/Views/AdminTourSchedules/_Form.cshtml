@@ -1,0 +1,58 @@
+@model TourScheduleFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+<input type="hidden" asp-for="Id" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="TourId" class="form-label fw-semibold"></label>
+        <select asp-for="TourId" asp-items="Model.Tours" class="form-select">
+            <option value="">Select tour</option>
+        </select>
+        <span asp-validation-for="TourId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="ScheduleDate" class="form-label fw-semibold"></label>
+        <input asp-for="ScheduleDate" class="form-control" type="date" />
+        <span asp-validation-for="ScheduleDate" class="text-danger small"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="DayNumber" class="form-label fw-semibold"></label>
+        <input asp-for="DayNumber" class="form-control" type="number" min="1" />
+        <span asp-validation-for="DayNumber" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-8">
+        <label asp-for="Title" class="form-label fw-semibold"></label>
+        <input asp-for="Title" class="form-control" placeholder="Morning city discovery" />
+        <span asp-validation-for="Title" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Location" class="form-label fw-semibold"></label>
+        <input asp-for="Location" class="form-control" placeholder="Hue Imperial City" />
+        <span asp-validation-for="Location" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="StartTime" class="form-label fw-semibold"></label>
+        <input asp-for="StartTime" class="form-control" type="time" />
+        <span asp-validation-for="StartTime" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="EndTime" class="form-label fw-semibold"></label>
+        <input asp-for="EndTime" class="form-control" type="time" />
+        <span asp-validation-for="EndTime" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="SortOrder" class="form-label fw-semibold"></label>
+        <input asp-for="SortOrder" class="form-control" type="number" min="1" />
+        <span asp-validation-for="SortOrder" class="text-danger small"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Description" class="form-label fw-semibold"></label>
+        <textarea asp-for="Description" class="form-control" rows="5" placeholder="Describe the activity, transfers, meals, notes..."></textarea>
+        <span asp-validation-for="Description" class="text-danger small"></span>
+    </div>
+</div>
