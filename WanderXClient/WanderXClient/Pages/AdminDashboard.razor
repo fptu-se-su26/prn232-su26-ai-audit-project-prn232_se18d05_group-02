@@ -1,47 +1,10 @@
 @page "/dashboard"
 @page "/admin-dashboard"
 
+@layout AdminLayout
 <PageTitle>Admin Dashboard - WanderX</PageTitle>
 
-<div class="guide-admin-page">
-    <aside class="guide-sidebar">
-        <div class="guide-sidebar__brand">
-            <a class="brand-mark" href="/">WanderX</a>
-            <p>Admin Suite</p>
-        </div>
-        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
-            <a class="guide-sidebar__link" href="/dashboard">
-                <MaterialIcon Name="dashboard" />
-                Dashboard
-            </a>
-            <a class="guide-sidebar__link" href="/guides">
-                <MaterialIcon Name="badge" />
-                Guides
-            </a>
-            <a class="guide-sidebar__link" href="/guide-assignments">
-                <MaterialIcon Name="assignment_ind" />
-                Assignments
-            </a>
-            <a class="guide-sidebar__link" href="/admin-service-requests">
-                <MaterialIcon Name="support_agent" />
-                Service Requests
-            </a>
-            <a class="guide-sidebar__link" href="/tour-reviews" aria-current="page">
-                <MaterialIcon Name="rate_review" />
-                Tour Reviews
-            </a>
-            <a class="guide-sidebar__link" href="/admin-quiz">
-                <MaterialIcon Name="quiz" />
-                Manage Quizzes
-            </a>
-            <a class="guide-sidebar__link" href="/">
-                <MaterialIcon Name="home" />
-                Homepage
-            </a>
-        </nav>
-    </aside>
 
-    <main class="guide-main">
         <header class="guide-topbar">
             <div>
                 <p class="guide-eyebrow">Admin</p>
@@ -53,9 +16,9 @@
         <section class="guide-content">
             <div class="guide-stat-grid">
                 <article class="guide-stat">
-                    <p>Guide Management</p>
+                    <p>Tour Management</p>
                     <strong>01</strong>
-                    <span>Manage guide accounts and profiles</span>
+                    <span>Manage travel tour packages</span>
                 </article>
                 <article class="guide-stat guide-stat--secondary">
                     <p>Assignments</p>
@@ -85,6 +48,14 @@
                             <MaterialIcon Name="badge" />
                             Open Guides
                         </a>
+                        <a class="wx-button" href="/admin/tours">
+                            <MaterialIcon Name="travel_explore" />
+                            Open Tours
+                        </a>
+                        <a class="wx-button" href="/admin-quiz">
+                            <MaterialIcon Name="quiz" />
+                            Manage Quizzes
+                        </a>
                         <a class="wx-button wx-button--secondary" href="/guide-assignments">
                             <MaterialIcon Name="assignment_ind" />
                             Open Assignments
@@ -94,6 +65,5 @@
                 <p class="guide-subtitle">Use this dashboard as the admin landing page after login. Guide profiles and guide-to-tour assignments are managed in separate operation screens.</p>
             </section>
         </section>
-    </main>
-    <MobileBottomNav />
-</div>
+
+

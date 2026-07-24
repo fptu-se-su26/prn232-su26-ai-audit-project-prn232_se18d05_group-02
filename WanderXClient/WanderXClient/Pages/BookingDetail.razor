@@ -1,4 +1,4 @@
-@page "/booking-detail/{Id:guid}"
+﻿@page "/booking-detail/{Id:guid}"
 @using WanderXClient.Models
 @using WanderXClient.Services
 @inject UserApiClient UserApi
@@ -6,7 +6,7 @@
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
 
-<PageTitle>WanderX - Chi tiết đặt chỗ @(_booking?.BookingCode ?? "")</PageTitle>
+<PageTitle>WanderX - Booking Details @(_booking?.BookingCode ?? "")</PageTitle>
 
 <AppHeader />
 
@@ -20,14 +20,21 @@ else if (_booking == null)
 {
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-24 text-center">
         <span class="material-symbols-outlined text-5xl text-muted-fg">error_outline</span>
-        <h2 class="font-title font-bold text-xl !text-primary mt-4">Không tìm thấy đơn hàng</h2>
+        <h2 class="font-title font-bold text-xl !text-primary mt-4">Booking not found</h2>
         <a href="/my-bookings" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold !text-primary hover:underline">
-            <span class="material-symbols-outlined text-base">arrow_back</span> Quay lại danh sách
+            <span class="material-symbols-outlined text-base">arrow_back</span> Back to list
         </a>
     </main>
 }
 else
 {
+    var cancellationPending = string.Equals(_booking.CancellationStatus, "Pending", StringComparison.OrdinalIgnoreCase);
+    var cancellationRejected = string.Equals(_booking.CancellationStatus, "Rejected", StringComparison.OrdinalIgnoreCase);
+    var canRequestCancellation = _booking.Status != "Cancelled"
+        && _booking.Status != "Finished"
+        && !_booking.PaidAt.HasValue
+        && !cancellationPending;
+
     var statusStyles = _booking.Status switch
     {
         "Paid"      => "bg-green-100 text-green-700",
@@ -37,16 +44,15 @@ else
     };
     var statusText = _booking.Status switch
     {
-        "Paid"      => "Đã thanh toán",
-        "Pending"   => "Chờ thanh toán",
-        "Cancelled" => "Đã hủy",
+        "Paid"      => "Paid",
+        "Pending"   => "Pending payment",
+        "Cancelled" => "Cancelled",
         _           => _booking.Status
     };
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 
-            <!-- Left Profile Sidebar -->
             <aside class="lg:col-span-4 bg-white border border-hairline rounded-lg p-6 space-y-6 shadow-sm">
                 <div class="flex flex-col items-center text-center pb-6 border-b border-hairline">
                     <div class="w-20 h-20 rounded-full overflow-hidden border-2 !border-primary mb-4">
@@ -59,64 +65,70 @@ else
                 <nav class="flex flex-col gap-1 text-sm font-semibold text-muted-fg">
                     <a href="my-bookings" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-soft !text-primary">
                         <span class="material-symbols-outlined text-lg">receipt_long</span>
-                        Đơn hàng của tôi
+                        My Bookings
                     </a>
                     <a href="service-requests" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
                         <span class="material-symbols-outlined text-lg">description</span>
-                        Yêu cầu dịch vụ
+                        Service Requests
                     </a>
                     <a href="profile" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
                         <span class="material-symbols-outlined text-lg">person</span>
-                        Thông tin cá nhân
+                        Profile
                     </a>
                     <a href="travel-quiz" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
                         <span class="material-symbols-outlined text-lg">quiz</span>
-                        Trắc nghiệm Travel Style
+                        Travel Style Quiz
                     </a>
                 </nav>
             </aside>
 
-            <!-- Right content -->
             <section class="lg:col-span-8 space-y-8">
 
                 <!-- Back + Header -->
                 <div class="space-y-4">
                     <a href="/my-bookings" class="flex items-center gap-2 text-xs font-bold text-muted-fg hover:!text-primary transition-colors uppercase tracking-wider">
-                        <span class="material-symbols-outlined text-base">arrow_back</span> Quay lại danh sách đặt chỗ
+                        <span class="material-symbols-outlined text-base">arrow_back</span> Back to bookings
                     </a>
                     <div class="flex flex-wrap items-center justify-between gap-4 border-b border-hairline pb-4">
                         <div>
-                            <span class="text-xs text-muted-fg font-semibold">Mã đơn hàng: <span class="!text-primary font-bold">@_booking.BookingCode</span></span>
+                            <span class="text-xs text-muted-fg font-semibold">Booking code: <span class="!text-primary font-bold">@_booking.BookingCode</span></span>
                             <h1 class="text-2xl font-extrabold tracking-tight font-title !text-primary mt-1">@_booking.TourName</h1>
                             <span class="px-3 py-1 rounded text-xs font-bold @statusStyles inline-block mt-2">@statusText</span>
+                            @if (cancellationPending)
+                            {
+                                <span class="ml-2 px-3 py-1 rounded text-xs font-bold bg-blue-100 text-blue-700 inline-block mt-2">Cancellation pending</span>
+                            }
+                            else if (cancellationRejected)
+                            {
+                                <span class="ml-2 px-3 py-1 rounded text-xs font-bold bg-slate-100 text-slate-700 inline-block mt-2">Cancellation rejected</span>
+                            }
                         </div>
                     </div>
                 </div>
 
-                <!-- Tiến trình đơn hàng -->
                 <div class="bg-white border border-hairline rounded-lg p-6 md:p-8 space-y-6 shadow-sm">
                     <div class="flex justify-between items-center">
-                        <h3 class="font-title font-bold text-base !text-primary">Tiến trình đơn hàng</h3>
+                        <h3 class="font-title font-bold text-base !text-primary">Booking Progress</h3>
                         <div class="flex gap-2">
                             @if (!_booking.PaidAt.HasValue)
                             {
                                 <button class="wx-button wx-button--secondary text-sm px-4 py-2" @onclick="ShowSpecialRequestModal">
                                     <span class="material-symbols-outlined text-lg mr-1">add</span>
-                                    Thêm yêu cầu
+                                    Add request
                                 </button>
                             }
                             @if (_booking.CompletedAt.HasValue)
                             {
                                 <button class="wx-button wx-button--secondary text-sm px-4 py-2" @onclick="NavigateToReview">
                                     <span class="material-symbols-outlined text-lg mr-1">star</span>
-                                    Đánh giá tour
+                                    Tour Reviews
                                 </button>
                             }
                         </div>
                     </div>
 
                     @{
-                        // Xác định trạng thái từng bước
+                        // Resolve each progress step state.
                         bool step1Done = _booking.ApprovedAt.HasValue;
                         bool step1Failed = _booking.RequestFailedAt.HasValue;
                         bool step2Done = _booking.PaidAt.HasValue;
@@ -127,19 +139,16 @@ else
                         bool step4Failed = _booking.CompletionFailedAt.HasValue;
                         bool isCancelled = _booking.Status == "Cancelled";
 
-                        // Spinner khi chưa có kết quả (chưa success, chưa fail, chưa hủy)
                         bool step1Spin = !step1Done && !step1Failed && !isCancelled;
                         bool step2Spin = step1Done && !step2Done && !step2Failed && !isCancelled;
                         bool step3Spin = step2Done && !step3Done && !step3Failed && !isCancelled;
                         bool step4Spin = step3Done && !step4Done && !step4Failed && !isCancelled;
 
-                        // Hủy chỉ hiển thị ở bước 1 và 2 khi chưa thanh toán
                         bool canShowCancel = isCancelled && !_booking.PaidAt.HasValue;
                     }
 
                     <div class="relative pl-6 border-l-4 border-blue-500 ml-3 space-y-8 text-sm">
 
-                        <!-- Bước 1: Yêu cầu đặt chỗ -->
                         <div class="relative z-10">
                             @if (canShowCancel || step1Failed)
                             {
@@ -164,10 +173,10 @@ else
                                 </span>
                             }
                             <div>
-                                <h4 class="font-semibold !text-primary">Yêu cầu đặt chỗ</h4>
+                                <h4 class="font-semibold !text-primary">Booking request</h4>
                                 @if (canShowCancel || step1Failed)
                                 {
-                                    <span class="text-xs text-muted-fg">@(canShowCancel ? "Đã hủy" : "Bị từ chối")</span>
+                                    <span class="text-xs text-muted-fg">@(canShowCancel ? "Cancelled" : "Rejected")</span>
                                 }
                                 else if (step1Done)
                                 {
@@ -175,13 +184,13 @@ else
                                 }
                                 else if (step1Spin)
                                 {
-                                    <span class="text-xs text-muted-fg">Đang xử lý</span>
+                                    <span class="text-xs text-muted-fg">Processing</span>
                                 }
                                 
                             </div>
                         </div>
 
-                        <!-- Bước 2: Thanh toán -->
+                        <!-- Step 2: Payment -->
                         <div class="relative z-10">
                             @if (canShowCancel || step2Failed)
                             {
@@ -207,10 +216,10 @@ else
                             }
 
                             <div>
-                                <h4 class="font-semibold !text-primary">Thanh toán (@_booking.TotalAmount.ToString("N0")đ)</h4>
+                                <h4 class="font-semibold !text-primary">Payment (@_booking.TotalAmount.ToString("N0") VND)</h4>
                                 @if (canShowCancel || step2Failed)
                                 {
-                                    <span class="text-xs text-muted-fg">@(canShowCancel ? "Đã hủy" : "Thất bại")</span>
+                                    <span class="text-xs text-muted-fg">@(canShowCancel ? "Cancelled" : "Failed")</span>
                                 }
                                 else if (step2Done)
                                 {
@@ -218,13 +227,12 @@ else
                                 }
                                 else if (step2Spin)
                                 {
-                                    <span class="text-xs text-muted-fg">Đang xử lý</span>
+                                    <span class="text-xs text-muted-fg">Processing</span>
                                 }
                                 
                             </div>
                         </div>
 
-                        <!-- Bước 3: Hướng dẫn viên xác nhận -->
                         <div class="relative z-10">
                             @if (step3Failed)
                             {
@@ -250,10 +258,10 @@ else
                             }
 
                             <div>
-                                <h4 class="font-semibold !text-primary">Hướng dẫn viên xác nhận</h4>
+                                <h4 class="font-semibold !text-primary">Staff confirmation</h4>
                                 @if (step3Failed)
                                 {
-                                    <span class="text-xs text-muted-fg">Bị từ chối</span>
+                                    <span class="text-xs text-muted-fg">Rejected</span>
                                 }
                                 else if (step3Done)
                                 {
@@ -261,13 +269,12 @@ else
                                 }
                                 else if (step3Spin)
                                 {
-                                    <span class="text-xs text-muted-fg">Đang xử lý</span>
+                                    <span class="text-xs text-muted-fg">Processing</span>
                                 }
                                 
                             </div>
                         </div>
 
-                        <!-- Bước 4: chuyến đi -->
                         <div class="relative z-10">
                             @if (step4Failed)
                             {
@@ -293,18 +300,18 @@ else
                             }
 
                             <div>
-                                <h4 class="font-semibold !text-primary">Chuyến du lịch</h4>
+                                <h4 class="font-semibold !text-primary">Trip</h4>
                                 @if (step4Failed)
                                 {
-                                    <span class="text-xs text-muted-fg">Tour bị hủy</span>
+                                    <span class="text-xs text-muted-fg">Tour cancelled</span>
                                 }
                                 else if (step4Done)
                                 {
-                                    <span class="text-xs text-muted-fg">hãy chuẩn bị khởi hành</span>
+                                    <span class="text-xs text-muted-fg">Get ready for departure</span>
                                 }
                                 else if (step4Spin)
                                 {
-                                    <span class="text-xs text-muted-fg">Đang xử lý</span>
+                                    <span class="text-xs text-muted-fg">Processing</span>
                                 }
                                 
                             </div>
@@ -313,16 +320,15 @@ else
                     </div>
                 </div>
 
-                <!-- Passengers Details table -->
                 <div class="bg-white border border-hairline rounded-lg p-6 md:p-8 space-y-4">
-                    <h3 class="font-title font-bold text-base !text-primary">Danh sách hành khách</h3>
+                    <h3 class="font-title font-bold text-base !text-primary">Passenger List</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-hairline text-xs font-bold text-muted-fg uppercase tracking-wider">
-                                    <th class="py-3 px-4">Tên hành khách</th>
-                                    <th class="py-3 px-4">Số điện thoại</th>
-                                    <th class="py-3 px-4">Loại vé</th>
+                                    <th class="py-3 px-4">Passenger Name</th>
+                                    <th class="py-3 px-4">Phone Number</th>
+                                    <th class="py-3 px-4">Ticket Type</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-hairline">
@@ -343,9 +349,9 @@ else
                                     {
                                         var rowIndex = i;
                                         <tr class="font-medium !text-primary">
-                                            <td class="py-3.5 px-4">HÀNH KHÁCH @rowIndex</td>
-                                            <td class="py-3.5 px-4">Đang cập nhật</td>
-                                            <td class="py-3.5 px-4">Người lớn @(rowIndex == 1 ? "(Trưởng đoàn)" : "")</td>
+                                            <td class="py-3.5 px-4">PASSENGER @rowIndex</td>
+                                            <td class="py-3.5 px-4">Updating</td>
+                                            <td class="py-3.5 px-4">Adult @(rowIndex == 1 ? "(Group leader)" : "")</td>
                                         </tr>
                                     }
                                 }
@@ -354,27 +360,26 @@ else
                     </div>
                 </div>
 
-                <!-- Billing overview card & download receipt CTA -->
                 @if (_booking.Status != "Cancelled")
                 {
                     <div class="bg-white border border-hairline rounded-lg p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
                         <div class="space-y-1 text-center md:text-left">
-                            <span class="text-xs font-semibold text-muted-fg uppercase tracking-wider">Hóa đơn giá trị gia tăng</span>
+                            <span class="text-xs font-semibold text-muted-fg uppercase tracking-wider">VAT invoice</span>
                             <h4 class="font-title font-bold text-lg !text-primary">VAT Invoice & Receipts</h4>
-                            <p class="text-xs text-muted-fg">Tải xuống hóa đơn điện tử chính thức cho kỳ đặt chỗ này.</p>
+                            <p class="text-xs text-muted-fg">Download the official electronic invoice for this booking.</p>
                         </div>
                         <div class="flex gap-3">
                             @if (_booking.PaidAt.HasValue)
                             {
                                 <button class="bg-primary hover:bg-primary/95 text-white font-semibold text-sm px-6 py-3 rounded-full transition-all shadow-sm flex items-center gap-2">
                                     <span class="material-symbols-outlined text-lg">download</span>
-                                    Xuất Hóa Đơn
+                                    Export Invoice
                                 </button>
                             }
-                            @if (_booking.Status != "Cancelled" && !_booking.PaidAt.HasValue)
+                            @if (canRequestCancellation)
                             {
                                 <button class="border border-hairline hover:bg-surface-soft !text-primary font-semibold text-sm px-6 py-3 rounded-full transition-all flex items-center gap-2" @onclick="ShowCancelModal">
-                                    Yêu cầu hủy
+                                    Cancellation Request
                                 </button>
                             }
                         </div>
@@ -386,34 +391,44 @@ else
     </main>
     <AppFooter />
 
-    <!-- Cancellation Confirmation Modal -->
     @if (_showCancelModal)
     {
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 space-y-4">
                 <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-3xl text-red-500">warning</span>
-                    <h3 class="text-xl font-bold !text-primary">Xác nhận hủy đặt chỗ</h3>
+                    <span class="material-symbols-outlined text-3xl text-amber-500">assignment_late</span>
+                    <h3 class="text-xl font-bold !text-primary">Request booking cancellation</h3>
                 </div>
                 <p class="text-sm text-muted-fg">
-                    Bạn có chắc chắn muốn hủy đặt chỗ <span class="font-semibold !text-primary">@_booking?.BookingCode</span> cho tour <span class="font-semibold !text-primary">@_booking?.TourName</span>?
+                    Your request for booking <span class="font-semibold !text-primary">@_booking?.BookingCode</span> will be reviewed by WanderX staff before the booking is cancelled.
                 </p>
-                <p class="text-xs text-muted-fg">
-                    Hành động này không thể hoàn tác. Sau khi hủy, trạng thái đơn hàng sẽ được cập nhật thành "Đã hủy".
-                </p>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold !text-primary">Reason</label>
+                    <textarea class="w-full border border-hairline rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/15"
+                              rows="4"
+                              maxlength="1000"
+                              @bind="_cancelReason"
+                              placeholder="Tell us why you want to cancel this booking."></textarea>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(_cancelError))
+                {
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <p class="text-xs text-red-700">@_cancelError</p>
+                    </div>
+                }
                 <div class="flex gap-3 justify-end pt-2">
                     <button class="px-4 py-2 rounded-lg border border-hairline hover:bg-surface-soft text-sm font-semibold !text-primary transition-colors" @onclick="HideCancelModal">
-                        Hủy bỏ
+                        Keep booking
                     </button>
                     <button class="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors flex items-center gap-2" @onclick="ConfirmCancel" disabled="@_isCancelling">
                         @if (_isCancelling)
                         {
                             <span class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                            <span>Đang xử lý...</span>
+                            <span>Sending...</span>
                         }
                         else
                         {
-                            <span>Xác nhận hủy</span>
+                            <span>Send request</span>
                         }
                     </button>
                 </div>
@@ -421,29 +436,28 @@ else
         </div>
     }
 
-    <!-- Special Request Modal -->
     @if (_showSpecialRequestModal)
     {
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-lg max-w-lg w-full p-6 space-y-4">
                 <div class="flex justify-between items-center">
-                    <h3 class="font-title font-bold text-lg !text-primary">Thêm yêu cầu đặc biệt</h3>
+                    <h3 class="font-title font-bold text-lg !text-primary">Add Special Requests</h3>
                     <button @onclick="HideSpecialRequestModal" class="text-muted-fg hover:!text-primary">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold !text-primary">Mô tả</label>
-                    <p class="text-xs text-muted-fg">Nhập yêu cầu của bạn (có thể nhập nhiều yêu cầu):</p>
-                    <p class="text-xs text-muted-fg italic">Yêu cầu 1: ...</p>
-                    <p class="text-xs text-muted-fg italic">Yêu cầu n: ...</p>
-                    <textarea class="w-full border border-hairline rounded-lg p-3 text-sm resize-none" rows="4" @bind="_specialRequestDescription" placeholder="Nhập yêu cầu của bạn..."></textarea>
+                    <label class="text-sm font-semibold !text-primary">Description</label>
+                    <p class="text-xs text-muted-fg">Enter one or more requests:</p>
+                    <p class="text-xs text-muted-fg italic">Request 1: ...</p>
+                    <p class="text-xs text-muted-fg italic">Request n: ...</p>
+                    <textarea class="w-full border border-hairline rounded-lg p-3 text-sm resize-none" rows="4" @bind="_specialRequestDescription" placeholder="Enter your requests..."></textarea>
                 </div>
 
                 <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
                     <p class="text-xs text-amber-800">
-                        <strong>Lưu ý:</strong> Các yêu cầu thêm của bạn chỉ thực hiện trong tiến trình 1-2. Sau khi tiến trình 2 hoàn thành (thanh toán thành công), bạn không thể yêu cầu thêm. Khi bạn thêm yêu cầu đặc biệt, tùy trường hợp phí phát sinh trong chuyến đi sẽ tăng.
+                        <strong>Note:</strong> Additional requests can only be submitted during steps 1-2. After payment is completed, you cannot add more requests. Extra services may increase trip costs depending on the case.
                     </p>
                 </div>
 
@@ -456,17 +470,17 @@ else
 
                 <div class="flex gap-3 justify-end">
                     <button class="wx-button wx-button--outline" @onclick="HideSpecialRequestModal" disabled="@_isSubmittingRequest">
-                        Hủy
+                        Cancel
                     </button>
                     <button class="wx-button wx-button--secondary" @onclick="SubmitSpecialRequest" disabled="@_isSubmittingRequest">
                         @if (_isSubmittingRequest)
                         {
                             <span class="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></span>
-                            <span>Đang gửi...</span>
+                            <span>Submitting...</span>
                         }
                         else
                         {
-                            <span>Gửi</span>
+                            <span>Submit</span>
                         }
                     </button>
                 </div>
@@ -481,6 +495,8 @@ else
     private bool _isLoading = true;
     private bool _showCancelModal = false;
     private bool _isCancelling = false;
+    private string _cancelReason = string.Empty;
+    private string _cancelError = string.Empty;
     private bool _showSpecialRequestModal = false;
     private bool _isSubmittingRequest = false;
     private string _specialRequestDescription = string.Empty;
@@ -489,17 +505,6 @@ else
     private BookingSummaryResponse? _booking;
     private string _avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
 
-    // Tính năng: Xem chi tiết đơn hàng (Booking Detail)
-    // Bước 1: Khởi tạo trang BookingDetail với tham số route Id (Guid).
-    // Bước 2: Gọi AuthSessionService.GetAsync() để xác thực người dùng.
-    // Bước 3: Nếu không có session, chuyển hướng về /login.
-    // Bước 4: Đọc avatar đã lưu từ localStorage (nếu có).
-    // Bước 5: Gọi UserApiClient.GetBookingByIdAsync(Id) (Client - UserApiClient.cs)
-    // Bước 6: UserApiClient gửi HTTP GET đến 'api/users/bookings/{id}' (Server - UsersController.cs)
-    // Bước 7: UsersController gọi IUserService.GetBookingByIdAsync(id) (Server - UserService.cs)
-    // Bước 8: UserService truy vấn DB lấy Booking theo Id, map thành BookingSummaryResponse (bao gồm PaidAt, ConfirmedAt, CompletedAt).
-    // Bước 9: Dữ liệu trả về Client, hiển thị thông tin chi tiết và Tiến trình đơn hàng động theo timestamps từ DB.
-    // Bước 10: Kết thúc.
 
     protected override async Task OnInitializedAsync()
     {
@@ -532,12 +537,15 @@ else
 
     private void ShowCancelModal()
     {
+        _cancelError = string.Empty;
         _showCancelModal = true;
     }
 
     private void HideCancelModal()
     {
         _showCancelModal = false;
+        _cancelReason = string.Empty;
+        _cancelError = string.Empty;
     }
 
     private void ShowSpecialRequestModal()
@@ -563,13 +571,13 @@ else
     {
         if (_booking == null || string.IsNullOrWhiteSpace(_specialRequestDescription))
         {
-            _specialRequestError = "Vui lòng nhập mô tả yêu cầu.";
+            _specialRequestError = "Please enter a request description.";
             return;
         }
 
         if (_specialRequestDescription.Trim().Length < 10)
         {
-            _specialRequestError = "Mô tả yêu cầu phải có ít nhất 10 ký tự.";
+            _specialRequestError = "The request description must be at least 10 characters.";
             return;
         }
 
@@ -591,7 +599,7 @@ else
         catch (Exception ex)
         {
             _specialRequestError = ex.Message.Contains("404")
-                ? "Không tìm thấy API. Vui lòng khởi động lại WanderXServer và thử lại."
+                ? "API endpoint was not found. Please restart WanderXServer and try again."
                 : ex.Message;
         }
         finally
@@ -604,19 +612,29 @@ else
     {
         if (_booking == null) return;
 
+        if (string.IsNullOrWhiteSpace(_cancelReason) || _cancelReason.Trim().Length < 10)
+        {
+            _cancelError = "Please enter a cancellation reason with at least 10 characters.";
+            return;
+        }
+
         _isCancelling = true;
+        _cancelError = string.Empty;
         try
         {
-            var updatedBooking = await UserApi.CancelBookingAsync(_booking.Id);
+            var updatedBooking = await UserApi.CancelBookingAsync(_booking.Id, new CreateCancellationRequest
+            {
+                Reason = _cancelReason.Trim()
+            });
             if (updatedBooking != null)
             {
                 _booking = updatedBooking;
             }
-            _showCancelModal = false;
+            HideCancelModal();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Handle error - could show a toast notification
+            _cancelError = ex.Message;
         }
         finally
         {

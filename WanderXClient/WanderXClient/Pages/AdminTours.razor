@@ -1,0 +1,791 @@
+@page "/admin/tours"
+@layout AdminLayout
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+@inject TourApiClient TourApi
+
+<PageTitle>Tour Management - WanderX</PageTitle>
+
+<header class="guide-topbar">
+    <div>
+        <p class="guide-eyebrow">Tour Operations</p>
+        <h1>Manage Tours</h1>
+        <p class="guide-subtitle">Create, update, publish, archive, and remove travel tour inventory.</p>
+    </div>
+
+    <div class="guide-topbar__actions">
+        <label class="guide-search" aria-label="Search tours">
+            <MaterialIcon Name="search" />
+            <input type="search" placeholder="Search code, destination..." @bind="_searchTerm" @bind:event="oninput" />
+        </label>
+        <button class="wx-button wx-button--secondary" type="button" @onclick="OpenCreateForm">
+            <MaterialIcon Name="add" />
+            Add Tour
+        </button>
+    </div>
+</header>
+
+<section class="guide-content">
+    @if (_isLoading)
+    {
+        <div class="guide-empty">
+            <MaterialIcon Name="sync" />
+            Loading tour inventory...
+        </div>
+    }
+    else
+    {
+        var filteredTours = FilteredTours.ToList();
+
+        <div class="guide-stat-grid">
+            <article class="guide-stat">
+                <p>Total Tours</p>
+                <strong>@_tours.Count</strong>
+                <span>Inventory records</span>
+            </article>
+            <article class="guide-stat guide-stat--secondary">
+                <p>Published</p>
+                <strong>@PublishedTours</strong>
+                <span>Visible for customers</span>
+            </article>
+            <article class="guide-stat guide-stat--tertiary">
+                <p>Drafts</p>
+                <strong>@DraftTours</strong>
+                <span>Need review</span>
+            </article>
+            <article class="guide-stat">
+                <p>Avg. Price</p>
+                <strong>@AveragePrice.ToString("C0")</strong>
+                <span>Per tour package</span>
+            </article>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(_message))
+        {
+            <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")">
+                @_message
+            </div>
+        }
+
+        @if (_isFormOpen)
+        {
+            <div class="admin-tour-modal-backdrop">
+                <section class="admin-tour-modal" role="dialog" aria-modal="true" aria-labelledby="tour-form-title" @onclick:stopPropagation="true">
+                    <div class="guide-section-heading admin-tour-modal__header">
+                        <div>
+                            <p class="guide-eyebrow">@(_editingTourId is null ? "New tour" : "Edit tour")</p>
+                            <h2 id="tour-form-title">@(_editingTourId is null ? "Add Tour Package" : "Update Tour Package")</h2>
+                        </div>
+                        <button class="wx-button wx-button--outline admin-tour-modal__close" type="button" title="Close popup" @onclick="CloseForm">
+                            <MaterialIcon Name="close" />
+                            Close
+                        </button>
+                    </div>
+
+                    <EditForm Model="@_form" OnValidSubmit="@SaveTourAsync" class="guide-form admin-tour-modal__body">
+                        <DataAnnotationsValidator />
+                        <div class="admin-tour-validation">
+                            <ValidationSummary />
+                        </div>
+
+                        <div class="guide-form-grid">
+                            <div class="guide-field">
+                                <label for="tour-code">Tour code</label>
+                                <InputText id="tour-code" class="guide-control" placeholder="WX-HUE-226" @bind-Value="_form.Code" />
+                                <span class="guide-field-hint">Format: WX-LOCATION-001, for example WX-HUE-226.</span>
+                                <ValidationMessage For="@(() => _form.Code)" />
+                            </div>
+
+                            <div class="guide-field guide-field--wide">
+                                <label for="tour-name">Tour name</label>
+                                <InputText id="tour-name" class="guide-control" @bind-Value="_form.Name" />
+                                <ValidationMessage For="@(() => _form.Name)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="tour-destination">Destination</label>
+                                <InputText id="tour-destination" class="guide-control" @bind-Value="_form.Destination" />
+                                <ValidationMessage For="@(() => _form.Destination)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="tour-region">Region</label>
+                                <InputText id="tour-region" class="guide-control" @bind-Value="_form.Region" />
+                                <ValidationMessage For="@(() => _form.Region)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="tour-duration">Duration days</label>
+                                <InputNumber id="tour-duration" class="guide-control" @bind-Value="_form.DurationDays" />
+                                <ValidationMessage For="@(() => _form.DurationDays)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="tour-price">Price</label>
+                                <InputNumber id="tour-price" class="guide-control" @bind-Value="_form.Price" />
+                                <ValidationMessage For="@(() => _form.Price)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="tour-capacity">Capacity</label>
+                                <InputNumber id="tour-capacity" class="guide-control" @bind-Value="_form.Capacity" />
+                                <ValidationMessage For="@(() => _form.Capacity)" />
+                            </div>
+
+                            <div class="guide-field">
+                                <label for="tour-status">Status</label>
+                                <InputSelect id="tour-status" class="guide-control" @bind-Value="_form.Status">
+                                    @foreach (var status in StatusOptions)
+                                    {
+                                        <option value="@status">@status</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _form.Status)" />
+                            </div>
+
+                            <div class="guide-field guide-field--wide admin-tour-image-field">
+                                <label>Tour image</label>
+                                <div class="admin-tour-image-tabs" role="group" aria-label="Choose image source">
+                                    <button class="@GetImageSourceClass("BuiltIn")" type="button" @onclick='() => SetImageSource("BuiltIn")'>
+                                        Existing image
+                                    </button>
+                                    <button class="@GetImageSourceClass("Url")" type="button" @onclick='() => SetImageSource("Url")'>
+                                        Image URL
+                                    </button>
+                                </div>
+
+                                @if (_form.ImageSourceMode == "Url")
+                                {
+                                    <InputText id="tour-image" class="guide-control" placeholder="https://example.com/tour-image.jpg" @bind-Value="_form.CustomImageUrl" />
+                                    <span class="guide-field-hint">Use a valid http or https image URL.</span>
+                                    <ValidationMessage For="@(() => _form.CustomImageUrl)" />
+                                }
+                                else
+                                {
+                                    <div class="admin-tour-image-options">
+                                        @foreach (var image in BuiltInTourImages)
+                                        {
+                                            <button class="@GetBuiltInImageClass(image.Url)" type="button" @onclick="() => SelectBuiltInImage(image.Url)">
+                                                <img src="@image.Url" alt="@image.Name" />
+                                                <span>@image.Name</span>
+                                                @if (IsBuiltInImageSelected(image.Url))
+                                                {
+                                                    <MaterialIcon Name="check_circle" />
+                                                }
+                                            </button>
+                                        }
+                                    </div>
+                                    <ValidationMessage For="@(() => _form.SelectedImageUrl)" />
+                                }
+                            </div>
+                        </div>
+
+                        <div class="guide-field">
+                            <label for="tour-description">Description</label>
+                            <InputTextArea id="tour-description" class="guide-control guide-control--area" @bind-Value="_form.Description" />
+                            <ValidationMessage For="@(() => _form.Description)" />
+                        </div>
+
+                        <div class="guide-form-actions admin-tour-modal__actions">
+                            <button class="wx-button" type="submit" disabled="@_isSaving">
+                                <MaterialIcon Name="save" />
+                                @(_isSaving ? "Saving..." : "Save Tour")
+                            </button>
+                            <button class="wx-button wx-button--outline" type="button" @onclick="CloseForm">
+                                Cancel
+                            </button>
+                        </div>
+                    </EditForm>
+                </section>
+            </div>
+        }
+
+        <section class="guide-table-shell">
+            <div class="guide-table-toolbar">
+                <div class="guide-filter-group" role="group" aria-label="Filter tour status">
+                    @foreach (var filter in FilterOptions)
+                    {
+                        <button class="@GetFilterClass(filter)" type="button" @onclick="() => SetStatusFilter(filter)">
+                            @filter
+                        </button>
+                    }
+                </div>
+                <p>@filteredTours.Count tour(s)</p>
+            </div>
+
+            <div class="guide-table-scroll">
+                <table class="guide-table admin-tour-table">
+                    <thead>
+                        <tr>
+                            <th>Tour</th>
+                            <th>Destination</th>
+                            <th>Duration</th>
+                            <th>Price</th>
+                            <th>Capacity</th>
+                            <th>Status</th>
+                            <th class="guide-table__actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (filteredTours.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="7">
+                                    <div class="guide-empty guide-empty--compact">
+                                        <MaterialIcon Name="travel_explore" />
+                                        No tours match the current filters.
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var tour in filteredTours)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="admin-tour-cell">
+                                            <div class="admin-tour-thumb">
+                                                @if (string.IsNullOrWhiteSpace(tour.ImageUrl))
+                                                {
+                                                    <MaterialIcon Name="image" />
+                                                }
+                                                else
+                                                {
+                                                    <img src="@tour.ImageUrl" alt="@tour.Name" />
+                                                }
+                                            </div>
+                                            <div>
+                                                <strong>@tour.Name</strong>
+                                                <span>@tour.Code</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="guide-tour-cell">
+                                            <strong>@tour.Destination</strong>
+                                            <span>@tour.Region</span>
+                                        </div>
+                                    </td>
+                                    <td>@tour.DurationDays day(s)</td>
+                                    <td>@tour.Price.ToString("C0")</td>
+                                    <td>@tour.Capacity guests</td>
+                                    <td>
+                                        <span class="@GetTourStatusClass(tour.Status)">
+                                            <span></span>
+                                            @tour.Status
+                                        </span>
+                                    </td>
+                                    <td class="guide-table__actions">
+                                        @if (_pendingDeleteTourId == tour.Id)
+                                        {
+                                            <button class="guide-icon-button guide-icon-button--danger" type="button" title="Confirm delete" disabled="@_isSaving" @onclick="() => DeleteTourAsync(tour.Id)">
+                                                <MaterialIcon Name="check" />
+                                            </button>
+                                            <button class="guide-icon-button" type="button" title="Cancel delete" disabled="@_isSaving" @onclick="CancelDelete">
+                                                <MaterialIcon Name="close" />
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="guide-icon-button" type="button" title="Edit tour" @onclick="() => OpenEditForm(tour)">
+                                                <MaterialIcon Name="edit" />
+                                            </button>
+                                            <button class="guide-icon-button" type="button" title="Hide tour" @onclick="() => HideTourAsync(tour.Id)" disabled="@IsHidden(tour)">
+                                                <MaterialIcon Name="visibility_off" />
+                                            </button>
+                                            <button class="guide-icon-button guide-icon-button--danger" type="button" title="Delete tour" @onclick="() => ConfirmDelete(tour.Id)">
+                                                <MaterialIcon Name="delete" />
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+</section>
+
+@code {
+    private static readonly string[] StatusOptions = { "Draft", "Published", "Archived", "Hidden" };
+    private static readonly string[] FilterOptions = { "All", "Draft", "Published", "Archived", "Hidden" };
+    private static readonly BuiltInTourImage[] BuiltInTourImages =
+    {
+        new("Ha Noi Heritage", "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80"),
+        new("Da Nang Coast", "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80"),
+        new("Hoi An Lanterns", "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80"),
+        new("Mountain Escape", "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80")
+    };
+
+    private List<TourResponse> _tours = new();
+    private TourFormModel _form = TourFormModel.CreateDefault(BuiltInTourImages[0].Url);
+    private Guid? _editingTourId;
+    private Guid? _pendingDeleteTourId;
+    private bool _isLoading = true;
+    private bool _isSaving;
+    private bool _isFormOpen;
+    private bool _isError;
+    private string? _message;
+    private string _searchTerm = string.Empty;
+    private string _statusFilter = "All";
+
+    private IEnumerable<TourResponse> FilteredTours => _tours
+        .Where(MatchesSearch)
+        .Where(MatchesStatus)
+        .OrderBy(item => item.Name)
+        .ThenBy(item => item.Code);
+
+    private int PublishedTours => _tours.Count(tour => IsStatus(tour, "Published"));
+
+    private int DraftTours => _tours.Count(tour => IsStatus(tour, "Draft"));
+
+    private decimal AveragePrice => _tours.Count == 0 ? 0 : _tours.Average(tour => tour.Price);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadToursAsync();
+    }
+
+    private async Task LoadToursAsync(bool clearMessage = true)
+    {
+        _isLoading = true;
+
+        if (clearMessage)
+        {
+            _message = null;
+            _isError = false;
+        }
+
+        try
+        {
+            _tours = await TourApi.GetToursAsync();
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void OpenCreateForm()
+    {
+        _form = TourFormModel.CreateDefault(BuiltInTourImages[0].Url);
+        _editingTourId = null;
+        _pendingDeleteTourId = null;
+        _isFormOpen = true;
+        _message = null;
+        _isError = false;
+    }
+
+    private void OpenEditForm(TourResponse tour)
+    {
+        _form = TourFormModel.FromTour(tour, BuiltInTourImages.Select(image => image.Url));
+        _editingTourId = tour.Id;
+        _pendingDeleteTourId = null;
+        _isFormOpen = true;
+        _message = null;
+        _isError = false;
+    }
+
+    private void CloseForm()
+    {
+        _isFormOpen = false;
+        _editingTourId = null;
+        _form = TourFormModel.CreateDefault(BuiltInTourImages[0].Url);
+    }
+
+    private async Task SaveTourAsync()
+    {
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            if (_editingTourId is Guid tourId)
+            {
+                await TourApi.UpdateTourAsync(tourId, _form.ToUpdateRequest());
+                _message = "Tour package updated.";
+            }
+            else
+            {
+                await TourApi.CreateTourAsync(_form.ToCreateRequest());
+                _message = "New tour package created.";
+            }
+
+            CloseForm();
+            await LoadToursAsync(clearMessage: false);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void ConfirmDelete(Guid tourId)
+    {
+        _pendingDeleteTourId = tourId;
+        _message = "Click the check button to confirm deleting this tour.";
+        _isError = false;
+    }
+
+    private void CancelDelete()
+    {
+        _pendingDeleteTourId = null;
+        _message = null;
+        _isError = false;
+    }
+
+    private async Task DeleteTourAsync(Guid tourId)
+    {
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            await TourApi.DeleteTourAsync(tourId);
+            _pendingDeleteTourId = null;
+            _message = "Tour package deleted.";
+            await LoadToursAsync(clearMessage: false);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private async Task HideTourAsync(Guid tourId)
+    {
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            await TourApi.HideTourAsync(tourId);
+            _message = "Tour package hidden.";
+            await LoadToursAsync(clearMessage: false);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void SetStatusFilter(string filter)
+    {
+        _statusFilter = filter;
+    }
+
+    private void SetImageSource(string mode)
+    {
+        _form.ImageSourceMode = mode;
+
+        if (mode == "BuiltIn" && string.IsNullOrWhiteSpace(_form.SelectedImageUrl))
+        {
+            _form.SelectedImageUrl = BuiltInTourImages[0].Url;
+        }
+    }
+
+    private void SelectBuiltInImage(string imageUrl)
+    {
+        _form.SelectedImageUrl = imageUrl;
+        _form.ImageSourceMode = "BuiltIn";
+    }
+
+    private string GetImageSourceClass(string mode)
+    {
+        return _form.ImageSourceMode.Equals(mode, StringComparison.OrdinalIgnoreCase)
+            ? "guide-filter guide-filter--active"
+            : "guide-filter";
+    }
+
+    private string GetBuiltInImageClass(string imageUrl)
+    {
+        return IsBuiltInImageSelected(imageUrl)
+            ? "admin-tour-image-option admin-tour-image-option--selected"
+            : "admin-tour-image-option";
+    }
+
+    private bool IsBuiltInImageSelected(string imageUrl)
+    {
+        return _form.ImageSourceMode == "BuiltIn" &&
+            _form.SelectedImageUrl.Equals(imageUrl, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool MatchesSearch(TourResponse tour)
+    {
+        if (string.IsNullOrWhiteSpace(_searchTerm))
+        {
+            return true;
+        }
+
+        var term = _searchTerm.Trim();
+        return Contains(tour.Code, term) ||
+            Contains(tour.Name, term) ||
+            Contains(tour.Destination, term) ||
+            Contains(tour.Region, term) ||
+            Contains(tour.Description, term);
+    }
+
+    private bool MatchesStatus(TourResponse tour)
+    {
+        return _statusFilter == "All" || IsStatus(tour, _statusFilter);
+    }
+
+    private string GetFilterClass(string filter)
+    {
+        return _statusFilter.Equals(filter, StringComparison.OrdinalIgnoreCase)
+            ? "guide-filter guide-filter--active"
+            : "guide-filter";
+    }
+
+    private static bool Contains(string value, string term)
+    {
+        return value.Contains(term, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsStatus(TourResponse tour, string status)
+    {
+        return tour.Status.Equals(status, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsHidden(TourResponse tour)
+    {
+        return IsStatus(tour, "Hidden");
+    }
+
+    private static string GetTourStatusClass(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "published" => "guide-status guide-status--active",
+            "draft" => "guide-status guide-status--busy",
+            "archived" or "hidden" => "guide-status guide-status--muted",
+            _ => "guide-status"
+        };
+    }
+
+    private static string ToUserMessage(Exception exception)
+    {
+        return exception.Message.Contains('{')
+            ? "The tour request could not be completed. Please check the form and try again."
+            : exception.Message;
+    }
+
+    private sealed class TourFormModel : IValidatableObject
+    {
+        [Required(ErrorMessage = "Tour code is required.")]
+        [StringLength(32, ErrorMessage = "Tour code must be 32 characters or fewer.")]
+        public string Code { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Tour name is required.")]
+        [StringLength(160, ErrorMessage = "Tour name must be 160 characters or fewer.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Destination is required.")]
+        [StringLength(160, ErrorMessage = "Destination must be 160 characters or fewer.")]
+        public string Destination { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Region is required.")]
+        [StringLength(160, ErrorMessage = "Region must be 160 characters or fewer.")]
+        public string Region { get; set; } = string.Empty;
+
+        [Range(1, 30, ErrorMessage = "Duration must be between 1 and 30 days.")]
+        public int DurationDays { get; set; } = 1;
+
+        [Range(1, 1000000, ErrorMessage = "Price must be greater than 0.")]
+        public decimal Price { get; set; }
+
+        [Range(1, 100, ErrorMessage = "Capacity must be between 1 and 100.")]
+        public int Capacity { get; set; } = 1;
+
+        [Required(ErrorMessage = "Status is required.")]
+        public string Status { get; set; } = "Draft";
+
+        public string ImageSourceMode { get; set; } = "BuiltIn";
+
+        public string SelectedImageUrl { get; set; } = string.Empty;
+
+        [StringLength(500, ErrorMessage = "Image URL must be 500 characters or fewer.")]
+        public string CustomImageUrl { get; set; } = string.Empty;
+
+        [StringLength(1200, ErrorMessage = "Description must be 1200 characters or fewer.")]
+        public string Description { get; set; } = string.Empty;
+
+        public static TourFormModel CreateDefault(string defaultImageUrl)
+        {
+            return new TourFormModel
+            {
+                Status = "Draft",
+                DurationDays = 3,
+                Capacity = 10,
+                SelectedImageUrl = defaultImageUrl
+            };
+        }
+
+        public static TourFormModel FromTour(TourResponse tour, IEnumerable<string> builtInImageUrls)
+        {
+            var hasBuiltInImage = builtInImageUrls.Contains(tour.ImageUrl, StringComparer.OrdinalIgnoreCase);
+
+            return new TourFormModel
+            {
+                Code = tour.Code,
+                Name = tour.Name,
+                Destination = tour.Destination,
+                Region = tour.Region,
+                DurationDays = tour.DurationDays,
+                Price = tour.Price,
+                Capacity = tour.Capacity,
+                Status = tour.Status,
+                ImageSourceMode = hasBuiltInImage ? "BuiltIn" : "Url",
+                SelectedImageUrl = hasBuiltInImage ? tour.ImageUrl : builtInImageUrls.FirstOrDefault() ?? string.Empty,
+                CustomImageUrl = hasBuiltInImage ? string.Empty : tour.ImageUrl,
+                Description = tour.Description
+            };
+        }
+
+        public CreateTourRequest ToCreateRequest()
+        {
+            return new CreateTourRequest
+            {
+                Code = Code.Trim().ToUpperInvariant(),
+                Name = Name,
+                Destination = Destination,
+                Region = Region,
+                DurationDays = DurationDays,
+                Price = Price,
+                Capacity = Capacity,
+                Status = Status,
+                ImageUrl = GetResolvedImageUrl(),
+                Description = Description
+            };
+        }
+
+        public UpdateTourRequest ToUpdateRequest()
+        {
+            return new UpdateTourRequest
+            {
+                Code = Code.Trim().ToUpperInvariant(),
+                Name = Name,
+                Destination = Destination,
+                Region = Region,
+                DurationDays = DurationDays,
+                Price = Price,
+                Capacity = Capacity,
+                Status = Status,
+                ImageUrl = GetResolvedImageUrl(),
+                Description = Description
+            };
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!StatusOptions.Contains(Status, StringComparer.OrdinalIgnoreCase))
+            {
+                yield return new ValidationResult("Choose a supported tour status.", new[] { nameof(Status) });
+            }
+
+            if (!Regex.IsMatch(Code.Trim(), "^WX-[A-Z]{2,20}-\\d{3}$", RegexOptions.IgnoreCase))
+            {
+                yield return new ValidationResult("Tour code must follow WX-LOCATION-001, for example WX-HUE-226.", new[] { nameof(Code) });
+            }
+
+            if (Name.Trim().Length < 4)
+            {
+                yield return new ValidationResult("Tour name must be at least 4 characters.", new[] { nameof(Name) });
+            }
+
+            if (ContainsDigit(Name))
+            {
+                yield return new ValidationResult("Tour name cannot contain numbers.", new[] { nameof(Name) });
+            }
+
+            if (Destination.Trim().Length < 2)
+            {
+                yield return new ValidationResult("Destination must be at least 2 characters.", new[] { nameof(Destination) });
+            }
+
+            if (ContainsDigit(Destination))
+            {
+                yield return new ValidationResult("Destination cannot contain numbers.", new[] { nameof(Destination) });
+            }
+
+            if (Region.Trim().Length < 2)
+            {
+                yield return new ValidationResult("Region must be at least 2 characters.", new[] { nameof(Region) });
+            }
+
+            if (Description.Trim().Length < 20)
+            {
+                yield return new ValidationResult("Description must be at least 20 characters.", new[] { nameof(Description) });
+            }
+
+            if (ImageSourceMode == "BuiltIn")
+            {
+                if (string.IsNullOrWhiteSpace(SelectedImageUrl))
+                {
+                    yield return new ValidationResult("Select an existing image.", new[] { nameof(SelectedImageUrl) });
+                }
+            }
+            else if (ImageSourceMode == "Url")
+            {
+                if (!IsValidHttpUrl(CustomImageUrl))
+                {
+                    yield return new ValidationResult("Image URL must be a valid http or https URL.", new[] { nameof(CustomImageUrl) });
+                }
+                else if (CustomImageUrl.Length > 500)
+                {
+                    yield return new ValidationResult("Image URL must be 500 characters or fewer.", new[] { nameof(CustomImageUrl) });
+                }
+            }
+            else
+            {
+                yield return new ValidationResult("Choose an image source.", new[] { nameof(ImageSourceMode) });
+            }
+        }
+
+        private string GetResolvedImageUrl()
+        {
+            return ImageSourceMode == "BuiltIn"
+                ? SelectedImageUrl.Trim()
+                : CustomImageUrl.Trim();
+        }
+
+        private static bool IsValidHttpUrl(string value)
+        {
+            return Uri.TryCreate(value.Trim(), UriKind.Absolute, out var uri) &&
+                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+        }
+
+        private static bool ContainsDigit(string value)
+        {
+            return value.Any(char.IsDigit);
+        }
+    }
+
+    private sealed record BuiltInTourImage(string Name, string Url);
+}

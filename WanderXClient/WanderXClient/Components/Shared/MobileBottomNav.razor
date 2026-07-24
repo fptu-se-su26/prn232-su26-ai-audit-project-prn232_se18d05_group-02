@@ -24,13 +24,21 @@
             <MaterialIcon Name="dashboard" />
             Dashboard
         </a>
-        <a class="@GetActiveCss("/guides")" href="/guides">
-            <MaterialIcon Name="badge" />
-            Guides
+        <a class="@GetActiveCss("/admin/tours")" href="/admin/tours">
+            <MaterialIcon Name="travel_explore" />
+            Tours
         </a>
-        <a class="@GetActiveCss("/guide-assignments")" href="/guide-assignments">
-            <MaterialIcon Name="assignment_ind" />
-            Assigns
+        <a class="@GetActiveCss("/admin/tour-schedules")" href="/admin/tour-schedules">
+            <MaterialIcon Name="event_note" />
+            Plans
+        </a>
+        <a class="@GetActiveCss("/admin/booked-tours")" href="/admin/booked-tours">
+            <MaterialIcon Name="calendar_view_week" />
+            Booked
+        </a>
+        <a class="@GetActiveCss("/admin/tour-pricing")" href="/admin/tour-pricing">
+            <MaterialIcon Name="payments" />
+            Pricing
         </a>
     }
     else
@@ -81,7 +89,8 @@
         }
         else
         {
-            isActive = relative.Equals(target, StringComparison.OrdinalIgnoreCase) || 
+            isActive = relative.Equals(target, StringComparison.OrdinalIgnoreCase) ||
+                       relative.StartsWith($"{target}/", StringComparison.OrdinalIgnoreCase) ||
                        (target == "dashboard" && relative.Equals("admin-dashboard", StringComparison.OrdinalIgnoreCase));
         }
 

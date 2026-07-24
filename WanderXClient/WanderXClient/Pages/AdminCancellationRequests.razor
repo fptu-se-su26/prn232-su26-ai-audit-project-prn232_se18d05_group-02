@@ -1,0 +1,888 @@
+@page "/admin-cancellations"
+@layout AdminLayout
+@using System.Globalization
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient UserApi
+@inject AuthSessionService SessionService
+
+<PageTitle>WanderX Admin - Cancellation Requests</PageTitle>
+
+
+        <header class="guide-topbar">
+            <div>
+                <p class="guide-eyebrow">Member 2 / Feature 3</p>
+                <h1>Cancellation Requests</h1>
+                <p class="guide-subtitle">Review booking cancellation requests and approve or reject them with a staff note.</p>
+            </div>
+            <div class="guide-topbar__actions">
+                <label class="guide-search" aria-label="Search cancellation requests">
+                    <MaterialIcon Name="search" />
+                    <input type="search" placeholder="Search booking, tour, customer..." value="@_searchTerm" @oninput="OnSearchInput" />
+                </label>
+            </div>
+        </header>
+
+        <section class="guide-content cancellation-page">
+            @if (!string.IsNullOrWhiteSpace(_message))
+            {
+                <div class="guide-alert">@_message</div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="guide-alert guide-alert--error">@_error</div>
+            }
+
+            <div class="guide-stat-grid">
+                <article class="guide-stat">
+                    <p>Total requests</p>
+                    <strong>@_requests.Count</strong>
+                    <span>All cancellation records</span>
+                </article>
+                <article class="guide-stat guide-stat--secondary">
+                    <p>Pending review</p>
+                    <strong>@_requests.Count(item => item.CancellationStatus == "Pending")</strong>
+                    <span>Waiting for staff action</span>
+                </article>
+                <article class="guide-stat guide-stat--tertiary">
+                    <p>Approved</p>
+                    <strong>@_requests.Count(item => item.CancellationStatus == "Approved")</strong>
+                    <span>Bookings cancelled</span>
+                </article>
+                <article class="guide-stat">
+                    <p>Rejected</p>
+                    <strong>@_requests.Count(item => item.CancellationStatus == "Rejected")</strong>
+                    <span>Bookings kept active</span>
+                </article>
+            </div>
+
+            <section class="guide-table-shell cancellation-table-shell">
+                <div class="guide-table-toolbar">
+                    <div class="guide-filter-group" role="group" aria-label="Cancellation status filter">
+                        @foreach (var status in _statusFilters)
+                        {
+                            <button class="@(_statusFilter == status ? "guide-filter guide-filter--active" : "guide-filter")"
+                                    type="button"
+                                    @onclick="() => SetStatusFilter(status)">
+                                @status
+                            </button>
+                        }
+                    </div>
+                    <p>@FilteredCount requests</p>
+                </div>
+
+                @if (_isLoading)
+                {
+                    <div class="guide-empty">
+                        <MaterialIcon Name="sync" />
+                        Loading cancellation requests...
+                    </div>
+                }
+                else if (FilteredCount == 0)
+                {
+                    <div class="guide-empty">
+                        <MaterialIcon Name="inbox" />
+                        No cancellation requests found.
+                    </div>
+                }
+                else
+                {
+                    <div class="guide-table-scroll booking-table-scroll cancellation-table-scroll">
+                        <table class="guide-table booking-table cancellation-table">
+                            <colgroup>
+                                <col class="cancellation-table__col-booking" />
+                                <col class="cancellation-table__col-reason" />
+                                <col class="cancellation-table__col-requested" />
+                                <col class="cancellation-table__col-status" />
+                                <col class="cancellation-table__col-actions" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Booking</th>
+                                    <th>Reason</th>
+                                    <th>Requested</th>
+                                    <th>Status</th>
+                                    <th class="guide-table__actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var request in PagedRequests)
+                                {
+                                    <tr>
+                                        <td data-label="Booking">
+                                            <div class="booking-cell-title">
+                                                <strong>@request.TourName</strong>
+                                                <span>@request.BookingCode · @(request.TourCode ?? "No tour code")</span>
+                                                <span>@request.CustomerName · @request.CustomerEmail</span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Reason">
+                                            <p class="cancellation-reason">@(string.IsNullOrWhiteSpace(request.CancellationReason) ? "No reason provided." : request.CancellationReason)</p>
+                                        </td>
+                                        <td data-label="Requested">
+                                            <div class="booking-status-cell">
+                                                <strong>@FormatDateTime(request.CancellationRequestedAt)</strong>
+                                                <small>@request.TotalAmount.ToString("N0", CultureInfo.InvariantCulture) VND</small>
+                                            </div>
+                                        </td>
+                                        <td data-label="Status">
+                                            <div class="booking-status-cell">
+                                                <span class="@GetCancellationClass(request.CancellationStatus)">
+                                                    <span></span>@GetCancellationStatus(request)
+                                                </span>
+                                                <small>Booking: @request.Status</small>
+                                            </div>
+                                        </td>
+                                        <td class="guide-table__actions" data-label="Actions">
+                                            <button class="guide-icon-button"
+                                                    type="button"
+                                                    title="@GetReviewTitle(request)"
+                                                    @onclick="() => OpenReviewModal(request)">
+                                                <MaterialIcon Name="fact_check" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="booking-pagination">
+                        <p>Showing @PageStart-@PageEnd of @FilteredCount</p>
+                        <div class="booking-pagination__controls" role="navigation" aria-label="Cancellation request pages">
+                            <button class="guide-icon-button"
+                                    type="button"
+                                    title="Previous page"
+                                    disabled="@(_currentPage <= 1)"
+                                    @onclick="PreviousPage">
+                                <MaterialIcon Name="chevron_left" />
+                            </button>
+
+                            @foreach (var pageNumber in Enumerable.Range(1, TotalPages))
+                            {
+                                <button class="booking-page-button @(pageNumber == _currentPage ? "booking-page-button--active" : string.Empty)"
+                                        type="button"
+                                        aria-current="@(pageNumber == _currentPage ? "page" : null)"
+                                        @onclick="() => SetPage(pageNumber)">
+                                    @pageNumber
+                                </button>
+                            }
+
+                            <button class="guide-icon-button"
+                                    type="button"
+                                    title="Next page"
+                                    disabled="@(_currentPage >= TotalPages)"
+                                    @onclick="NextPage">
+                                <MaterialIcon Name="chevron_right" />
+                            </button>
+                        </div>
+                    </div>
+                }
+            </section>
+        </section>
+@if (_selectedRequest is not null)
+{
+    var readOnly = !string.Equals(_selectedRequest.CancellationStatus, "Pending", StringComparison.OrdinalIgnoreCase);
+
+    <div class="booking-modal-overlay cancellation-modal-overlay" @onclick="CloseReviewModal">
+        <section class="booking-modal cancellation-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-review-title" @onclick:stopPropagation="true">
+            <header class="booking-modal__header">
+                <div>
+                    <p class="guide-eyebrow">Cancellation review</p>
+                    <h2 id="cancel-review-title">@_selectedRequest.BookingCode</h2>
+                    <span>@_selectedRequest.TourName</span>
+                </div>
+                <button class="guide-icon-button" type="button" title="Close" @onclick="CloseReviewModal">
+                    <MaterialIcon Name="close" />
+                </button>
+            </header>
+
+            <div class="cancellation-modal__summary">
+                <div>
+                    <span>Customer</span>
+                    <strong>@_selectedRequest.CustomerName</strong>
+                    <small>@_selectedRequest.CustomerEmail</small>
+                </div>
+                <div>
+                    <span>Booking status</span>
+                    <strong>@_selectedRequest.Status</strong>
+                    <small>Departure @_selectedRequest.DepartureDate.ToString("dd/MM/yyyy")</small>
+                </div>
+                <div>
+                    <span>Requested at</span>
+                    <strong>@FormatDateTime(_selectedRequest.CancellationRequestedAt)</strong>
+                    <small>@GetCancellationStatus(_selectedRequest)</small>
+                </div>
+            </div>
+
+            <div class="guide-form-field">
+                <label>Customer reason</label>
+                <textarea rows="4" readonly>@(string.IsNullOrWhiteSpace(_selectedRequest.CancellationReason) ? "No reason provided." : _selectedRequest.CancellationReason)</textarea>
+            </div>
+
+            @if (readOnly)
+            {
+                <div class="cancellation-review-note">
+                    <MaterialIcon Name="@(_selectedRequest.CancellationStatus == "Approved" ? "check_circle" : "block")" />
+                    <div>
+                        <strong>@GetCancellationStatus(_selectedRequest)</strong>
+                        <p>Reviewed by @(_selectedRequest.CancellationReviewedBy ?? "Admin staff") on @FormatDateTime(_selectedRequest.CancellationReviewedAt).</p>
+                        @if (!string.IsNullOrWhiteSpace(_selectedRequest.CancellationReviewNote))
+                        {
+                            <p>@_selectedRequest.CancellationReviewNote</p>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="booking-form-grid booking-form-grid--two">
+                    <div class="guide-form-field">
+                        <label>Decision</label>
+                        <select @bind="_reviewStatus">
+                            <option value="Approved">Approve cancellation</option>
+                            <option value="Rejected">Reject request</option>
+                        </select>
+                    </div>
+                    <div class="guide-form-field">
+                        <label>Reviewed by</label>
+                        <input value="@_reviewedBy" readonly />
+                    </div>
+                </div>
+
+                <div class="guide-form-field">
+                    <label>Staff note</label>
+                    <textarea rows="3" maxlength="1000" @bind="_reviewNote" placeholder="Add a short note for this review."></textarea>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(_reviewError))
+                {
+                    <div class="guide-alert guide-alert--error">@_reviewError</div>
+                }
+
+                <footer class="booking-modal__footer">
+                    <button class="wx-button wx-button--outline" type="button" @onclick="CloseReviewModal" disabled="@_isReviewing">
+                        Cancel
+                    </button>
+                    <button class="wx-button wx-button--secondary" type="button" @onclick="SubmitReviewAsync" disabled="@_isReviewing">
+                        <MaterialIcon Name="@(_isReviewing ? "sync" : "fact_check")" />
+                        @(_isReviewing ? "Saving..." : "Save decision")
+                    </button>
+                </footer>
+            }
+        </section>
+    </div>
+}
+
+<style>
+    .cancellation-page .guide-stat strong {
+        white-space: nowrap;
+    }
+
+    .cancellation-table-shell,
+    .cancellation-table-scroll {
+        min-width: 0;
+        overflow-x: visible;
+        max-width: 100%;
+    }
+
+    .cancellation-table {
+        min-width: 0;
+        table-layout: fixed;
+    }
+
+    .cancellation-table__col-booking { width: 34%; }
+    .cancellation-table__col-reason { width: 26%; }
+    .cancellation-table__col-requested { width: 16%; }
+    .cancellation-table__col-status { width: 14%; }
+    .cancellation-table__col-actions { width: 10%; }
+
+    .cancellation-table th,
+    .cancellation-table td {
+        padding: 14px 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .cancellation-table .guide-table__actions {
+        text-align: right;
+    }
+
+    .cancellation-reason {
+        margin: 0;
+        color: #475569;
+        display: -webkit-box;
+        font-size: 13px;
+        line-height: 1.45;
+        overflow: hidden;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    .booking-cell-title {
+        display: grid;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    .booking-cell-title strong,
+    .booking-cell-title span {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .booking-cell-title strong {
+        color: #0f172a;
+        line-height: 1.35;
+    }
+
+    .booking-cell-title span,
+    .booking-status-cell small,
+    .cancellation-modal__summary small {
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .booking-status-cell {
+        display: grid;
+        gap: 6px;
+        justify-items: start;
+    }
+
+    .booking-status-cell strong {
+        color: #0f172a;
+        font-size: 13px;
+        line-height: 1.35;
+    }
+
+    .booking-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 18px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .booking-pagination p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .booking-pagination__controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .booking-page-button {
+        min-width: 34px;
+        height: 34px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .booking-page-button--active {
+        border-color: #2563eb;
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+    .cancel-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .cancel-pill span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .cancel-pill--pending {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .cancel-pill--approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .cancel-pill--rejected {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .booking-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        overflow: auto;
+        padding: 32px 20px;
+        background: rgba(15, 23, 42, 0.58);
+        backdrop-filter: blur(4px);
+    }
+
+    .booking-modal {
+        width: min(920px, 100%);
+        max-height: calc(100vh - 64px);
+        overflow: auto;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+    }
+
+    .booking-modal__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .booking-modal__header h2 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 22px;
+        line-height: 1.2;
+    }
+
+    .booking-modal__header span {
+        color: #64748b;
+        display: block;
+        margin-top: 4px;
+        overflow-wrap: anywhere;
+    }
+
+    .booking-modal > .guide-form-field,
+    .booking-modal > .booking-form-grid,
+    .booking-modal > .guide-alert,
+    .booking-modal > .cancellation-review-note,
+    .booking-modal__footer {
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+
+    .booking-form-grid {
+        display: grid;
+        gap: 16px;
+    }
+
+    .booking-form-grid--two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .guide-form-field {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .guide-form-field label {
+        color: #0f172a;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .guide-form-field input,
+    .guide-form-field select,
+    .guide-form-field textarea {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        color: #0f172a;
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+
+    .guide-form-field textarea[readonly],
+    .guide-form-field input[readonly] {
+        background: #f8fafc;
+        color: #475569;
+    }
+
+    .booking-modal__footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 18px 0 24px;
+    }
+
+    .cancellation-modal {
+        max-width: 760px;
+    }
+
+    .cancellation-modal__summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin: 18px 24px;
+        margin-bottom: 18px;
+    }
+
+    .cancellation-modal__summary > div,
+    .cancellation-review-note {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+        padding: 12px;
+    }
+
+    .cancellation-modal__summary span {
+        display: block;
+        color: #64748b;
+        font-size: .72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .cancellation-modal__summary strong,
+    .cancellation-review-note strong {
+        display: block;
+        color: #0f172a;
+        overflow-wrap: anywhere;
+    }
+
+    .cancellation-review-note {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .cancellation-review-note .material-symbols-outlined {
+        color: #0f766e;
+    }
+
+    .cancellation-review-note p {
+        margin: 4px 0 0;
+        color: #475569;
+        font-size: .86rem;
+    }
+
+    @@media (max-width: 900px) {
+        .cancellation-modal__summary,
+        .booking-form-grid--two {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 720px) {
+        .cancellation-table-scroll {
+            overflow-x: visible;
+        }
+
+        .cancellation-table,
+        .cancellation-table colgroup,
+        .cancellation-table thead,
+        .cancellation-table tbody,
+        .cancellation-table tr,
+        .cancellation-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .cancellation-table thead,
+        .cancellation-table colgroup {
+            display: none;
+        }
+
+        .cancellation-table tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 0;
+        }
+
+        .cancellation-table tbody tr:last-child {
+            border-bottom: 0;
+        }
+
+        .cancellation-table td {
+            border-bottom: 0;
+            display: grid;
+            grid-template-columns: 92px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            padding: 8px 16px;
+        }
+
+        .cancellation-table td::before {
+            content: attr(data-label);
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .cancellation-table .guide-table__actions {
+            text-align: left;
+            white-space: normal;
+        }
+
+        .booking-pagination {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 14px 16px 16px;
+        }
+
+        .booking-pagination__controls {
+            justify-content: flex-start;
+        }
+
+        .booking-modal-overlay {
+            padding: 16px;
+        }
+
+        .booking-modal {
+            max-height: calc(100vh - 32px);
+        }
+
+        .booking-modal__header,
+        .cancellation-modal__summary {
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
+</style>
+
+@code {
+    private const int PageSize = 5;
+    private readonly string[] _statusFilters = ["All", "Pending", "Approved", "Rejected"];
+    private readonly List<BookingResponse> _requests = new();
+    private bool _isLoading = true;
+    private bool _isReviewing;
+    private string _statusFilter = "All";
+    private string _searchTerm = string.Empty;
+    private string _message = string.Empty;
+    private string _error = string.Empty;
+    private string _reviewError = string.Empty;
+    private string _reviewStatus = "Approved";
+    private string _reviewNote = string.Empty;
+    private string _reviewedBy = "Admin staff";
+    private int _currentPage = 1;
+    private BookingResponse? _selectedRequest;
+
+    private IEnumerable<BookingResponse> FilteredRequests
+    {
+        get
+        {
+            var query = _requests.AsEnumerable();
+
+            if (_statusFilter != "All")
+            {
+                query = query.Where(item => string.Equals(item.CancellationStatus, _statusFilter, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(_searchTerm))
+            {
+                var term = _searchTerm.Trim();
+                query = query.Where(item =>
+                    item.BookingCode.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    item.TourName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    item.Destination.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    (item.TourCode?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    item.CustomerName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    item.CustomerEmail.Contains(term, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return query;
+        }
+    }
+
+    private int FilteredCount => FilteredRequests.Count();
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredCount / (double)PageSize));
+    private int PageStart => FilteredCount == 0 ? 0 : ((_currentPage - 1) * PageSize) + 1;
+    private int PageEnd => Math.Min(_currentPage * PageSize, FilteredCount);
+    private IEnumerable<BookingResponse> PagedRequests => FilteredRequests.Skip((_currentPage - 1) * PageSize).Take(PageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = await SessionService.GetAsync();
+        _reviewedBy = string.IsNullOrWhiteSpace(session?.FullName)
+            ? session?.Email ?? "Admin staff"
+            : session.FullName;
+
+        await LoadRequestsAsync();
+    }
+
+    private async Task LoadRequestsAsync()
+    {
+        _isLoading = true;
+        _error = string.Empty;
+
+        try
+        {
+            var requests = await UserApi.GetCancellationRequestsAsync();
+            _requests.Clear();
+            if (requests is not null)
+            {
+                _requests.AddRange(requests);
+            }
+            ClampPage();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void OnSearchInput(ChangeEventArgs args)
+    {
+        _searchTerm = args.Value?.ToString() ?? string.Empty;
+        _currentPage = 1;
+    }
+
+    private void SetStatusFilter(string status)
+    {
+        _statusFilter = status;
+        _currentPage = 1;
+    }
+
+    private void SetPage(int page)
+    {
+        _currentPage = Math.Clamp(page, 1, TotalPages);
+    }
+
+    private void PreviousPage()
+    {
+        SetPage(_currentPage - 1);
+    }
+
+    private void NextPage()
+    {
+        SetPage(_currentPage + 1);
+    }
+
+    private void ClampPage()
+    {
+        _currentPage = Math.Clamp(_currentPage, 1, TotalPages);
+    }
+
+    private void OpenReviewModal(BookingResponse request)
+    {
+        _selectedRequest = request;
+        _reviewStatus = "Approved";
+        _reviewNote = string.Empty;
+        _reviewError = string.Empty;
+        _message = string.Empty;
+    }
+
+    private void CloseReviewModal()
+    {
+        if (_isReviewing)
+        {
+            return;
+        }
+
+        _selectedRequest = null;
+        _reviewError = string.Empty;
+    }
+
+    private async Task SubmitReviewAsync()
+    {
+        if (_selectedRequest is null)
+        {
+            return;
+        }
+
+        _isReviewing = true;
+        _reviewError = string.Empty;
+        _message = string.Empty;
+
+        try
+        {
+            var updated = await UserApi.ReviewCancellationRequestAsync(_selectedRequest.Id, new ReviewCancellationRequest
+            {
+                Status = _reviewStatus,
+                ReviewedBy = _reviewedBy,
+                ReviewNote = string.IsNullOrWhiteSpace(_reviewNote) ? null : _reviewNote.Trim()
+            });
+
+            if (updated is not null)
+            {
+                var index = _requests.FindIndex(item => item.Id == updated.Id);
+                if (index >= 0)
+                {
+                    _requests[index] = updated;
+                }
+            }
+
+            _message = _reviewStatus == "Approved"
+                ? "Cancellation request approved. The booking has been cancelled."
+                : "Cancellation request rejected. The booking status was kept unchanged.";
+            _selectedRequest = null;
+        }
+        catch (Exception ex)
+        {
+            _reviewError = ex.Message;
+        }
+        finally
+        {
+            _isReviewing = false;
+        }
+    }
+
+    private static string GetCancellationStatus(BookingResponse request)
+    {
+        return string.IsNullOrWhiteSpace(request.CancellationStatus) ? "Pending" : request.CancellationStatus;
+    }
+
+    private static string GetCancellationClass(string? status)
+    {
+        return status switch
+        {
+            "Approved" => "cancel-pill cancel-pill--approved",
+            "Rejected" => "cancel-pill cancel-pill--rejected",
+            _ => "cancel-pill cancel-pill--pending"
+        };
+    }
+
+    private static string GetBookingStatusClass(string status)
+    {
+        return status switch
+        {
+            "Cancelled" => "booking-pill booking-pill--cancelled",
+            "Confirmed" or "Finished" or "Paid" => "booking-pill booking-pill--active",
+            _ => "booking-pill"
+        };
+    }
+
+    private static string GetReviewTitle(BookingResponse request)
+    {
+        return string.Equals(request.CancellationStatus, "Pending", StringComparison.OrdinalIgnoreCase)
+            ? "Review request"
+            : "View decision";
+    }
+
+    private static string FormatDateTime(DateTime? value)
+    {
+        return value.HasValue ? value.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "Not recorded";
+    }
+}
+
+

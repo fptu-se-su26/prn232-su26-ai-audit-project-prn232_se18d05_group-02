@@ -1,0 +1,1141 @@
+@page "/admin-payments"
+@layout AdminLayout
+@using System.Globalization
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient UserApi
+@inject AuthSessionService SessionService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>WanderX Admin - Payment Management</PageTitle>
+
+
+        <header class="guide-topbar">
+            <div>
+                <p class="guide-eyebrow">Member 2 / Feature 4</p>
+                <h1>Payment Management</h1>
+                <p class="guide-subtitle">Record full payments, 40% deposits, remaining balances, and export booking confirmations.</p>
+            </div>
+            <div class="guide-topbar__actions">
+                <label class="guide-search" aria-label="Search payments">
+                    <MaterialIcon Name="search" />
+                    <input type="search" placeholder="Search booking, tour, customer..." value="@_searchTerm" @oninput="OnSearchInput" />
+                </label>
+            </div>
+        </header>
+
+        <section class="guide-content payment-page">
+            @if (!string.IsNullOrWhiteSpace(_message))
+            {
+                <div class="guide-alert">@_message</div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(_error))
+            {
+                <div class="guide-alert guide-alert--error">@_error</div>
+            }
+
+            <div class="guide-stat-grid">
+                <article class="guide-stat">
+                    <p>Total value</p>
+                    <strong>@Money(_payments.Sum(item => item.TotalAmount))</strong>
+                    <span>Managed booking amount</span>
+                </article>
+                <article class="guide-stat guide-stat--secondary">
+                    <p>Collected</p>
+                    <strong>@Money(_payments.Sum(item => item.PaidAmount ?? 0m))</strong>
+                    <span>Recorded payments</span>
+                </article>
+                <article class="guide-stat guide-stat--tertiary">
+                    <p>Remaining</p>
+                    <strong>@Money(_payments.Sum(GetRemainingAmount))</strong>
+                    <span>Balance to collect</span>
+                </article>
+                <article class="guide-stat">
+                    <p>Deposits</p>
+                    <strong>@_payments.Count(item => GetPaymentStatus(item) == DepositPaidStatus)</strong>
+                    <span>40% deposits recorded</span>
+                </article>
+            </div>
+
+            <section class="guide-table-shell booking-table-shell payment-table-shell">
+                <div class="guide-table-toolbar">
+                    <div class="guide-filter-group" role="group" aria-label="Payment status filter">
+                        @foreach (var status in _statusFilters)
+                        {
+                            <button class="@(_statusFilter == status ? "guide-filter guide-filter--active" : "guide-filter")"
+                                    type="button"
+                                    @onclick="() => SetStatusFilter(status)">
+                                @status
+                            </button>
+                        }
+                    </div>
+                    <p>@FilteredCount payments</p>
+                </div>
+
+                @if (_isLoading)
+                {
+                    <div class="guide-empty">
+                        <MaterialIcon Name="sync" />
+                        Loading payments...
+                    </div>
+                }
+                else if (FilteredCount == 0)
+                {
+                    <div class="guide-empty">
+                        <MaterialIcon Name="inbox" />
+                        No payments found.
+                    </div>
+                }
+                else
+                {
+                    <div class="guide-table-scroll booking-table-scroll payment-table-scroll">
+                        <table class="guide-table booking-table payment-table">
+                            <colgroup>
+                                <col class="payment-table__col-booking" />
+                                <col class="payment-table__col-total" />
+                                <col class="payment-table__col-paid" />
+                                <col class="payment-table__col-remaining" />
+                                <col class="payment-table__col-status" />
+                                <col class="payment-table__col-actions" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Booking</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Remaining</th>
+                                    <th>Status</th>
+                                    <th class="guide-table__actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var booking in PagedPayments)
+                                {
+                                    <tr>
+                                        <td data-label="Booking">
+                                            <div class="booking-cell-title">
+                                                <strong>@booking.TourName</strong>
+                                                <span>@booking.BookingCode · @(booking.TourCode ?? "No tour code")</span>
+                                                <span>@booking.CustomerName · @booking.CustomerEmail</span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Total">@Money(booking.TotalAmount)</td>
+                                        <td data-label="Paid">
+                                            <div class="booking-status-cell">
+                                                <strong>@Money(booking.PaidAmount ?? 0m)</strong>
+                                                <small>@(booking.PaymentMethod ?? "No method")</small>
+                                            </div>
+                                        </td>
+                                        <td data-label="Remaining">
+                                            <div class="booking-status-cell">
+                                                <strong>@Money(GetRemainingAmount(booking))</strong>
+                                                <small>Due by @booking.DepartureDate.ToString("dd/MM/yyyy")</small>
+                                            </div>
+                                        </td>
+                                        <td data-label="Status">
+                                            <div class="booking-status-cell">
+                                                <span class="@GetPaymentStatusClass(booking)">
+                                                    <span></span>@GetPaymentStatus(booking)
+                                                </span>
+                                                @if (booking.PaymentUpdatedAt.HasValue || !string.IsNullOrWhiteSpace(booking.PaymentUpdatedBy))
+                                                {
+                                                    <small>@FormatPaymentAudit(booking)</small>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td class="guide-table__actions" data-label="Actions">
+                                            @if (CanRecordPayment(booking))
+                                            {
+                                                <button class="guide-icon-button"
+                                                        type="button"
+                                                        title="@GetPaymentActionTitle(booking)"
+                                                        @onclick="() => OpenPaymentModal(booking)">
+                                                    <MaterialIcon Name="payments" />
+                                                </button>
+                                            }
+                                            <button class="guide-icon-button"
+                                                    type="button"
+                                                    title="Export invoice"
+                                                    @onclick="() => OpenInvoiceModal(booking)">
+                                                <MaterialIcon Name="receipt" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="booking-pagination">
+                        <p>Showing @PageStart-@PageEnd of @FilteredCount</p>
+                        <div class="booking-pagination__controls" role="navigation" aria-label="Payment pages">
+                            <button class="guide-icon-button" type="button" title="Previous page" disabled="@(_currentPage <= 1)" @onclick="PreviousPage">
+                                <MaterialIcon Name="chevron_left" />
+                            </button>
+
+                            @foreach (var pageNumber in Enumerable.Range(1, TotalPages))
+                            {
+                                <button class="booking-page-button @(pageNumber == _currentPage ? "booking-page-button--active" : string.Empty)"
+                                        type="button"
+                                        aria-current="@(pageNumber == _currentPage ? "page" : null)"
+                                        @onclick="() => SetPage(pageNumber)">
+                                    @pageNumber
+                                </button>
+                            }
+
+                            <button class="guide-icon-button" type="button" title="Next page" disabled="@(_currentPage >= TotalPages)" @onclick="NextPage">
+                                <MaterialIcon Name="chevron_right" />
+                            </button>
+                        </div>
+                    </div>
+                }
+            </section>
+        </section>
+@if (_paymentBooking is not null)
+{
+    var locked = IsPaymentLocked(_paymentBooking);
+    <div class="booking-modal-overlay" @onclick="ClosePaymentModal">
+        <section class="booking-modal payment-modal" role="dialog" aria-modal="true" aria-labelledby="payment-modal-title" @onclick:stopPropagation="true">
+            <header class="booking-modal__header">
+                <div>
+                    <p class="guide-eyebrow">Payment record</p>
+                    <h2 id="payment-modal-title">@_paymentBooking.BookingCode</h2>
+                    <span>@_paymentBooking.TourName</span>
+                </div>
+                <button class="guide-icon-button" type="button" title="Close" @onclick="ClosePaymentModal">
+                    <MaterialIcon Name="close" />
+                </button>
+            </header>
+
+            <div class="payment-summary-grid">
+                <article>
+                    <span>Total amount</span>
+                    <strong>@Money(_paymentBooking.TotalAmount)</strong>
+                </article>
+                <article>
+                    <span>Payment to record</span>
+                    <strong>@Money(PaymentPreviewAmount)</strong>
+                </article>
+                <article>
+                    <span>Remaining after save</span>
+                    <strong>@Money(PaymentPreviewRemaining)</strong>
+                </article>
+            </div>
+
+            @if (locked)
+            {
+                <div class="payment-lock-note">
+                    <MaterialIcon Name="lock" />
+                    <div>
+                        <strong>Payment is locked</strong>
+                        <p>Cancelled or finished bookings cannot be updated.</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="booking-form-grid booking-form-grid--two">
+                    <div class="guide-form-field">
+                        <label>Payment option</label>
+                        <select @bind="_paymentForm.PaymentOption">
+                            <option value="Full">Full payment</option>
+                            <option value="Deposit40">Deposit 40%</option>
+                            @if ((_paymentBooking.PaidAmount ?? 0m) > 0m && GetRemainingAmount(_paymentBooking) > 0m)
+                            {
+                                <option value="Balance">Collect remaining balance</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="guide-form-field">
+                        <label>Payment method</label>
+                        <select @bind="_paymentForm.PaymentMethod">
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Card">Card</option>
+                            <option value="Cash">Cash</option>
+                            <option value="E-Wallet">E-Wallet</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="booking-form-grid booking-form-grid--two">
+                    <div class="guide-form-field">
+                        <label>Reference</label>
+                        <input @bind="_paymentForm.PaymentReference" maxlength="120" placeholder="Transaction ID, receipt code..." />
+                    </div>
+                    <div class="guide-form-field">
+                        <label>Updated by</label>
+                        <input value="@_paymentUpdatedBy" readonly />
+                    </div>
+                </div>
+
+                <div class="guide-form-field">
+                    <label>Payment note</label>
+                    <textarea rows="3" maxlength="1000" @bind="_paymentForm.PaymentNote" placeholder="Optional internal note."></textarea>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(_paymentError))
+                {
+                    <div class="guide-alert guide-alert--error">@_paymentError</div>
+                }
+
+                <footer class="booking-modal__footer">
+                    <button class="wx-button wx-button--outline" type="button" @onclick="ClosePaymentModal" disabled="@_isSavingPayment">
+                        Cancel
+                    </button>
+                    <button class="wx-button wx-button--secondary" type="button" @onclick="SavePaymentAsync" disabled="@_isSavingPayment">
+                        <MaterialIcon Name="@(_isSavingPayment ? "sync" : "save")" />
+                        @(_isSavingPayment ? "Saving..." : "Save payment")
+                    </button>
+                </footer>
+            }
+        </section>
+    </div>
+}
+
+@if (_invoiceBooking is not null)
+{
+    <div class="booking-modal-overlay" @onclick="CloseInvoiceModal">
+        <section class="booking-modal invoice-modal" role="dialog" aria-modal="true" aria-labelledby="invoice-modal-title" @onclick:stopPropagation="true">
+            <header class="booking-modal__header">
+                <div>
+                    <p class="guide-eyebrow">Booking confirmation</p>
+                    <h2 id="invoice-modal-title">Invoice @_invoiceBooking.BookingCode</h2>
+                    <span>@_invoiceBooking.CustomerName · @_invoiceBooking.CustomerEmail</span>
+                </div>
+                <button class="guide-icon-button" type="button" title="Close" @onclick="CloseInvoiceModal">
+                    <MaterialIcon Name="close" />
+                </button>
+            </header>
+
+            <div class="invoice-sheet">
+                <div class="invoice-brand">
+                    <div>
+                        <strong>WanderX</strong>
+                        <span>Booking Confirmation</span>
+                    </div>
+                    <p>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+
+                <div class="invoice-grid">
+                    <div>
+                        <span>Booking code</span>
+                        <strong>@_invoiceBooking.BookingCode</strong>
+                    </div>
+                    <div>
+                        <span>Tour</span>
+                        <strong>@_invoiceBooking.TourName</strong>
+                    </div>
+                    <div>
+                        <span>Destination</span>
+                        <strong>@_invoiceBooking.Destination</strong>
+                    </div>
+                    <div>
+                        <span>Departure</span>
+                        <strong>@_invoiceBooking.DepartureDate.ToString("dd/MM/yyyy")</strong>
+                    </div>
+                    <div>
+                        <span>Guests</span>
+                        <strong>@_invoiceBooking.GuestCount</strong>
+                    </div>
+                    <div>
+                        <span>Payment status</span>
+                        <strong>@GetPaymentStatus(_invoiceBooking)</strong>
+                    </div>
+                </div>
+
+                <table class="invoice-table">
+                    <tbody>
+                        <tr>
+                            <th>Total amount</th>
+                            <td>@Money(_invoiceBooking.TotalAmount)</td>
+                        </tr>
+                        <tr>
+                            <th>Paid amount</th>
+                            <td>@Money(_invoiceBooking.PaidAmount ?? 0m)</td>
+                        </tr>
+                        <tr>
+                            <th>Remaining amount</th>
+                            <td>@Money(GetRemainingAmount(_invoiceBooking))</td>
+                        </tr>
+                        <tr>
+                            <th>Payment method</th>
+                            <td>@(_invoiceBooking.PaymentMethod ?? "Not recorded")</td>
+                        </tr>
+                        <tr>
+                            <th>Reference</th>
+                            <td>@(_invoiceBooking.PaymentReference ?? "Not recorded")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <footer class="booking-modal__footer">
+                <button class="wx-button wx-button--outline" type="button" @onclick="CloseInvoiceModal">
+                    Close
+                </button>
+                <button class="wx-button wx-button--secondary" type="button" @onclick="PrintInvoiceAsync">
+                    <MaterialIcon Name="print" />
+                    Print invoice
+                </button>
+            </footer>
+        </section>
+    </div>
+}
+
+<style>
+    .payment-page .guide-stat strong {
+        display: block;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        white-space: normal;
+        font-size: 36px;
+        line-height: 1.08;
+    }
+
+    .payment-page .guide-stat {
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .payment-page .guide-stat p,
+    .payment-page .guide-stat span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .payment-table-shell,
+    .payment-table-scroll {
+        min-width: 0;
+        overflow-x: visible;
+        max-width: 100%;
+    }
+
+    .payment-table {
+        min-width: 0;
+        table-layout: fixed;
+    }
+
+    .payment-table__col-booking { width: 34%; }
+    .payment-table__col-total { width: 13%; }
+    .payment-table__col-paid { width: 15%; }
+    .payment-table__col-remaining { width: 15%; }
+    .payment-table__col-status { width: 13%; }
+    .payment-table__col-actions { width: 10%; }
+
+    .payment-table th,
+    .payment-table td {
+        padding: 14px 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .payment-table .guide-table__actions {
+        text-align: right;
+    }
+
+    .booking-cell-title {
+        display: grid;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    .booking-cell-title strong,
+    .booking-cell-title span {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .booking-cell-title strong,
+    .booking-status-cell strong {
+        color: #0f172a;
+        line-height: 1.35;
+    }
+
+    .booking-cell-title span,
+    .booking-status-cell small {
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .booking-status-cell {
+        display: grid;
+        gap: 6px;
+        justify-items: start;
+    }
+
+    .payment-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .payment-status span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .payment-status--unpaid { background: #fef3c7; color: #b45309; }
+    .payment-status--deposit { background: #dbeafe; color: #1d4ed8; }
+    .payment-status--paid { background: #dcfce7; color: #15803d; }
+    .payment-status--failed { background: #fee2e2; color: #b91c1c; }
+
+    .booking-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 18px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .booking-pagination p {
+        margin: 0;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .booking-pagination__controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .booking-page-button {
+        min-width: 34px;
+        height: 34px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .booking-page-button--active {
+        border-color: #2563eb;
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+    .booking-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        overflow: auto;
+        padding: 32px 20px;
+        background: rgba(15, 23, 42, 0.58);
+        backdrop-filter: blur(4px);
+    }
+
+    .booking-modal {
+        width: min(920px, 100%);
+        max-height: calc(100vh - 64px);
+        overflow: auto;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24);
+    }
+
+    .payment-modal,
+    .invoice-modal {
+        max-width: 760px;
+    }
+
+    .booking-modal__header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 22px 24px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .booking-modal__header h2 {
+        margin: 0;
+        color: #0f172a;
+        font-size: 22px;
+        line-height: 1.2;
+    }
+
+    .booking-modal__header span {
+        color: #64748b;
+        display: block;
+        margin-top: 4px;
+        overflow-wrap: anywhere;
+    }
+
+    .payment-summary-grid,
+    .invoice-sheet,
+    .booking-modal > .guide-form-field,
+    .booking-modal > .booking-form-grid,
+    .booking-modal > .guide-alert,
+    .payment-lock-note,
+    .booking-modal__footer {
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+
+    .payment-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+        margin-bottom: 18px;
+    }
+
+    .payment-summary-grid article,
+    .payment-lock-note {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+        padding: 12px;
+    }
+
+    .payment-summary-grid span,
+    .invoice-grid span {
+        display: block;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .payment-summary-grid strong,
+    .invoice-grid strong {
+        color: #0f172a;
+        display: block;
+        overflow-wrap: anywhere;
+    }
+
+    .booking-form-grid {
+        display: grid;
+        gap: 16px;
+    }
+
+    .booking-form-grid--two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .guide-form-field {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .guide-form-field label {
+        color: #0f172a;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .guide-form-field input,
+    .guide-form-field select,
+    .guide-form-field textarea {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        color: #0f172a;
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+
+    .guide-form-field input[readonly] {
+        background: #f8fafc;
+        color: #475569;
+    }
+
+    .payment-lock-note {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        color: #475569;
+    }
+
+    .payment-lock-note strong {
+        color: #0f172a;
+    }
+
+    .payment-lock-note p {
+        margin: 4px 0 0;
+        font-size: 13px;
+    }
+
+    .booking-modal__footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 18px 0 24px;
+    }
+
+    .invoice-sheet {
+        margin-top: 18px;
+        margin-bottom: 18px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .invoice-brand {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 14px;
+        margin-bottom: 16px;
+    }
+
+    .invoice-brand strong {
+        color: #0f172a;
+        display: block;
+        font-size: 22px;
+    }
+
+    .invoice-brand span,
+    .invoice-brand p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .invoice-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .invoice-table th,
+    .invoice-table td {
+        border-top: 1px solid #e2e8f0;
+        padding: 10px 0;
+        text-align: left;
+    }
+
+    .invoice-table th {
+        color: #64748b;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+
+    .invoice-table td {
+        color: #0f172a;
+        font-weight: 800;
+        text-align: right;
+    }
+
+    @@media (max-width: 900px) {
+        .payment-summary-grid,
+        .booking-form-grid--two,
+        .invoice-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 720px) {
+        .payment-page,
+        .payment-page .guide-stat-grid,
+        .payment-page .guide-stat,
+        .payment-table-shell,
+        .payment-table-scroll,
+        .payment-table,
+        .payment-page .guide-table-toolbar,
+        .payment-page .guide-filter-group {
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .payment-page .guide-stat-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .payment-page .guide-stat > * {
+            width: auto;
+            min-width: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+        }
+
+        .payment-page .guide-stat strong {
+            font-size: 32px;
+            white-space: normal;
+        }
+
+        .payment-page .guide-table-toolbar,
+        .payment-page .guide-filter-group {
+            flex-wrap: wrap;
+        }
+
+        .payment-table-scroll {
+            overflow-x: visible;
+        }
+
+        .payment-table,
+        .payment-table colgroup,
+        .payment-table thead,
+        .payment-table tbody,
+        .payment-table tr,
+        .payment-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .payment-table thead,
+        .payment-table colgroup {
+            display: none;
+        }
+
+        .payment-table tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 0;
+        }
+
+        .payment-table tbody tr:last-child {
+            border-bottom: 0;
+        }
+
+        .payment-table td {
+            border-bottom: 0;
+            display: grid;
+            grid-template-columns: 92px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            padding: 8px 16px;
+        }
+
+        .payment-table td::before {
+            content: attr(data-label);
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .payment-table .guide-table__actions {
+            text-align: left;
+            white-space: normal;
+        }
+
+        .booking-pagination {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 14px 16px 16px;
+        }
+
+        .booking-pagination__controls {
+            justify-content: flex-start;
+        }
+
+        .booking-modal-overlay {
+            padding: 16px;
+        }
+
+        .booking-modal {
+            max-height: calc(100vh - 32px);
+        }
+
+        .payment-summary-grid,
+        .invoice-sheet,
+        .booking-modal > .guide-form-field,
+        .booking-modal > .booking-form-grid,
+        .booking-modal > .guide-alert,
+        .payment-lock-note,
+        .booking-modal__footer {
+            margin-left: 16px;
+            margin-right: 16px;
+        }
+    }
+</style>
+
+@code {
+    private const int PageSize = 5;
+    private const string DepositPaidStatus = "40% Paid";
+    private readonly string[] _statusFilters = ["All", "Unpaid", DepositPaidStatus, "Paid", "Failed"];
+    private readonly List<BookingResponse> _payments = new();
+    private bool _isLoading = true;
+    private bool _isSavingPayment;
+    private string _statusFilter = "All";
+    private string _searchTerm = string.Empty;
+    private string _message = string.Empty;
+    private string _error = string.Empty;
+    private string _paymentError = string.Empty;
+    private string _paymentUpdatedBy = "Admin staff";
+    private int _currentPage = 1;
+    private BookingResponse? _paymentBooking;
+    private BookingResponse? _invoiceBooking;
+    private PaymentForm _paymentForm = new();
+
+    private decimal PaymentPreviewAmount => _paymentBooking is null ? 0m : CalculatePaymentAmount(_paymentBooking, _paymentForm.PaymentOption);
+    private decimal PaymentPreviewRemaining => _paymentBooking is null ? 0m : Math.Max(_paymentBooking.TotalAmount - PaymentPreviewAmount, 0m);
+
+    private IEnumerable<BookingResponse> FilteredPayments
+    {
+        get
+        {
+            var query = _payments.AsEnumerable();
+
+            if (_statusFilter != "All")
+            {
+                query = query.Where(item => GetPaymentStatus(item) == _statusFilter);
+            }
+
+            if (!string.IsNullOrWhiteSpace(_searchTerm))
+            {
+                var term = _searchTerm.Trim();
+                query = query.Where(item =>
+                    item.BookingCode.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    item.TourName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    item.Destination.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    (item.TourCode?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    item.CustomerName.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                    item.CustomerEmail.Contains(term, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return query;
+        }
+    }
+
+    private int FilteredCount => FilteredPayments.Count();
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredCount / (double)PageSize));
+    private int PageStart => FilteredCount == 0 ? 0 : ((_currentPage - 1) * PageSize) + 1;
+    private int PageEnd => Math.Min(_currentPage * PageSize, FilteredCount);
+    private IEnumerable<BookingResponse> PagedPayments => FilteredPayments.Skip((_currentPage - 1) * PageSize).Take(PageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = await SessionService.GetAsync();
+        _paymentUpdatedBy = string.IsNullOrWhiteSpace(session?.FullName)
+            ? session?.Email ?? "Admin staff"
+            : session.FullName;
+
+        await LoadPaymentsAsync();
+    }
+
+    private async Task LoadPaymentsAsync()
+    {
+        _isLoading = true;
+        _error = string.Empty;
+
+        try
+        {
+            var payments = await UserApi.GetPaymentsAsync();
+            _payments.Clear();
+            if (payments is not null)
+            {
+                _payments.AddRange(payments);
+            }
+            ClampPage();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void OnSearchInput(ChangeEventArgs args)
+    {
+        _searchTerm = args.Value?.ToString() ?? string.Empty;
+        _currentPage = 1;
+    }
+
+    private void SetStatusFilter(string status)
+    {
+        _statusFilter = status;
+        _currentPage = 1;
+    }
+
+    private void SetPage(int page) => _currentPage = Math.Clamp(page, 1, TotalPages);
+    private void PreviousPage() => SetPage(_currentPage - 1);
+    private void NextPage() => SetPage(_currentPage + 1);
+    private void ClampPage() => _currentPage = Math.Clamp(_currentPage, 1, TotalPages);
+
+    private void OpenPaymentModal(BookingResponse booking)
+    {
+        _paymentBooking = booking;
+        var defaultOption = (booking.PaidAmount ?? 0m) > 0m && GetRemainingAmount(booking) > 0m ? "Balance" : booking.PaymentOption ?? "Full";
+        _paymentForm = new PaymentForm
+        {
+            PaymentOption = defaultOption,
+            PaymentMethod = booking.PaymentMethod ?? "Bank Transfer",
+            PaymentReference = booking.PaymentReference,
+            PaymentNote = booking.PaymentNote
+        };
+        _paymentError = string.Empty;
+        _message = string.Empty;
+    }
+
+    private void ClosePaymentModal()
+    {
+        if (_isSavingPayment)
+        {
+            return;
+        }
+
+        _paymentBooking = null;
+        _paymentError = string.Empty;
+    }
+
+    private async Task SavePaymentAsync()
+    {
+        if (_paymentBooking is null)
+        {
+            return;
+        }
+
+        _isSavingPayment = true;
+        _paymentError = string.Empty;
+        _message = string.Empty;
+
+        try
+        {
+            var updated = await UserApi.UpdatePaymentAsync(_paymentBooking.Id, new UpdatePaymentRequest
+            {
+                PaymentOption = _paymentForm.PaymentOption,
+                PaymentMethod = _paymentForm.PaymentMethod,
+                PaymentReference = string.IsNullOrWhiteSpace(_paymentForm.PaymentReference) ? null : _paymentForm.PaymentReference.Trim(),
+                UpdatedBy = _paymentUpdatedBy,
+                PaymentNote = string.IsNullOrWhiteSpace(_paymentForm.PaymentNote) ? null : _paymentForm.PaymentNote.Trim()
+            });
+
+            if (updated is not null)
+            {
+                var index = _payments.FindIndex(item => item.Id == updated.Id);
+                if (index >= 0)
+                {
+                    _payments[index] = updated;
+                }
+            }
+
+            _message = "Payment record saved.";
+            _paymentBooking = null;
+        }
+        catch (Exception ex)
+        {
+            _paymentError = ex.Message;
+        }
+        finally
+        {
+            _isSavingPayment = false;
+        }
+    }
+
+    private void OpenInvoiceModal(BookingResponse booking)
+    {
+        _invoiceBooking = booking;
+    }
+
+    private void CloseInvoiceModal()
+    {
+        _invoiceBooking = null;
+    }
+
+    private async Task PrintInvoiceAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("print");
+    }
+
+    private static bool CanRecordPayment(BookingResponse booking)
+    {
+        return !IsPaymentLocked(booking) && GetPaymentStatus(booking) != "Paid";
+    }
+
+    private static bool IsPaymentLocked(BookingResponse booking)
+    {
+        return booking.Status is "Cancelled" or "Finished";
+    }
+
+    private static decimal CalculatePaymentAmount(BookingResponse booking, string option)
+    {
+        return option switch
+        {
+            "Deposit40" => decimal.Round(booking.TotalAmount * 0.4m, 2, MidpointRounding.AwayFromZero),
+            "Balance" => booking.TotalAmount,
+            _ => booking.TotalAmount
+        };
+    }
+
+    private static decimal GetRemainingAmount(BookingResponse booking)
+    {
+        if (booking.RemainingAmount.HasValue)
+        {
+            return Math.Max(booking.RemainingAmount.Value, 0m);
+        }
+
+        return Math.Max(booking.TotalAmount - (booking.PaidAmount ?? 0m), 0m);
+    }
+
+    private static string GetPaymentStatus(BookingResponse booking)
+    {
+        if (booking.PaymentFailedAt.HasValue)
+        {
+            return "Failed";
+        }
+
+        if (!booking.PaidAt.HasValue || (booking.PaidAmount ?? 0m) <= 0m)
+        {
+            return "Unpaid";
+        }
+
+        return GetRemainingAmount(booking) > 0m ? DepositPaidStatus : "Paid";
+    }
+
+    private static string GetPaymentStatusClass(BookingResponse booking)
+    {
+        return GetPaymentStatus(booking) switch
+        {
+            "Paid" => "payment-status payment-status--paid",
+            DepositPaidStatus => "payment-status payment-status--deposit",
+            "Failed" => "payment-status payment-status--failed",
+            _ => "payment-status payment-status--unpaid"
+        };
+    }
+
+    private static string GetPaymentActionTitle(BookingResponse booking)
+    {
+        return IsPaymentLocked(booking) ? "Payment locked" : "Record payment";
+    }
+
+    private static string FormatPaymentAudit(BookingResponse booking)
+    {
+        var by = string.IsNullOrWhiteSpace(booking.PaymentUpdatedBy) ? "Admin staff" : booking.PaymentUpdatedBy;
+        return booking.PaymentUpdatedAt.HasValue
+            ? $"{booking.PaymentUpdatedAt.Value.ToLocalTime():dd/MM/yyyy HH:mm} by {by}"
+            : $"By {by}";
+    }
+
+    private static string Money(decimal value) => $"{value.ToString("N0", CultureInfo.InvariantCulture)} VND";
+
+    private sealed class PaymentForm
+    {
+        public string PaymentOption { get; set; } = "Full";
+        public string PaymentMethod { get; set; } = "Bank Transfer";
+        public string? PaymentReference { get; set; }
+        public string? PaymentNote { get; set; }
+    }
+}
+
+

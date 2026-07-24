@@ -10,7 +10,7 @@
 | Học kỳ                  | SU26                                                                |
 | Tên bài tập / Project   | Group Project                                                       |
 | Tên sinh viên / Nhóm    | Group 2                                                             |
-| MSSV / Danh sách MSSV   | DE180158                                                            |
+| MSSV / Danh sách MSSV   | DE180158, DE180166                                                  |
 | Giảng viên hướng dẫn    | Lê Thiện Nhật Quang                                                 |
 | Ngày bắt đầu            | 2026-05-18                                                          |
 | Ngày hoàn thành         |                                                                     |
@@ -57,9 +57,9 @@ Sinh viên/nhóm cần ghi lại:
 | 3 | 05/06/2026 | ChatGPT / Antigravity | Guide Portal Calendar & Filter UX | Khi nhấn vào tour trên calendar, nhảy xuống + filter theo status & date | Calendar click handling, smooth scroll, multi-criteria filter | Có | PROMPTS.md - Prompt số 3 |
 | 4 | 16/06/2026 | Gemini | Responsive Design Implementation | Làm responsive cho trang web cho cả laptop và mobile với nâng cao UI/UX | Responsive UI/UX implementation, mobile-first design | Có | PROMPTS.md - Prompt-04 |
 | 5 | 23/06/2026 | Antigravity / Gemini | Redesign Travel Website UI/UX | Tái cấu trúc toàn diện UI/UX (Homepage, Listing, Detail) theo Design System | Đề xuất UX và mã nguồn mẫu React/Tailwind cho các trang cốt lõi | Có | PROMPTS.md - Prompt-05 |
-| 6 | 24/07/2026 | OpenAI Codex / ChatGPT | Review và hoàn thiện Travel Style Quiz | Đối chiếu M5-F01, sửa authorization, validation, Guid contract và đồng bộ UI | Backend/client build thành công, xác định phần còn thiếu và phạm vi commit | Có | PROMPTS.md - Prompt-06 |
-| 7 |  |  |  |  |  | Có / Không |  |
-| 8 |  |  |  |  |  | Có / Không |  |
+| 6 | 20/07/2026 | ChatGPT / Codex | Member 2 Admin/Staff Booking Operations | Triển khai FE1-FE4: Booking Management, Booking Status, Cancellation Requests, Payment Management | Hoàn thiện API, DTO, Blazor UI, business rules, email hooks và debug lỗi tích hợp | Có | PROMPTS.md - Prompt-06 |
+| 7 | 12/07/2026 – 22/07/2026 | Antigravity / Claude | Member 3 Customer Management & Tour Reviews | Triển khai Feature 1-4 thành viên 3: hồ sơ khách hàng, theo dõi booking, yêu cầu dịch vụ, đánh giá tour + debug lỗi tích hợp | Tạo API, Service, Blazor UI cho cả 4 feature. Debug URL sai, 204 parse, silent catch, closure bug | Có | PROMPTS.md - Prompt-07 |
+| 8 | 24/07/2026 | OpenAI Codex / ChatGPT | Review và hoàn thiện Travel Style Quiz | Đối chiếu M5-F01, sửa authorization, validation, Guid contract và đồng bộ UI | Backend/client build thành công, xác định phần còn thiếu và phạm vi commit | Có | PROMPTS.md - Prompt-08 |
 | 9 |  |  |  |  |  | Có / Không |  |
 | 10 |  |  |  |  |  | Có / Không |  |
 
@@ -753,6 +753,271 @@ Mã nguồn mẫu do AI cung cấp rất sạch và chuẩn cấu trúc Tailwind
 
 ### Prompt-06
 
+| Nội dung                    | Thông tin                                                         |
+|-----------------------------|-------------------------------------------------------------------|
+| Ngày sử dụng                | 20/07/2026                                                        |
+| Công cụ AI                  | ChatGPT / Codex                                                   |
+| Mục đích sử dụng            | Member 2 Admin/Staff Booking Operations Implementation            |
+| Phần việc liên quan         | Backend API / Blazor Frontend / Database update / Debug           |
+| Mức độ sử dụng              | Hỗ trợ một phần                                                   |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Tôi là thành viên 2, hãy làm từng feature của thành viên 2, đi từ trên xuống, bám sát cấu trúc của project, hãy bắt đầu từ feature 1 đi.
+
+Các yêu cầu bổ sung trong quá trình làm:
+- Booking list phải vừa khít, không có thanh kéo ngang và có phân trang 5 booking/trang.
+- Ticket type dùng tiếng Anh, gồm Adult và Child, form tạo booking dùng dropdown.
+- FE2 phải ràng buộc trạng thái: Pending chỉ sang Confirmed/Cancelled; Confirmed chỉ sang Finished/Cancelled; Finished/Cancelled không được đổi nữa.
+- Updated by cố định theo tài khoản hiện tại, không cho sửa.
+- Cancellation request phải mở popup, giao diện đồng nhất với web và có phân trang như bookings.
+- Xử lý gửi email cho các luồng hủy booking/reject/approve để chỉ cần cấu hình mail là hoạt động.
+- FE4 Payment Management phải quản lý full payment, 40% deposit, remaining balance, reference, invoice/receipt và khóa sửa khi đã paid.
+- Debug các lỗi phát sinh như CSRF token, route đổi link nhưng không render form, DbUpdateConcurrencyException, Failed to fetch và UI bị tràn số.
+```
+
+#### 5.2. Bối cảnh khi viết prompt
+
+```text
+Thành viên 2 phụ trách nhóm chức năng Admin/Staff liên quan đến quản lý booking, trạng thái booking, yêu cầu hủy booking và thanh toán trong dự án WanderX. Project đã có sẵn cấu trúc backend ASP.NET Core, Entity Framework Core, Blazor frontend và database hiện tại, nên yêu cầu là tận dụng cấu trúc sẵn có, hạn chế tạo mới không cần thiết và triển khai từng feature từ trên xuống.
+```
+
+#### 5.3. Kết quả AI trả về
+
+```text
+AI hỗ trợ phân tích và triển khai các phần chính:
+1. Backend:
+   - Bổ sung DTO request/response cho booking, guest/passenger, status update, cancellation review và payment update.
+   - Mở rộng BookingsController với các endpoint CRUD booking, status update, cancellation review và payment management.
+   - Bổ sung logic trong BookingService/UserService cho nghiệp vụ status, cancellation và payment.
+   - Chuẩn bị SmtpEmailSender để gửi email tự động khi có cấu hình SMTP thật.
+2. Database:
+   - Tận dụng bảng Bookings hiện có, bổ sung các cột cần thiết cho tour code, audit status, cancellation và payment.
+   - Không tạo thêm bảng mới cho payment/cancellation trong phạm vi FE1-FE4.
+3. Frontend:
+   - Tạo/cập nhật các trang AdminBookings, AdminCancellationRequests và AdminPayments.
+   - Thiết kế popup/modal cho create/edit booking, đổi status, review cancellation và record payment.
+   - Thêm phân trang 5 dòng/trang, filter, search và chỉnh UI tránh overflow.
+4. Debug:
+   - Xử lý anti-CSRF token mismatch bằng cách dùng API client phù hợp.
+   - Sửa lỗi route đổi URL nhưng không render form.
+   - Sửa lỗi concurrency khi cập nhật ngày tour đã đặt.
+   - Sửa lỗi Failed to fetch và lỗi số tiền bị tràn trên dashboard payment.
+```
+
+#### 5.4. Kết quả đã áp dụng vào bài
+
+```text
+Đã áp dụng vào project WanderX:
+1. FE1 Booking Management:
+   - Admin/Staff xem danh sách booking, tạo booking, sửa booking, quản lý guest list, ticket type Adult/Child và phân trang.
+2. FE2 Booking Status Management:
+   - Dropdown trạng thái chỉ hiển thị lựa chọn hợp lệ theo nghiệp vụ.
+   - Finished/Cancelled bị khóa đổi trạng thái và hiển thị thông báo nhẹ nhàng.
+   - Updated by lấy theo tài khoản hiện tại, không cho chỉnh thủ công.
+3. FE3 Cancellation Request Management:
+   - User gửi yêu cầu hủy booking.
+   - Admin/Staff xem danh sách request, mở popup review, approve/reject và có phân trang đồng bộ với bookings.
+   - Chuẩn bị email tự động cho request received, approved và rejected.
+4. FE4 Payment Management:
+   - Admin/Staff quản lý unpaid/deposit paid/paid/failed.
+   - Ghi nhận full payment, 40% deposit hoặc remaining balance.
+   - Lưu payment reference, method, note, updated by và hiển thị invoice/receipt.
+   - Booking đã paid thì ẩn nút record payment và backend cũng chặn cập nhật.
+```
+
+#### 5.5. Phần sinh viên/nhóm đã chỉnh sửa hoặc cải tiến
+
+```text
+Trần Hồng Quân (DE180166) kiểm tra từng feature theo nghiệp vụ thực tế và yêu cầu AI sửa nhiều vòng:
+1. Điều chỉnh UI từ form chèn trong list sang popup/modal để thao tác gọn hơn.
+2. Tinh chỉnh bảng list và phân trang để đồng nhất giữa Bookings, Cancel Requests và Payments.
+3. Ràng buộc status/payment theo quy tắc nghiệp vụ thay vì cho đổi tự do.
+4. Đổi ticket type sang tiếng Anh và dùng dropdown để giảm lỗi nhập liệu.
+5. Kiểm tra lại việc tận dụng database hiện có và tổng hợp các cột đã bổ sung.
+```
+
+#### 5.6. Đánh giá chất lượng prompt
+
+- [X] Prompt rõ ràng
+- [X] Prompt có đủ bối cảnh
+- [ ] Prompt còn thiếu thông tin
+- [X] Prompt tạo ra kết quả tốt
+- [ ] Prompt tạo ra kết quả chưa phù hợp
+- [X] Cần hỏi lại AI nhiều lần
+- [X] Cần tự kiểm tra và chỉnh sửa nhiều
+- [ ] Kết quả AI có lỗi hoặc chưa chính xác
+
+#### 5.7. Minh chứng liên quan
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | |
+| File liên quan | WanderXServer/Controllers/BookingsController.cs; WanderXServer/Services/BookingService.cs; WanderXServer/Services/UserService.cs; WanderXServer/DataAccessLayer/WanderXDbContext.cs; WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXClient/WanderXClient/Pages/AdminCancellationRequests.razor; WanderXClient/WanderXClient/Pages/AdminPayments.razor |
+| Screenshot | Test UI trực tiếp các trang Admin Bookings, Cancel Requests và Payments |
+| Kết quả chạy/test | Backend/frontend build thành công sau khi sửa lỗi; test thủ công các luồng chính |
+| Link tài liệu/báo cáo | AI_AUDIT_LOG.md - Lần sử dụng AI số 6; CHANGELOG.md - Phase 04 Member 2 Implementation |
+
+#### 5.8. Ghi chú thêm
+
+```text
+AI được dùng như công cụ hỗ trợ phân tích, code, debug và rà soát. Sinh viên chịu trách nhiệm kiểm tra nghiệp vụ, chỉnh UI, xác nhận dữ liệu thực tế và đảm bảo các feature phù hợp với cấu trúc project WanderX.
+```
+
+---
+
+---
+
+### Prompt-07
+
+| Nội dung                    | Thông tin                                                         |
+|-----------------------------|-------------------------------------------------------------------|
+| Ngày sử dụng                | 12/07/2026 – 22/07/2026                                           |
+| Công cụ AI                  | Antigravity / Claude (Google DeepMind)                            |
+| Mục đích sử dụng            | Member 3: Quản lý Khách hàng và Đánh giá (Feature 1–4)           |
+| Phần việc liên quan         | Backend API / Blazor Frontend / Database / Debug                  |
+| Mức độ sử dụng              | Hỗ trợ một phần                                                   |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Tôi là thành viên 3, hãy làm các feature của tôi theo yêu cầu dưới đây, bám sát cấu trúc của project WanderX:
+
+Feature 1: Quản lý hồ sơ khách hàng
+- Khách hàng xem thông tin cá nhân
+- Khách hàng chỉnh sửa thông tin cá nhân
+- Khách hàng quản lý danh sách người đi cùng
+
+Feature 2: Tra cứu và theo dõi booking cá nhân
+- Khách hàng xem danh sách tour đã đặt
+- Khách hàng xem chi tiết từng booking tour
+- Khách hàng theo dõi trạng thái booking hoặc hủy booking
+
+Feature 3: Quản lý yêu cầu đặc biệt của khách
+- Khách hàng thêm yêu cầu dịch vụ đi kèm
+- Quản lý trạng thái request yêu cầu dịch vụ
+- Xem danh sách request yêu cầu dịch vụ
+
+Feature 4: Đánh giá và nhận xét tour
+- Khách hàng rating and feedback tour sau khi hoàn thành (chỉ khi CompletedAt có giá trị)
+- Mỗi booking chỉ 1 đánh giá, có thể sửa hoặc xóa
+- Admin Quản lý danh sách các đánh giá
+
+Yêu cầu thêm:
+- Phân trang số trang bấm được cho MyBookings, ServiceUserRequest, AdminServiceRequests
+- Đánh giá tour: 1-5 sao bằng click icon, có nhận xét văn bản
+- Admin duyệt đánh giá: Visible/Hidden/Deleted kèm lý do
+- Sửa lỗi: URL sai api/tour_review → api/tourreviews, 204 NoContent khi chưa có review, hiển thị lỗi rõ ràng thay vì catch im lặng
+```
+
+#### 5.2. Bối cảnh khi viết prompt
+
+```text
+Thành viên 3 phụ trách luồng Customer Management trong project WanderX (Blazor WASM + ASP.NET Core). Project đã có sẵn cấu trúc backend, database schema, và Blazor frontend. Yêu cầu là tận dụng cấu trúc sẵn có, không tạo bảng mới ngoài phạm vi, và đảm bảo UI đồng nhất với các trang khác trong WanderX.
+
+Sau khi implement xong phần cơ bản, phát sinh nhiều lỗi runtime khó debug:
+1. Blazor WASM cache cũ gọi sai URL (api/tour_review thay vì api/tourreviews).
+2. API GetByBookingId trả Ok(null) → client JsonException khi parse.
+3. catch(Exception){} im lặng → UI không hiện lỗi.
+4. Closure bug trong @for star rating.
+5. Lỗi No DefaultChallengeScheme khi dùng [Authorize] nhưng JWT chưa cấu hình.
+```
+
+#### 5.3. Kết quả AI trả về
+
+```text
+AI (Antigravity) hỗ trợ triển khai toàn bộ 4 feature:
+
+1. Feature 1 – Profile.razor:
+   - Trang xem/sửa thông tin cá nhân (FullName, PhoneNumber, Address).
+   - Đổi mật khẩu với xác minh mật khẩu cũ.
+   - Lưu avatar qua localStorage.
+
+2. Feature 2 – MyBookings.razor + BookingDetail.razor:
+   - Danh sách booking phân trang 5/trang với số trang bấm được.
+   - Chi tiết booking: thông tin tour, hành khách, timeline 4 bước trực quan.
+   - Hủy booking khi trạng thái cho phép.
+
+3. Feature 3 – ServiceUserRequest.razor + AdminServiceRequests.razor:
+   - Khách tạo và xem yêu cầu dịch vụ theo booking.
+   - Admin drill-down: tour → booking → người → dịch vụ → duyệt/từ chối kèm lý do.
+   - Phân trang cho cả hai trang.
+
+4. Feature 4 – TourReview.razor + AdminTourReviews.razor:
+   - Form đánh giá 1–5 sao + nhận xét, chỉ hiện khi CompletedAt có giá trị.
+   - Mỗi booking 1 review; khách sửa hoặc xóa được.
+   - Admin xem tất cả review, moderate Visible/Hidden/Deleted kèm lý do.
+   - TourReviewsController: explicit route, 204 NoContent khi chưa có review.
+   - TourReviewService: validate bằng tiếng Việt.
+
+5. Debug:
+   - UserApiClient.GetReviewByBookingIdAsync: xử lý 204 riêng thay vì dùng GetAsync<> chung.
+   - CreateReviewAsync: parse JSON error {"error":"..."} từ server.
+   - TourReview.razor: thêm _errorMessage hiển thị lỗi lên UI.
+   - Closure bug: var starIndex = i trong vòng lặp @for.
+   - Dùng email query string thay JWT để tránh AuthenticationScheme error.
+```
+
+#### 5.4. Kết quả đã áp dụng vào bài
+
+```text
+1. Profile.razor: khách hàng xem/sửa thông tin cá nhân, đổi mật khẩu.
+2. MyBookings.razor: danh sách booking phân trang với số trang bấm.
+3. BookingDetail.razor: chi tiết booking, timeline 4 bước, hủy booking.
+4. ServiceUserRequest.razor: tạo/xem yêu cầu dịch vụ theo booking.
+5. AdminServiceRequests.razor: admin quản lý yêu cầu dịch vụ drill-down.
+6. TourReview.razor: đánh giá 1–5 sao, sửa/xóa đánh giá.
+7. AdminTourReviews.razor: admin moderate đánh giá với lý do.
+8. TourReviewsController.cs: CRUD + moderate API, email query string.
+9. TourReviewService.cs: validate nghiệp vụ bằng tiếng Việt, 204 NoContent.
+10. UserApiClient.cs: xử lý riêng 204 và parse JSON error từ server.
+```
+
+#### 5.5. Phần sinh viên/nhóm đã chỉnh sửa hoặc cải tiến
+
+```text
+Võ Quang Đăng Khoa (DE180127) kiểm tra lại nghiệp vụ và tự điều chỉnh:
+1. Không tạo bảng mới – dùng TourReviews và UserSpecialRequests có sẵn trong schema.
+2. Đồng bộ UI (sidebar menu bên trái) theo đúng layout WanderX hiện có.
+3. Kiểm tra build backend + frontend (0 error) sau mỗi thay đổi.
+4. Sửa silent catch thành hiển thị lỗi rõ ràng cho người dùng.
+5. Đổi GetByBookingId trả 204 thay Ok(null) để client xử lý đúng.
+6. Sửa closure bug @for star rating với var starIndex = i.
+7. Kiểm tra Hard Reload browser để xóa Blazor WASM cache khi test.
+```
+
+#### 5.6. Đánh giá chất lượng prompt
+
+- [X] Prompt rõ ràng
+- [X] Prompt có đủ bối cảnh
+- [ ] Prompt còn thiếu thông tin
+- [X] Prompt tạo ra kết quả tốt
+- [ ] Prompt tạo ra kết quả chưa phù hợp
+- [X] Cần hỏi lại AI nhiều lần
+- [X] Cần tự kiểm tra và chỉnh sửa nhiều
+- [X] Kết quả AI có lỗi hoặc chưa chính xác
+
+#### 5.7. Minh chứng liên quan
+
+| Loại minh chứng         | Nội dung                                                                                                               |
+|-------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| Link commit             |                                                                                                                        |
+| File liên quan          | WanderXServer/Controllers/TourReviewsController.cs; WanderXServer/Services/TourReviewService.cs; WanderXClient/WanderXClient/Pages/TourReview.razor; WanderXClient/WanderXClient/Pages/AdminTourReviews.razor; WanderXClient/WanderXClient/Pages/AdminServiceRequests.razor; WanderXClient/WanderXClient/Pages/MyBookings.razor; WanderXClient/WanderXClient/Pages/BookingDetail.razor; WanderXClient/WanderXClient/Pages/ServiceUserRequest.razor; WanderXClient/WanderXClient/Pages/Profile.razor; WanderXClient/WanderXClient/Services/UserApiClient.cs |
+| Screenshot              |                                                                                                                        |
+| Kết quả chạy/test       | dotnet build backend và frontend: 0 error. Test thủ công toàn bộ luồng 4 feature.                                     |
+| Link tài liệu/báo cáo  | AI_AUDIT_LOG.md - Lần sử dụng AI số 7; CHANGELOG.md - Phase 04.3 Member 3 Implementation                              |
+
+#### 5.8. Ghi chú thêm
+
+```text
+AI được dùng như công cụ hỗ trợ phân tích, tạo code mẫu và debug. Sinh viên tự kiểm tra nghiệp vụ, đồng bộ UI, build và test thủ công từng feature. Đặc biệt lưu ý khi test Blazor WASM: phải Hard Reload (Ctrl+Shift+R) để xóa cache cũ, tránh nhầm lỗi do browser vẫn chạy file .dll phiên bản cũ.
+```
+
+---
+
+### Prompt-08
+
 | Nội dung | Thông tin |
 |---|---|
 | Ngày sử dụng | 24/07/2026 |
@@ -829,7 +1094,7 @@ Tôi đã có code Function 1 Travel Style Quiz. Hãy kiểm tra code đã đún
 | File code | TravelStyleQuizController.cs, TravelStyleQuizService.cs, QuizAnswerDto.cs, TravelQuiz.razor, QuizContracts.cs, UserApiClient.cs |
 | Kết quả build | Server và client build thành công, 0 error |
 | Commit dự kiến | `feat: implement secure travel style quiz flow` |
-| Audit liên quan | AI_AUDIT_LOG.md - Lần sử dụng AI số 6 |
+| Audit liên quan | AI_AUDIT_LOG.md - Lần sử dụng AI số 8 |
 
 #### 5.8. Ghi chú thêm
 

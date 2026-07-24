@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/WanderXClient/">
+    <Project Path="WanderXClient/WanderXClient/WanderXClient.csproj" />
+  </Folder>
+  <Project Path="WanderXServer/WanderXServer.csproj" />
+</Solution>

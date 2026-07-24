@@ -20,7 +20,7 @@ public sealed class SmtpEmailSender : IEmailSender
         if (!_options.IsConfigured)
         {
             _logger.LogWarning(
-                "SMTP is not configured. Guide notification email was not sent. To={ToEmail}; Subject={Subject}",
+                "SMTP is not configured. Email was not sent. To={ToEmail}; Subject={Subject}",
                 toEmail,
                 subject);
             return;

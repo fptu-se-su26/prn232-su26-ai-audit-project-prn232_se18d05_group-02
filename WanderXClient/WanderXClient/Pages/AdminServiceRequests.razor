@@ -1,62 +1,27 @@
-@page "/admin-service-requests"
+﻿@page "/admin-service-requests"
+@layout AdminLayout
 @using WanderXClient.Models
 @using WanderXClient.Services
 @inject UserApiClient UserApi
 @inject NavigationManager NavManager
 
-<PageTitle>WanderX Admin - Quản lý yêu cầu dịch vụ</PageTitle>
+<PageTitle>WanderX Admin - Service Request Management</PageTitle>
 
-<div class="guide-admin-page">
-    <!-- Sidebar -->
-    <aside class="guide-sidebar">
-        <div class="guide-sidebar__brand">
-            <a class="brand-mark" href="/">WanderX</a>
-            <p>Admin Suite</p>
-        </div>
-        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
-            <a class="guide-sidebar__link" href="/dashboard">
-                <MaterialIcon Name="dashboard" />
-                Dashboard
-            </a>
-            <a class="guide-sidebar__link" href="/guides">
-                <MaterialIcon Name="badge" />
-                Guides
-            </a>
-            <a class="guide-sidebar__link" href="/guide-assignments">
-                <MaterialIcon Name="assignment_ind" />
-                Assignments
-            </a>
-            <a class="guide-sidebar__link guide-sidebar__link--active" href="/admin-service-requests">
-                <MaterialIcon Name="support_agent" />
-                Service Requests
-            </a>
-            <a class="guide-sidebar__link " href="/tour-reviews" aria-current="page">
-                <MaterialIcon Name="rate_review" />
-                Tour Reviews
-            </a>
-            <a class="guide-sidebar__link" href="/">
-                <MaterialIcon Name="home" />
-                Homepage
-            </a>
-        </nav>
-    </aside>
 
-    <!-- Main content -->
-    <main class="guide-main">
 
         @if (_view == "list")
         {
-            <!-- ===== VIEW 1: Danh sách Booking có yêu cầu ===== -->
+            <!-- ===== VIEW 1: Bookings with requests ===== -->
             <header class="guide-topbar">
                 <div>
-                    <p class="guide-eyebrow">Quản lý</p>
-                    <h1>Yêu cầu dịch vụ đặc biệt</h1>
-                    <p class="guide-subtitle">Xem và duyệt yêu cầu dịch vụ thêm của khách hàng theo từng tour.</p>
+                    <p class="guide-eyebrow">Management</p>
+                    <h1>Special Service Requests</h1>
+                    <p class="guide-subtitle">Review and approve customer add-on service requests by tour.</p>
                 </div>
                 <div class="guide-topbar__actions">
-                    <label class="guide-search" aria-label="Tìm kiếm tour">
+                    <label class="guide-search" aria-label="Search tours">
                         <MaterialIcon Name="search" />
-                        <input type="search" placeholder="Tìm theo tour, khách hàng..." value="@_searchTerm" @oninput="OnSearchInput" />
+                        <input type="search" placeholder="Search by tour, customer..." value="@_searchTerm" @oninput="OnSearchInput" />
                     </label>
                 </div>
             </header>
@@ -66,7 +31,7 @@
                 {
                     <div class="guide-empty">
                         <MaterialIcon Name="sync" />
-                        Đang tải danh sách...
+                        Loading list...
                     </div>
                 }
                 else if (!string.IsNullOrWhiteSpace(_listError))
@@ -78,24 +43,24 @@
                     <!-- Stats -->
                     <div class="guide-stat-grid">
                         <article class="guide-stat">
-                            <p>Tổng tour có yêu cầu</p>
+                            <p>Tours with requests</p>
                             <strong>@_bookings.Count</strong>
-                            <span>Booking đang có yêu cầu</span>
+                            <span>Bookings with requests</span>
                         </article>
                         <article class="guide-stat guide-stat--secondary">
-                            <p>Chờ duyệt</p>
+                            <p>Pending Review</p>
                             <strong>@_bookings.Sum(b => b.PendingRequests)</strong>
-                            <span>Cần xử lý ngay</span>
+                            <span>Needs action</span>
                         </article>
                         <article class="guide-stat guide-stat--tertiary">
-                            <p>Đã duyệt</p>
+                            <p>Approved</p>
                             <strong>@_bookings.Sum(b => b.ApprovedRequests)</strong>
-                            <span>Đã chấp nhận</span>
+                            <span>Accepted</span>
                         </article>
                         <article class="guide-stat">
-                            <p>Đã từ chối</p>
+                            <p>Rejected</p>
                             <strong>@_bookings.Sum(b => b.RejectedRequests)</strong>
-                            <span>Không được duyệt</span>
+                            <span>Not approved</span>
                         </article>
                     </div>
 
@@ -103,7 +68,7 @@
                     <section class="guide-table-shell">
                         <div class="guide-table-toolbar">
                             <div class="guide-filter-group" role="group">
-                                @foreach (var f in new[] { "Tất cả", "Chờ duyệt", "Có kết quả" })
+                                @foreach (var f in new[] { "All", "Pending Review", "Resolved" })
                                 {
                                     <button class="@(_statusFilter == f ? "guide-filter guide-filter--active" : "guide-filter")"
                                             type="button" @onclick="() => SetStatusFilter(f)">
@@ -116,7 +81,7 @@
                                 {
                                     var start = (_currentPage - 1) * PageSize + 1;
                                     var end = Math.Min(_currentPage * PageSize, FilteredBookings.Count());
-                                    <text>Hiển thị @start–@end / @FilteredBookings.Count() tour</text>
+                                    <text>Showing @start-@end / @FilteredBookings.Count() tour</text>
                                 }
                                 else
                                 {
@@ -129,12 +94,12 @@
                             <table class="guide-table">
                                 <thead>
                                     <tr>
-                                        <th>Tour / Khách hàng</th>
-                                        <th>Ngày khởi hành</th>
-                                        <th>Trạng thái booking</th>
-                                        <th style="text-align:center">Tổng YC</th>
-                                        <th style="text-align:center">Chờ duyệt</th>
-                                        <th class="guide-table__actions">Xem chi tiết</th>
+                                        <th>Tour / Customer</th>
+                                        <th>Departure Date</th>
+                                        <th>Booking Status</th>
+                                        <th style="text-align:center">Total Requests</th>
+                                        <th style="text-align:center">Pending Review</th>
+                                        <th class="guide-table__actions">View Details</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -144,7 +109,7 @@
                                             <td colspan="6">
                                                 <div class="guide-empty guide-empty--compact">
                                                     <MaterialIcon Name="inbox" />
-                                                    Không có tour nào phù hợp.
+                                                    No matching tours found.
                                                 </div>
                                             </td>
                                         </tr>
@@ -203,9 +168,9 @@
                         @if (TotalPages >= 1)
                         {
                             <div class="guide-table-pagination" style="padding: 12px 24px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
-                                <span style="font-size: 13px; color: #64748b;">Trang @_currentPage / @TotalPages</span>
+                                <span style="font-size: 13px; color: #64748b;">Page @_currentPage / @TotalPages</span>
                                 <div style="display: flex; gap: 4px;">
-                                    <button class="wx-page-btn" disabled="@(_currentPage <= 1)" @onclick="PrevPage" title="Trang trước">
+                                    <button class="wx-page-btn" disabled="@(_currentPage <= 1)" @onclick="PrevPage" title="Previous page">
                                         <MaterialIcon Name="chevron_left" />
                                     </button>
                                     @for (var p = 1; p <= TotalPages; p++)
@@ -214,7 +179,7 @@
                                         <button class="wx-page-btn @(_currentPage == pg ? "wx-page-btn--active" : "")"
                                                 @onclick="() => GoToPage(pg)">@pg</button>
                                     }
-                                    <button class="wx-page-btn" disabled="@(_currentPage >= TotalPages)" @onclick="NextPage" title="Trang sau">
+                                    <button class="wx-page-btn" disabled="@(_currentPage >= TotalPages)" @onclick="NextPage" title="Next page">
                                         <MaterialIcon Name="chevron_right" />
                                     </button>
                                 </div>
@@ -226,7 +191,7 @@
         }
         else if (_view == "booking")
         {
-            <!-- ===== VIEW 2: Danh sách khách hàng trong booking đó ===== -->
+            <!-- ===== VIEW 2: Requests in the selected booking ===== -->
             <header class="guide-topbar">
                 <div>
                     <button class="guide-icon-button" style="margin-bottom:8px" type="button" @onclick="BackToList">
@@ -234,7 +199,7 @@
                     </button>
                     <p class="guide-eyebrow">@_selectedBooking!.BookingCode · @_selectedBooking.CustomerName</p>
                     <h1>@_selectedBooking.TourName</h1>
-                    <p class="guide-subtitle">@_selectedBooking.Destination · Khởi hành @_selectedBooking.DepartureDate.ToString("dd/MM/yyyy")</p>
+                    <p class="guide-subtitle">@_selectedBooking.Destination · Departure @_selectedBooking.DepartureDate.ToString("dd/MM/yyyy")</p>
                 </div>
             </header>
 
@@ -243,47 +208,47 @@
                 {
                     <div class="guide-empty">
                         <MaterialIcon Name="sync" />
-                        Đang tải yêu cầu...
+                        Loading requests...
                     </div>
                 }
                 else if (_bookingRequests == null || !_bookingRequests.Any())
                 {
                     <div class="guide-empty">
                         <MaterialIcon Name="inbox" />
-                        Booking này chưa có yêu cầu nào.
+                        This booking has no requests yet.
                     </div>
                 }
                 else
                 {
-                    <!-- Mini stats cho booking này -->
+                    <!-- Mini stats for this booking -->
                     <div class="guide-stat-grid" style="margin-bottom:24px">
                         <article class="guide-stat">
-                            <p>Tổng yêu cầu</p>
+                            <p>Total requests</p>
                             <strong>@_bookingRequests.Count</strong>
-                            <span>Từ khách hàng</span>
+                            <span>From customers</span>
                         </article>
                         <article class="guide-stat guide-stat--secondary">
-                            <p>Chờ duyệt</p>
+                            <p>Pending Review</p>
                             <strong>@_bookingRequests.Count(r => r.Status == "Pending")</strong>
-                            <span>Cần xử lý</span>
+                            <span>Needs action</span>
                         </article>
                         <article class="guide-stat guide-stat--tertiary">
-                            <p>Đã duyệt</p>
+                            <p>Approved</p>
                             <strong>@_bookingRequests.Count(r => r.Status == "Approved")</strong>
-                            <span>Chấp nhận</span>
+                            <span>Accepted</span>
                         </article>
                         <article class="guide-stat">
-                            <p>Từ chối</p>
+                            <p>Reject</p>
                             <strong>@_bookingRequests.Count(r => r.Status == "Rejected")</strong>
-                            <span>Không duyệt</span>
+                            <span>Not approved</span>
                         </article>
                     </div>
 
-                    <!-- Danh sách yêu cầu của khách này -->
+                    <!-- Customer request list -->
                     <section class="guide-form-panel">
                         <div class="guide-section-heading">
                             <div>
-                                <p class="guide-eyebrow">Khách hàng</p>
+                                <p class="guide-eyebrow">Customer</p>
                                 <h2>@_selectedBooking!.CustomerName</h2>
                             </div>
                             <span style="font-size:13px;color:var(--guide-muted)">@_selectedBooking.CustomerEmail</span>
@@ -307,30 +272,30 @@
                                                 <button class="wx-button" style="font-size:12px;padding:6px 16px;background:#16a34a;border-color:#16a34a"
                                                         type="button" @onclick="() => OpenReviewModal(req, true)">
                                                     <MaterialIcon Name="check_circle" />
-                                                    Duyệt
+                                                    Approve
                                                 </button>
                                                 <button class="wx-button wx-button--outline" style="font-size:12px;padding:6px 16px;color:#dc2626;border-color:#dc2626"
                                                         type="button" @onclick="() => OpenReviewModal(req, false)">
                                                     <MaterialIcon Name="cancel" />
-                                                    Từ chối
+                                                    Reject
                                                 </button>
                                             </div>
                                         }
                                     </div>
 
                                     <div class="asr-request-body">
-                                        <label class="asr-label">Nội dung yêu cầu:</label>
+                                        <label class="asr-label">Request details:</label>
                                         <p class="asr-description">@req.Description</p>
                                     </div>
 
                                     @if (!string.IsNullOrEmpty(req.AdminResponse))
                                     {
                                         <div class="asr-admin-response">
-                                            <label class="asr-label">Phản hồi của admin:</label>
+                                            <label class="asr-label">Admin response:</label>
                                             <p>@req.AdminResponse</p>
                                             @if (req.ReviewedAt.HasValue)
                                             {
-                                                <span class="asr-request-date">Xét duyệt lúc: @req.ReviewedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                                <span class="asr-request-date">Reviewed at: @req.ReviewedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
                                             }
                                         </div>
                                     }
@@ -342,14 +307,14 @@
             </section>
         }
 
-        <!-- ===== MODAL Duyệt / Từ chối ===== -->
+        <!-- ===== MODAL Approve / Reject ===== -->
         @if (_showModal && _reviewingRequest != null)
         {
             <div class="asr-modal-overlay" @onclick="CloseModal">
                 <div class="asr-modal" @onclick:stopPropagation="true">
                     <div class="asr-modal__header">
                         <div>
-                            <h2>@(_isApproving ? "✅ Duyệt yêu cầu" : "❌ Từ chối yêu cầu")</h2>
+                            <h2>@(_isApproving ? "✅ Approve requests" : "❌ Reject requests")</h2>
                             <p class="guide-subtitle" style="margin-top:4px">@_selectedBooking?.TourName · @_selectedBooking?.CustomerName</p>
                         </div>
                         <button class="guide-icon-button" type="button" @onclick="CloseModal">
@@ -359,22 +324,22 @@
 
                     <div class="asr-modal__body">
                         <div class="asr-modal-desc-box">
-                            <label class="asr-label">Nội dung yêu cầu của khách:</label>
+                            <label class="asr-label">Customer request details:</label>
                             <p>@_reviewingRequest.Description</p>
                         </div>
 
                         <div class="guide-field" style="margin-top:16px">
                             <label for="admin-response" class="asr-label">
-                                @(_isApproving ? "Ghi chú cho khách (tuỳ chọn):" : "Lý do từ chối (bắt buộc):")
+                                @(_isApproving ? "Note for customer (optional):" : "Rejection reason (required):")
                             </label>
                             <textarea id="admin-response"
                                       class="guide-control guide-control--area"
                                       rows="4"
-                                      placeholder="@(_isApproving ? "VD: Chúng tôi sẽ sắp xếp dịch vụ theo yêu cầu của bạn..." : "VD: Dịch vụ này không có sẵn trong gói tour của bạn...")"
+                                      placeholder="@(_isApproving ? "Example: We will arrange the service based on your request..." : "Example: This service is not available in your tour package...")"
                                       @bind="_adminResponse"></textarea>
                             @if (!_isApproving && string.IsNullOrWhiteSpace(_adminResponse) && _showValidation)
                             {
-                                <span style="color:#dc2626;font-size:12px">Vui lòng nhập lý do từ chối.</span>
+                                <span style="color:#dc2626;font-size:12px">Please enter a rejection reason.</span>
                             }
                         </div>
                     </div>
@@ -386,23 +351,18 @@
                         }
                         <div style="display:flex;gap:12px;justify-content:flex-end">
                             <button class="wx-button wx-button--outline" type="button" @onclick="CloseModal" disabled="@_isSaving">
-                                Huỷ
+                                Cancel
                             </button>
                             <button class="wx-button @(_isApproving ? "" : "asr-btn-reject")"
                                     type="button" @onclick="SubmitReview" disabled="@_isSaving">
                                 <MaterialIcon Name="@(_isApproving ? "check_circle" : "cancel")" />
-                                @(_isSaving ? "Đang xử lý..." : (_isApproving ? "Xác nhận duyệt" : "Xác nhận từ chối"))
+                                @(_isSaving ? "Processing..." : (_isApproving ? "Confirm approval" : "Confirm rejection"))
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
         }
-
-    </main>
-    <MobileBottomNav />
-</div>
-
 <style>
     :root {
         --asr-accent: #4f46e5;
@@ -631,7 +591,7 @@
     private bool _isLoadingRequests;
     private string? _listError;
     private string _searchTerm = string.Empty;
-    private string _statusFilter = "Tất cả";
+    private string _statusFilter = "All";
 
     // Data
     private List<BookingWithRequestCountResponse> _bookings = new();
@@ -664,8 +624,8 @@
 
             return _statusFilter switch
             {
-                "Chờ duyệt"  => b.PendingRequests > 0,
-                "Có kết quả" => b.ApprovedRequests > 0 || b.RejectedRequests > 0,
+                "Pending Review"  => b.PendingRequests > 0,
+                "Resolved" => b.ApprovedRequests > 0 || b.RejectedRequests > 0,
                 _            => true
             };
         });
@@ -709,7 +669,7 @@
         }
         catch (Exception ex)
         {
-            _listError = "Không thể tải danh sách: " + ex.Message;
+            _listError = "Could not load list: " + ex.Message;
         }
         finally
         {
@@ -769,7 +729,7 @@
     {
         if (_reviewingRequest == null) return;
 
-        // Validate: reject cần lý do
+        // Validate: rejection requires a reason.
         if (!_isApproving && string.IsNullOrWhiteSpace(_adminResponse))
         {
             _showValidation = true;
@@ -801,7 +761,7 @@
         }
         catch (Exception ex)
         {
-            _modalError = ex.Message.Contains('{') ? "Đã xảy ra lỗi. Vui lòng thử lại." : ex.Message;
+            _modalError = ex.Message.Contains('{') ? "Something went wrong. Please try again." : ex.Message;
         }
         finally
         {
@@ -836,10 +796,12 @@
 
     private static string GetStatusText(string status) => status switch
     {
-        "Pending"   => "Đang chờ",
-        "Approved"  => "Đã duyệt",
-        "Rejected"  => "Đã từ chối",
-        "Completed" => "Đã hoàn thành",
+        "Pending"   => "Pending",
+        "Approved"  => "Approved",
+        "Rejected"  => "Rejected",
+        "Completed" => "Completed",
         _           => status
     };
 }
+
+

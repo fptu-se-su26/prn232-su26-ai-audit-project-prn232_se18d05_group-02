@@ -25,7 +25,7 @@ Nguyên tắc ghi changelog:
 | Học kỳ | SU26 |
 | Tên bài tập / Project | Group Project - WanderX Tour Management System |
 | Tên sinh viên / Nhóm | Group 2 |
-| MSSV / Danh sách MSSV | DE180158 |
+| MSSV / Danh sách MSSV | DE180158, DE180166 |
 | Giảng viên hướng dẫn | Lê Thiện Nhật Quang |
 | Repository URL | https://github.com/group-02/wanderx-tour-management |
 | Ngày bắt đầu | 17/05/2026 |
@@ -41,6 +41,8 @@ Nguyên tắc ghi changelog:
 | Phase 02 | 17/05 - 20/05/2026 | Phân tích yêu cầu & Design | Completed |
 | Phase 03 | 20/05 - ... | Thiết kế hệ thống | In Progress |
 | Phase 04 | 25/05 - ... | Implementation - Guide Management | In Progress |
+| Phase 04.2 | 20/07/2026 | Implementation - Member 2 Admin/Staff Booking Operations | Completed |
+| Phase 04.3 | 12/07/2026 – 22/07/2026 | Implementation - Member 3 Customer Management & Tour Reviews | Completed |
 | Phase 05 |  | Testing & Debug | Not Started |
 | Phase 06 |  | Hoàn thiện báo cáo và demo | Not Started |
 
@@ -288,65 +290,216 @@ Viết tại đây...
 
 ---
 
-# [Phase 04] Implementation
+# [Phase 04.2] Implementation - Member 2 Admin/Staff Booking Operations
 
 ## Ngày thực hiện
 
 ```text
-DD/MM/YYYY
+20/07/2026
 ```
 
 ## Đã hoàn thành
 
-- [ ] Tạo project structure
-- [ ] Cài đặt database connection
-- [ ] Xây dựng backend
-- [ ] Xây dựng frontend
-- [ ] Xây dựng authentication/authorization
-- [ ] Xử lý CRUD
-- [ ] Xử lý validation
-- [ ] Tích hợp API
-- [ ] Xử lý upload/download file
-- [ ] Xử lý lỗi
-- [ ] Tối ưu giao diện
-- [ ] Cập nhật README hướng dẫn chạy
+- [X] Xây dựng backend API cho Booking Management
+- [X] Xây dựng backend API cho Booking Status Management
+- [X] Xây dựng backend API cho Cancellation Request Management
+- [X] Xây dựng backend API cho Payment Management
+- [X] Bổ sung DTO request/response cần thiết
+- [X] Tận dụng database hiện có và bổ sung cột vào bảng Bookings
+- [X] Xây dựng frontend Blazor cho Admin Bookings
+- [X] Xây dựng frontend Blazor cho Admin Cancellation Requests
+- [X] Xây dựng frontend Blazor cho Admin Payments
+- [X] Xử lý validation và business rules
+- [X] Xử lý lỗi tích hợp frontend/backend
+- [X] Tối ưu giao diện, popup/modal và phân trang 5 dòng/trang
 
 ## Thay đổi chi tiết
 
 | STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
 |---:|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Implement FE1 Booking Management: danh sách booking, tạo/sửa booking, guest list, ticket type Adult/Child, search/filter và phân trang | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXServer/Controllers/BookingsController.cs; WanderXServer/Services/BookingService.cs | Test trực tiếp màn hình Admin Bookings |
+| 2 | Implement FE2 Booking Status Management với business rule khóa Finished/Cancelled và giới hạn dropdown trạng thái hợp lệ | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXServer/Dtos/Bookings/UpdateBookingStatusRequest.cs; WanderXServer/Services/BookingService.cs | Test đổi status Pending/Confirmed/Finished/Cancelled |
+| 3 | Implement FE3 Cancellation Request Management: user gửi request, admin approve/reject bằng popup, đồng bộ giao diện và phân trang | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminCancellationRequests.razor; WanderXClient/WanderXClient/Pages/BookingDetail.razor; WanderXServer/Controllers/UsersController.cs; WanderXServer/Controllers/BookingsController.cs | Test tạo và review cancellation request |
+| 4 | Implement FE4 Payment Management: quản lý unpaid/deposit paid/paid/failed, full/deposit/balance payment, reference, invoice/receipt và khóa booking đã paid | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Pages/AdminPayments.razor; WanderXServer/Dtos/Bookings/UpdatePaymentRequest.cs; WanderXServer/Services/BookingService.cs | Test record payment và view invoice |
+| 5 | Bổ sung các cột booking/status/cancellation/payment vào bảng Bookings bằng logic đảm bảo schema khi chạy app | Trần Hồng Quân - DE180166 | WanderXServer/BusinessObject/Booking.cs; WanderXServer/DataAccessLayer/WanderXDbContext.cs | Kiểm tra app chạy với database hiện có |
+| 6 | Chuẩn bị gửi email tự động cho cancellation request received/approved/rejected và direct cancellation | Trần Hồng Quân - DE180166 | WanderXServer/Services/SmtpEmailSender.cs; WanderXServer/Services/UserService.cs; WanderXServer/Services/BookingService.cs | Email hook đã sẵn sàng, chỉ cần cấu hình SMTP thật |
+| 7 | Fix lỗi CSRF token, route đổi link nhưng không render form, concurrency khi đổi ngày tour, Failed to fetch và lỗi số tiền bị tràn UI | Trần Hồng Quân - DE180166 | WanderXClient/WanderXClient/Services/UserApiClient.cs; WanderXClient/WanderXClient/Pages/AdminBookings.razor; WanderXClient/WanderXClient/Pages/AdminPayments.razor; WanderXServer/Services/BookingService.cs | Build và test thủ công sau khi sửa |
 
 ## AI có hỗ trợ không?
 
-- [ ] Có
+- [X] Có
 - [ ] Không
 
 Nếu có, mô tả AI đã hỗ trợ phần nào:
 
 ```text
-Viết tại đây...
+ChatGPT/Codex hỗ trợ:
+1. Phân tích nghiệp vụ Member 2 theo từng feature FE1-FE4.
+2. Đề xuất DTO/API/service cần bổ sung dựa trên cấu trúc project có sẵn.
+3. Hỗ trợ viết và chỉnh Blazor UI cho các màn hình Admin/Staff.
+4. Hỗ trợ debug lỗi runtime và build phát sinh khi tích hợp frontend/backend.
+5. Hỗ trợ rà soát để tận dụng database hiện có, không tạo bảng mới ngoài phạm vi yêu cầu.
+
+Chi tiết trong PROMPTS.md - Prompt-06 và AI_AUDIT_LOG.md - Lần sử dụng AI số 6.
 ```
 
 ## Commit/Screenshot minh chứng
 
 ```text
-Dán link commit, screenshot hoặc mô tả minh chứng tại đây...
+Files implemented/tested:
+- WanderXClient/WanderXClient/Pages/AdminBookings.razor
+- WanderXClient/WanderXClient/Pages/AdminCancellationRequests.razor
+- WanderXClient/WanderXClient/Pages/AdminPayments.razor
+- WanderXServer/Controllers/BookingsController.cs
+- WanderXServer/Controllers/UsersController.cs
+- WanderXServer/Services/BookingService.cs
+- WanderXServer/Services/UserService.cs
+- WanderXServer/DataAccessLayer/WanderXDbContext.cs
+
+Kết quả kiểm tra:
+- Build backend/frontend thành công sau khi fix lỗi.
+- Test thủ công các luồng booking, status, cancellation request và payment.
 ```
 
 ## Ghi chú
 
 ```text
-Viết tại đây...
+Các chức năng FE1-FE4 phục vụ phía Admin/Staff. Database không tạo thêm bảng mới cho cancellation/payment; hệ thống bổ sung các cột cần thiết vào bảng Bookings để lưu trạng thái, yêu cầu hủy và thông tin thanh toán. Email đã được chuẩn bị theo dạng SMTP configuration, khi điền thông tin mail thật trong appsettings thì các luồng tự động có thể gửi email.
+```
+
+---
+
+---
+
+# [Phase 04.3] Implementation - Member 3: Quản lý Khách hàng và Đánh giá
+
+## Ngày thực hiện
+
+```text
+12/07/2026 – 22/07/2026
+```
+
+## Người thực hiện
+
+```text
+Võ Quang Đăng Khoa – DE180127 (Thành viên 3)
+```
+
+## Đã hoàn thành
+
+### Feature 1: Quản lý hồ sơ khách hàng
+- [X] Trang Profile.razor – khách hàng xem thông tin cá nhân (họ tên, email, SĐT, địa chỉ)
+- [X] Chỉnh sửa thông tin cá nhân (FullName, PhoneNumber, Address)
+- [X] Thay đổi mật khẩu với xác minh mật khẩu cũ
+- [X] Hiển thị avatar người dùng và lưu cục bộ qua localStorage
+
+### Feature 2: Tra cứu và theo dõi booking cá nhân
+- [X] Trang MyBookings.razor – danh sách tất cả booking của khách theo thứ tự mới nhất
+- [X] Phân trang cho danh sách booking (5 booking/trang, có số trang bấm được)
+- [X] Trang BookingDetail.razor – xem chi tiết từng booking (thông tin tour, hành khách, tổng tiền)
+- [X] Theo dõi tiến trình booking theo 4 bước trực quan (Paid → Confirmed → Completed)
+- [X] Hủy booking (nếu trạng thái cho phép)
+
+### Feature 3: Quản lý yêu cầu đặc biệt của khách
+- [X] Trang ServiceUserRequest.razor – khách tạo yêu cầu dịch vụ đi kèm cho booking
+- [X] Xem danh sách yêu cầu của mình với phân trang
+- [X] Trang AdminServiceRequests.razor – Admin xem tất cả booking có yêu cầu dịch vụ
+- [X] Drill-down: bấm vào booking → xem danh sách người yêu cầu → bấm vào người → xem chi tiết từng dịch vụ
+- [X] Admin duyệt hoặc từ chối từng yêu cầu kèm lý do
+
+### Feature 4: Đánh giá và nhận xét tour
+- [X] Trang TourReview.razor – khách đánh giá (1–5 sao + nhận xét văn bản) sau khi tour hoàn thành
+- [X] Chỉ cho phép đánh giá khi booking có trạng thái CompletedAt (tiến trình 4 hoàn thành)
+- [X] Mỗi booking chỉ được tạo 1 đánh giá; khách có thể chỉnh sửa hoặc xóa đánh giá của mình
+- [X] Trang AdminTourReviews.razor – Admin xem danh sách tất cả đánh giá, duyệt Visible/Hidden/Deleted và ghi lý do
+- [X] Xây dựng API TourReviewsController với đầy đủ CRUD + moderate endpoint
+- [X] Xây dựng TourReviewService với validation nghiệp vụ bằng tiếng Việt
+- [X] Phân trang cho AdminServiceRequests.razor, MyBookings.razor, ServiceUserRequest.razor
+
+## Thay đổi chi tiết
+
+| STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
+|---:|---|---|---|---|
+| 1 | Implement Feature 1: Profile.razor – xem/sửa thông tin cá nhân, đổi mật khẩu | Võ Quang Đăng Khoa – DE180127 | WanderXClient/WanderXClient/Pages/Profile.razor; WanderXServer/Controllers/UsersController.cs; WanderXServer/Services/UserService.cs | Test thủ công đăng nhập, xem và sửa profile |
+| 2 | Implement Feature 2: MyBookings.razor – danh sách booking có phân trang | Võ Quang Đăng Khoa – DE180127 | WanderXClient/WanderXClient/Pages/MyBookings.razor; WanderXServer/Controllers/UsersController.cs | Test xem danh sách và phân trang 5 booking/trang |
+| 3 | Implement Feature 2: BookingDetail.razor – chi tiết booking, tiến trình 4 bước, hủy booking | Võ Quang Đăng Khoa – DE180127 | WanderXClient/WanderXClient/Pages/BookingDetail.razor; WanderXServer/Controllers/UsersController.cs | Test xem chi tiết, theo dõi trạng thái và hủy |
+| 4 | Implement Feature 3: ServiceUserRequest.razor – tạo và xem yêu cầu dịch vụ của khách | Võ Quang Đăng Khoa – DE180127 | WanderXClient/WanderXClient/Pages/ServiceUserRequest.razor; WanderXServer/Controllers/UsersController.cs; WanderXServer/Services/UserSpecialRequestService.cs | Test tạo request và xem danh sách |
+| 5 | Implement Feature 3: AdminServiceRequests.razor – admin quản lý yêu cầu dịch vụ theo tour/người | Võ Quang Đăng Khoa – DE180127 | WanderXClient/WanderXClient/Pages/AdminServiceRequests.razor; WanderXServer/Controllers/UsersController.cs | Test drill-down booking → người → dịch vụ → duyệt/từ chối |
+| 6 | Implement Feature 3: UserSpecialRequestsController.cs – API riêng cho special requests | Võ Quang Đăng Khoa – DE180127 | WanderXServer/Controllers/UserSpecialRequestsController.cs; WanderXServer/Services/UserSpecialRequestService.cs | Build backend thành công |
+| 7 | Implement Feature 4: TourReview.razor – form đánh giá 1–5 sao, nhận xét, chỉnh sửa/xóa | Võ Quang Đăng Khoa – DE180127 | WanderXClient/WanderXClient/Pages/TourReview.razor; WanderXServer/Controllers/TourReviewsController.cs | Test submit review và cập nhật |
+| 8 | Implement Feature 4: AdminTourReviews.razor – admin xem, duyệt, ẩn, xóa đánh giá | Võ Quang Đăng Khoa – DE180127 | WanderXClient/WanderXClient/Pages/AdminTourReviews.razor; WanderXServer/Controllers/TourReviewsController.cs | Test moderate review với lý do |
+| 9 | Xây dựng TourReviewsController.cs – CRUD + moderate API, dùng email query thay JWT | Võ Quang Đăng Khoa – DE180127 | WanderXServer/Controllers/TourReviewsController.cs | Build thành công, test API |
+| 10 | Xây dựng TourReviewService.cs – business logic validation bằng tiếng Việt, 204 cho review trống | Võ Quang Đăng Khoa – DE180127 | WanderXServer/Services/TourReviewService.cs | Build thành công |
+| 11 | Xây dựng BusinessObject/TourReview.cs và DTO TourReviews/ cho server và client models | Võ Quang Đăng Khoa – DE180127 | WanderXServer/BusinessObject/TourReview.cs; WanderXServer/Dtos/TourReviews/; WanderXClient/WanderXClient/Models/TourReviewContracts.cs | Build thành công |
+| 12 | Bổ sung phân trang số trang có thể bấm cho AdminServiceRequests, MyBookings, ServiceUserRequest | Võ Quang Đăng Khoa – DE180127 | WanderXClient/WanderXClient/Pages/AdminServiceRequests.razor; WanderXClient/WanderXClient/Pages/MyBookings.razor; WanderXClient/WanderXClient/Pages/ServiceUserRequest.razor | Test phân trang các trang |
+| 13 | Debug lỗi URL sai (api/tour_review → api/tourreviews), 204 parse, silent exception | Võ Quang Đăng Khoa – DE180127 | WanderXClient/WanderXClient/Services/UserApiClient.cs | Build và test sau fix |
+
+## AI có hỗ trợ không?
+
+- [X] Có
+- [ ] Không
+
+Nếu có, mô tả AI đã hỗ trợ phần nào:
+
+```text
+Antigravity (Google DeepMind) hỗ trợ:
+1. Phân tích yêu cầu từng feature của thành viên 3 và đề xuất luồng triển khai.
+2. Tạo code mẫu cho TourReviewsController, TourReviewService, TourReview.razor, AdminTourReviews.razor, AdminServiceRequests.razor.
+3. Hỗ trợ debug lỗi runtime: URL sai (tour_review vs tourreviews), silent exception catch, 204 NoContent parse lỗi, closure bug trong vòng lặp Blazor.
+4. Gợi ý dùng email query string thay JWT để tránh lỗi AuthenticationScheme chưa cấu hình.
+5. Hỗ trợ viết logic phân trang có số trang bấm được cho các trang khách hàng và admin.
+
+Chi tiết trong PROMPTS.md - Prompt-07 và AI_AUDIT_LOG.md - Lần sử dụng AI số 7.
+```
+
+## Commit/Screenshot minh chứng
+
+```text
+Files được tạo/sửa đổi:
+Server:
+- WanderXServer/BusinessObject/TourReview.cs
+- WanderXServer/Controllers/TourReviewsController.cs
+- WanderXServer/Controllers/UserSpecialRequestsController.cs
+- WanderXServer/Controllers/UsersController.cs (bổ sung endpoints)
+- WanderXServer/Services/TourReviewService.cs
+- WanderXServer/Services/UserSpecialRequestService.cs
+- WanderXServer/Dtos/TourReviews/CreateTourReviewRequest.cs
+- WanderXServer/Dtos/TourReviews/UpdateTourReviewRequest.cs
+- WanderXServer/Dtos/TourReviews/TourReviewResponse.cs
+- WanderXServer/DataAccessLayer/WanderXDbContext.cs (bổ sung TourReviews DbSet)
+
+Client:
+- WanderXClient/WanderXClient/Pages/Profile.razor
+- WanderXClient/WanderXClient/Pages/MyBookings.razor
+- WanderXClient/WanderXClient/Pages/BookingDetail.razor
+- WanderXClient/WanderXClient/Pages/ServiceUserRequest.razor
+- WanderXClient/WanderXClient/Pages/AdminServiceRequests.razor
+- WanderXClient/WanderXClient/Pages/TourReview.razor
+- WanderXClient/WanderXClient/Pages/AdminTourReviews.razor
+- WanderXClient/WanderXClient/Models/TourReviewContracts.cs
+- WanderXClient/WanderXClient/Services/UserApiClient.cs (bổ sung review methods)
+
+Kết quả kiểm tra:
+- dotnet build backend và frontend đều thành công (0 error).
+- Test thủ công toàn bộ luồng: xem/sửa profile, xem booking, tạo yêu cầu dịch vụ, admin duyệt yêu cầu, gửi đánh giá tour, admin moderate đánh giá.
+```
+
+## Ghi chú
+
+```text
+Thành viên 3 phụ trách toàn bộ luồng phía khách hàng (Customer side) bao gồm: hồ sơ cá nhân, xem và theo dõi booking, yêu cầu dịch vụ đặc biệt và đánh giá tour. Database không tạo bảng mới ngoài TourReviews (đã có trong schema ban đầu) và UserSpecialRequests.
+
+Lỗi quan trọng đã debug:
+1. URL Blazor WASM cache cũ gọi api/tour_review (sai) thay vì api/tourreviews (đúng) → Hard Reload browser.
+2. GetByBookingId trả Ok(null) → client crash khi parse JSON null → đổi thành 204 NoContent.
+3. catch(Exception){} im lặng trong TourReview.razor → thêm _errorMessage để hiển thị lỗi rõ ràng lên UI.
+4. Closure bug trong vòng lặp @for tạo sao rating → dùng var starIndex = i để capture đúng.
 ```
 
 ---
 
 # [Phase 05] Testing & Debug
+
 
 ## Ngày thực hiện
 

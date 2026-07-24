@@ -120,11 +120,11 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("bookings/{id:guid}/cancel")]
-    public async Task<ActionResult<BookingSummaryResponse>> CancelBooking(Guid id)
+    public async Task<ActionResult<BookingSummaryResponse>> CancelBooking(Guid id, [FromBody] CreateCancellationRequest request)
     {
         try
         {
-            var booking = await _userService.CancelBookingAsync(id);
+            var booking = await _userService.CancelBookingAsync(id, request ?? new CreateCancellationRequest());
             if (booking == null)
             {
                 return NotFound(new ProblemDetails

@@ -1,0 +1,114 @@
+﻿@page "/tours"
+@inject TourApiClient TourApi
+
+<PageTitle>Tours - WanderX</PageTitle>
+
+<div class="wx-page">
+    <AppHeader />
+    <main>
+        <section class="section tours-page">
+            <div class="wx-container">
+                <div class="section__header">
+                    <div>
+                        <h2>All Experiences</h2>
+                        <p class="section__copy">Browse every published WanderX tour package.</p>
+                    </div>
+                    <a class="wx-button wx-button--outline" href="/">
+                        Back home
+                    </a>
+                </div>
+
+                @if (_isLoading)
+                {
+                    <div class="tour-grid">
+                        @foreach (var index in Enumerable.Range(1, 3))
+                        {
+                            <article class="tour-card tour-card--loading" aria-label="Loading tour">
+                                <div class="tour-card__image"></div>
+                                <div class="tour-card__body">
+                                    <div class="tour-card__meta">
+                                        <span>Loading</span>
+                                        <span>...</span>
+                                    </div>
+                                    <h3>Finding tour...</h3>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+                else if (_tours.Count == 0)
+                {
+                    <div class="guide-empty">
+                        No published tours are available right now.
+                    </div>
+                }
+                else
+                {
+                    <div class="tour-grid">
+                        @foreach (var tour in _tours)
+                        {
+                            <TourCard
+                                Title="@tour.Name"
+                                Location="@tour.Destination"
+                                Duration="@FormatDuration(tour.DurationDays)"
+                                Price="@FormatMoney(tour.Price)"
+                                OriginalPrice="@tour.OriginalPrice"
+                                EffectivePrice="@tour.EffectivePrice"
+                                DiscountPercent="@tour.DiscountPercent"
+                                PromotionName="@tour.AppliedPromotionName"
+                                Rating="@GetRating(tour)"
+                                ImageUrl="@GetImageUrl(tour)"
+                                TourId="@tour.Id" />
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+    </main>
+    <AppFooter />
+    <MobileBottomNav />
+</div>
+
+@code {
+    private List<TourResponse> _tours = new();
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var tours = await TourApi.GetToursAsync(status: "Published");
+            _tours = tours
+                .Where(tour => tour.Status.Equals("Published", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(tour => tour.Name)
+                .ToList();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static string FormatDuration(int durationDays)
+    {
+        return durationDays == 1 ? "1 Day" : $"{durationDays} Days";
+    }
+
+    private static string GetRating(TourResponse tour)
+    {
+        var seed = Math.Abs(tour.Code.GetHashCode());
+        return (4.7m + seed % 4 / 10m).ToString("0.0");
+    }
+
+    private static string GetImageUrl(TourResponse tour)
+    {
+        return string.IsNullOrWhiteSpace(tour.ImageUrl)
+            ? "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"
+            : tour.ImageUrl;
+    }
+
+    private static string FormatMoney(decimal value)
+    {
+        return $"{value:N0} VND";
+    }
+}
