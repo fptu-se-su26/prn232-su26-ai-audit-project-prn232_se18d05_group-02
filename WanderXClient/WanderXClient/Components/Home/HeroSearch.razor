@@ -1,12 +1,12 @@
-<div class="hero-search-tabs">
+﻿<div class="hero-search-tabs">
     <button type="button" class="search-tab @(_activeTab == "tour" ? "active" : "")" @onclick='() => SetActiveTab("tour")'>
-        <MaterialIcon Name="tour" /> Tour Du Lịch
+        <MaterialIcon Name="tour" /> Tours
     </button>
     <button type="button" class="search-tab @(_activeTab == "hotel" ? "active" : "")" @onclick='() => SetActiveTab("hotel")'>
-        <MaterialIcon Name="hotel" /> Khách Sạn
+        <MaterialIcon Name="hotel" /> Hotels
     </button>
     <button type="button" class="search-tab @(_activeTab == "flight" ? "active" : "")" @onclick='() => SetActiveTab("flight")'>
-        <MaterialIcon Name="flight_takeoff" /> Vé Máy Bay
+        <MaterialIcon Name="flight_takeoff" /> Flights
     </button>
 </div>
 

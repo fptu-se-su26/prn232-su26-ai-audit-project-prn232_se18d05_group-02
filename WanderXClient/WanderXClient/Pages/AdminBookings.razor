@@ -1,4 +1,4 @@
-@page "/admin-bookings"
+﻿@page "/admin-bookings"
 @page "/admin-bookings/new"
 @page "/admin-bookings/{BookingId:guid}/edit"
 @layout AdminLayout
@@ -1291,9 +1291,7 @@
 
     private static string NormalizeTicketType(string? ticketType)
     {
-        if (string.Equals(ticketType, "Child", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(ticketType, "Tre em", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(ticketType, "Trẻ em", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(ticketType, "Child", StringComparison.OrdinalIgnoreCase))
         {
             return "Child";
         }
@@ -1321,6 +1319,7 @@
             "confirmed" or "confirm" => "Confirmed",
             "finished" or "finish" => "Finished",
             "cancelled" or "cancel" => "Cancelled",
+            "paid" => "Paid",
             _ => "Pending"
         };
     }
@@ -1330,6 +1329,7 @@
         return NormalizeStatusForForm(currentStatus) switch
         {
             "Pending" => ["Confirmed", "Cancelled"],
+            "Paid" => ["Confirmed", "Cancelled"],
             "Confirmed" => ["Finished", "Cancelled"],
             _ => Array.Empty<string>()
         };

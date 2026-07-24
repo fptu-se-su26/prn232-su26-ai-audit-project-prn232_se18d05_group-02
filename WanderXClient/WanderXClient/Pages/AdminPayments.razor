@@ -53,7 +53,7 @@
                 </article>
                 <article class="guide-stat">
                     <p>Deposits</p>
-                    <strong>@_payments.Count(item => GetPaymentStatus(item) == "Deposit Paid")</strong>
+                    <strong>@_payments.Count(item => GetPaymentStatus(item) == DepositPaidStatus)</strong>
                     <span>40% deposits recorded</span>
                 </article>
             </div>
@@ -869,7 +869,8 @@
 
 @code {
     private const int PageSize = 5;
-    private readonly string[] _statusFilters = ["All", "Unpaid", "Deposit Paid", "Paid", "Failed"];
+    private const string DepositPaidStatus = "40% Paid";
+    private readonly string[] _statusFilters = ["All", "Unpaid", DepositPaidStatus, "Paid", "Failed"];
     private readonly List<BookingResponse> _payments = new();
     private bool _isLoading = true;
     private bool _isSavingPayment;
@@ -1099,7 +1100,7 @@
             return "Unpaid";
         }
 
-        return GetRemainingAmount(booking) > 0m ? "Deposit Paid" : "Paid";
+        return GetRemainingAmount(booking) > 0m ? DepositPaidStatus : "Paid";
     }
 
     private static string GetPaymentStatusClass(BookingResponse booking)
@@ -1107,7 +1108,7 @@
         return GetPaymentStatus(booking) switch
         {
             "Paid" => "payment-status payment-status--paid",
-            "Deposit Paid" => "payment-status payment-status--deposit",
+            DepositPaidStatus => "payment-status payment-status--deposit",
             "Failed" => "payment-status payment-status--failed",
             _ => "payment-status payment-status--unpaid"
         };

@@ -389,7 +389,8 @@ public class BookingService : IBookingService
             ? booking.PaymentOption ?? DepositPaymentOption
             : paymentOption;
         booking.PaymentMethod = paymentMethod;
-        booking.PaymentReference = TrimToNull(request.PaymentReference);
+        booking.PaymentReference = TrimToNull(request.PaymentReference)
+            ?? GeneratePaymentReference(paymentMethod, booking.BookingCode, updatedAt);
         booking.PaidAmount = paidAmount;
         booking.RemainingAmount = remainingAmount;
         booking.PaymentUpdatedAt = updatedAt;
@@ -626,6 +627,20 @@ public class BookingService : IBookingService
         };
     }
 
+    private static string GeneratePaymentReference(string paymentMethod, string bookingCode, DateTime timestamp)
+    {
+        var prefix = paymentMethod.ToLowerInvariant() switch
+        {
+            "bank transfer" => "BT",
+            "card" => "CARD",
+            "cash" => "CASH",
+            "e-wallet" => "EW",
+            _ => "PAY"
+        };
+
+        return $"{prefix}-{bookingCode}-{timestamp:yyyyMMddHHmmss}";
+    }
+
     private static string NormalizePaymentStatus(string status)
     {
         var value = TrimToNull(status);
@@ -676,11 +691,16 @@ public class BookingService : IBookingService
 
         var isAllowed = current switch
         {
-            PendingStatus => newStatus is ConfirmedStatus or CancelledStatus,
+            PendingStatus => newStatus is CancelledStatus,
             PaidStatus => newStatus is ConfirmedStatus or CancelledStatus,
             ConfirmedStatus => newStatus is FinishedStatus or CancelledStatus,
             _ => false
         };
+
+        if (current == PendingStatus && newStatus == ConfirmedStatus)
+        {
+            throw new InvalidOperationException("Payment must be completed before confirming this booking.");
+        }
 
         if (!isAllowed)
         {
