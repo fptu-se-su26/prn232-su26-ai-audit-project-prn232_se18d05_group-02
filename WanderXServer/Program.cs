@@ -34,6 +34,7 @@ builder.Services.AddScoped<IGuideService, GuideService>();
 builder.Services.AddScoped<IGuideTourService, GuideTourService>();
 builder.Services.AddScoped<UserSpecialRequestService>();
 builder.Services.AddScoped<TourReviewService>();
+builder.Services.AddScoped<TravelStyleQuizService>();
 builder.Services.AddScoped<ITourService, TourService>();
 builder.Services.AddScoped<ITourScheduleService, TourScheduleService>();
 builder.Services.AddScoped<IBookedTourService, BookedTourService>();

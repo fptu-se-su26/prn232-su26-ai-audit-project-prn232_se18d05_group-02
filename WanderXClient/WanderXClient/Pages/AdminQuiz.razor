@@ -1,0 +1,786 @@
+@page "/admin-quiz"
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient ApiClient
+@inject IJSRuntime JS
+
+<PageTitle>Manage Quizzes - WanderX Admin</PageTitle>
+
+<div class="guide-admin-page">
+    <aside class="guide-sidebar">
+        <div class="guide-sidebar__brand">
+            <a class="brand-mark" href="/">WanderX</a>
+            <p>Admin Suite</p>
+        </div>
+        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
+            <a class="guide-sidebar__link" href="/dashboard">
+                <MaterialIcon Name="dashboard" />
+                Dashboard
+            </a>
+            <a class="guide-sidebar__link" href="/guides">
+                <MaterialIcon Name="badge" />
+                Guides
+            </a>
+            <a class="guide-sidebar__link" href="/guide-assignments">
+                <MaterialIcon Name="assignment_ind" />
+                Assignments
+            </a>
+            <a class="guide-sidebar__link" href="/admin-service-requests">
+                <MaterialIcon Name="support_agent" />
+                Service Requests
+            </a>
+            <a class="guide-sidebar__link" href="/tour-reviews">
+                <MaterialIcon Name="rate_review" />
+                Tour Reviews
+            </a>
+            <a class="guide-sidebar__link active" href="/admin-quiz" aria-current="page">
+                <MaterialIcon Name="quiz" />
+                Manage Quizzes
+            </a>
+            <a class="guide-sidebar__link" href="/">
+                <MaterialIcon Name="home" />
+                Homepage
+            </a>
+        </nav>
+    </aside>
+
+    <main class="guide-main">
+        <header class="guide-topbar">
+            <div>
+                <p class="guide-eyebrow">Admin</p>
+                <h1>Manage Travel Style Quiz</h1>
+                <p class="guide-subtitle">Add, edit, and remove quiz questions and their scoring options.</p>
+            </div>
+            <button class="wx-button" @onclick="ShowAddModal">
+                <MaterialIcon Name="add_circle" />
+                Add Question
+            </button>
+        </header>
+
+        <section class="guide-content">
+            @if (_isLoading)
+            {
+                <div class="aqz-loading">
+                    <span class="material-symbols-outlined aqz-spinner">progress_activity</span>
+                    <p>Loading questions…</p>
+                </div>
+            }
+            else if (_questions is { Count: 0 })
+            {
+                <div class="aqz-empty">
+                    <span class="material-symbols-outlined">quiz</span>
+                    <h3>No questions yet</h3>
+                    <p>Click "Add Question" to create the first quiz question.</p>
+                </div>
+            }
+            else
+            {
+                <div class="aqz-question-list">
+                    @foreach (var q in _questions!)
+                    {
+                        <article class="aqz-question-card">
+                            <div class="aqz-question-card__header">
+                                <div class="aqz-question-card__meta">
+                                    <span class="aqz-order-badge">Q@(q.DisplayOrder)</span>
+                                    <h3 class="aqz-question-text">@q.Text</h3>
+                                </div>
+                                <div class="aqz-question-card__actions">
+                                    <button class="wx-button wx-button--secondary wx-button--sm" @onclick="() => ShowEditModal(q)">
+                                        <MaterialIcon Name="edit" />
+                                        Edit
+                                    </button>
+                                    <button class="wx-button wx-button--danger wx-button--sm" @onclick="() => ConfirmDelete(q)">
+                                        <MaterialIcon Name="delete" />
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="aqz-options-grid">
+                                @foreach (var opt in q.Options)
+                                {
+                                    <div class="aqz-option-chip aqz-option-chip--@opt.Category.ToLower()">
+                                        <span class="aqz-option-chip__key">@opt.OptionKey</span>
+                                        <span class="aqz-option-chip__text">@opt.Text</span>
+                                        <span class="aqz-option-chip__cat">@opt.Category</span>
+                                    </div>
+                                }
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <div class="aqz-toast aqz-toast--error">
+                    <MaterialIcon Name="error" />
+                    @_errorMessage
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(_successMessage))
+            {
+                <div class="aqz-toast aqz-toast--success">
+                    <MaterialIcon Name="check_circle" />
+                    @_successMessage
+                </div>
+            }
+        </section>
+    </main>
+    <MobileBottomNav />
+</div>
+
+<!-- Add / Edit Modal -->
+@if (_showModal)
+{
+    <div class="aqz-modal-backdrop" @onclick="HideModal">
+        <div class="aqz-modal" @onclick:stopPropagation>
+            <div class="aqz-modal__header">
+                <h2>@(_isEditMode ? "Edit Question" : "Add New Question")</h2>
+                <button class="aqz-modal__close" @onclick="HideModal">
+                    <MaterialIcon Name="close" />
+                </button>
+            </div>
+            <div class="aqz-modal__body">
+                <!-- Question Text -->
+                <label class="aqz-field-label" for="q-text">Question Text <span class="aqz-required">*</span></label>
+                <textarea id="q-text" class="aqz-textarea" rows="3"
+                          placeholder="e.g. Bạn thích đi du lịch đến đâu nhất?"
+                          @bind="_editQuestion.Text" @bind:event="oninput"></textarea>
+
+                <!-- Options -->
+                <div class="aqz-options-section">
+                    <h4>Answer Options</h4>
+                    <p class="aqz-hint">Each option maps answers to a travel style category.</p>
+                    @for (int i = 0; i < _editQuestion.Options.Count; i++)
+                    {
+                        var idx = i;
+                        var opt = _editQuestion.Options[idx];
+                        <div class="aqz-option-editor">
+                            <div class="aqz-option-editor__key">
+                                <input class="aqz-input aqz-input--sm" maxlength="1"
+                                       placeholder="A"
+                                       value="@opt.OptionKey"
+                                       @oninput="e => opt.OptionKey = e.Value?.ToString() ?? string.Empty" />
+                            </div>
+                            <div class="aqz-option-editor__body">
+                                <input class="aqz-input" placeholder="Option text…"
+                                       value="@opt.Text"
+                                       @oninput="e => opt.Text = e.Value?.ToString() ?? string.Empty" />
+                                <select class="aqz-select" value="@opt.Category"
+                                        @onchange="e => opt.Category = e.Value?.ToString() ?? string.Empty">
+                                    <option value="">— Select Category —</option>
+                                    <option value="Adventure">🧗 Adventure (Mạo hiểm)</option>
+                                    <option value="Cultural">🏛️ Cultural (Văn hóa)</option>
+                                    <option value="Relaxation">🏖️ Relaxation (Nghỉ dưỡng)</option>
+                                    <option value="Luxury">💎 Luxury (Thượng lưu)</option>
+                                </select>
+                            </div>
+                            <button class="aqz-remove-opt" @onclick="() => RemoveOption(idx)">
+                                <MaterialIcon Name="remove_circle" />
+                            </button>
+                        </div>
+                    }
+                    <button class="wx-button wx-button--ghost" @onclick="AddOption">
+                        <MaterialIcon Name="add" />
+                        Add Option
+                    </button>
+                </div>
+            </div>
+            <div class="aqz-modal__footer">
+                <button class="wx-button wx-button--secondary" @onclick="HideModal">Cancel</button>
+                <button class="wx-button" @onclick="SaveQuestion" disabled="@_isSaving">
+                    @if (_isSaving)
+                    {
+                        <span class="material-symbols-outlined aqz-spinner">progress_activity</span>
+                    }
+                    else
+                    {
+                        <MaterialIcon Name="save" />
+                    }
+                    @(_isEditMode ? "Save Changes" : "Create Question")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Confirm Delete Modal -->
+@if (_showDeleteConfirm)
+{
+    <div class="aqz-modal-backdrop" @onclick="() => _showDeleteConfirm = false">
+        <div class="aqz-modal aqz-modal--sm" @onclick:stopPropagation>
+            <div class="aqz-modal__header">
+                <h2>Delete Question?</h2>
+            </div>
+            <div class="aqz-modal__body">
+                <p>Are you sure you want to delete this question? This action cannot be undone.</p>
+                <blockquote class="aqz-delete-preview">@_questionToDelete?.Text</blockquote>
+            </div>
+            <div class="aqz-modal__footer">
+                <button class="wx-button wx-button--secondary" @onclick="() => _showDeleteConfirm = false">Cancel</button>
+                <button class="wx-button wx-button--danger" @onclick="ExecuteDelete" disabled="@_isSaving">
+                    @if (_isSaving)
+                    {
+                        <span class="material-symbols-outlined aqz-spinner">progress_activity</span>
+                    }
+                    else
+                    {
+                        <MaterialIcon Name="delete_forever" />
+                    }
+                    Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+/* ── Layout ─────────────────────────────────────────────────────────── */
+.guide-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+/* ── Question List ──────────────────────────────────────────────────── */
+.aqz-question-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.aqz-question-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    transition: box-shadow 0.2s;
+}
+
+.aqz-question-card:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.aqz-question-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.aqz-question-card__meta {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+}
+
+.aqz-order-badge {
+    background: #0f172a;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.aqz-question-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.aqz-question-card__actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ── Options Grid ───────────────────────────────────────────────────── */
+.aqz-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+}
+
+.aqz-option-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.aqz-option-chip__key {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.aqz-option-chip__text {
+    font-size: 13px;
+    color: #1e293b;
+    line-height: 1.45;
+}
+
+.aqz-option-chip__cat {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 2px;
+    border-radius: 9999px;
+    padding: 2px 8px;
+    width: fit-content;
+}
+
+.aqz-option-chip--adventure .aqz-option-chip__cat { background: #fef3c7; color: #92400e; }
+.aqz-option-chip--cultural  .aqz-option-chip__cat { background: #dbeafe; color: #1d4ed8; }
+.aqz-option-chip--relaxation .aqz-option-chip__cat { background: #dcfce7; color: #15803d; }
+.aqz-option-chip--luxury    .aqz-option-chip__cat { background: #f3e8ff; color: #7e22ce; }
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.wx-button--sm {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    gap: 4px !important;
+}
+
+.wx-button--danger {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    border-color: #ef4444 !important;
+}
+
+.wx-button--danger:hover {
+    background: #dc2626 !important;
+}
+
+.wx-button--ghost {
+    background: transparent !important;
+    border: 1px dashed #cbd5e1 !important;
+    color: #64748b !important;
+}
+
+/* ── States ──────────────────────────────────────────────────────────── */
+.aqz-loading, .aqz-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 80px 24px;
+    text-align: center;
+    color: #64748b;
+}
+
+.aqz-loading .material-symbols-outlined,
+.aqz-empty .material-symbols-outlined {
+    font-size: 48px;
+    color: #cbd5e1;
+}
+
+.aqz-empty h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.aqz-spinner {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+@@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Toast ───────────────────────────────────────────────────────────── */
+.aqz-toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 16px;
+}
+
+.aqz-toast--error   { background: #fff1f2; color: #b91c1c; border: 1px solid #fca5a5; }
+.aqz-toast--success { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+
+/* ── Modal ───────────────────────────────────────────────────────────── */
+.aqz-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.aqz-modal {
+    background: #ffffff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 640px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+}
+
+.aqz-modal--sm { max-width: 440px; }
+
+.aqz-modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0;
+}
+
+.aqz-modal__header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.aqz-modal__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 4px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    transition: background 0.15s;
+}
+
+.aqz-modal__close:hover { background: #f1f5f9; }
+
+.aqz-modal__body {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+
+.aqz-modal__footer {
+    padding: 0 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+/* ── Form Elements ───────────────────────────────────────────────────── */
+.aqz-field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.aqz-required { color: #ef4444; }
+
+.aqz-textarea, .aqz-input, .aqz-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: #0f172a;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.aqz-textarea:focus, .aqz-input:focus, .aqz-select:focus {
+    border-color: #0f172a;
+}
+
+.aqz-input--sm {
+    width: 48px;
+    text-align: center;
+    flex-shrink: 0;
+    padding: 10px 6px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.aqz-hint {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 0;
+}
+
+.aqz-options-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.aqz-options-section h4 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.aqz-option-editor {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.aqz-option-editor__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.aqz-remove-opt {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ef4444;
+    padding: 10px 4px;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.15s;
+}
+
+.aqz-remove-opt:hover { opacity: 0.7; }
+
+.aqz-delete-preview {
+    margin: 12px 0 0;
+    padding: 12px 16px;
+    background: #fff1f2;
+    border-left: 3px solid #ef4444;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    font-style: italic;
+}
+</style>
+
+@code {
+    private List<QuizQuestionClientDto>? _questions;
+    private bool _isLoading = true;
+    private bool _isSaving = false;
+    private string _errorMessage = string.Empty;
+    private string _successMessage = string.Empty;
+
+    private bool _showModal = false;
+    private bool _isEditMode = false;
+    private QuizQuestionClientDto _editQuestion = CreateEmptyQuestion();
+
+    private bool _showDeleteConfirm = false;
+    private QuizQuestionClientDto? _questionToDelete;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadQuestionsAsync();
+    }
+
+    private async Task LoadQuestionsAsync()
+    {
+        _isLoading = true;
+        _errorMessage = string.Empty;
+        StateHasChanged();
+        try
+        {
+            var result = await ApiClient.GetQuizQuestionsAsync();
+            _questions = result?.ToList() ?? new List<QuizQuestionClientDto>();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to load questions: {ex.Message}";
+            _questions = new List<QuizQuestionClientDto>();
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ShowAddModal()
+    {
+        _isEditMode = false;
+        _editQuestion = CreateEmptyQuestion();
+        _showModal = true;
+        ClearMessages();
+    }
+
+    private void ShowEditModal(QuizQuestionClientDto q)
+    {
+        _isEditMode = true;
+        // Deep copy to avoid mutating list directly
+        _editQuestion = new QuizQuestionClientDto
+        {
+            Id = q.Id,
+            Text = q.Text,
+            DisplayOrder = q.DisplayOrder,
+            Options = q.Options.Select(o => new QuizOptionClientDto
+            {
+                Id = o.Id,
+                QuestionId = o.QuestionId,
+                OptionKey = o.OptionKey,
+                Text = o.Text,
+                Category = o.Category,
+                Score = o.Score
+            }).ToList()
+        };
+        _showModal = true;
+        ClearMessages();
+    }
+
+    private void HideModal() => _showModal = false;
+
+    private void AddOption()
+    {
+        _editQuestion.Options.Add(new QuizOptionClientDto
+        {
+            OptionKey = GetNextOptionKey(),
+            Score = 3
+        });
+    }
+
+    private string GetNextOptionKey()
+    {
+        var keys = new[] { "A", "B", "C", "D", "E", "F" };
+        var used = _editQuestion.Options.Select(o => o.OptionKey.ToUpperInvariant()).ToHashSet();
+        return keys.FirstOrDefault(k => !used.Contains(k)) ?? "X";
+    }
+
+    private void RemoveOption(int idx)
+    {
+        if (idx >= 0 && idx < _editQuestion.Options.Count)
+            _editQuestion.Options.RemoveAt(idx);
+    }
+
+    private async Task SaveQuestion()
+    {
+        ClearMessages();
+        if (string.IsNullOrWhiteSpace(_editQuestion.Text))
+        {
+            _errorMessage = "Question text is required.";
+            return;
+        }
+        if (_editQuestion.Options.Count == 0)
+        {
+            _errorMessage = "At least one option is required.";
+            return;
+        }
+        foreach (var opt in _editQuestion.Options)
+        {
+            if (string.IsNullOrWhiteSpace(opt.OptionKey) || string.IsNullOrWhiteSpace(opt.Text) || string.IsNullOrWhiteSpace(opt.Category))
+            {
+                _errorMessage = "All options must have a key, text, and category.";
+                return;
+            }
+        }
+
+        _isSaving = true;
+        try
+        {
+            if (_isEditMode)
+            {
+                await ApiClient.UpdateQuizQuestionAsync(_editQuestion.Id, _editQuestion);
+                _successMessage = "Question updated successfully.";
+            }
+            else
+            {
+                await ApiClient.CreateQuizQuestionAsync(_editQuestion);
+                _successMessage = "Question created successfully.";
+            }
+            _showModal = false;
+            await LoadQuestionsAsync();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Save failed: {ex.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void ConfirmDelete(QuizQuestionClientDto q)
+    {
+        _questionToDelete = q;
+        _showDeleteConfirm = true;
+        ClearMessages();
+    }
+
+    private async Task ExecuteDelete()
+    {
+        if (_questionToDelete is null) return;
+        _isSaving = true;
+        try
+        {
+            await ApiClient.DeleteQuizQuestionAsync(_questionToDelete.Id);
+            _successMessage = "Question deleted successfully.";
+            _showDeleteConfirm = false;
+            _questionToDelete = null;
+            await LoadQuestionsAsync();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Delete failed: {ex.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void ClearMessages()
+    {
+        _errorMessage = string.Empty;
+        _successMessage = string.Empty;
+    }
+
+    private static QuizQuestionClientDto CreateEmptyQuestion()
+    {
+        return new QuizQuestionClientDto
+        {
+            Options = new List<QuizOptionClientDto>
+            {
+                new QuizOptionClientDto { OptionKey = "A", Score = 3 },
+                new QuizOptionClientDto { OptionKey = "B", Score = 3 },
+                new QuizOptionClientDto { OptionKey = "C", Score = 3 },
+                new QuizOptionClientDto { OptionKey = "D", Score = 3 }
+            }
+        };
+    }
+}

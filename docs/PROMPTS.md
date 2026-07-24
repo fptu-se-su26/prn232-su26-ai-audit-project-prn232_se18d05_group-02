@@ -59,7 +59,7 @@ Sinh viên/nhóm cần ghi lại:
 | 5 | 23/06/2026 | Antigravity / Gemini | Redesign Travel Website UI/UX | Tái cấu trúc toàn diện UI/UX (Homepage, Listing, Detail) theo Design System | Đề xuất UX và mã nguồn mẫu React/Tailwind cho các trang cốt lõi | Có | PROMPTS.md - Prompt-05 |
 | 6 | 20/07/2026 | ChatGPT / Codex | Member 2 Admin/Staff Booking Operations | Triển khai FE1-FE4: Booking Management, Booking Status, Cancellation Requests, Payment Management | Hoàn thiện API, DTO, Blazor UI, business rules, email hooks và debug lỗi tích hợp | Có | PROMPTS.md - Prompt-06 |
 | 7 | 12/07/2026 – 22/07/2026 | Antigravity / Claude | Member 3 Customer Management & Tour Reviews | Triển khai Feature 1-4 thành viên 3: hồ sơ khách hàng, theo dõi booking, yêu cầu dịch vụ, đánh giá tour + debug lỗi tích hợp | Tạo API, Service, Blazor UI cho cả 4 feature. Debug URL sai, 204 parse, silent catch, closure bug | Có | PROMPTS.md - Prompt-07 |
-| 8 |  |  |  |  |  | Có / Không |  |
+| 8 | 24/07/2026 | OpenAI Codex / ChatGPT | Review và hoàn thiện Travel Style Quiz | Đối chiếu M5-F01, sửa authorization, validation, Guid contract và đồng bộ UI | Backend/client build thành công, xác định phần còn thiếu và phạm vi commit | Có | PROMPTS.md - Prompt-08 |
 | 9 |  |  |  |  |  | Có / Không |  |
 | 10 |  |  |  |  |  | Có / Không |  |
 
@@ -1016,6 +1016,93 @@ AI được dùng như công cụ hỗ trợ phân tích, tạo code mẫu và d
 
 ---
 
+### Prompt-08
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 24/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục tiêu | Review và hoàn thiện M5-F01 Travel Style Quiz theo requirement và UI redesign của dự án |
+| Loại prompt | Review code / Debug / Security / Refactoring / Testing |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Tôi đã có code Function 1 Travel Style Quiz. Hãy kiểm tra code đã đúng requirement chưa, đồng thời phải sử dụng UI của dự án và đồng bộ với các thiết kế trong docs/Redesign/quiz1.html, quiz2.html, Quiz3.html và quizresult.html. Nếu phần nào làm được thì chỉnh sửa trực tiếp; phần nào phụ thuộc module khác hoặc chưa thể làm thì hướng dẫn để tôi tiếp tục.
+```
+
+#### 5.2. Bối cảnh đã cung cấp cho AI
+
+```text
+- Dự án ASP.NET Core .NET 8 và Blazor WebAssembly.
+- Requirement M5-F01 Travel Style Quiz.
+- Source code server/client hiện tại.
+- JWT chứa NameIdentifier, Email và Role.
+- Các file HTML redesign dùng làm mẫu giao diện.
+- Yêu cầu giữ đồng bộ với cấu trúc và UI chung của WanderX.
+```
+
+#### 5.3. Kết quả AI trả về
+
+```text
+1. Báo cáo gap giữa code hiện tại và acceptance criteria M5-F01.
+2. Bản sửa authorization cho Customer/Admin và lấy UserId từ JWT.
+3. Contract đáp án dùng QuestionId/OptionId kiểu Guid.
+4. Validation phía backend cho các request thiếu hoặc không hợp lệ.
+5. Cập nhật Blazor UI và API client theo contract mới.
+6. Kiểm tra build cho server và client.
+7. Danh sách file nên commit/push và file nên loại trừ để tránh conflict.
+8. Hướng dẫn cho QuizAttempt/versioning, 8 travel styles và tour recommendation cần thống nhất thêm với nhóm.
+```
+
+#### 5.4. Phần đã sử dụng
+
+```text
+- Authorization và identity từ JWT.
+- Validation đáp án ở backend.
+- Guid contract giữa client và server.
+- UTC timestamp do backend quản lý.
+- UI TravelQuiz ba phase dựa trên redesign.
+- Quy trình kiểm tra build và chuẩn bị commit.
+```
+
+#### 5.5. Phần không sử dụng hoặc hoãn lại
+
+```text
+- Chưa triển khai QuizAttempt và chống submit lặp vì cần thay đổi schema/version policy.
+- Chưa mở rộng đủ 8 travel styles vì cần contract chung với Function 2 recommendation.
+- Chưa kết nối tour recommendation thật vì chưa có API tour thống nhất.
+- Không commit các file .vscode vì đây là cấu hình máy cá nhân.
+```
+
+#### 5.6. Cách kiểm chứng
+
+```text
+1. Đọc lại các file đã sửa và tìm kiếm contract cũ còn sót.
+2. Chạy `dotnet restore` cho hai solution.
+3. Chạy `dotnet build WanderXServer/WanderXServer.sln --no-restore`.
+4. Chạy `dotnet build WanderXClient/WanderXClient.sln --no-restore`.
+5. Kiểm tra staged changes chỉ chứa 19 file thuộc Function 1.
+```
+
+#### 5.7. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| File code | TravelStyleQuizController.cs, TravelStyleQuizService.cs, QuizAnswerDto.cs, TravelQuiz.razor, QuizContracts.cs, UserApiClient.cs |
+| Kết quả build | Server và client build thành công, 0 error |
+| Commit dự kiến | `feat: implement secure travel style quiz flow` |
+| Audit liên quan | AI_AUDIT_LOG.md - Lần sử dụng AI số 8 |
+
+#### 5.8. Ghi chú thêm
+
+```text
+Kết quả AI được dùng như nội dung review và hỗ trợ triển khai. Sinh viên kiểm tra lại requirement, cấu trúc JWT, database, UI và build output trước khi quyết định commit.
+```
+
+---
 ## 6. Prompt quan trọng nhất
 
 Chọn một prompt có ảnh hưởng lớn nhất đến bài tập/project.
