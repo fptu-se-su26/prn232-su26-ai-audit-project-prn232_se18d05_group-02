@@ -268,7 +268,7 @@ else if (_phase == QuizPhase.Result && _result != null)
                         <h2 class="tqz-tours__title">Tour gợi ý cho bạn</h2>
                         <p class="tqz-tours__sub">Lựa chọn dựa trên sở thích và phong cách riêng của bạn.</p>
                     </div>
-                    <a href="/tours" class="tqz-see-all">Xem tất cả <span class="material-symbols-outlined">arrow_forward</span></a>
+                    <a href="/recommendations" class="tqz-see-all">Xem gợi ý thực tế <span class="material-symbols-outlined">arrow_forward</span></a>
                 </div>
                 <div class="tqz-tour-cards">
                     @foreach (var tour in styleInfo.SuggestedTours)
@@ -292,7 +292,7 @@ else if (_phase == QuizPhase.Result && _result != null)
                                         <p class="tqz-price-label">Giá từ</p>
                                         <p class="tqz-price">@tour.PriceDisplay</p>
                                     </div>
-                                    <a href="/tours" class="tqz-book-btn">Book Now</a>
+                                    <a href="/recommendations" class="tqz-book-btn">Xem tour phù hợp</a>
                                 </div>
                             </div>
                         </div>

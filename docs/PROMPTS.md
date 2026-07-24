@@ -60,7 +60,7 @@ Sinh viên/nhóm cần ghi lại:
 | 6 | 20/07/2026 | ChatGPT / Codex | Member 2 Admin/Staff Booking Operations | Triển khai FE1-FE4: Booking Management, Booking Status, Cancellation Requests, Payment Management | Hoàn thiện API, DTO, Blazor UI, business rules, email hooks và debug lỗi tích hợp | Có | PROMPTS.md - Prompt-06 |
 | 7 | 12/07/2026 – 22/07/2026 | Antigravity / Claude | Member 3 Customer Management & Tour Reviews | Triển khai Feature 1-4 thành viên 3: hồ sơ khách hàng, theo dõi booking, yêu cầu dịch vụ, đánh giá tour + debug lỗi tích hợp | Tạo API, Service, Blazor UI cho cả 4 feature. Debug URL sai, 204 parse, silent catch, closure bug | Có | PROMPTS.md - Prompt-07 |
 | 8 | 24/07/2026 | OpenAI Codex / ChatGPT | Review và hoàn thiện Travel Style Quiz | Đối chiếu M5-F01, sửa authorization, validation, Guid contract và đồng bộ UI | Backend/client build thành công, xác định phần còn thiếu và phạm vi commit | Có | PROMPTS.md - Prompt-08 |
-| 9 |  |  |  |  |  | Có / Không |  |
+| 9 | 24/07/2026 | OpenAI Codex / ChatGPT | Triển khai gợi ý tour theo nhu cầu | Phân tích M5-F02, thiết kế rule-based scoring, filter, random và UI dùng dữ liệu dự án | Hoàn thiện API/service/Blazor UI, cấu hình trọng số và build solution thành công | Có | PROMPTS.md - Prompt-09 |
 | 10 |  |  |  |  |  | Có / Không |  |
 
 ---
@@ -1101,6 +1101,62 @@ Tôi đã có code Function 1 Travel Style Quiz. Hãy kiểm tra code đã đún
 ```text
 Kết quả AI được dùng như nội dung review và hỗ trợ triển khai. Sinh viên kiểm tra lại requirement, cấu trúc JWT, database, UI và build output trước khi quyết định commit.
 ```
+
+---
+### Prompt-09
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 24/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục tiêu | Triển khai M5-F02 gợi ý tour theo nhu cầu, đồng bộ dữ liệu và UI WanderX |
+| Loại prompt | Phân tích yêu cầu / Thiết kế giải pháp / Sinh code / Review / Testing |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Triển khai Function 02 thành viên 5: gợi ý tour theo nhu cầu. Recommendation phải dùng kết quả quiz, chỉ trả tour đủ điều kiện, tính điểm rule-based, hỗ trợ filter, random, phân trang và MatchReasons. Code phải tuân theo model, API và UI hiện có của dự án như Function 01; phần làm được thì chỉnh trực tiếp, phần phụ thuộc module khác phải nêu rõ.
+```
+
+#### 5.2. Bối cảnh đã cung cấp cho AI
+
+```text
+Requirement M5-F02; source ASP.NET Core .NET 8 và Blazor WebAssembly; model Tour, GuideTourAssignment, Booking, TourPricing, Promotion, Review và TravelStyleQuizResult hiện có; yêu cầu không tạo dữ liệu giả và tránh thay đổi schema thuộc module khác.
+```
+
+#### 5.3. Kết quả AI trả về
+
+```text
+Thiết kế và triển khai recommendation service dùng lịch GuideTourAssignment làm lịch khởi hành thực tế; tính availability từ Capacity trừ booking Paid/Confirmed; chọn giá/khuyến mãi còn hiệu lực; lấy rating từ review hiển thị; lọc tour Published và lịch tương lai; chấm điểm có lý do; hỗ trợ sort ổn định, phân trang, random và excludeTourIds; tạo API và trang Blazor đồng bộ UI WanderX.
+```
+
+#### 5.4. Phần đã sử dụng và tự kiểm chứng
+
+```text
+- Dùng cấu hình trọng số trong appsettings.json.
+- Dùng identity JWT cho recommendation cá nhân hóa và fallback tour chung khi chưa làm quiz.
+- Không trừ booking Pending; không trả lịch hết chỗ.
+- Tạo /api/recommendations/me, /api/tours/search, /api/tours/random và /api/recommendation-config/styles.
+- Nối kết quả Travel Style Quiz đến /recommendations.
+- Chạy dotnet build WanderX.slnx --no-restore: thành công, 0 warning, 0 error.
+```
+
+#### 5.5. Phần điều chỉnh theo kiến trúc dự án
+
+```text
+Schema hiện tại chưa có Departure entity, DestinationId, TourTypeId và Tags riêng. Vì vậy lịch thực tế dùng GuideTourAssignment; destination dùng chuỗi Tour.Destination; loại/phong cách được suy luận có kiểm soát từ Name, Description, Destination và Region. Không tự ý sửa model Tour hoặc tạo migration để tránh xung đột module Tour. SecondaryStyle chưa chấm vì QuizResult hiện chỉ lưu DominantStyle.
+```
+
+#### 5.6. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| File backend | RecommendationsController.cs, RecommendationService.cs, RecommendationOptions.cs, RecommendationContracts.cs, Program.cs, appsettings.json |
+| File frontend | Recommendations.razor, TourRecommendationCard.razor, RecommendationContracts.cs, UserApiClient.cs, TravelQuiz.razor |
+| Kết quả build | `dotnet build WanderX.slnx --no-restore`: thành công, 0 warning, 0 error |
+| Audit liên quan | AI_AUDIT_LOG.md - Lần sử dụng AI số 9 |
 
 ---
 ## 6. Prompt quan trọng nhất

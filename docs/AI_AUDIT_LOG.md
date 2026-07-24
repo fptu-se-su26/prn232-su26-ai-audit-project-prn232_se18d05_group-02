@@ -1086,6 +1086,51 @@ Kết quả cuối cùng được kiểm chứng bằng build server/client. Cá
 ```
 
 ---
+### Lần sử dụng AI số 9
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 24/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục đích sử dụng | Phân tích và triển khai M5-F02 gợi ý tour theo nhu cầu |
+| Phần việc liên quan | Recommendation API / Rule scoring / Filter / Random / Blazor UI / Testing |
+| Mức độ sử dụng | Hỗ trợ một phần |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-09
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+AI đề xuất ánh xạ requirement vào schema thật của WanderX, triển khai tập tour đủ điều kiện, giá hiệu lực, số chỗ còn lại, đánh giá, rule-based MatchScore/MatchReasons, filter, sort ổn định, random có exclude list và giao diện recommendations.
+```
+
+#### 4.3. Phần sinh viên/nhóm đã sử dụng và điều chỉnh
+
+```text
+Áp dụng API/service/UI đề xuất nhưng giữ nguyên schema module Tour. GuideTourAssignment được dùng làm lịch khởi hành; chỉ booking Paid/Confirmed trừ capacity; không dùng dữ liệu mẫu. Destination và style/type được xử lý theo các trường sẵn có. SecondaryStyle được hoãn vì QuizResult chưa có dữ liệu này.
+```
+
+#### 4.4. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| File liên quan | RecommendationsController.cs; RecommendationService.cs; RecommendationOptions.cs; Recommendations.razor; TourRecommendationCard.razor; UserApiClient.cs |
+| Kết quả chạy/test | `dotnet build WanderX.slnx --no-restore`: thành công, 0 warning, 0 error |
+| Ghi chú | Chưa tạo migration; không thay đổi file solution hoặc cấu hình .vscode |
+
+#### 4.5. Nhận xét cá nhân/nhóm
+
+```text
+AI hỗ trợ đối chiếu requirement và xây dựng khung thuật toán, nhưng em kiểm tra lại toàn bộ model hiện có để tránh giả định có Departure, DestinationId hoặc Tags. Kết quả được điều chỉnh theo dữ liệu thật và build trước khi commit.
+```
+
+---
 ## 5. Bảng tổng hợp mức độ sử dụng AI
 
 Đánh dấu mức độ AI hỗ trợ ở từng hạng mục.
