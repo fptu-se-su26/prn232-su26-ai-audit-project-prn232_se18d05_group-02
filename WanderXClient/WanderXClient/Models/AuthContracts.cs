@@ -4,8 +4,8 @@ namespace WanderXClient.Models;
 
 public sealed class LoginRequest
 {
-    [Required(ErrorMessage = "Email is required.")]
-    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    [Required(ErrorMessage = "Account is required.")]
+    [StringLength(256, ErrorMessage = "Account must be 256 characters or fewer.")]
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Password is required.")]

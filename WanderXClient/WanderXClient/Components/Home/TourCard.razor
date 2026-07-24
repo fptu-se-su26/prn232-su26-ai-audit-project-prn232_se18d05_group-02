@@ -1,4 +1,4 @@
-<article class="tour-card">
+﻿<article class="tour-card">
     <div class="tour-card__image">
         <img alt="@Title" src="@ImageUrl" />
         @if (HasDiscount)
@@ -85,6 +85,6 @@
 
     private static string FormatMoney(decimal value)
     {
-        return $"{value:N0} đ";
+        return $"{value:N0} VND";
     }
 }

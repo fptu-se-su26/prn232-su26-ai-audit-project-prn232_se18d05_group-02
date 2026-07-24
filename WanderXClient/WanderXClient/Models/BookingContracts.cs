@@ -65,7 +65,7 @@ public sealed class CreateBookingRequest
 {
     public Guid? UserId { get; set; }
 
-    [EmailAddress]
+    [StringLength(256)]
     public string? UserEmail { get; set; }
 
     [StringLength(32)]

@@ -1,4 +1,4 @@
-@page "/profile"
+﻿@page "/profile"
 @using WanderXClient.Models
 @using WanderXClient.Services
 @inject UserApiClient UserApi
@@ -6,7 +6,7 @@
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
 
-<PageTitle>WanderX - Thông tin cá nhân</PageTitle>
+<PageTitle>WanderX - Profile</PageTitle>
 
 <AppHeader />
 
@@ -18,11 +18,9 @@
 }
 else if (_profile != null)
 {
-    <!-- Main Container (Không có header/footer vì đã có ở AppHeader/AppFooter toàn cục) -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             
-            <!-- Left Profile Sidebar (4 cols) -->
             <aside class="lg:col-span-4 bg-white border border-hairline rounded-lg p-6 space-y-6">
                 <div class="flex flex-col items-center text-center pb-6 border-b border-hairline">
                     <div class="relative mb-4">
@@ -41,28 +39,27 @@ else if (_profile != null)
                 <nav class="flex flex-col gap-1 text-sm font-semibold text-muted-fg">
                     <a href="my-bookings" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
                         <span class="material-symbols-outlined text-lg">receipt_long</span>
-                        Đơn hàng của tôi
+                        My Bookings
                     </a>
                     <a href="service-requests" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
                         <span class="material-symbols-outlined text-lg">description</span>
-                        Yêu cầu dịch vụ
+                        Service Requests
                     </a>
                     <a href="profile" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-soft !text-primary">
                         <span class="material-symbols-outlined text-lg">person</span>
-                        Thông tin cá nhân
+                        Profile
                     </a>
                     <a href="travel-quiz" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
                         <span class="material-symbols-outlined text-lg">quiz</span>
-                        Trắc nghiệm Travel Style
+                        Travel Style Quiz
                     </a>
                 </nav>
             </aside>
 
-            <!-- Right list content (8 cols) -->
             <section class="lg:col-span-8 space-y-8">
                 <div class="border-b border-hairline pb-4">
-                    <h1 class="text-2xl font-extrabold tracking-tight font-title !text-primary">Thông tin cá nhân</h1>
-                    <p class="text-xs text-muted-fg mt-1">Cập nhật thông tin liên hệ và cài đặt bảo mật tài khoản.</p>
+                    <h1 class="text-2xl font-extrabold tracking-tight font-title !text-primary">Profile</h1>
+                    <p class="text-xs text-muted-fg mt-1">Update contact information and account security settings.</p>
                 </div>
 
                 @if (!string.IsNullOrEmpty(_errorMessage))
@@ -82,34 +79,33 @@ else if (_profile != null)
                 <!-- Travel Badge Showcase -->
                 <div class="bg-gradient-to-r from-accent-orange/10 to-orange-400/5 border border-accent-orange/20 rounded-lg p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div class="space-y-2 text-center md:text-left">
-                        <span class="text-xs font-bold text-accent-orange uppercase tracking-wider">Travel Style của bạn</span>
+                        <span class="text-xs font-bold text-accent-orange uppercase tracking-wider">Your Travel Style</span>
                         <h3 class="font-title font-bold text-xl !text-primary flex items-center justify-center md:justify-start gap-2">
                             <span class="material-symbols-outlined text-accent-orange">local_activity</span>
-                            Nhà Khám Phá Văn Hóa
+                            Cultural Explorer
                         </h3>
                         <p class="text-xs text-muted-fg max-w-lg leading-relaxed">
-                            Bạn yêu thích việc tìm hiểu sâu xa lịch sử, ẩm thực và nếp sống của con người bản địa. Bạn thích những chuyến hành trình chậm rãi, giàu chất văn thơ hơn là check-in vội vàng.
+                            You enjoy exploring local history, cuisine, and ways of life. You prefer slow, meaningful journeys over rushed check-ins.
                         </p>
                     </div>
                     <a href="travel-quiz" class="!bg-primary hover:bg-primary/95 text-white font-semibold text-xs px-5 py-3 rounded-full transition-all flex-shrink-0">
-                        Làm lại trắc nghiệm
+                        Retake quiz
                     </a>
                 </div>
 
-                <!-- Settings edit form -->
                 <EditForm Model="_updateModel" OnValidSubmit="HandleSubmit" class="bg-white border border-hairline rounded-lg p-6 md:p-8 space-y-6">
                     <DataAnnotationsValidator />
 
-                    <h3 class="font-title font-bold text-base !text-primary">Thông tin liên lạc</h3>
+                    <h3 class="font-title font-bold text-base !text-primary">Contact Information</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">Họ & Tên</label>
+                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">Full Name</label>
                             <InputText @bind-Value="_updateModel.FullName" class="w-full rounded-md border-hairline py-2.5 px-3.5 text-sm focus:ring-primary focus:border-primary" />
                             <ValidationMessage For="@(() => _updateModel.FullName)" class="text-xs text-red-500" />
                         </div>
                         <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">Số điện thoại</label>
+                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">Phone Number</label>
                             <InputText @bind-Value="_updateModel.PhoneNumber" class="w-full rounded-md border-hairline py-2.5 px-3.5 text-sm focus:ring-primary focus:border-primary" />
                             <ValidationMessage For="@(() => _updateModel.PhoneNumber)" class="text-xs text-red-500" />
                         </div>
@@ -118,20 +114,20 @@ else if (_profile != null)
                             <input type="email" readonly value="@_profile.Email" class="w-full rounded-md border-hairline bg-surface-soft text-muted-fg py-2.5 px-3.5 text-sm focus:ring-0 focus:outline-none cursor-not-allowed">
                         </div>
                         <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">Địa chỉ</label>
+                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">Address</label>
                             <InputText @bind-Value="_updateModel.Address" class="w-full rounded-md border-hairline py-2.5 px-3.5 text-sm focus:ring-primary focus:border-primary" />
                         </div>
                     </div>
 
-                    <h3 class="font-title font-bold text-base !text-primary pt-4 border-t border-hairline">Đổi mật khẩu</h3>
+                    <h3 class="font-title font-bold text-base !text-primary pt-4 border-t border-hairline">Change Password</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">Mật khẩu hiện tại</label>
+                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">Current Password</label>
                             <InputText type="password" @bind-Value="_updateModel.CurrentPassword" placeholder="••••••••" class="w-full rounded-md border-hairline py-2.5 px-3.5 text-sm focus:ring-primary focus:border-primary" />
                         </div>
                         <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">Mật khẩu mới</label>
-                            <InputText type="password" @bind-Value="_updateModel.NewPassword" placeholder="Mật khẩu mới" class="w-full rounded-md border-hairline py-2.5 px-3.5 text-sm focus:ring-primary focus:border-primary" />
+                            <label class="block text-xs font-bold text-muted-fg uppercase tracking-wider">New Password</label>
+                            <InputText type="password" @bind-Value="_updateModel.NewPassword" placeholder="New Password" class="w-full rounded-md border-hairline py-2.5 px-3.5 text-sm focus:ring-primary focus:border-primary" />
                             <ValidationMessage For="@(() => _updateModel.NewPassword)" class="text-xs text-red-500" />
                         </div>
                     </div>
@@ -140,11 +136,11 @@ else if (_profile != null)
                         <button type="submit" disabled="@_isSubmitting" class="!bg-primary hover:bg-primary/95 text-white font-semibold text-sm px-8 py-3 rounded-full transition-all shadow-sm disabled:opacity-50">
                             @if (_isSubmitting)
                             {
-                                <span>Đang lưu...</span>
+                                <span>Saving...</span>
                             }
                             else
                             {
-                                <span>Lưu thay đổi</span>
+                                <span>Save Changes</span>
                             }
                         </button>
                     </div>
@@ -168,16 +164,6 @@ else if (_profile != null)
     private string _avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
     private const string AvatarLocalStorageKey = "wanderx.user.avatar";
 
-    // Tính năng: Xem thông tin cá nhân
-    // Bước 1: Khi trang Profile được khởi tạo (OnInitializedAsync chạy)
-    // Bước 2: Gọi AuthSessionService.GetAsync() để lấy Session (lấy Email user) từ localStorage.
-    // Bước 3: Nếu không có session, chuyển hướng về trang /login.
-    // Bước 4: Gọi UserApiClient.GetProfileAsync(email) (Client - UserApiClient.cs)
-    // Bước 5: UserApiClient gửi HTTP GET đến 'api/users/profile?email={email}' (Server - UsersController.cs)
-    // Bước 6: UsersController gọi IUserService.GetProfileAsync(email) (Server - UserService.cs)
-    // Bước 7: UserService truy vấn CSDL lấy ApplicationUser qua dbContext.Users, trả về UserProfileResponse
-    // Bước 8: Dữ liệu trả về Client, gán vào biến _profile và map vào _updateModel để binding lên UI
-    // Bước 9: Kết thúc. Dữ liệu hiển thị lên màn hình.
     
     protected override async Task OnInitializedAsync()
     {
@@ -198,7 +184,6 @@ else if (_profile != null)
                 _updateModel.PhoneNumber = _profile.PhoneNumber;
                 _updateModel.Address = _profile.Address;
 
-                // Load avatar từ localStorage (nếu user đã từng upload)
                 var savedAvatar = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", AvatarLocalStorageKey);
                 if (!string.IsNullOrWhiteSpace(savedAvatar))
                 {
@@ -208,7 +193,7 @@ else if (_profile != null)
         }
         catch (Exception ex)
         {
-            _errorMessage = "Không thể tải thông tin: " + ex.Message;
+            _errorMessage = "Could not load profile: " + ex.Message;
         }
         finally
         {
@@ -252,27 +237,16 @@ else if (_profile != null)
         }
     }
 
-    // Tính năng: Chỉnh sửa thông tin cá nhân
-    // Bước 1: User điền form UI, nhấn submit
-    // Bước 2: Kích hoạt hàm HandleSubmit qua EditForm
-    // Bước 3: Đặt cờ _isSubmitting = true. Reset thông báo lỗi/thành công.
-    // Bước 4: Gọi UserApiClient.UpdateProfileAsync(email, _updateModel) (Client - UserApiClient.cs)
-    // Bước 5: UserApiClient gửi HTTP PUT body={_updateModel} đến 'api/users/profile?email={email}' (Server - UsersController.cs)
-    // Bước 6: UsersController gọi IUserService.UpdateProfileAsync(email, request) (Server - UserService.cs)
-    // Bước 7: UserService tìm ApplicationUser, update FullName, PhoneNumber, Address. Nếu có NewPassword thì hash pass và update. Lưu xuống CSDL.
-    // Bước 8: Dữ liệu mới (UserProfileResponse) được trả về Client.
-    // Bước 9: Gán kết quả vào biến _profile, hiển thị thông báo "_successMessage".
-    // Bước 10: Kết thúc. Dữ liệu mới hiển thị trên form.
 
     private async Task HandleAvatarChange(InputFileChangeEventArgs e)
     {
         var file = e.File;
         if (file != null)
         {
-            var maxAllowedSize = 5 * 1024 * 1024; // 5 MB
+            var maxAllowedSize = 5 * 1024 * 1024;
             if (file.Size > maxAllowedSize)
             {
-                _errorMessage = "Kích thước ảnh không được vượt quá 5MB.";
+                _errorMessage = "Image size must not exceed 5MB.";
                 return;
             }
 
@@ -281,7 +255,6 @@ else if (_profile != null)
                 _isSubmitting = true;
                 _errorMessage = string.Empty;
                 
-                // Hiển thị preview ảnh (resize và đọc thành base64)
                 var format = "image/jpeg";
                 var resizedImageFile = await file.RequestImageFileAsync(format, 400, 400);
                 using var stream = resizedImageFile.OpenReadStream(maxAllowedSize);
@@ -290,19 +263,14 @@ else if (_profile != null)
                 
                 _avatarUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
 
-                // Lưu avatar vào localStorage để giữ khi chuyển trang
                 await JSRuntime.InvokeVoidAsync("localStorage.setItem", AvatarLocalStorageKey, _avatarUrl);
                 
-                // TODO: Gọi API upload file lên server thực tế ở đây
-                // var content = new MultipartFormDataContent();
-                // content.Add(new ByteArrayContent(buffer), "file", file.Name);
-                // await UserApi.UploadAvatarAsync(_session.Email, content);
                 
-                _successMessage = "Ảnh đại diện đã được cập nhật (Preview)!";
+                _successMessage = "Profile photo updated (preview)!";
             }
             catch (Exception ex)
             {
-                _errorMessage = "Lỗi khi tải ảnh: " + ex.Message;
+                _errorMessage = "Error uploading image: " + ex.Message;
             }
             finally
             {
@@ -328,7 +296,6 @@ else if (_profile != null)
                 _updateModel.CurrentPassword = string.Empty;
                 _updateModel.NewPassword = string.Empty;
                 
-                // Cập nhật lại session nếu user đổi tên
                 _session.FullName = result.FullName;
                 await SessionService.SaveAsync(new AuthResponse 
                 { 
@@ -336,14 +303,14 @@ else if (_profile != null)
                     Email = _session.Email, 
                     FullName = _session.FullName, 
                     Role = _session.Role 
-                }, true); // default true for simplicty
-                
-                _successMessage = "Cập nhật thông tin thành công!";
+                }, true);
+
+                _successMessage = "Profile updated successfully!";
             }
         }
         catch (Exception ex)
         {
-            _errorMessage = "Có lỗi xảy ra: " + ex.Message;
+            _errorMessage = "An error occurred: " + ex.Message;
         }
         finally
         {
