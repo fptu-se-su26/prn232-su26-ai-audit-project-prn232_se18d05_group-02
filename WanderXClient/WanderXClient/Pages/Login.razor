@@ -2,6 +2,7 @@
 @inject AuthApiClient AuthApi
 @inject AuthSessionService AuthSession
 @inject NavigationManager Navigation
+@inject IConfiguration Configuration
 
 <PageTitle>Sign In - WanderX</PageTitle>
 
@@ -52,14 +53,10 @@
 
         <div class="auth-divider">Or continue with</div>
 
-        <div class="social-grid">
-            <button class="social-button" type="button">
-                <MaterialIcon Name="travel_explore" />
-                Google
-            </button>
-            <button class="social-button" type="button">
-                <MaterialIcon Name="phone_iphone" />
-                Apple
+        <div class="social-grid social-grid--single">
+            <button class="social-button" type="button" @onclick="GoogleLogin">
+                <span class="google-mark">G</span>
+                Continue with Google
             </button>
         </div>
 
@@ -71,11 +68,31 @@
 </AuthShell>
 
 @code {
+    [SupplyParameterFromQuery(Name = "googleError")] public string? GoogleError { get; set; }
+    [SupplyParameterFromQuery(Name = "returnUrl")] public string? ReturnUrl { get; set; }
+
     private readonly LoginRequest _model = new();
     private bool _isBusy;
     private bool _isError;
     private string? _message;
 
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(GoogleError))
+        {
+            _isError = true;
+            _message = GoogleError == "GOOGLE_NOT_CONFIGURED"
+                ? "Google Sign-In chưa được cấu hình. Vui lòng dùng tài khoản thường hoặc cấu hình Google Client ID/Secret."
+                : $"Google Sign-In thất bại: {GoogleError}";
+        }
+    }
+
+    private void GoogleLogin()
+    {
+        var apiBase = Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+        var safeReturn = !string.IsNullOrWhiteSpace(ReturnUrl) && ReturnUrl.StartsWith('/') && !ReturnUrl.StartsWith("//") ? ReturnUrl : "/";
+        Navigation.NavigateTo($"{apiBase.TrimEnd('/')}/api/auth/google/start?returnUrl={Uri.EscapeDataString(safeReturn)}", forceLoad: true);
+    }
     private async Task SubmitAsync()
     {
         _isBusy = true;
@@ -93,7 +110,10 @@
             }
 
             await AuthSession.SaveAsync(response, _model.RememberMe);
-            Navigation.NavigateTo(GetRedirectPath(response.Role));
+            var target = !string.IsNullOrWhiteSpace(ReturnUrl) && ReturnUrl.StartsWith('/') && !ReturnUrl.StartsWith("//")
+                ? ReturnUrl
+                : GetRedirectPath(response.Role);
+            Navigation.NavigateTo(target);
         }
         catch (Exception ex)
         {
@@ -123,3 +143,5 @@
         };
     }
 }
+
+<style>.social-grid--single{grid-template-columns:1fr}.google-mark{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;font-weight:800;color:#4285f4;background:#fff}</style>
