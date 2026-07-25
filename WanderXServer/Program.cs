@@ -101,6 +101,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("USER_LOCK", policy => policy.RequireRole("Admin"));
 });
 
+builder.Services.AddHttpClient();
+builder.Services.AddDataProtection();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
