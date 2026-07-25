@@ -40,6 +40,9 @@ public class Tour
     [StringLength(32)]
     public string Status { get; set; } = "Draft";
 
+    [StringLength(32)]
+    public string? LockReason { get; set; }
+
     [StringLength(500)]
     public string ImageUrl { get; set; } = string.Empty;
 

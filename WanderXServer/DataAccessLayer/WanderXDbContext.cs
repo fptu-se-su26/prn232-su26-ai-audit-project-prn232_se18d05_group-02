@@ -238,6 +238,8 @@ public class WanderXDbContext : DbContext
         SeedQuizData();
         SeedTours();
         SaveChanges();
+        SeedSchedulesForPaidAssignedBookings();
+        SaveChanges();
 
         // Update existing Finished assignments that don't have an evidence image
         var finishedToursWithNoEvidence = GuideTourAssignments
@@ -520,6 +522,7 @@ BEGIN
         [Price] decimal(18,2) NOT NULL,
         [Capacity] int NOT NULL,
         [Status] nvarchar(32) NOT NULL,
+        [LockReason] nvarchar(32) NULL,
         [ImageUrl] nvarchar(500) NOT NULL,
         [Description] nvarchar(1200) NOT NULL,
         [CreatedAt] datetime2 NOT NULL,
@@ -528,6 +531,13 @@ BEGIN
     );
 
     CREATE UNIQUE INDEX [IX_Tours_Code] ON [Tours] ([Code]);
+END
+""");
+
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Tours', 'LockReason') IS NULL
+BEGIN
+    ALTER TABLE [Tours] ADD [LockReason] nvarchar(32) NULL;
 END
 """);
 
@@ -832,7 +842,7 @@ END
         QuizQuestions.AddRange(questions);
         SaveChanges();
     }
-// end TV3
+    // end TV3
     private void SeedGuideTourAssignments()
     {
         var today = DateTime.Today;
@@ -1000,6 +1010,91 @@ END
         }
     }
     // end TV3
+
+    private void SeedSchedulesForPaidAssignedBookings()
+    {
+        var qualifiedBookings = Bookings
+            .Where(booking =>
+                !string.IsNullOrWhiteSpace(booking.TourCode) &&
+                (booking.Status == "Paid" || booking.PaidAt != null))
+            .ToList();
+
+        foreach (var booking in qualifiedBookings)
+        {
+            var tour = Tours.FirstOrDefault(item => item.Code == booking.TourCode);
+            if (tour is null)
+            {
+                continue;
+            }
+
+            var assignment = GuideTourAssignments
+                .Include(item => item.GuideProfile)
+                .ThenInclude(item => item.User)
+                .FirstOrDefault(item =>
+                    item.TourCode == booking.TourCode &&
+                    (item.Status == "Assigned" || item.Status == "Confirmed"));
+
+            if (assignment is null)
+            {
+                continue;
+            }
+
+            var alreadySeeded = TourSchedules.Any(schedule =>
+                schedule.TourId == tour.ScheduleTourId &&
+                schedule.Description.Contains(booking.BookingCode));
+
+            if (alreadySeeded)
+            {
+                continue;
+            }
+
+            for (var day = 1; day <= tour.DurationDays; day++)
+            {
+                var scheduleDate = booking.DepartureDate.Date.AddDays(day - 1);
+                var dayPlan = GetDefaultScheduleDay(day, tour.Destination);
+
+                TourSchedules.Add(new TourSchedule
+                {
+                    TourId = tour.ScheduleTourId,
+                    DayNumber = day,
+                    ScheduleDate = scheduleDate,
+                    Title = $"Day {day}: {dayPlan.Title}",
+                    Description = $"{dayPlan.Description} Booking {booking.BookingCode} is paid and assigned to guide {assignment.GuideProfile.User.FullName}.",
+                    Location = day == 1 ? assignment.MeetingPoint : tour.Destination,
+                    StartTime = dayPlan.StartTime,
+                    EndTime = dayPlan.EndTime,
+                    SortOrder = day
+                });
+            }
+        }
+    }
+
+    private static ScheduleDayTemplate GetDefaultScheduleDay(int day, string destination)
+    {
+        return day switch
+        {
+            1 => new ScheduleDayTemplate(
+                "Arrival briefing and local orientation",
+                $"Meet guests, confirm travel documents, and introduce the route around {destination}.",
+                new TimeSpan(9, 0, 0),
+                new TimeSpan(11, 30, 0)),
+            2 => new ScheduleDayTemplate(
+                "Main experience route",
+                $"Guide the core sightseeing and cultural experience planned for {destination}.",
+                new TimeSpan(8, 30, 0),
+                new TimeSpan(16, 30, 0)),
+            3 => new ScheduleDayTemplate(
+                "Immersive activity and guest support",
+                "Coordinate the booked activity, meal timing, transfer support, and guest requests.",
+                new TimeSpan(9, 0, 0),
+                new TimeSpan(17, 0, 0)),
+            _ => new ScheduleDayTemplate(
+                "Wrap-up and departure support",
+                "Review the itinerary, support checkout or transfer, and close the guided tour.",
+                new TimeSpan(8, 30, 0),
+                new TimeSpan(12, 0, 0))
+        };
+    }
 
     private void SeedTours()
     {
@@ -1374,4 +1469,10 @@ END
         string Status,
         string ImageUrl,
         string Description);
+
+    private sealed record ScheduleDayTemplate(
+        string Title,
+        string Description,
+        TimeSpan StartTime,
+        TimeSpan EndTime);
 }
