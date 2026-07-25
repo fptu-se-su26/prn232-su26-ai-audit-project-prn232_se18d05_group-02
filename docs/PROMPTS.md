@@ -61,7 +61,7 @@ Sinh viên/nhóm cần ghi lại:
 | 7 | 12/07/2026 – 22/07/2026 | Antigravity / Claude | Member 3 Customer Management & Tour Reviews | Triển khai Feature 1-4 thành viên 3: hồ sơ khách hàng, theo dõi booking, yêu cầu dịch vụ, đánh giá tour + debug lỗi tích hợp | Tạo API, Service, Blazor UI cho cả 4 feature. Debug URL sai, 204 parse, silent catch, closure bug | Có | PROMPTS.md - Prompt-07 |
 | 8 | 24/07/2026 | OpenAI Codex / ChatGPT | Review và hoàn thiện Travel Style Quiz | Đối chiếu M5-F01, sửa authorization, validation, Guid contract và đồng bộ UI | Backend/client build thành công, xác định phần còn thiếu và phạm vi commit | Có | PROMPTS.md - Prompt-08 |
 | 9 | 24/07/2026 | OpenAI Codex / ChatGPT | Triển khai gợi ý tour theo nhu cầu | Phân tích M5-F02, thiết kế rule-based scoring, filter, random và UI dùng dữ liệu dự án | Hoàn thiện API/service/Blazor UI, cấu hình trọng số và build solution thành công | Có | PROMPTS.md - Prompt-09 |
-| 10 |  |  |  |  |  | Có / Không |  |
+| 10 | 24/07/2026 | OpenAI Codex / ChatGPT | Triển khai Dashboard thống kê | Đối chiếu M5-F03, xây KPI, doanh thu, booking series, top guide và UI theo dữ liệu thật | Hoàn thiện 4 API, policy DASHBOARD_VIEW, dashboard widget độc lập và build thành công | Có | PROMPTS.md - Prompt-10 |
 
 ---
 
@@ -1157,6 +1157,48 @@ Schema hiện tại chưa có Departure entity, DestinationId, TourTypeId và Ta
 | File frontend | Recommendations.razor, TourRecommendationCard.razor, RecommendationContracts.cs, UserApiClient.cs, TravelQuiz.razor |
 | Kết quả build | `dotnet build WanderX.slnx --no-restore`: thành công, 0 warning, 0 error |
 | Audit liên quan | AI_AUDIT_LOG.md - Lần sử dụng AI số 9 |
+
+---
+### Prompt-10
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 24/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục tiêu | Triển khai M5-F03 Dashboard thống kê theo model và UI WanderX |
+| Loại prompt | Phân tích yêu cầu / Thiết kế / Sinh code / Security / Testing |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Tiếp tục Function 03 thành viên 5: Dashboard thống kê. API phải chặn Customer/Guide, có filter thời gian, KPI tour mở, booking theo CreatedAt, doanh thu dự kiến/đã thu/còn lại, doanh thu theo tour và top guide. Dùng dữ liệu thật và UI dự án, không làm sai module khác.
+```
+
+#### 5.2. Kết quả và phần áp dụng
+
+```text
+Tạo policy DASHBOARD_VIEW cho Admin/Staff; bốn endpoint summary, bookings-by-status, revenue-by-tour và top-guides; validation khoảng ngày tối đa 12 tháng; doanh thu dự kiến chỉ từ Confirmed/Finished và collected từ PaidAmount; bảng top guide có breakdown; giao diện filter, KPI, widget lỗi độc lập, last updated và drill-down.
+```
+
+#### 5.3. Điều chỉnh theo dữ liệu dự án
+
+```text
+Dự án chưa có bảng Payment riêng nên dùng Booking.PaidAmount. Chưa có permission table nên policy ánh xạ role Admin/Staff. Chưa có dữ liệu audit tiến độ, khiếu nại và điểm thủ công nên top guide V1 chỉ chấm 40 điểm tour hoàn thành, 30 điểm rating và 15 điểm tỷ lệ nhận việc; hiển thị thang 85 và “Chưa đủ mẫu” khi không có review.
+```
+
+#### 5.4. Kiểm chứng
+
+```text
+Chạy dotnet build WanderX.slnx --no-restore: build thành công, 0 error; 2 nullable warning cũ trong UserSpecialRequestService không thuộc Function 03. Kiểm tra không còn conflict marker và không sửa file solution/.vscode.
+```
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Backend | DashboardController.cs, DashboardService.cs, DashboardContracts.cs, Program.cs |
+| Frontend | AdminDashboard.razor, DashboardContracts.cs, UserApiClient.cs |
+| Audit liên quan | AI_AUDIT_LOG.md - Lần sử dụng AI số 10 |
 
 ---
 ## 6. Prompt quan trọng nhất

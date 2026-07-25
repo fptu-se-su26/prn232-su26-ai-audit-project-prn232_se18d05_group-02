@@ -309,6 +309,11 @@ public sealed class UserApiClient
         }
     }
 
+    public Task<DashboardSummary?> GetDashboardSummaryAsync(DashboardFilter filter) => GetAsync<DashboardSummary>($"api/admin/dashboard/summary?{BuildDashboardQuery(filter)}");
+    public Task<List<BookingStatusPoint>?> GetDashboardBookingsAsync(DashboardFilter filter) => GetAsync<List<BookingStatusPoint>>($"api/admin/dashboard/bookings-by-status?{BuildDashboardQuery(filter)}");
+    public Task<RevenueByTourPage?> GetDashboardRevenueAsync(DashboardFilter filter) => GetAsync<RevenueByTourPage>($"api/admin/dashboard/revenue-by-tour?{BuildDashboardQuery(filter)}");
+    public Task<List<TopGuideItem>?> GetDashboardGuidesAsync(DashboardFilter filter) => GetAsync<List<TopGuideItem>>($"api/admin/dashboard/top-guides?{BuildDashboardQuery(filter)}");
+    private static string BuildDashboardQuery(DashboardFilter f){var q=new List<string>{$"Page={f.Page}",$"PageSize={f.PageSize}"};if(f.FromDate.HasValue)q.Add($"FromDate={f.FromDate:yyyy-MM-dd}");if(f.ToDate.HasValue)q.Add($"ToDate={f.ToDate:yyyy-MM-dd}");if(!string.IsNullOrWhiteSpace(f.TourCode))q.Add($"TourCode={Uri.EscapeDataString(f.TourCode)}");if(!string.IsNullOrWhiteSpace(f.Destination))q.Add($"Destination={Uri.EscapeDataString(f.Destination)}");if(!string.IsNullOrWhiteSpace(f.Status))q.Add($"Status={Uri.EscapeDataString(f.Status)}");return string.Join("&",q);}
     public Task<RecommendationPageResponse?> GetRecommendationsAsync(RecommendationFilter filter, bool personalized)
     {
         var endpoint = personalized ? "api/recommendations/me" : "api/tours/search";

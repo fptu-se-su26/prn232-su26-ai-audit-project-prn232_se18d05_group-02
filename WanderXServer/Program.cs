@@ -37,6 +37,7 @@ builder.Services.AddScoped<TourReviewService>();
 builder.Services.AddScoped<TravelStyleQuizService>();
 builder.Services.Configure<RecommendationOptions>(builder.Configuration.GetSection("Recommendations"));
 builder.Services.AddScoped<RecommendationService>();
+builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<ITourService, TourService>();
 builder.Services.AddScoped<ITourScheduleService, TourScheduleService>();
 builder.Services.AddScoped<IBookedTourService, BookedTourService>();
@@ -88,6 +89,11 @@ builder.Services.AddRateLimiter(options =>
         opt.PermitLimit = 5;
         opt.QueueLimit = 0;
     });
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("DASHBOARD_VIEW", policy => policy.RequireRole("Admin", "Staff"));
 });
 
 builder.Services.AddEndpointsApiExplorer();

@@ -1131,6 +1131,42 @@ AI hỗ trợ đối chiếu requirement và xây dựng khung thuật toán, nh
 ```
 
 ---
+### Lần sử dụng AI số 10
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 24/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục đích sử dụng | Triển khai M5-F03 Dashboard thống kê |
+| Phần việc liên quan | KPI / Revenue / Booking series / Guide ranking / Authorization / Blazor UI |
+| Mức độ sử dụng | Hỗ trợ một phần |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-10
+```
+
+#### 4.2. Kết quả đã sử dụng và kiểm chứng
+
+```text
+Áp dụng policy DASHBOARD_VIEW, bốn API dashboard và giao diện Admin Dashboard. Công thức được điều chỉnh theo entity thật: booking theo CreatedAt, doanh thu từ Confirmed/Finished, đã thu từ PaidAmount, top guide dựa trên assignment/review. Build toàn solution thành công, 0 error.
+```
+
+#### 4.3. Giới hạn được ghi nhận
+
+```text
+Chưa có permission table, Payment entity, audit tiến độ, khiếu nại hoặc điểm Admin. Vì vậy không tự tạo dữ liệu thay thế; Staff được policy cho phép theo role hiện tại và top guide hiển thị breakdown trên thang 85.
+```
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| File liên quan | DashboardController.cs; DashboardService.cs; AdminDashboard.razor; UserApiClient.cs; Program.cs |
+| Kết quả build | Thành công, 0 error; 2 warning cũ ngoài phạm vi |
+
+---
 ## 5. Bảng tổng hợp mức độ sử dụng AI
 
 Đánh dấu mức độ AI hỗ trợ ở từng hạng mục.
