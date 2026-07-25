@@ -1,69 +1,31 @@
 @page "/dashboard"
 @page "/admin-dashboard"
-
 @layout AdminLayout
-<PageTitle>Admin Dashboard - WanderX</PageTitle>
-
-
-        <header class="guide-topbar">
-            <div>
-                <p class="guide-eyebrow">Admin</p>
-                <h1>Dashboard</h1>
-                <p class="guide-subtitle">System overview and operations shortcuts.</p>
-            </div>
-        </header>
-
-        <section class="guide-content">
-            <div class="guide-stat-grid">
-                <article class="guide-stat">
-                    <p>Tour Management</p>
-                    <strong>01</strong>
-                    <span>Manage travel tour packages</span>
-                </article>
-                <article class="guide-stat guide-stat--secondary">
-                    <p>Assignments</p>
-                    <strong>02</strong>
-                    <span>Track tour staffing work</span>
-                </article>
-                <article class="guide-stat guide-stat--tertiary">
-                    <p>Operations</p>
-                    <strong>03</strong>
-                    <span>Monitor active tour support</span>
-                </article>
-                <article class="guide-stat">
-                    <p>Accounts</p>
-                    <strong>04</strong>
-                    <span>Role-based access entry point</span>
-                </article>
-            </div>
-
-            <section class="guide-form-panel">
-                <div class="guide-section-heading">
-                    <div>
-                        <p class="guide-eyebrow">Quick action</p>
-                        <h2>Guide Operations</h2>
-                    </div>
-                    <div class="guide-form-actions">
-                        <a class="wx-button" href="/guides">
-                            <MaterialIcon Name="badge" />
-                            Open Guides
-                        </a>
-                        <a class="wx-button" href="/admin/tours">
-                            <MaterialIcon Name="travel_explore" />
-                            Open Tours
-                        </a>
-                        <a class="wx-button" href="/admin-quiz">
-                            <MaterialIcon Name="quiz" />
-                            Manage Quizzes
-                        </a>
-                        <a class="wx-button wx-button--secondary" href="/guide-assignments">
-                            <MaterialIcon Name="assignment_ind" />
-                            Open Assignments
-                        </a>
-                    </div>
-                </div>
-                <p class="guide-subtitle">Use this dashboard as the admin landing page after login. Guide profiles and guide-to-tour assignments are managed in separate operation screens.</p>
-            </section>
-        </section>
-
-
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient Api
+@inject AuthSessionService Session
+<PageTitle>Dashboard thống kê - WanderX</PageTitle>
+<header class="guide-topbar"><div><p class="guide-eyebrow">Admin · Asia/Ho_Chi_Minh</p><h1>Dashboard thống kê</h1><p class="guide-subtitle">Booking tính theo CreatedAt; doanh thu dự kiến chỉ gồm Confirmed và Finished.</p></div></header>
+<section class="guide-content dash">
+ @if(!_allowed){<div class="dash-error">Bạn không có quyền DASHBOARD_VIEW.</div>}
+ else {
+ <section class="dash-filter"><label>Từ ngày<InputDate @bind-Value="_filter.FromDate" /></label><label>Đến ngày<InputDate @bind-Value="_filter.ToDate" /></label><label>Tour code<input @bind="_filter.TourCode" /></label><label>Điểm đến<input @bind="_filter.Destination" /></label><label>Trạng thái<select @bind="_filter.Status"><option value="">Tất cả</option><option>Pending</option><option>Paid</option><option>Confirmed</option><option>Finished</option><option>Cancelled</option></select></label><button class="wx-button" @onclick="LoadAll">Áp dụng</button><button class="wx-button wx-button--secondary" @onclick="Reset">Đặt lại</button></section>
+ @if(_summaryError!=null){<div class="dash-error">KPI: @_summaryError</div>}
+ else if(_summary!=null){<div class="dash-kpis"><a href="/admin/tours" title="Tour mở có lịch tương lai khả dụng"><span>Tour đang mở</span><strong>@_summary.OpenTourCount</strong></a><a href="/admin-bookings" title="Booking tạo trong kỳ theo CreatedAt"><span>Booking trong kỳ</span><strong>@_summary.BookingCount</strong></a><a href="/admin-bookings" title="TotalAmount của booking Confirmed/Finished"><span>Doanh thu dự kiến</span><strong>@Money(_summary.ExpectedRevenue)</strong></a><a href="/admin-payments" title="PaidAmount đã ghi nhận của booking Confirmed/Finished"><span>Đã thu</span><strong>@Money(_summary.CollectedRevenue)</strong><small>Còn lại @Money(_summary.OutstandingRevenue)</small></a></div><p class="dash-updated">Cập nhật: @_summary.LastUpdated.AddHours(7).ToString("dd/MM/yyyy HH:mm")</p>}
+ <div class="dash-grid"><section class="dash-panel"><h2>Booking theo trạng thái</h2>@if(_bookingError!=null){<div class="dash-error">@_bookingError</div>}else{<div class="status-bars">@foreach(var x in _bookingGroups){<div><span>@x.Key</span><progress max="@Math.Max(1,_bookingMax)" value="@x.Value"></progress><strong>@x.Value</strong></div>}</div>}</section>
+ <section class="dash-panel"><h2>Top hướng dẫn viên</h2>@if(_guideError!=null){<div class="dash-error">@_guideError</div>}else{<table><thead><tr><th>#</th><th>Guide</th><th>Finished</th><th>Rating</th><th>Nhận việc</th><th>Score</th></tr></thead><tbody>@foreach(var g in _guides){<tr title="@string.Join(" · ",g.ScoreBreakdown)"><td>@g.Rank</td><td>@g.GuideName</td><td>@g.CompletedTours</td><td>@(g.AverageRating?.ToString("0.0")??g.RatingNote)</td><td>@g.AcceptanceRate.ToString("0")%</td><td><strong>@g.Score</strong>/85</td></tr>}</tbody></table>}</section></div>
+ <section class="dash-panel"><h2>Doanh thu theo tour</h2>@if(_revenueError!=null){<div class="dash-error">@_revenueError</div>}else if(_revenue!=null){<table><thead><tr><th>Tour</th><th>Dự kiến</th><th>Đã thu</th><th>Còn lại</th></tr></thead><tbody>@foreach(var x in _revenue.Items){<tr><td><strong>@x.TourName</strong><small>@x.TourCode</small></td><td>@Money(x.Expected)</td><td>@Money(x.Collected)</td><td>@Money(x.Outstanding)</td></tr>}</tbody><tfoot><tr><th>Tổng</th><th>@Money(_revenue.TotalExpected)</th><th>@Money(_revenue.TotalCollected)</th><th>@Money(_revenue.TotalExpected-_revenue.TotalCollected)</th></tr></tfoot></table>}</section> }
+</section>
+<style>
+.dash{display:grid;gap:22px}.dash-filter{display:flex;align-items:end;flex-wrap:wrap;gap:12px;padding:18px;background:#fff;border:1px solid #e2e8f0;border-radius:16px}.dash-filter label{display:grid;gap:6px;font-size:12px;font-weight:700}.dash-filter input,.dash-filter select{padding:10px;border:1px solid #cbd5e1;border-radius:9px}.dash-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.dash-kpis a{display:grid;gap:8px;padding:22px;border-radius:16px;background:#fff;border:1px solid #e2e8f0;text-decoration:none;color:#0f172a}.dash-kpis span,.dash-kpis small{color:#64748b}.dash-kpis strong{font-size:26px}.dash-updated{text-align:right;color:#64748b;font-size:12px}.dash-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:20px}.dash-panel{overflow:auto;padding:22px;background:#fff;border:1px solid #e2e8f0;border-radius:16px}.dash-panel h2{margin-top:0}.dash-panel table{width:100%;border-collapse:collapse}.dash-panel th,.dash-panel td{text-align:left;padding:11px;border-bottom:1px solid #e2e8f0}.dash-panel td small{display:block;color:#64748b}.status-bars{display:grid;gap:14px}.status-bars div{display:grid;grid-template-columns:85px 1fr 32px;gap:10px;align-items:center}.status-bars progress{width:100%;accent-color:#ff5a5f}.dash-error{padding:14px;color:#991b1b;background:#fef2f2;border-radius:10px}@@media(max-width:900px){.dash-kpis,.dash-grid{grid-template-columns:1fr 1fr}}@@media(max-width:600px){.dash-kpis,.dash-grid{grid-template-columns:1fr}}
+</style>
+@code{private DashboardFilter _filter=new();private DashboardSummary? _summary;private RevenueByTourPage? _revenue;private List<TopGuideItem> _guides=new();private Dictionary<string,int> _bookingGroups=new();private int _bookingMax;private bool _allowed;private string? _summaryError,_bookingError,_revenueError,_guideError;
+ protected override async Task OnInitializedAsync(){var s=await Session.GetAsync();_allowed=s!=null&&(s.Role.Equals("Admin",StringComparison.OrdinalIgnoreCase)||s.Role.Equals("Staff",StringComparison.OrdinalIgnoreCase));await Reset();}
+ private async Task Reset(){var n=DateTime.Today;_filter=new(){FromDate=new DateTime(n.Year,n.Month,1),ToDate=new DateTime(n.Year,n.Month,1).AddMonths(1).AddDays(-1)};if(_allowed)await LoadAll();}
+ private async Task LoadAll(){await Task.WhenAll(LoadSummary(),LoadBookings(),LoadRevenue(),LoadGuides());}
+ private async Task LoadSummary(){try{_summaryError=null;_summary=await Api.GetDashboardSummaryAsync(_filter);}catch(Exception e){_summaryError=e.Message;}}
+ private async Task LoadBookings(){try{_bookingError=null;var rows=await Api.GetDashboardBookingsAsync(_filter)??new();_bookingGroups=rows.GroupBy(x=>x.Status).ToDictionary(g=>g.Key,g=>g.Sum(x=>x.Count));_bookingMax=_bookingGroups.Values.DefaultIfEmpty(0).Max();}catch(Exception e){_bookingError=e.Message;}}
+ private async Task LoadRevenue(){try{_revenueError=null;_revenue=await Api.GetDashboardRevenueAsync(_filter);}catch(Exception e){_revenueError=e.Message;}}
+ private async Task LoadGuides(){try{_guideError=null;_guides=await Api.GetDashboardGuidesAsync(_filter)??new();}catch(Exception e){_guideError=e.Message;}}
+ private static string Money(decimal x)=>$"{x:N0} ₫";}
