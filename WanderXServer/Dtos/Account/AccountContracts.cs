@@ -1,0 +1,13 @@
+using System.ComponentModel.DataAnnotations; using WanderXServer.BusinessObject.Enums;
+namespace WanderXServer.Dtos.Account;
+public sealed class AdminUserQuery { public string? Keyword { get; set; } public UserRole? Role { get; set; } public string? Status { get; set; } public bool? PhoneVerified { get; set; } [Range(1,int.MaxValue)]public int Page { get; set; }=1;[Range(1,50)]public int PageSize { get; set; }=10; }
+public class AdminUserItem { public Guid Id { get; set; } public string FullName { get; set; }=string.Empty; public string Email { get; set; }=string.Empty; public string PhoneNumber { get; set; }=string.Empty; public string Role { get; set; }=string.Empty; public string Status { get; set; }=string.Empty; public bool PhoneVerified { get; set; } public DateTime CreatedAt { get; set; } public DateTime? LastLoginAt { get; set; } public DateTime? LockoutEnd { get; set; } }
+public sealed class AdminUserPage { public int Page { get; set; } public int PageSize { get; set; } public int TotalCount { get; set; } public List<AdminUserItem> Items { get; set; }=new(); }
+public sealed class AdminUserDetail : AdminUserItem { public List<AccountAuditItem> AuditLogs { get; set; }=new(); public List<string> Permissions { get; set; }=new(); }
+public sealed class AccountAuditItem { public Guid Id { get; set; } public string Action { get; set; }=string.Empty; public string? OldValue { get; set; } public string? NewValue { get; set; } public string Reason { get; set; }=string.Empty; public DateTime CreatedAt { get; set; } public Guid ActorUserId { get; set; } }
+public sealed class ChangeRoleRequest { [Required]public string Role { get; set; }=string.Empty;[Required,StringLength(500,MinimumLength=3)]public string Reason { get; set; }=string.Empty; }
+public sealed class LockUserRequest { public DateTime? LockUntil { get; set; } [Required,StringLength(500,MinimumLength=3)]public string Reason { get; set; }=string.Empty; }
+public sealed class UnlockUserRequest { [Required,StringLength(500,MinimumLength=3)]public string Reason { get; set; }=string.Empty; }
+public sealed class SendPhoneOtpRequest { [Required,Phone]public string PhoneNumber { get; set; }=string.Empty; }
+public sealed class SendPhoneOtpResponse { public Guid VerificationId { get; set; } public string MaskedPhone { get; set; }=string.Empty; public DateTime ExpiresAt { get; set; } public int ResendAfterSeconds { get; set; } }
+public sealed class VerifyPhoneOtpRequest { public Guid VerificationId { get; set; } [Required,RegularExpression("^\\d{6}$")]public string Otp { get; set; }=string.Empty; }

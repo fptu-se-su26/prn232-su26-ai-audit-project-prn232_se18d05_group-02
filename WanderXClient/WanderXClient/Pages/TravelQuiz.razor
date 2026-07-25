@@ -1,0 +1,1636 @@
+@page "/travel-quiz"
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject UserApiClient ApiClient
+@inject AuthSessionService SessionService
+@inject NavigationManager Navigation
+
+<PageTitle>Travel Style Quiz - WanderX</PageTitle>
+
+@if (_phase == QuizPhase.Splash)
+{
+    <!-- ── PHASE 1: Splash Intro (quiz1.html) ──────────────────────────────── -->
+    <div class="tqz-splash">
+        <div class="tqz-splash__bg">
+            <div class="tqz-splash__overlay"></div>
+            <div class="tqz-splash__img tqz-animate-zoom"></div>
+        </div>
+
+        <header class="tqz-splash__header">
+            <span class="tqz-brand">WanderX</span>
+            <button class="tqz-splash__close" @onclick='() => Navigation.NavigateTo("/")'>
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </header>
+
+        <aside class="tqz-splash__corner tqz-splash__corner--left">
+            <div class="tqz-mag-side">
+                <div class="tqz-mag-side__num">01/0@(_questions?.Count ?? 5)</div>
+                <div class="tqz-mag-side__label">Trải nghiệm đỉnh cao</div>
+            </div>
+        </aside>
+
+        <aside class="tqz-splash__corner tqz-splash__corner--right">
+            <div class="tqz-glass-card">
+                <div class="tqz-glass-card__row">
+                    <div class="tqz-verified-dot">
+                        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1; font-size:16px">verified</span>
+                    </div>
+                    <span class="tqz-glass-card__label">98% Match Rate</span>
+                </div>
+                <p class="tqz-glass-card__desc">Hệ thống AI phân tích hơn 500 biến số để tìm điểm đến hoàn hảo cho bạn.</p>
+            </div>
+        </aside>
+
+        <main class="tqz-splash__main">
+            <div class="tqz-tag">Exclusive Experience</div>
+            <div class="tqz-splash__headline-wrap">
+                <h1 class="tqz-splash__h1">Khám phá <em>Phong cách Du lịch</em> của Bạn</h1>
+                <div class="tqz-mag-line"></div>
+            </div>
+            <p class="tqz-splash__sub">Dành 2 phút để chúng tôi cá nhân hóa những hành trình trong mơ của riêng bạn.</p>
+
+            @if (_isLoading)
+            {
+                <div class="tqz-splash__cta-wrap">
+                    <button class="tqz-splash__cta" disabled>
+                        <span class="material-symbols-outlined tqz-spin">progress_activity</span>
+                        Đang tải câu hỏi…
+                    </button>
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <p class="tqz-splash__error">@_errorMessage</p>
+                <button class="tqz-splash__cta" @onclick="LoadQuestionsAsync">Thử lại</button>
+            }
+            else
+            {
+                <div class="tqz-splash__cta-wrap">
+                    <div class="tqz-cta-glow"></div>
+                    <button class="tqz-splash__cta" @onclick="StartQuiz">
+                        Bắt đầu Khảo sát
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </div>
+            }
+
+            <div class="tqz-scroll-indicator">
+                <span class="tqz-scroll-label">Scroll for details</span>
+                <div class="tqz-scroll-line"></div>
+            </div>
+        </main>
+    </div>
+}
+else if (_phase == QuizPhase.Question && _questions != null && _currentIndex < _questions.Count)
+{
+    <!-- ── PHASE 2: Question Page (quiz2.html layout) ──────────────────────── -->
+    var q = _questions[_currentIndex];
+    int progress = (int)Math.Round((_currentIndex / (double)_questions.Count) * 100);
+    <div class="tqz-quiz">
+        <header class="tqz-quiz__header">
+            <div class="tqz-quiz__brand">
+                <span class="material-symbols-outlined">menu</span>
+                <span class="tqz-brand tqz-brand--dark">WanderX</span>
+            </div>
+            <div class="tqz-quiz__header-right">
+                <button class="tqz-skip-btn" @onclick='() => Navigation.NavigateTo("/")'>Skip Quiz</button>
+                <span class="material-symbols-outlined tqz-user-icon">account_circle</span>
+            </div>
+        </header>
+
+        <main class="tqz-quiz__main">
+            <div class="tqz-quiz__inner">
+                <!-- Progress -->
+                <div class="tqz-progress-wrap">
+                    <div class="tqz-progress__meta">
+                        <span class="tqz-progress__counter">Câu hỏi @(_currentIndex + 1)/@_questions.Count</span>
+                        <span class="tqz-progress__label">Travel Style Quiz</span>
+                    </div>
+                    <div class="tqz-progress-bar">
+                        <div class="tqz-progress-bar__fill" style="width:@(progress)%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Text -->
+                <h1 class="tqz-quiz__question">@q.Text</h1>
+
+                <!-- Option Cards Grid -->
+                <div class="tqz-options-grid">
+                    @foreach (var opt in q.Options)
+                    {
+                        var isSelected = _answers.TryGetValue(_currentIndex, out var sel) && sel == opt.Id;
+                        <label class="tqz-option-label @(isSelected ? "tqz-option-label--selected" : "")">
+                            <input type="radio"
+                                   name="quiz-option"
+                                   value="@opt.OptionKey"
+                                   class="tqz-option-radio"
+                                   checked="@isSelected"
+                                   @onchange="() => SelectOption(opt.Id)" />
+                            <div class="tqz-option-card">
+                                <div class="tqz-option-card__check">
+                                    <span class="material-symbols-outlined">check</span>
+                                </div>
+                                <div class="tqz-option-card__body">
+                                    <span class="tqz-option-key">@opt.OptionKey</span>
+                                    <p class="tqz-option-text">@opt.Text</p>
+                                </div>
+                            </div>
+                        </label>
+                    }
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer class="tqz-quiz__footer">
+            <button class="tqz-nav-btn tqz-nav-btn--back" @onclick="GoBack"
+                    disabled="@(_currentIndex == 0)">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Quay lại
+            </button>
+            <div class="tqz-footer-right">
+                <span class="tqz-footer-hint">@(!string.IsNullOrEmpty(_errorMessage) ? _errorMessage : (_answers.ContainsKey(_currentIndex) ? "" : "Hãy chọn một lựa chọn để tiếp tục"))</span>
+                @if (_currentIndex < _questions.Count - 1)
+                {
+                    <button class="tqz-nav-btn tqz-nav-btn--next"
+                            @onclick="GoNext"
+                            disabled="@(!_answers.ContainsKey(_currentIndex))">
+                        Tiếp theo
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                }
+                else
+                {
+                    <button class="tqz-nav-btn tqz-nav-btn--submit"
+                            @onclick="SubmitQuiz"
+                            disabled="@(_isSaving || !_answers.ContainsKey(_currentIndex))">
+                        @if (_isSaving)
+                        {
+                            <span class="material-symbols-outlined tqz-spin">progress_activity</span>
+                        }
+                        Nộp bài
+                        <span class="material-symbols-outlined">check_circle</span>
+                    </button>
+                }
+            </div>
+        </footer>
+    </div>
+}
+else if (_phase == QuizPhase.Result && _result != null)
+{
+    <!-- ── PHASE 3: Result Page (quizresult.html layout) ──────────────────── -->
+    var styleInfo = GetStyleInfo(_result.DominantStyle);
+    int totalScore = _result.AdventureScore + _result.CulturalScore + _result.RelaxationScore + _result.LuxuryScore;
+    int advPct   = totalScore > 0 ? (int)Math.Round(_result.AdventureScore   * 100.0 / totalScore) : 0;
+    int culPct   = totalScore > 0 ? (int)Math.Round(_result.CulturalScore    * 100.0 / totalScore) : 0;
+    int relPct   = totalScore > 0 ? (int)Math.Round(_result.RelaxationScore  * 100.0 / totalScore) : 0;
+    int luxPct   = totalScore > 0 ? (int)Math.Round(_result.LuxuryScore      * 100.0 / totalScore) : 0;
+
+    <div class="tqz-result">
+        <header class="tqz-result__topbar">
+            <div class="tqz-result__topbar-left">
+                <a href="/" class="tqz-brand tqz-brand--dark">WanderX</a>
+            </div>
+        </header>
+
+        <main class="tqz-result__main">
+            <!-- Hero Result section -->
+            <section class="tqz-result__hero">
+                <div class="tqz-result__hero-text">
+                    <span class="tqz-result-badge">Kết quả bài trắc nghiệm</span>
+                    <h1 class="tqz-result__h1">
+                        Phong cách của bạn:<br/>
+                        <span class="tqz-result__style-name" style="color:@styleInfo.Color">@styleInfo.Title</span>
+                    </h1>
+                    <p class="tqz-result__desc">@styleInfo.Description</p>
+                    <div class="tqz-result__tags">
+                        @foreach (var tag in styleInfo.Tags)
+                        {
+                            <span class="tqz-result__tag">
+                                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">@tag.Icon</span>
+                                @tag.Label
+                            </span>
+                        }
+                    </div>
+                </div>
+                <div class="tqz-result__hero-img-wrap">
+                    <div class="tqz-result__hero-glow"></div>
+                    <div class="tqz-result__hero-img">
+                        <div class="tqz-result__hero-img-overlay"></div>
+                        <div class="tqz-result__hero-quote">
+                            <p class="tqz-result__hero-quote-label">Cảm hứng dành cho bạn</p>
+                            <p class="tqz-result__hero-quote-text">"@styleInfo.Quote"</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Score breakdown -->
+            <section class="tqz-scores">
+                <h2 class="tqz-scores__title">Phân tích phong cách du lịch</h2>
+                <div class="tqz-score-grid">
+                    <div class="tqz-score-row">
+                        <span class="tqz-score-label">🧗 Mạo hiểm</span>
+                        <div class="tqz-score-bar-wrap">
+                            <div class="tqz-score-bar tqz-score-bar--adventure" style="width:@(advPct)%"></div>
+                        </div>
+                        <span class="tqz-score-pct">@advPct%</span>
+                    </div>
+                    <div class="tqz-score-row">
+                        <span class="tqz-score-label">🏛️ Văn hóa</span>
+                        <div class="tqz-score-bar-wrap">
+                            <div class="tqz-score-bar tqz-score-bar--cultural" style="width:@(culPct)%"></div>
+                        </div>
+                        <span class="tqz-score-pct">@culPct%</span>
+                    </div>
+                    <div class="tqz-score-row">
+                        <span class="tqz-score-label">🏖️ Nghỉ dưỡng</span>
+                        <div class="tqz-score-bar-wrap">
+                            <div class="tqz-score-bar tqz-score-bar--relaxation" style="width:@(relPct)%"></div>
+                        </div>
+                        <span class="tqz-score-pct">@relPct%</span>
+                    </div>
+                    <div class="tqz-score-row">
+                        <span class="tqz-score-label">💎 Thượng lưu</span>
+                        <div class="tqz-score-bar-wrap">
+                            <div class="tqz-score-bar tqz-score-bar--luxury" style="width:@(luxPct)%"></div>
+                        </div>
+                        <span class="tqz-score-pct">@luxPct%</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Suggested Tours -->
+            <section class="tqz-tours">
+                <div class="tqz-tours__header">
+                    <div>
+                        <h2 class="tqz-tours__title">Tour gợi ý cho bạn</h2>
+                        <p class="tqz-tours__sub">Lựa chọn dựa trên sở thích và phong cách riêng của bạn.</p>
+                    </div>
+                    <a href="/recommendations" class="tqz-see-all">Xem gợi ý thực tế <span class="material-symbols-outlined">arrow_forward</span></a>
+                </div>
+                <div class="tqz-tour-cards">
+                    @foreach (var tour in styleInfo.SuggestedTours)
+                    {
+                        <div class="tqz-tour-card">
+                            <div class="tqz-tour-card__img-wrap">
+                                <div class="tqz-tour-card__img" style="background-image:url('@tour.ImageKeyword')"></div>
+                                <div class="tqz-tour-card__badge">@tour.Badge</div>
+                            </div>
+                            <div class="tqz-tour-card__body">
+                                <div class="tqz-tour-card__top">
+                                    <h3 class="tqz-tour-card__title">@tour.Name</h3>
+                                    <span class="material-symbols-outlined tqz-fav-icon">favorite</span>
+                                </div>
+                                <div class="tqz-tour-card__meta">
+                                    <span><span class="material-symbols-outlined">schedule</span>@tour.Duration</span>
+                                    <span><span class="material-symbols-outlined">star</span>@tour.Rating</span>
+                                </div>
+                                <div class="tqz-tour-card__footer">
+                                    <div>
+                                        <p class="tqz-price-label">Giá từ</p>
+                                        <p class="tqz-price">@tour.PriceDisplay</p>
+                                    </div>
+                                    <a href="/recommendations" class="tqz-book-btn">Xem tour phù hợp</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+
+            <!-- CTA Banner -->
+            <section class="tqz-cta-banner">
+                <div class="tqz-cta-banner__deco"></div>
+                <div class="tqz-cta-banner__content">
+                    <h2 class="tqz-cta-banner__h2">Bạn đã sẵn sàng cho chuyến đi tiếp theo?</h2>
+                    <p class="tqz-cta-banner__sub">Đăng ký để nhận những ưu đãi đặc quyền và hành trình thiết kế riêng cho bạn.</p>
+                    <div class="tqz-cta-banner__actions">
+                        <button class="tqz-retake-btn" @onclick="() => _phase = QuizPhase.Splash">
+                            <span class="material-symbols-outlined">refresh</span>
+                            Làm lại Quiz
+                        </button>
+                        <a href="/profile" class="tqz-view-profile-btn">
+                            Xem Hồ Sơ
+                            <span class="material-symbols-outlined">person</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+}
+
+<style>
+/* ══════════════════════════════════════════════════════════════════════
+   FONTS & BASE
+   ══════════════════════════════════════════════════════════════════════ */
+@@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@@400;500;600;700;800&family=Inter:wght@@400;500;600&family=Material+Symbols+Outlined:wght,FILL@@100..700,0..1&display=swap');
+
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   SHARED
+   ══════════════════════════════════════════════════════════════════════ */
+.tqz-brand {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+}
+
+.tqz-brand--dark { color: #0f172a; }
+
+.tqz-spin { animation: tqz-spin 1s linear infinite; display: inline-block; }
+@@keyframes tqz-spin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════════════════════════════════════════════
+   PHASE 1 – SPLASH
+   ══════════════════════════════════════════════════════════════════════ */
+.tqz-splash {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    overflow: hidden;
+    background: #0f172a;
+}
+
+.tqz-splash__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.tqz-splash__img {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+}
+
+.tqz-animate-zoom {
+    animation: tqz-zoom 20s ease-in-out infinite alternate;
+}
+@@keyframes tqz-zoom {
+    from { transform: scale(1); }
+    to   { transform: scale(1.06); }
+}
+
+.tqz-splash__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+        rgba(15,23,42,0.1) 0%,
+        rgba(15,23,42,0.4) 40%,
+        rgba(15,23,42,0.85) 100%);
+    z-index: 1;
+}
+
+/* Header */
+.tqz-splash__header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 32px;
+    box-sizing: border-box;
+}
+
+.tqz-splash__header .tqz-brand { color: #ffffff; }
+
+.tqz-splash__close {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    backdrop-filter: blur(8px);
+    transition: background 0.2s;
+}
+.tqz-splash__close:hover { background: rgba(255,255,255,0.22); }
+
+/* Corner decorations */
+.tqz-splash__corner {
+    position: absolute;
+    z-index: 10;
+}
+
+.tqz-splash__corner--left {
+    top: 128px;
+    left: 32px;
+}
+
+.tqz-splash__corner--right {
+    bottom: 48px;
+    right: 32px;
+    width: 260px;
+}
+
+.tqz-mag-side {
+    border-left: 1px solid rgba(255,255,255,0.3);
+    padding-left: 16px;
+}
+
+.tqz-mag-side__num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.tqz-mag-side__label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+}
+
+.tqz-glass-card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.tqz-glass-card__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.tqz-verified-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #0284c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.tqz-glass-card__label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.tqz-glass-card__desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.6);
+    margin: 0;
+}
+
+/* Main content */
+.tqz-splash__main {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    max-width: 1280px;
+    padding: 0 32px 96px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.tqz-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    padding: 6px 18px;
+    border-radius: 9999px;
+    margin-bottom: 24px;
+}
+
+.tqz-splash__headline-wrap {
+    margin-bottom: 24px;
+}
+
+.tqz-splash__h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.12;
+    color: #ffffff;
+    margin: 0 0 16px;
+}
+
+.tqz-splash__h1 em {
+    font-style: italic;
+    font-weight: 400;
+}
+
+.tqz-mag-line {
+    height: 1px;
+    width: 96px;
+    margin: 0 auto;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.8) 50%, transparent 100%);
+    opacity: 0.5;
+}
+
+.tqz-splash__sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.9);
+    max-width: 520px;
+    margin: 0 auto 48px;
+}
+
+.tqz-splash__cta-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.tqz-cta-glow {
+    position: absolute;
+    inset: -4px;
+    background: #ff5a5f;
+    border-radius: 9999px;
+    filter: blur(12px);
+    opacity: 0.3;
+    transition: opacity 0.3s;
+}
+
+.tqz-splash__cta-wrap:hover .tqz-cta-glow { opacity: 0.55; }
+
+.tqz-splash__cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 48px;
+    background: #ff5a5f;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(255,90,95,0.4);
+    transition: transform 0.15s, opacity 0.15s;
+}
+
+.tqz-splash__cta:hover { transform: translateY(-2px); }
+.tqz-splash__cta:active { transform: scale(0.96); }
+.tqz-splash__cta:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.tqz-splash__error {
+    color: rgba(255,100,100,0.9);
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.tqz-scroll-indicator {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.5;
+    z-index: 5;
+}
+
+.tqz-scroll-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: #ffffff;
+}
+
+.tqz-scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, #ffffff, transparent);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   PHASE 2 – QUIZ QUESTION
+   ══════════════════════════════════════════════════════════════════════ */
+.tqz-quiz {
+    min-height: 100vh;
+    background: #fcf8fa;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header */
+.tqz-quiz__header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    background: rgba(252,248,250,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e2e8f0;
+    box-sizing: border-box;
+}
+
+.tqz-quiz__brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f172a;
+    cursor: pointer;
+}
+
+.tqz-quiz__header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tqz-skip-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #64748b;
+    transition: opacity 0.15s;
+}
+
+.tqz-skip-btn:hover { opacity: 0.7; }
+
+.tqz-user-icon { color: #0f172a; font-size: 28px; }
+
+/* Main */
+.tqz-quiz__main {
+    flex: 1;
+    padding: 96px 32px 120px;
+}
+
+.tqz-quiz__inner {
+    max-width: 896px;
+    margin: 0 auto;
+}
+
+/* Progress */
+.tqz-progress-wrap {
+    margin-bottom: 24px;
+}
+
+.tqz-progress__meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.tqz-progress__counter {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.tqz-progress__label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #94a3b8;
+}
+
+.tqz-progress-bar {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.tqz-progress-bar__fill {
+    height: 100%;
+    background: #0f172a;
+    border-radius: 9999px;
+    transition: width 0.8s ease-out;
+}
+
+/* Question headline */
+.tqz-quiz__question {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 700;
+    line-height: 1.22;
+    color: #0f172a;
+    margin: 0 0 48px;
+    max-width: 640px;
+}
+
+/* Option Cards */
+.tqz-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.tqz-option-label {
+    position: relative;
+    cursor: pointer;
+    display: block;
+}
+
+.tqz-option-radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tqz-option-card {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    min-height: 80px;
+}
+
+.tqz-option-label:hover .tqz-option-card {
+    border-color: #94a3b8;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.tqz-option-label--selected .tqz-option-card {
+    border-color: #0f172a;
+    background: #f8fafc;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+}
+
+.tqz-option-card__check {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #0f172a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.25s, transform 0.25s;
+}
+
+.tqz-option-label--selected .tqz-option-card__check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.tqz-option-card__body {
+    flex: 1;
+}
+
+.tqz-option-key {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #94a3b8;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.tqz-option-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* Footer navigation */
+.tqz-quiz__footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 40;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.tqz-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tqz-footer-hint {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.tqz-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+}
+
+.tqz-nav-btn--back {
+    background: #f8fafc;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+
+.tqz-nav-btn--back:hover:not(:disabled) { background: #f1f5f9; }
+
+.tqz-nav-btn--next, .tqz-nav-btn--submit {
+    background: #0f172a;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.2);
+}
+
+.tqz-nav-btn--submit {
+    background: #ff5a5f;
+    box-shadow: 0 4px 12px rgba(255,90,95,0.3);
+}
+
+.tqz-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.tqz-nav-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.tqz-nav-btn:active:not(:disabled) { transform: scale(0.97); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   PHASE 3 – RESULT
+   ══════════════════════════════════════════════════════════════════════ */
+.tqz-result {
+    min-height: 100vh;
+    background: #fcf8fa;
+    font-family: 'Inter', sans-serif;
+}
+
+.tqz-result__topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(252,248,250,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+}
+
+.tqz-result__main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+}
+
+/* Hero section */
+.tqz-result__hero {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 48px;
+    align-items: center;
+    margin-bottom: 80px;
+}
+
+@@media (max-width: 768px) {
+    .tqz-result__hero { grid-template-columns: 1fr; }
+    .tqz-splash__corner--left,
+    .tqz-splash__corner--right { display: none; }
+    .tqz-quiz__header, .tqz-quiz__footer { padding: 0 16px; }
+}
+
+.tqz-result__hero-text { display: flex; flex-direction: column; gap: 20px; }
+
+.tqz-result-badge {
+    display: inline-block;
+    background: #ffdad8;
+    color: #92001b;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    width: fit-content;
+}
+
+.tqz-result__h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    color: #0f172a;
+    margin: 0;
+}
+
+.tqz-result__style-name { font-weight: 800; }
+
+.tqz-result__desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #64748b;
+    max-width: 520px;
+    margin: 0;
+}
+
+.tqz-result__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tqz-result__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+/* Hero image */
+.tqz-result__hero-img-wrap {
+    position: relative;
+}
+
+.tqz-result__hero-glow {
+    position: absolute;
+    inset: -16px;
+    background: #ffdad8;
+    border-radius: 50%;
+    filter: blur(48px);
+    opacity: 0.2;
+}
+
+.tqz-result__hero-img {
+    aspect-ratio: 3/4;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+}
+
+.tqz-result__hero-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
+}
+
+.tqz-result__hero-quote {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    right: 24px;
+    color: #ffffff;
+}
+
+.tqz-result__hero-quote-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    opacity: 0.8;
+    margin: 0 0 4px;
+}
+
+.tqz-result__hero-quote-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Score breakdown */
+.tqz-scores {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 64px;
+}
+
+.tqz-scores__title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 24px;
+}
+
+.tqz-score-grid { display: flex; flex-direction: column; gap: 16px; }
+
+.tqz-score-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 48px;
+    align-items: center;
+    gap: 16px;
+}
+
+.tqz-score-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.tqz-score-bar-wrap {
+    height: 10px;
+    background: #f1f5f9;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.tqz-score-bar {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 1.2s ease-out;
+}
+
+.tqz-score-bar--adventure  { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.tqz-score-bar--cultural   { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+.tqz-score-bar--relaxation { background: linear-gradient(90deg, #10b981, #34d399); }
+.tqz-score-bar--luxury     { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+
+.tqz-score-pct {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: right;
+}
+
+/* Suggested tours */
+.tqz-tours { margin-bottom: 64px; }
+
+.tqz-tours__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.tqz-tours__title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px;
+    position: relative;
+}
+
+.tqz-tours__title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: #0f172a;
+}
+
+.tqz-tours__sub {
+    font-size: 14px;
+    color: #64748b;
+    margin: 12px 0 0;
+}
+
+.tqz-see-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    text-decoration: none;
+    transition: gap 0.2s;
+}
+
+.tqz-see-all:hover { gap: 10px; }
+
+.tqz-tour-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.tqz-tour-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.25s, transform 0.25s;
+}
+
+.tqz-tour-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    transform: translateY(-4px);
+}
+
+.tqz-tour-card__img-wrap {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+}
+
+.tqz-tour-card__img {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease;
+    background-color: #334155;
+    background-image: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+}
+
+.tqz-tour-card:hover .tqz-tour-card__img { transform: scale(1.08); }
+
+.tqz-tour-card__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #0f172a;
+}
+
+.tqz-tour-card__body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tqz-tour-card__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.tqz-tour-card__title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #0f172a;
+    margin: 0;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.tqz-fav-icon {
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.15s;
+    flex-shrink: 0;
+}
+
+.tqz-fav-icon:hover { color: #ff5a5f; }
+
+.tqz-tour-card__meta {
+    display: flex;
+    gap: 16px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.tqz-tour-card__meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tqz-tour-card__meta .material-symbols-outlined { font-size: 16px; }
+
+.tqz-tour-card__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.tqz-price-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748b;
+    margin: 0 0 2px;
+}
+
+.tqz-price {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ff5a5f;
+    margin: 0;
+}
+
+.tqz-book-btn {
+    background: #ff5a5f;
+    color: #ffffff;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.15s, transform 0.15s;
+    box-shadow: 0 2px 8px rgba(255,90,95,0.3);
+}
+
+.tqz-book-btn:hover { opacity: 0.9; transform: scale(1.03); }
+
+/* CTA banner */
+.tqz-cta-banner {
+    background: #0f172a;
+    border-radius: 24px;
+    padding: 56px;
+    position: relative;
+    overflow: hidden;
+    color: #ffffff;
+}
+
+.tqz-cta-banner__deco {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04));
+    pointer-events: none;
+}
+
+.tqz-cta-banner__content { position: relative; z-index: 1; max-width: 560px; }
+
+.tqz-cta-banner__h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.tqz-cta-banner__sub {
+    font-size: 15px;
+    line-height: 1.6;
+    opacity: 0.75;
+    margin: 0 0 28px;
+}
+
+.tqz-cta-banner__actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.tqz-retake-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #ffffff;
+    border-radius: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background 0.2s;
+}
+
+.tqz-retake-btn:hover { background: rgba(255,255,255,0.18); }
+
+.tqz-view-profile-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: #ff5a5f;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(255,90,95,0.4);
+    transition: opacity 0.2s;
+}
+
+.tqz-view-profile-btn:hover { opacity: 0.9; }
+</style>
+
+@code {
+    private enum QuizPhase { Splash, Question, Result }
+
+    private QuizPhase _phase = QuizPhase.Splash;
+    private List<QuizQuestionClientDto>? _questions;
+    private int _currentIndex = 0;
+    private Dictionary<int, Guid> _answers = new(); // key = question index, value = option ID
+    private TravelStyleQuizResultResponse? _result;
+    private bool _isLoading = true;
+    private bool _isSaving = false;
+    private string _errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadQuestionsAsync();
+    }
+
+    private async Task LoadQuestionsAsync()
+    {
+        _isLoading = true;
+        _errorMessage = string.Empty;
+        StateHasChanged();
+        try
+        {
+            var result = await ApiClient.GetQuizQuestionsAsync();
+            _questions = result?.OrderBy(q => q.DisplayOrder).ToList() ?? new List<QuizQuestionClientDto>();
+            if (_questions.Count == 0)
+            {
+                _errorMessage = "Chưa có câu hỏi nào. Vui lòng liên hệ admin.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Không thể tải câu hỏi: {ex.Message}";
+            _questions = new List<QuizQuestionClientDto>();
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void StartQuiz()
+    {
+        if (_questions is { Count: > 0 })
+        {
+            _currentIndex = 0;
+            _answers.Clear();
+            _phase = QuizPhase.Question;
+        }
+    }
+
+    private void SelectOption(Guid optionId)
+    {
+        _answers[_currentIndex] = optionId;
+        _errorMessage = string.Empty;
+    }
+
+    private void GoBack()
+    {
+        if (_currentIndex > 0)
+        {
+            _currentIndex--;
+        }
+        else
+        {
+            _phase = QuizPhase.Splash;
+        }
+    }
+
+    private void GoNext()
+    {
+        if (_answers.ContainsKey(_currentIndex) && _currentIndex < (_questions?.Count ?? 0) - 1)
+        {
+            _currentIndex++;
+        }
+    }
+
+    private async Task SubmitQuiz()
+    {
+        if (_questions is null || !_answers.ContainsKey(_currentIndex)) return;
+
+        var session = await SessionService.GetAsync();
+        if (session is null || string.IsNullOrEmpty(session.Email))
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        _isSaving = true;
+        StateHasChanged();
+
+        try
+        {
+            if (_answers.Count != _questions.Count)
+            {
+                _errorMessage = "Vui lòng trả lời đầy đủ tất cả câu hỏi.";
+                return;
+            }
+
+            var answers = _questions.Select((question, index) => new QuizAnswerDto
+            {
+                QuestionId = question.Id,
+                OptionId = _answers[index]
+            }).ToList();
+
+            var request = new TravelStyleQuizSubmitRequest { Answers = answers };
+
+            _result = await ApiClient.SubmitQuizResultAsync(request);
+            _phase = QuizPhase.Result;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Nộp bài thất bại: {ex.Message}";
+        }
+        finally
+        {
+            _isSaving = false;
+            StateHasChanged();
+        }
+    }
+
+    private static StyleInfo GetStyleInfo(string dominantStyle)
+    {
+        return dominantStyle.ToLowerInvariant() switch
+        {
+            "adventure" => new StyleInfo
+            {
+                Title = "Người Khám phá Mạo hiểm",
+                Color = "#f59e0b",
+                Description = "Bạn sinh ra để chinh phục những vùng đất hoang sơ. Trái tim bạn đập nhanh hơn khi nghĩ đến đỉnh núi phủ sương và những cánh rừng nguyên sinh bất khuất.",
+                Quote = "Không phải đích đến mà là con đường mới là điều quan trọng",
+                Tags = new[]
+                {
+                    new StyleTag { Icon = "hiking",   Label = "Trekking & Leo núi" },
+                    new StyleTag { Icon = "kayaking", Label = "Thể thao mạo hiểm" }
+                },
+                SuggestedTours = new[]
+                {
+                    new SuggestedTour { Name = "Chinh phục Fansipan - Nóc nhà Đông Dương", Duration = "3N2Đ", Rating = "4.9 (87)", PriceDisplay = "3.500.000đ", Badge = "Thử thách", ImageKeyword = "" },
+                    new SuggestedTour { Name = "Trekking rừng nguyên sinh Phong Nha", Duration = "4N3Đ", Rating = "4.8 (62)", PriceDisplay = "5.200.000đ", Badge = "Hot", ImageKeyword = "" },
+                    new SuggestedTour { Name = "Kayak vượt thác Đakrong Quảng Trị", Duration = "2N1Đ", Rating = "4.7 (45)", PriceDisplay = "1.800.000đ", Badge = "New", ImageKeyword = "" }
+                }
+            },
+            "cultural" => new StyleInfo
+            {
+                Title = "Nhà Khám phá Văn hóa",
+                Color = "#0284c7",
+                Description = "Bạn không chỉ đến thăm nơi chốn, bạn đắm mình trong từng câu chuyện lịch sử. Mỗi ngôi đền cổ, mỗi lễ hội truyền thống đều thắp sáng ngọn lửa tò mò trong bạn.",
+                Quote = "Du lịch mở rộng tầm nhìn và làm phong phú tâm hồn",
+                Tags = new[]
+                {
+                    new StyleTag { Icon = "museum",   Label = "Di sản & Bảo tàng" },
+                    new StyleTag { Icon = "festival", Label = "Lễ hội bản địa" }
+                },
+                SuggestedTours = new[]
+                {
+                    new SuggestedTour { Name = "Hội An - Huế: Hành trình Di sản Miền Trung", Duration = "5N4Đ", Rating = "4.9 (210)", PriceDisplay = "6.800.000đ", Badge = "Top Rated", ImageKeyword = "" },
+                    new SuggestedTour { Name = "Hà Nội - Ninh Bình: Cố đô ngàn năm", Duration = "3N2Đ", Rating = "4.8 (158)", PriceDisplay = "3.200.000đ", Badge = "Popular", ImageKeyword = "" },
+                    new SuggestedTour { Name = "Sapa - Bản Cát Cát: Văn hóa H'Mông", Duration = "3N2Đ", Rating = "4.7 (95)", PriceDisplay = "4.100.000đ", Badge = "Cultural", ImageKeyword = "" }
+                }
+            },
+            "relaxation" => new StyleInfo
+            {
+                Title = "Người Tận hưởng Nghỉ dưỡng",
+                Color = "#10b981",
+                Description = "Bạn biết giá trị của sự bình yên. Một chiếc ghế tắm nắng, tiếng sóng biển nhẹ nhàng và ly nước dừa tươi mát — đó là thiên đường theo định nghĩa của bạn.",
+                Quote = "Nghỉ ngơi không phải là lười biếng, đó là điều khôn ngoan",
+                Tags = new[]
+                {
+                    new StyleTag { Icon = "spa",          Label = "Spa & Thư giãn" },
+                    new StyleTag { Icon = "beach_access", Label = "Biển & Resort" }
+                },
+                SuggestedTours = new[]
+                {
+                    new SuggestedTour { Name = "Phú Quốc 5 sao - Nghỉ dưỡng trọn gói", Duration = "4N3Đ", Rating = "4.9 (315)", PriceDisplay = "8.900.000đ", Badge = "Best Seller", ImageKeyword = "" },
+                    new SuggestedTour { Name = "Đà Nẵng - Hội An: Resort bãi biển Mỹ Khê", Duration = "3N2Đ", Rating = "4.8 (187)", PriceDisplay = "5.500.000đ", Badge = "Popular", ImageKeyword = "" },
+                    new SuggestedTour { Name = "Nha Trang Vinpearl - Thiên đường đảo", Duration = "3N2Đ", Rating = "4.7 (220)", PriceDisplay = "6.200.000đ", Badge = "Hot", ImageKeyword = "" }
+                }
+            },
+            _ => new StyleInfo // Luxury
+            {
+                Title = "Người Khám phá Sang trọng",
+                Color = "#7c3aed",
+                Description = "Bạn yêu thích sự tinh tế kết hợp cùng những trải nghiệm độc bản. Bạn không chỉ tìm kiếm điểm đến, mà tìm kiếm những câu chuyện được kể qua kiến trúc, ẩm thực và dịch vụ thượng lưu.",
+                Quote = "Sống trọn vẹn từng khoảnh khắc xa hoa",
+                Tags = new[]
+                {
+                    new StyleTag { Icon = "diamond",       Label = "Đẳng cấp 5 sao" },
+                    new StyleTag { Icon = "auto_awesome",  Label = "Trải nghiệm độc quyền" }
+                },
+                SuggestedTours = new[]
+                {
+                    new SuggestedTour { Name = "Hội An: Di sản & Nghỉ dưỡng Thượng lưu", Duration = "4N3Đ", Rating = "4.9 (120)", PriceDisplay = "15.500.000đ", Badge = "Limited Edition", ImageKeyword = "" },
+                    new SuggestedTour { Name = "Khám phá Thụy Sĩ: Tàu Panoramic & Boutique Hotel", Duration = "8N7Đ", Rating = "5.0 (85)", PriceDisplay = "82.900.000đ", Badge = "Top Rated", ImageKeyword = "" },
+                    new SuggestedTour { Name = "Dubai & Abu Dhabi: Du thuyền & Tiệc tối Sa mạc", Duration = "6N5Đ", Rating = "4.8 (210)", PriceDisplay = "45.000.000đ", Badge = "New Trend", ImageKeyword = "" }
+                }
+            }
+        };
+    }
+
+    private record StyleInfo
+    {
+        public string Title  { get; init; } = string.Empty;
+        public string Color  { get; init; } = "#ff5a5f";
+        public string Description { get; init; } = string.Empty;
+        public string Quote  { get; init; } = string.Empty;
+        public StyleTag[] Tags { get; init; } = Array.Empty<StyleTag>();
+        public SuggestedTour[] SuggestedTours { get; init; } = Array.Empty<SuggestedTour>();
+    }
+
+    private record StyleTag
+    {
+        public string Icon  { get; init; } = string.Empty;
+        public string Label { get; init; } = string.Empty;
+    }
+
+    private record SuggestedTour
+    {
+        public string Name         { get; init; } = string.Empty;
+        public string Duration     { get; init; } = string.Empty;
+        public string Rating       { get; init; } = string.Empty;
+        public string PriceDisplay { get; init; } = string.Empty;
+        public string Badge        { get; init; } = string.Empty;
+        public string ImageKeyword { get; init; } = string.Empty;
+    }
+}

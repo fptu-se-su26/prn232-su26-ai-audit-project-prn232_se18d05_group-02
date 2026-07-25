@@ -10,7 +10,7 @@
 | Học kỳ                  | SU26                                                                |
 | Tên bài tập / Project   | Group Project                                                       |
 | Tên sinh viên / Nhóm    | Group 2                                                             |
-| MSSV / Danh sách MSSV   | DE180158, DE180166                                                  |
+| MSSV / Danh sách MSSV   | DE180158, DE180166, DE180127                                        |
 | Giảng viên hướng dẫn    | Lê Thiện Nhật Quang                                                 |
 | Ngày bắt đầu            | 2026-05-12                                                          |
 | Ngày hoàn thành         |                                                                     |
@@ -23,7 +23,7 @@
 
 - [X] ChatGPT
 - [X] Gemini
-- [ ] Claude
+- [X] Claude
 - [X] GitHub Copilot
 - [ ] Cursor
 - [X] Antigravity
@@ -899,6 +899,310 @@ AI hỗ trợ tốt trong việc bóc tách nghiệp vụ và xử lý lỗi ph�
 
 ---
 
+### Lần sử dụng AI số 7
+
+| Nội dung                    | Thông tin                                                         |
+|-----------------------------|-------------------------------------------------------------------|
+| Ngày sử dụng                | 12/07/2026 – 22/07/2026                                           |
+| Công cụ AI                  | Antigravity / Claude (Sonnet 4.6)                                 |
+| Mục đích sử dụng            | Implement Member 3 features: Customer Management & Tour Reviews   |
+| Phần việc liên quan         | Backend API / Blazor Frontend / Debug / Database                  |
+| Mức độ sử dụng              | Hỗ trợ một phần                                                   |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-07
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+AI hỗ trợ triển khai 4 feature của thành viên 3:
+
+1. Feature 1 – Quản lý hồ sơ khách hàng:
+   - Profile.razor: form xem/sửa thông tin, đổi mật khẩu, hiển thị avatar.
+   - API endpoint: GET/PUT api/users/profile?email=...
+
+2. Feature 2 – Theo dõi booking cá nhân:
+   - MyBookings.razor: danh sách booking theo email, phân trang 5/trang có số trang.
+   - BookingDetail.razor: chi tiết booking + timeline 4 bước (Paid→Confirmed→Completed) + hủy.
+   - API endpoint: GET api/users/bookings, GET api/users/bookings/{id}, PUT cancel.
+
+3. Feature 3 – Yêu cầu dịch vụ đặc biệt:
+   - ServiceUserRequest.razor: khách tạo/xem yêu cầu, phân trang.
+   - AdminServiceRequests.razor: admin drill-down booking → người → dịch vụ → duyệt/từ chối.
+   - API: GET/POST api/users/special-requests; admin endpoints trong UsersController.
+
+4. Feature 4 – Đánh giá tour:
+   - TourReview.razor: form 1–5 sao + nhận xét, block nếu chưa CompletedAt, sửa/xóa.
+   - AdminTourReviews.razor: bảng tất cả đánh giá, moderate Visible/Hidden/Deleted.
+   - TourReviewsController: explicit route [Route("api/tourreviews")], 204 khi chưa có review.
+   - TourReviewService: validate bằng tiếng Việt, load lại entity sau SaveChanges.
+
+5. Debug lỗi:
+   - URL cache cũ api/tour_review → đổi thành api/tourreviews, Hard Reload.
+   - GetByBookingId Ok(null) → client JsonException → đổi thành 204 NoContent.
+   - catch(Exception){} silent → thêm _errorMessage hiển thị lỗi lên UI.
+   - Closure bug @for star rating → var starIndex = i.
+   - Email query string thay JWT để tránh lỗi AuthenticationScheme chưa cấu hình.
+```
+
+#### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
+
+```text
+1. Cấu trúc API endpoint cho tất cả 4 feature.
+2. Code mẫu TourReviewsController, TourReviewService, TourReview.razor, AdminTourReviews.razor, AdminServiceRequests.razor.
+3. Chiến lược dùng email query string để định danh user thay JWT.
+4. Logic phân trang có số trang bấm được (TotalPages, CurrentPage).
+5. Phân tích và fix 4 lỗi runtime quan trọng sau khi build thành công.
+```
+
+#### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
+
+```text
+Võ Quang Đăng Khoa (DE180127) kiểm tra lại nghiệp vụ và điều chỉnh kết quả AI:
+
+1. Không tạo thêm bảng mới – tận dụng TourReviews và UserSpecialRequests có sẵn trong DB schema.
+2. Đồng bộ giao diện Profile, MyBookings, BookingDetail, ServiceUserRequest theo layout WanderX hiện có (sidebar menu bên trái như các trang khác của khách hàng).
+3. Thêm error message box màu đỏ trên TourReview.razor thay vì để UI im lặng khi thất bại.
+4. Đổi GetByBookingId trả 204 NoContent thay Ok(null) để client không bị crash khi parse JSON null.
+5. Kiểm tra và sửa closure bug trong vòng lặp @for tạo 5 sao đánh giá (dùng var starIndex = i).
+6. Viết lại TourReviewService với error message bằng tiếng Việt để UI hiển thị thân thiện.
+7. Kiểm tra build backend + frontend (dotnet build) sau mỗi lần thay đổi để đảm bảo 0 lỗi.
+```
+
+#### 4.5. Minh chứng
+
+| Loại minh chứng         | Nội dung                                                                                       |
+|-------------------------|-----------------------------------------------------------------------------------------------|
+| Link commit             |                                                                                               |
+| File liên quan          | WanderXServer/Controllers/TourReviewsController.cs, WanderXServer/Services/TourReviewService.cs, WanderXClient/WanderXClient/Pages/TourReview.razor, WanderXClient/WanderXClient/Pages/AdminTourReviews.razor, WanderXClient/WanderXClient/Pages/AdminServiceRequests.razor, WanderXClient/WanderXClient/Pages/MyBookings.razor, WanderXClient/WanderXClient/Pages/BookingDetail.razor, WanderXClient/WanderXClient/Pages/ServiceUserRequest.razor, WanderXClient/WanderXClient/Pages/Profile.razor |
+| Screenshot              |                                                                                               |
+| Kết quả chạy/test       | dotnet build backend + frontend: 0 error. Test thủ công toàn bộ luồng 4 feature.             |
+| Link video demo         |                                                                                               |
+| Ghi chú khác            | Xem CHANGELOG.md Phase 04.3 và PROMPTS.md Prompt-07 để biết chi tiết                         |
+
+#### 4.6. Nhận xét cá nhân/nhóm
+
+```text
+Lần sử dụng AI thứ 7 này hỗ trợ tốt cho thành viên 3 triển khai toàn bộ luồng Customer Management:
+
+1. Ưu điểm:
+   - AI phân tích đúng cấu trúc project Blazor + ASP.NET Core và đề xuất code phù hợp.
+   - Hỗ trợ phân tích nguyên nhân lỗi nhanh (URL sai, 204 parse, silent catch, closure bug).
+   - Tổng hợp nhiều lần debug lỗi thành giải pháp rõ ràng.
+
+2. Điều chỉnh của sinh viên:
+   - Kiểm tra lại nghiệp vụ: chỉ cho phép đánh giá khi CompletedAt đã có (tour hoàn thành).
+   - Đồng bộ UI theo layout WanderX hiện có, không để lẫn lộn với các trang khác.
+   - Sửa logic 204 NoContent để client không crash khi booking chưa có review.
+   - Thêm error message rõ ràng thay vì catch im lặng.
+
+3. Bài học:
+   - AI là công cụ hỗ trợ mạnh nhưng cần kiểm tra lại từng phần theo nghiệp vụ thực tế.
+   - Debug lỗi tích hợp frontend-backend đòi hỏi hiểu cả 2 layer, AI gợi ý hướng nhưng cần developer xác nhận nguyên nhân thực.
+   - Hard Reload browser khi test Blazor WASM để tránh nhầm do cache cũ.
+```
+
+---
+
+### Lần sử dụng AI số 8
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 24/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục đích sử dụng | Review requirement, hoàn thiện bảo mật, validation và UI cho Travel Style Quiz |
+| Phần việc liên quan | M5-F01 Travel Style Quiz / Backend / Frontend / Security / Testing |
+| Mức độ sử dụng | Hỗ trợ một phần |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-08
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+AI đối chiếu mã nguồn Travel Style Quiz với requirement M5-F01 và bộ giao diện redesign, sau đó chỉ ra các vấn đề chính:
+
+1. Endpoint quiz và CRUD cấu hình chưa kiểm tra authorization ở server.
+2. API tin cậy email do client truyền lên, có nguy cơ đọc hoặc ghi kết quả của người dùng khác.
+3. Frontend dùng index/DisplayOrder thay cho QuestionId thật nên có thể liên kết sai đáp án khi đổi thứ tự câu hỏi.
+4. Backend bỏ qua câu hỏi hoặc option không hợp lệ thay vì trả lỗi nghiệp vụ.
+5. CompletedAt do client cung cấp thay vì được tạo theo UTC ở backend.
+6. Cần giữ giao diện Blazor đồng bộ với quiz1.html, quiz2.html, Quiz3.html và quizresult.html.
+7. Nên tách file khi commit để giảm xung đột tại Program.cs, WanderXDbContext.cs và các component dùng chung.
+```
+
+#### 4.3. Phần sinh viên/nhóm đã sử dụng từ AI
+
+```text
+1. Áp dụng [Authorize(Roles = "Customer")] cho API lưu/xem kết quả quiz.
+2. Áp dụng [Authorize(Roles = "Admin")] cho API CRUD câu hỏi và lựa chọn.
+3. Lấy UserId từ JWT NameIdentifier thay vì nhận email từ request.
+4. Chuyển QuizAnswerDto sang QuestionId và OptionId kiểu Guid.
+5. Bổ sung validation cho thiếu câu trả lời, câu hỏi trùng, question không tồn tại và option không thuộc question.
+6. Để backend tự tạo CompletedAt bằng DateTime.UtcNow.
+7. Cập nhật TravelQuiz.razor và UserApiClient để sử dụng contract mới.
+8. Dùng kết quả review để xác định danh sách file cần commit và các file cấu hình cá nhân không nên đưa lên repository.
+```
+
+#### 4.4. Phần sinh viên/nhóm tự chỉnh sửa hoặc cải tiến
+
+```text
+1. Kiểm tra lại requirement M5-F01 và quyết định giữ GET questions là public để Guest có thể mở và làm thử quiz.
+2. Giữ giao diện quiz trong một Blazor page động thay vì tách thành nhiều HTML page độc lập.
+3. Kết hợp các layout quiz1, quiz2, Quiz3 và quizresult thành ba phase Splash, Question và Result.
+4. Giữ lại cấu trúc authentication/session sẵn có của WanderX thay vì tạo hệ thống đăng nhập mới.
+5. Kiểm tra các thay đổi với dữ liệu câu hỏi được seed trong WanderXDbContext.
+6. Tách các phần chưa đủ hợp đồng liên module như QuizAttempt/versioning và tour recommendation thật để tiếp tục thống nhất với nhóm.
+7. Rà soát danh sách staged files trước khi commit nhằm tránh đưa .vscode và tài liệu tạm vào source code runtime.
+```
+
+#### 4.5. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| Link commit | Commit message đề xuất: `feat: implement secure travel style quiz flow` |
+| File liên quan | WanderXServer/Controllers/TravelStyleQuizController.cs; WanderXServer/Services/TravelStyleQuizService.cs; WanderXServer/Dtos/Users/QuizAnswerDto.cs; WanderXClient/WanderXClient/Pages/TravelQuiz.razor; WanderXClient/WanderXClient/Models/QuizContracts.cs; WanderXClient/WanderXClient/Services/UserApiClient.cs |
+| Screenshot | Ảnh Git Changes với 19 file Function 1 được stage |
+| Kết quả chạy/test | `dotnet build WanderXServer/WanderXServer.sln --no-restore`: thành công, 0 error; `dotnet build WanderXClient/WanderXClient.sln --no-restore`: thành công, 0 error |
+| Link video demo | Chưa có |
+| Ghi chú khác | Chưa xác nhận end-to-end với database và browser; QuizAttempt/versioning và recommendation API chưa nằm trong lần triển khai này |
+
+#### 4.6. Nhận xét cá nhân/nhóm
+
+```text
+Qua lần sử dụng AI này, em nhận thấy việc sinh code chỉ là một phần nhỏ; bước quan trọng hơn là đối chiếu code với requirement và kiểm tra các ranh giới bảo mật.
+
+AI giúp phát hiện nhanh việc dùng email từ client và DisplayOrder làm định danh, nhưng em vẫn phải kiểm tra lại kiến trúc JWT, DTO, DbContext và UI hiện có trước khi áp dụng. Em đã chủ động giữ luồng Guest xem câu hỏi, Customer lưu kết quả và Admin quản lý cấu hình theo đúng vai trò của hệ thống.
+
+Kết quả cuối cùng được kiểm chứng bằng build server/client. Các phần chưa đủ thông tin liên module được ghi nhận rõ thay vì triển khai bằng dữ liệu giả. Bài học chính là cần review, hiểu và kiểm chứng mọi thay đổi do AI hỗ trợ trước khi commit hoặc merge vào nhánh chung.
+```
+
+---
+### Lần sử dụng AI số 9
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 24/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục đích sử dụng | Phân tích và triển khai M5-F02 gợi ý tour theo nhu cầu |
+| Phần việc liên quan | Recommendation API / Rule scoring / Filter / Random / Blazor UI / Testing |
+| Mức độ sử dụng | Hỗ trợ một phần |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-09
+```
+
+#### 4.2. Kết quả AI gợi ý
+
+```text
+AI đề xuất ánh xạ requirement vào schema thật của WanderX, triển khai tập tour đủ điều kiện, giá hiệu lực, số chỗ còn lại, đánh giá, rule-based MatchScore/MatchReasons, filter, sort ổn định, random có exclude list và giao diện recommendations.
+```
+
+#### 4.3. Phần sinh viên/nhóm đã sử dụng và điều chỉnh
+
+```text
+Áp dụng API/service/UI đề xuất nhưng giữ nguyên schema module Tour. GuideTourAssignment được dùng làm lịch khởi hành; chỉ booking Paid/Confirmed trừ capacity; không dùng dữ liệu mẫu. Destination và style/type được xử lý theo các trường sẵn có. SecondaryStyle được hoãn vì QuizResult chưa có dữ liệu này.
+```
+
+#### 4.4. Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| File liên quan | RecommendationsController.cs; RecommendationService.cs; RecommendationOptions.cs; Recommendations.razor; TourRecommendationCard.razor; UserApiClient.cs |
+| Kết quả chạy/test | `dotnet build WanderX.slnx --no-restore`: thành công, 0 warning, 0 error |
+| Ghi chú | Chưa tạo migration; không thay đổi file solution hoặc cấu hình .vscode |
+
+#### 4.5. Nhận xét cá nhân/nhóm
+
+```text
+AI hỗ trợ đối chiếu requirement và xây dựng khung thuật toán, nhưng em kiểm tra lại toàn bộ model hiện có để tránh giả định có Departure, DestinationId hoặc Tags. Kết quả được điều chỉnh theo dữ liệu thật và build trước khi commit.
+```
+
+---
+### Lần sử dụng AI số 10
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 24/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục đích sử dụng | Triển khai M5-F03 Dashboard thống kê |
+| Phần việc liên quan | KPI / Revenue / Booking series / Guide ranking / Authorization / Blazor UI |
+| Mức độ sử dụng | Hỗ trợ một phần |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-10
+```
+
+#### 4.2. Kết quả đã sử dụng và kiểm chứng
+
+```text
+Áp dụng policy DASHBOARD_VIEW, bốn API dashboard và giao diện Admin Dashboard. Công thức được điều chỉnh theo entity thật: booking theo CreatedAt, doanh thu từ Confirmed/Finished, đã thu từ PaidAmount, top guide dựa trên assignment/review. Build toàn solution thành công, 0 error.
+```
+
+#### 4.3. Giới hạn được ghi nhận
+
+```text
+Chưa có permission table, Payment entity, audit tiến độ, khiếu nại hoặc điểm Admin. Vì vậy không tự tạo dữ liệu thay thế; Staff được policy cho phép theo role hiện tại và top guide hiển thị breakdown trên thang 85.
+```
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| File liên quan | DashboardController.cs; DashboardService.cs; AdminDashboard.razor; UserApiClient.cs; Program.cs |
+| Kết quả build | Thành công, 0 error; 2 warning cũ ngoài phạm vi |
+
+---
+### Lần sử dụng AI số 11
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 25/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục đích sử dụng | Triển khai M5-F04 Account Management, RBAC và Phone OTP |
+| Phần việc liên quan | Authorization / User management / Audit / Token revocation / OTP / UI |
+| Mức độ sử dụng | Hỗ trợ một phần |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-11
+```
+
+#### 4.2. Phần sử dụng và tự điều chỉnh
+
+```text
+Áp dụng policy permission trên mô hình role đơn hiện có, quản lý user có phân trang/filter, đổi role và lock/unlock có audit transaction, bảo vệ Admin cuối cùng, token version, OTP hash/cooldown/max attempts và hai UI theo layout WanderX. Không thay thế authentication stack hay tạo multi-role làm vỡ contract hiện tại.
+```
+
+#### 4.3. Giới hạn phụ thuộc ngoài
+
+```text
+Chưa có SMS provider và credential nên adapter mặc định trả SMS_PROVIDER_ERROR; không log hoặc trả OTP để tránh vi phạm bảo mật. Cần nhóm chọn provider rồi cài adapter ISmsSender. Migration được viết thủ công vì môi trường thiếu dotnet-ef.
+```
+
+| Minh chứng | Nội dung |
+|---|---|
+| File | AccountManagementService.cs; AccountManagementController.cs; AdminUsers.razor; VerifyPhone.razor; migration AddAccountRbacAuditAndPhoneOtp |
+| Build | WanderX.slnx build thành công, 0 error |
+
+---
 ## 5. Bảng tổng hợp mức độ sử dụng AI
 
 Đánh dấu mức độ AI hỗ trợ ở từng hạng mục.
@@ -972,9 +1276,8 @@ Viết tại đây...
 
 | Thành viên | MSSV | Nhiệm vụ chính | Có sử dụng AI không? | Minh chứng đóng góp |
 |---|---|---|---|---|
-| Trần Hồng Quân | DE180166 | FE1 Booking Management, FE2 Booking Status Management, FE3 Cancellation Request Management, FE4 Payment Management | Có | PROMPTS.md - Prompt-06; CHANGELOG.md - Phase 04 Member 2 Implementation |
-|  |  |  | Có / Không |  |
-|  |  |  | Có / Không |  |
+| Trần Hồng Quân | DE180166 | FE1 Booking Management, FE2 Booking Status Management, FE3 Cancellation Request Management, FE4 Payment Management | Có | PROMPTS.md - Prompt-06; CHANGELOG.md - Phase 04.2 Member 2 Implementation |
+| Võ Quang Đăng Khoa | DE180127 | Feature 1 Quản lý hồ sơ khách hàng, Feature 2 Tra cứu và theo dõi booking, Feature 3 Quản lý yêu cầu dịch vụ, Feature 4 Đánh giá và nhận xét tour | Có | PROMPTS.md - Prompt-07; CHANGELOG.md - Phase 04.3 Member 3 Implementation |
 |  |  |  | Có / Không |  |
 
 ---

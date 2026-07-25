@@ -1,4 +1,4 @@
-@page "/tour-reviews"
+﻿@page "/tour-reviews"
 @layout AdminLayout
 @using WanderXClient.Models
 @using WanderXClient.Services
@@ -6,25 +6,25 @@
 @inject AuthSessionService SessionService
 @inject NavigationManager NavManager
 
-<PageTitle>WanderX Admin - Quản lý đánh giá tour</PageTitle>
+<PageTitle>WanderX Admin - Tour Review Management</PageTitle>
 
 
         @if (_isLoading)
         {
             <div class="guide-empty">
                 <MaterialIcon Name="sync" />
-                Đang tải dữ liệu...
+                Loading data...
             </div>
         }
         else if (_session == null || _session.Role != "Admin")
         {
             <div class="guide-empty">
                 <MaterialIcon Name="admin_panel_settings" />
-                <h2>Truy cập bị từ chối</h2>
-                <p>Bạn cần quyền admin để truy cập trang này.</p>
+                <h2>Access denied</h2>
+                <p>You need admin permission to access this page.</p>
                 <a class="wx-button wx-button--secondary" href="/">
                     <MaterialIcon Name="home" />
-                    Về trang chủ
+                    Back to home
                 </a>
             </div>
         }
@@ -33,9 +33,9 @@
             <!-- Header -->
             <header class="guide-topbar">
                 <div>
-                    <p class="guide-eyebrow">Quản lý</p>
-                    <h1>Đánh giá tour</h1>
-                    <p class="guide-subtitle">Xem và quản lý các đánh giá của khách hàng</p>
+                    <p class="guide-eyebrow">Management</p>
+                    <h1>Tour Reviews</h1>
+                    <p class="guide-subtitle">View and manage customer reviews</p>
                 </div>
             </header>
 
@@ -43,24 +43,24 @@
                 <!-- Stats -->
                 <div class="guide-stat-grid">
                     <article class="guide-stat">
-                        <p>Tổng đánh giá</p>
+                        <p>Total Reviews</p>
                         <strong>@(_reviews?.Count ?? 0)</strong>
-                        <span>Tất cả đánh giá</span>
+                        <span>All reviews</span>
                     </article>
                     <article class="guide-stat guide-stat--secondary">
-                        <p>Hiển thị</p>
+                        <p>Visible</p>
                         <strong>@(_reviews?.Count(r => r.Status == "Visible") ?? 0)</strong>
-                        <span>Đang công khai</span>
+                        <span>Publicly visible</span>
                     </article>
                     <article class="guide-stat guide-stat--tertiary">
-                        <p>Đã ẩn</p>
+                        <p>Hidden</p>
                         <strong>@(_reviews?.Count(r => r.Status == "Hidden") ?? 0)</strong>
-                        <span>Không hiển thị</span>
+                        <span>Not visible</span>
                     </article>
                     <article class="guide-stat">
-                        <p>Đã xóa</p>
+                        <p>Deleted</p>
                         <strong>@(_reviews?.Count(r => r.Status == "Deleted") ?? 0)</strong>
-                        <span>Đã bị xóa</span>
+                        <span>Deleted reviews</span>
                     </article>
                 </div>
 
@@ -68,18 +68,18 @@
                 <section class="guide-form-panel">
                     <div class="guide-section-heading">
                         <div>
-                            <p class="guide-eyebrow">Bộ lọc</p>
-                            <h2>Lọc đánh giá</h2>
+                            <p class="guide-eyebrow">Filters</p>
+                            <h2>Filter reviews</h2>
                         </div>
                         <div class="guide-topbar__actions">
-                            <label class="guide-search" aria-label="Tìm kiếm">
+                            <label class="guide-search" aria-label="Search">
                                 <MaterialIcon Name="search" />
-                                <input type="search" placeholder="Tìm theo tour, người dùng..." value="@_searchQuery" @oninput="OnSearchInput" />
+                                <input type="search" placeholder="Search by tour, user..." value="@_searchQuery" @oninput="OnSearchInput" />
                             </label>
                         </div>
                     </div>
                     <div class="guide-filter-group" role="group">
-                        @foreach (var f in new[] { "Tất cả", "Hiển thị", "Đã ẩn", "Đã xóa" })
+                        @foreach (var f in new[] { "All", "Visible", "Hidden", "Deleted" })
                         {
                             <button class="@(_statusFilter == f ? "guide-filter guide-filter--active" : "guide-filter")"
                                     type="button" @onclick="() => SetStatusFilter(f)">
@@ -88,7 +88,7 @@
                         }
                     </div>
                     <div class="guide-filter-group" role="group" style="margin-top: 12px;">
-                        @foreach (var f in new[] { "Tất cả", "5 sao", "4 sao", "3 sao", "2 sao", "1 sao" })
+                        @foreach (var f in new[] { "All", "5 stars", "4 stars", "3 stars", "2 stars", "1 star" })
                         {
                             <button class="@(_ratingFilter == f ? "guide-filter guide-filter--active" : "guide-filter")"
                                     type="button" @onclick="() => SetRatingFilter(f)">
@@ -103,8 +103,8 @@
                 {
                     <div class="guide-empty">
                         <MaterialIcon Name="rate_review" />
-                        <h3>Không tìm thấy đánh giá nào</h3>
-                        <p>Thử thay đổi bộ lọc tìm kiếm</p>
+                        <h3>No reviews found</h3>
+                        <p>Try changing the search filters</p>
                     </div>
                 }
                 else
@@ -148,7 +148,7 @@
                                     @if (!string.IsNullOrEmpty(review.Comment))
                                     {
                                         <div class="atr-review-field">
-                                            <label class="atr-label">Nhận xét:</label>
+                                            <label class="atr-label">Comment:</label>
                                             <p class="atr-value atr-comment">@review.Comment</p>
                                         </div>
                                     }
@@ -156,7 +156,7 @@
                                     @if (!string.IsNullOrEmpty(review.TravelPhotos))
                                     {
                                         <div class="atr-review-field">
-                                            <label class="atr-label">Ảnh đi du lịch:</label>
+                                            <label class="atr-label">Travel photo:</label>
                                             <p class="atr-value" style="font-size: 13px; color: var(--guide-muted);">@review.TravelPhotos</p>
                                         </div>
                                     }
@@ -164,18 +164,18 @@
                                     @if (!string.IsNullOrEmpty(review.ModerationReason))
                                     {
                                         <div class="atr-moderation-info">
-                                            <label class="atr-label">Lý do xử lý:</label>
+                                            <label class="atr-label">Moderation reason:</label>
                                             <p>@review.ModerationReason</p>
                                             @if (review.ModeratedAt.HasValue)
                                             {
-                                                <span class="atr-meta">Xử lý lúc: @review.ModeratedAt.Value.ToString("dd/MM/yyyy HH:mm") bởi @review.ModeratorName</span>
+                                                <span class="atr-meta">Moderated at: @review.ModeratedAt.Value.ToString("dd/MM/yyyy HH:mm") by @review.ModeratorName</span>
                                             }
                                         </div>
                                     }
 
                                     @if (review.UpdatedAt.HasValue)
                                     {
-                                        <span class="atr-meta">Cập nhật lần cuối: @review.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                        <span class="atr-meta">Last updated: @review.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</span>
                                     }
                                 </div>
 
@@ -186,7 +186,7 @@
                                         <button class="wx-button wx-button--outline" style="font-size:12px;padding:6px 14px"
                                                 type="button" @onclick="@(() => ShowModerateModal(review.Id, "Hidden"))">
                                             <MaterialIcon Name="visibility_off" />
-                                            Ẩn đánh giá
+                                            Hide review
                                         </button>
                                     }
                                     else if (review.Status == "Hidden")
@@ -194,7 +194,7 @@
                                         <button class="wx-button wx-button--outline" style="font-size:12px;padding:6px 14px"
                                                 type="button" @onclick="@(() => ShowModerateModal(review.Id, "Visible"))">
                                             <MaterialIcon Name="visibility" />
-                                            Hiển thị lại
+                                            Show again
                                         </button>
                                     }
                                     @if (review.Status != "Deleted")
@@ -202,7 +202,7 @@
                                         <button class="wx-button wx-button--outline atr-btn-delete" style="font-size:12px;padding:6px 14px"
                                                 type="button" @onclick="@(() => ShowModerateModal(review.Id, "Deleted"))">
                                             <MaterialIcon Name="delete" />
-                                            Xóa đánh giá
+                                            Delete review
                                         </button>
                                     }
                                 </div>
@@ -214,9 +214,9 @@
                     @if (TotalPages >= 1)
                     {
                         <div class="atr-pagination">
-                            <span class="atr-pagination-info">Trang @_currentPage / @TotalPages (@AllFilteredReviews.Count() kết quả)</span>
+                            <span class="atr-pagination-info">Page @_currentPage / @TotalPages (@AllFilteredReviews.Count() results)</span>
                             <div class="atr-pagination-controls">
-                                <button class="atr-pagination-btn" disabled="@(_currentPage <= 1)" @onclick="PrevPage" title="Trang trước">
+                                <button class="atr-pagination-btn" disabled="@(_currentPage <= 1)" @onclick="PrevPage" title="Previous page">
                                     <MaterialIcon Name="chevron_left" />
                                 </button>
                                 @for (var p = 1; p <= TotalPages; p++)
@@ -225,7 +225,7 @@
                                     <button class="atr-pagination-btn @(_currentPage == pg ? "atr-pagination-btn--active" : "")"
                                             @onclick="() => GoToPage(pg)">@pg</button>
                                 }
-                                <button class="atr-pagination-btn" disabled="@(_currentPage >= TotalPages)" @onclick="NextPage" title="Trang sau">
+                                <button class="atr-pagination-btn" disabled="@(_currentPage >= TotalPages)" @onclick="NextPage" title="Next page">
                                     <MaterialIcon Name="chevron_right" />
                                 </button>
                             </div>
@@ -241,8 +241,8 @@
         <div class="atr-modal" @onclick:stopPropagation="true">
             <div class="atr-modal__header">
                 <div>
-                    <h2>Xử lý đánh giá</h2>
-                    <p class="guide-subtitle atr-modal-subtitle">@(_moderationAction == "Hidden" ? "Ẩn đánh giá khỏi hiển thị công khai" : _moderationAction == "Deleted" ? "Xóa đánh giá vĩnh viễn" : "Hiển thị lại đánh giá")</p>
+                    <h2>Moderate review</h2>
+                    <p class="guide-subtitle atr-modal-subtitle">@(_moderationAction == "Hidden" ? "Hide the review from public display" : _moderationAction == "Deleted" ? "Permanently delete the review" : "Show the review again")</p>
                 </div>
                 <button class="guide-icon-button" type="button" @onclick="HideModerateModal">
                     <MaterialIcon Name="close" />
@@ -253,35 +253,35 @@
                 @if (_moderationAction != "Visible")
                 {
                     <div class="guide-field">
-                        <label for="moderation-reason" class="atr-label">Lý do xử lý:</label>
+                        <label for="moderation-reason" class="atr-label">Moderation reason:</label>
                         <textarea id="moderation-reason"
                                   class="guide-control guide-control--area"
                                   rows="4"
-                                  placeholder="Nhập lý do xử lý đánh giá..."
+                                  placeholder="Enter the moderation reason..."
                                   @bind="_moderationReason"></textarea>
                     </div>
                 }
                 else
                 {
-                    <p class="atr-confirm-text">Bạn có chắc chắn muốn hiển thị lại đánh giá này?</p>
+                    <p class="atr-confirm-text">Are you sure you want to show this review again?</p>
                 }
             </div>
 
             <div class="atr-modal__footer">
                 <div class="atr-modal__actions">
                     <button class="wx-button wx-button--outline" type="button" @onclick="HideModerateModal" disabled="@_isSubmitting">
-                        Huỷ
+                        Cancel
                     </button>
                     <button class="wx-button wx-button--secondary" type="button" @onclick="SubmitModeration" disabled="@_isSubmitting">
                         @if (_isSubmitting)
                         {
                             <MaterialIcon Name="sync" class="atr-spin" />
-                            <span>Đang xử lý...</span>
+                            <span>Processing...</span>
                         }
                         else
                         {
                             <MaterialIcon Name="check_circle" />
-                            <span>Xác nhận</span>
+                            <span>Confirm</span>
                         }
                     </button>
                 </div>
@@ -297,8 +297,8 @@
     private AuthSession? _session;
     private List<TourReviewResponse>? _reviews;
     private string _searchQuery = string.Empty;
-    private string _statusFilter = "Tất cả";
-    private string _ratingFilter = "Tất cả";
+    private string _statusFilter = "All";
+    private string _ratingFilter = "All";
     private Guid _selectedReviewId;
     private string _moderationAction = string.Empty;
     private string _moderationReason = string.Empty;
@@ -322,9 +322,9 @@
 
             return _statusFilter switch
             {
-                "Hiển thị" => r.Status == "Visible",
-                "Đã ẩn" => r.Status == "Hidden",
-                "Đã xóa" => r.Status == "Deleted",
+                "Visible" => r.Status == "Visible",
+                "Hidden" => r.Status == "Hidden",
+                "Deleted" => r.Status == "Deleted",
                 _ => true
             };
         })
@@ -332,11 +332,11 @@
         {
             return _ratingFilter switch
             {
-                "5 sao" => r.Rating == 5,
-                "4 sao" => r.Rating == 4,
-                "3 sao" => r.Rating == 3,
-                "2 sao" => r.Rating == 2,
-                "1 sao" => r.Rating == 1,
+                "5 stars" => r.Rating == 5,
+                "4 stars" => r.Rating == 4,
+                "3 stars" => r.Rating == 3,
+                "2 stars" => r.Rating == 2,
+                "1 star" => r.Rating == 1,
                 _ => true
             };
         })
@@ -462,9 +462,9 @@
     {
         return status switch
         {
-            "Visible" => "Hiển thị",
-            "Hidden" => "Đã ẩn",
-            "Deleted" => "Đã xóa",
+            "Visible" => "Visible",
+            "Hidden" => "Hidden",
+            "Deleted" => "Deleted",
             _ => status
         };
     }

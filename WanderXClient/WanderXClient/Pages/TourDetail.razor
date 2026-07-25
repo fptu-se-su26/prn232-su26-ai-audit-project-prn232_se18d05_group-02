@@ -1,5 +1,9 @@
-@page "/tour-detail/{TourId:guid}"
+﻿@page "/tour-detail/{TourId:guid}"
+@using System.ComponentModel.DataAnnotations
 @inject TourApiClient TourApi
+@inject UserApiClient UserApi
+@inject AuthSessionService SessionService
+@inject NavigationManager Navigation
 
 <PageTitle>@PageTitleText</PageTitle>
 
@@ -95,14 +99,124 @@
                                 <dd>@_tour.Capacity guests</dd>
                             </div>
                         </dl>
-                        <a class="wx-button" href="/login">
-                            Book this tour
-                        </a>
+                        @if (_session is null)
+                        {
+                            <div class="tour-booking-auth">
+                                <MaterialIcon Name="lock" />
+                                <p>Sign in to send this tour to your bookings.</p>
+                                <a class="wx-button" href="/login">Sign in to book</a>
+                            </div>
+                        }
+                        else if (_bookingSuccess is not null)
+                        {
+                            <div class="tour-booking-success">
+                                <MaterialIcon Name="check_circle" />
+                                <strong>Booking created</strong>
+                                <span>@_bookingSuccess.BookingCode has been sent to the booking list.</span>
+                                <a class="wx-button" href="/my-bookings">View my bookings</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <button class="wx-button" type="button" @onclick="OpenBookingModal">
+                                Book tour
+                            </button>
+                        }
                     </aside>
                 </div>
             </section>
         }
     </main>
+
+    @if (_isBookingModalOpen && _tour is not null)
+    {
+        <div class="tour-booking-modal-overlay" @onclick="CloseBookingModal">
+            <section class="tour-booking-modal" role="dialog" aria-modal="true" aria-labelledby="tour-booking-title" @onclick:stopPropagation="true">
+                <header class="tour-booking-modal__header">
+                    <div>
+                        <p class="guide-eyebrow">Book tour</p>
+                        <h2 id="tour-booking-title">@_tour.Name</h2>
+                        <span>@_tour.Code · @FormatMoney(UnitPrice) / person</span>
+                    </div>
+                    <button class="tour-booking-modal__close" type="button" title="Close popup" @onclick="CloseBookingModal">
+                        <MaterialIcon Name="close" />
+                    </button>
+                </header>
+
+                <EditForm Model="@_bookingForm" OnValidSubmit="@SubmitBookingAsync" class="tour-booking-form tour-booking-form--modal">
+                    <DataAnnotationsValidator />
+
+                    <div class="tour-booking-field">
+                        <label for="booking-date">Departure date</label>
+                        <InputDate id="booking-date" class="tour-booking-control" @bind-Value="_bookingForm.DepartureDate" />
+                        <ValidationMessage For="@(() => _bookingForm.DepartureDate)" />
+                    </div>
+
+                    <div class="tour-booking-guests">
+                        <div>
+                            <span>Adults</span>
+                            <div class="tour-booking-stepper">
+                                <button type="button" title="Decrease adults" @onclick="DecreaseAdults" disabled="@(_bookingForm.AdultCount <= 1)">-</button>
+                                <strong>@_bookingForm.AdultCount</strong>
+                                <button type="button" title="Increase adults" @onclick="IncreaseAdults" disabled="@IsAtCapacity">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <span>Children</span>
+                            <div class="tour-booking-stepper">
+                                <button type="button" title="Decrease children" @onclick="DecreaseChildren" disabled="@(_bookingForm.ChildCount <= 0)">-</button>
+                                <strong>@_bookingForm.ChildCount</strong>
+                                <button type="button" title="Increase children" @onclick="IncreaseChildren" disabled="@IsAtCapacity">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tour-booking-summary">
+                        <span>@GuestCount guest@(GuestCount == 1 ? string.Empty : "s")</span>
+                        <strong>@FormatMoney(TotalBookingAmount)</strong>
+                    </div>
+
+                    <div class="tour-booking-passengers">
+                        <div class="tour-booking-passengers__head">
+                            <span>Guest list</span>
+                            <small>Adult / Child</small>
+                        </div>
+
+                        @for (var i = 0; i < _bookingForm.Passengers.Count; i++)
+                        {
+                            var index = i;
+                            <div class="tour-booking-passenger">
+                                <div class="tour-booking-passenger__title">Guest @(index + 1)</div>
+                                <InputText class="tour-booking-control" placeholder="Full name" @bind-Value="_bookingForm.Passengers[index].FullName" />
+                                <InputText class="tour-booking-control" placeholder="Phone number" @bind-Value="_bookingForm.Passengers[index].PhoneNumber" />
+                                <InputSelect class="tour-booking-control" @bind-Value="_bookingForm.Passengers[index].TicketType">
+                                    <option value="Adult">Adult</option>
+                                    <option value="Child">Child</option>
+                                </InputSelect>
+                            </div>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(_bookingMessage))
+                    {
+                        <div class="@(_isBookingError ? "tour-booking-alert tour-booking-alert--error" : "tour-booking-alert")">
+                            @_bookingMessage
+                        </div>
+                    }
+
+                    <footer class="tour-booking-modal__footer">
+                        <button class="wx-button wx-button--outline" type="button" @onclick="CloseBookingModal" disabled="@_isBooking">
+                            Cancel
+                        </button>
+                        <button class="wx-button" type="submit" disabled="@_isBooking">
+                            @(_isBooking ? "Sending booking..." : "Book this tour")
+                        </button>
+                    </footer>
+                </EditForm>
+            </section>
+        </div>
+    }
+
     <AppFooter />
     <MobileBottomNav />
 </div>
@@ -113,6 +227,13 @@
 
     private TourResponse? _tour;
     private bool _isLoading = true;
+    private AuthSession? _session;
+    private TourBookingForm _bookingForm = TourBookingForm.CreateDefault();
+    private BookingResponse? _bookingSuccess;
+    private bool _isBooking;
+    private bool _isBookingModalOpen;
+    private bool _isBookingError;
+    private string? _bookingMessage;
 
     private string PageTitleText => _tour is null ? "Tour Details - WanderX" : $"{_tour.Name} - WanderX";
 
@@ -122,13 +243,25 @@
 
     private bool HasDiscount => _tour is not null && _tour.DiscountPercent > 0 && _tour.OriginalPrice > _tour.EffectivePrice;
 
+    private decimal UnitPrice => _tour?.EffectivePrice > 0 ? _tour.EffectivePrice : _tour?.Price ?? 0m;
+
+    private int GuestCount => _bookingForm.AdultCount + _bookingForm.ChildCount;
+
+    private decimal TotalBookingAmount => UnitPrice * GuestCount;
+
+    private bool IsAtCapacity => _tour is not null && GuestCount >= _tour.Capacity;
+
     protected override async Task OnParametersSetAsync()
     {
         _isLoading = true;
+        _bookingSuccess = null;
+        _bookingMessage = null;
 
         try
         {
+            _session = await SessionService.GetAsync();
             _tour = await TourApi.GetTourAsync(TourId);
+            ResetBookingForm();
         }
         catch
         {
@@ -145,6 +278,165 @@
         return durationDays == 1 ? "1 Day" : $"{durationDays} Days";
     }
 
+    private void OpenBookingModal()
+    {
+        _bookingMessage = null;
+        _isBookingError = false;
+        _isBookingModalOpen = true;
+    }
+
+    private void CloseBookingModal()
+    {
+        if (_isBooking)
+        {
+            return;
+        }
+
+        _isBookingModalOpen = false;
+        _bookingMessage = null;
+        _isBookingError = false;
+    }
+
+    private void IncreaseAdults()
+    {
+        if (!IsAtCapacity)
+        {
+            _bookingForm.AdultCount++;
+            SyncPassengers();
+        }
+    }
+
+    private void DecreaseAdults()
+    {
+        if (_bookingForm.AdultCount > 1)
+        {
+            _bookingForm.AdultCount--;
+            SyncPassengers();
+        }
+    }
+
+    private void IncreaseChildren()
+    {
+        if (!IsAtCapacity)
+        {
+            _bookingForm.ChildCount++;
+            SyncPassengers();
+        }
+    }
+
+    private void DecreaseChildren()
+    {
+        if (_bookingForm.ChildCount > 0)
+        {
+            _bookingForm.ChildCount--;
+            SyncPassengers();
+        }
+    }
+
+    private async Task SubmitBookingAsync()
+    {
+        if (_tour is null)
+        {
+            return;
+        }
+
+        if (_session is null)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        _isBooking = true;
+        _isBookingError = false;
+        _bookingMessage = null;
+
+        try
+        {
+            SyncPassengers();
+            ValidateBookingForm();
+
+            var request = new CreateBookingRequest
+            {
+                UserEmail = _session.Email,
+                TourCode = _tour.Code,
+                TourName = _tour.Name,
+                Destination = _tour.Destination,
+                ThumbnailUrl = _tour.ImageUrl,
+                DepartureDate = _bookingForm.DepartureDate,
+                GuestCount = GuestCount,
+                TotalAmount = TotalBookingAmount,
+                Passengers = _bookingForm.Passengers
+                    .Select(passenger => new BookingPassengerRequest
+                    {
+                        FullName = passenger.FullName.Trim(),
+                        PhoneNumber = passenger.PhoneNumber.Trim(),
+                        TicketType = passenger.TicketType
+                    })
+                    .ToList()
+            };
+
+            _bookingSuccess = await UserApi.CreateBookingAsync(request);
+            _isBookingModalOpen = false;
+            _bookingMessage = null;
+        }
+        catch (Exception exception)
+        {
+            _isBookingError = true;
+            _bookingMessage = ToUserMessage(exception);
+        }
+        finally
+        {
+            _isBooking = false;
+        }
+    }
+
+    private void ResetBookingForm()
+    {
+        _bookingForm = TourBookingForm.CreateDefault();
+        SyncPassengers();
+    }
+
+    private void SyncPassengers()
+    {
+        var desiredCount = Math.Max(1, GuestCount);
+
+        while (_bookingForm.Passengers.Count < desiredCount)
+        {
+            _bookingForm.Passengers.Add(new TourPassengerForm
+            {
+                TicketType = _bookingForm.Passengers.Count < _bookingForm.AdultCount ? "Adult" : "Child"
+            });
+        }
+
+        while (_bookingForm.Passengers.Count > desiredCount)
+        {
+            _bookingForm.Passengers.RemoveAt(_bookingForm.Passengers.Count - 1);
+        }
+
+        for (var i = 0; i < _bookingForm.Passengers.Count; i++)
+        {
+            _bookingForm.Passengers[i].TicketType = i < _bookingForm.AdultCount ? "Adult" : "Child";
+        }
+    }
+
+    private void ValidateBookingForm()
+    {
+        if (_bookingForm.DepartureDate.Date < DateTime.Today)
+        {
+            throw new InvalidOperationException("Departure date cannot be in the past.");
+        }
+
+        if (_tour is not null && GuestCount > _tour.Capacity)
+        {
+            throw new InvalidOperationException($"This tour can accept up to {_tour.Capacity} guests.");
+        }
+
+        if (_bookingForm.Passengers.Any(passenger => string.IsNullOrWhiteSpace(passenger.FullName)))
+        {
+            throw new InvalidOperationException("Please enter every guest name.");
+        }
+    }
+
     private static string GetStatusClass(string status)
     {
         return status.ToLowerInvariant() switch
@@ -155,8 +447,50 @@
         };
     }
 
+    private static string ToUserMessage(Exception exception)
+    {
+        return exception.Message.Contains('{')
+            ? "The booking request could not be completed. Please check the form and try again."
+            : exception.Message;
+    }
+
+    private sealed class TourBookingForm
+    {
+        [Required]
+        public DateTime DepartureDate { get; set; } = DateTime.Today.AddDays(1);
+
+        public int AdultCount { get; set; } = 1;
+
+        public int ChildCount { get; set; }
+
+        public List<TourPassengerForm> Passengers { get; set; } = new();
+
+        public static TourBookingForm CreateDefault()
+        {
+            return new TourBookingForm
+            {
+                DepartureDate = DateTime.Today.AddDays(1),
+                AdultCount = 1,
+                ChildCount = 0,
+                Passengers = new List<TourPassengerForm>
+                {
+                    new() { TicketType = "Adult" }
+                }
+            };
+        }
+    }
+
+    private sealed class TourPassengerForm
+    {
+        public string FullName { get; set; } = string.Empty;
+
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        public string TicketType { get; set; } = "Adult";
+    }
+
     private static string FormatMoney(decimal value)
     {
-        return $"{value:N0} đ";
+        return $"{value:N0} VND";
     }
 }

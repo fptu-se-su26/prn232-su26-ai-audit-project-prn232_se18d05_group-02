@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WanderXServer.BusinessObject;
 using WanderXServer.BusinessObject.Enums;
@@ -16,6 +16,8 @@ public class WanderXDbContext : DbContext
     public DbSet<AuthVerificationCode> VerificationCodes => Set<AuthVerificationCode>();
 
     public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+    public DbSet<AccountAuditLog> AccountAuditLogs => Set<AccountAuditLog>();
+    public DbSet<PhoneVerification> PhoneVerifications => Set<PhoneVerification>();
 
     public DbSet<GuideProfile> GuideProfiles => Set<GuideProfile>();
 
@@ -25,6 +27,9 @@ public class WanderXDbContext : DbContext
     public DbSet<BookingPassenger> BookingPassengers => Set<BookingPassenger>();
     public DbSet<UserSpecialRequest> UserSpecialRequests => Set<UserSpecialRequest>();
     public DbSet<TourReview> TourReviews => Set<TourReview>();
+    public DbSet<TravelStyleQuizResult> TravelStyleQuizResults => Set<TravelStyleQuizResult>();
+    public DbSet<QuizQuestion> QuizQuestions => Set<QuizQuestion>();
+    public DbSet<QuizOption> QuizOptions => Set<QuizOption>();
     public DbSet<Tour> Tours => Set<Tour>();
 
     public DbSet<TourSchedule> TourSchedules => Set<TourSchedule>();
@@ -215,8 +220,12 @@ public class WanderXDbContext : DbContext
         EnsureBookingsTable();
         EnsureUserSpecialRequestsTable();
         EnsureTourReviewsTable();
+        EnsureTravelStyleQuizResultsTable();
+        EnsureQuizQuestionsTable();
+        EnsureQuizOptionsTable();
         EnsureApplicationSchema();
         EnsureTourPricingStorage();
+        EnsureAccountSecuritySchema();
 
         var passwordHasher = new PasswordHasher<ApplicationUser>();
 
@@ -226,6 +235,7 @@ public class WanderXDbContext : DbContext
         SaveChanges();
         SeedGuideTourAssignments();
         SeedBookings();
+        SeedQuizData();
         SeedTours();
         SaveChanges();
 
@@ -254,6 +264,25 @@ END
 """);
     }
 
+    private void EnsureAccountSecuritySchema()
+    {
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Users', 'AccountStatus') IS NULL ALTER TABLE [Users] ADD [AccountStatus] nvarchar(32) NOT NULL CONSTRAINT [DF_Users_AccountStatus] DEFAULT 'Active';
+IF COL_LENGTH('Users', 'LockoutEnd') IS NULL ALTER TABLE [Users] ADD [LockoutEnd] datetime2 NULL;
+IF COL_LENGTH('Users', 'LockReason') IS NULL ALTER TABLE [Users] ADD [LockReason] nvarchar(500) NULL;
+IF COL_LENGTH('Users', 'TokenVersion') IS NULL ALTER TABLE [Users] ADD [TokenVersion] int NOT NULL CONSTRAINT [DF_Users_TokenVersion] DEFAULT 0;
+IF OBJECT_ID(N'[AccountAuditLogs]', N'U') IS NULL
+BEGIN
+ CREATE TABLE [AccountAuditLogs]([Id] uniqueidentifier NOT NULL PRIMARY KEY,[ActorUserId] uniqueidentifier NOT NULL,[TargetUserId] uniqueidentifier NOT NULL,[Action] nvarchar(40) NOT NULL,[OldValue] nvarchar(500) NULL,[NewValue] nvarchar(500) NULL,[Reason] nvarchar(500) NOT NULL,[CreatedAt] datetime2 NOT NULL);
+ CREATE INDEX [IX_AccountAuditLogs_TargetUserId_CreatedAt] ON [AccountAuditLogs]([TargetUserId],[CreatedAt]);
+END;
+IF OBJECT_ID(N'[PhoneVerifications]', N'U') IS NULL
+BEGIN
+ CREATE TABLE [PhoneVerifications]([Id] uniqueidentifier NOT NULL PRIMARY KEY,[UserId] uniqueidentifier NOT NULL,[PhoneNumber] nvarchar(20) NOT NULL,[OtpHash] nvarchar(128) NOT NULL,[ExpiresAt] datetime2 NOT NULL,[AttemptCount] int NOT NULL,[MaxAttempts] int NOT NULL,[SentCount] int NOT NULL,[LastSentAt] datetime2 NOT NULL,[Status] nvarchar(20) NOT NULL,[ProviderMessageId] nvarchar(120) NULL,[CreatedAt] datetime2 NOT NULL,[VerifiedAt] datetime2 NULL);
+ CREATE INDEX [IX_PhoneVerifications_UserId_PhoneNumber_CreatedAt] ON [PhoneVerifications]([UserId],[PhoneNumber],[CreatedAt]);
+END;
+""");
+    }
     public void EnsureApplicationSchema()
     {
         EnsureGuideTourAssignmentsTable();
@@ -666,7 +695,144 @@ BEGIN
 END
 ");
     }
-    // end TV3
+
+    private void EnsureTravelStyleQuizResultsTable()
+    {
+        Database.ExecuteSqlRaw(@"
+IF OBJECT_ID(N'[TravelStyleQuizResults]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [TravelStyleQuizResults] (
+        [Id] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [AnswersJson] nvarchar(max) NOT NULL,
+        [AdventureScore] int NOT NULL,
+        [CulturalScore] int NOT NULL,
+        [RelaxationScore] int NOT NULL,
+        [LuxuryScore] int NOT NULL,
+        [DominantStyle] nvarchar(50) NOT NULL,
+        [CompletedAt] datetime2 NOT NULL,
+        CONSTRAINT [PK_TravelStyleQuizResults] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TravelStyleQuizResults_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_TravelStyleQuizResults_UserId] ON [TravelStyleQuizResults] ([UserId]);
+END
+");
+    }
+
+    private void EnsureQuizQuestionsTable()
+    {
+        Database.ExecuteSqlRaw(@"
+IF OBJECT_ID(N'[QuizQuestions]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [QuizQuestions] (
+        [Id] uniqueidentifier NOT NULL,
+        [Text] nvarchar(max) NOT NULL,
+        [DisplayOrder] int NOT NULL,
+        CONSTRAINT [PK_QuizQuestions] PRIMARY KEY ([Id])
+    );
+END
+");
+    }
+
+    private void EnsureQuizOptionsTable()
+    {
+        Database.ExecuteSqlRaw(@"
+IF OBJECT_ID(N'[QuizOptions]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [QuizOptions] (
+        [Id] uniqueidentifier NOT NULL,
+        [QuestionId] uniqueidentifier NOT NULL,
+        [OptionKey] nvarchar(10) NOT NULL,
+        [Text] nvarchar(max) NOT NULL,
+        [Category] nvarchar(50) NOT NULL,
+        [Score] int NOT NULL,
+        CONSTRAINT [PK_QuizOptions] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_QuizOptions_QuizQuestions_QuestionId] FOREIGN KEY ([QuestionId]) REFERENCES [QuizQuestions] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_QuizOptions_QuestionId] ON [QuizOptions] ([QuestionId]);
+END
+");
+    }
+
+    private void SeedQuizData()
+    {
+        if (QuizQuestions.Any()) return;
+
+        var questions = new List<QuizQuestion>
+        {
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Bạn thích dành kỳ nghỉ của mình ở đâu nhất?",
+                DisplayOrder = 1,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Những ngọn núi hiểm trở hoặc rừng rậm hoang dã để hòa mình vào thiên nhiên.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Các thành phố cổ kính, viện bảo tàng và di tích lịch sử văn hóa.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Một bãi biển yên bình, tĩnh lặng hoặc khu nghỉ dưỡng spa biệt lập.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Khách sạn 5 sao cao cấp, trung tâm mua sắm sầm uất và khu vui chơi hiện đại.", Category = "Luxury", Score = 3 }
+                }
+            },
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Hoạt động yêu thích của bạn trong suốt chuyến đi là gì?",
+                DisplayOrder = 2,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Leo núi trekking, chèo thuyền kayak vượt thác hoặc các trò chơi mạo hiểm.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Tham gia lễ hội truyền thống bản địa, học làm đồ thủ công, hoặc tham quan di sản.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Nằm đọc sách bên hồ bơi, tắm nắng trên bãi cát, hoặc trị liệu spa thư giãn.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Thưởng thức bữa tối fine-dining tại nhà hàng Michelin hoặc tận hưởng du thuyền sang trọng.", Category = "Luxury", Score = 3 }
+                }
+            },
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Bạn thường chuẩn bị hành lý của mình như thế nào?",
+                DisplayOrder = 3,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Một chiếc balo gọn nhẹ với các vật dụng sinh tồn và đồ dã ngoại tiện lợi.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Mang theo máy ảnh chuyên nghiệp, sách hướng dẫn du lịch và sổ tay ghi chép.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Trang phục thoải mái, kem chống nắng, đồ bơi và vài cuốn tiểu thuyết.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Vali kéo sang trọng với trang phục thời thượng thiết kế riêng và nhiều phụ kiện.", Category = "Luxury", Score = 3 }
+                }
+            },
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Bạn thích đi du lịch cùng ai nhất để tận hưởng trọn vẹn chuyến đi?",
+                DisplayOrder = 4,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Đi du lịch một mình (solo) tự do hoặc nhóm bạn thân đam mê thử thách.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Người có cùng niềm đam mê tìm hiểu lịch sử, văn hóa bản xứ sâu sắc.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Gia đình thân yêu hoặc người đời để cùng nhau nghỉ ngơi hoàn toàn.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Một nhóm nhỏ cao cấp hoặc đối tác để cùng tận hưởng các dịch vụ VIP đẳng cấp.", Category = "Luxury", Score = 3 }
+                }
+            },
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Cách bạn lựa chọn ẩm thực và ăn uống khi đặt chân tới vùng đất mới?",
+                DisplayOrder = 5,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Ăn đồ đóng hộp mang theo tiện lợi hoặc thưởng thức bất cứ quán ăn ven đường nào.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Thử các món ăn ẩm thực đường phố truyền thống và đặc sản độc lạ của người bản xứ.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Gọi đồ ăn phục vụ tận phòng (room service) hoặc ăn buffet thoải mái tại resort.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Đặt bàn trước tại các nhà hàng nổi tiếng, sang trọng nhất và có tầm nhìn đẹp nhất vùng.", Category = "Luxury", Score = 3 }
+                }
+            }
+        };
+
+        QuizQuestions.AddRange(questions);
+        SaveChanges();
+    }
+// end TV3
     private void SeedGuideTourAssignments()
     {
         var today = DateTime.Today;

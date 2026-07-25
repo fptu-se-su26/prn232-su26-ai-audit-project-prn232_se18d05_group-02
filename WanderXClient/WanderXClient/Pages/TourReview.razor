@@ -1,4 +1,4 @@
-@page "/tour-review/{BookingId:guid}"
+﻿@page "/tour-review/{BookingId:guid}"
 @using WanderXClient.Models
 @using WanderXClient.Services
 @inject UserApiClient UserApi
@@ -6,7 +6,7 @@
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
 
-<PageTitle>WanderX - Đánh giá tour</PageTitle>
+<PageTitle>WanderX - Tour Review</PageTitle>
 
 <AppHeader />
 
@@ -20,9 +20,9 @@ else if (_session == null)
 {
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-24 text-center">
         <span class="material-symbols-outlined text-5xl text-muted-fg">login</span>
-        <h2 class="font-title font-bold text-xl !text-primary mt-4">Vui lòng đăng nhập</h2>
+        <h2 class="font-title font-bold text-xl !text-primary mt-4">Please log in</h2>
         <a href="/login" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold !text-primary hover:underline">
-            Đăng nhập
+            Log in
         </a>
     </main>
 }
@@ -30,9 +30,9 @@ else if (_booking == null)
 {
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-24 text-center">
         <span class="material-symbols-outlined text-5xl text-muted-fg">error_outline</span>
-        <h2 class="font-title font-bold text-xl !text-primary mt-4">Không tìm thấy đơn hàng</h2>
+        <h2 class="font-title font-bold text-xl !text-primary mt-4">Booking not found</h2>
         <a href="/my-bookings" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold !text-primary hover:underline">
-            <span class="material-symbols-outlined text-base">arrow_back</span> Quay lại danh sách
+            <span class="material-symbols-outlined text-base">arrow_back</span> Back to list
         </a>
     </main>
 }
@@ -40,10 +40,10 @@ else if (!_booking.CompletedAt.HasValue)
 {
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-24 text-center">
         <span class="material-symbols-outlined text-5xl text-muted-fg">lock</span>
-        <h2 class="font-title font-bold text-xl !text-primary mt-4">Chưa thể đánh giá</h2>
-        <p class="text-sm text-muted-fg mt-2">Bạn chỉ có thể đánh giá tour sau khi chuyến đi hoàn thành.</p>
+        <h2 class="font-title font-bold text-xl !text-primary mt-4">Review not available yet</h2>
+        <p class="text-sm text-muted-fg mt-2">You can only review a tour after the trip is completed.</p>
         <a href="/booking-detail/@_booking.Id" class="mt-6 inline-flex items-center gap-2 text-sm font-semibold !text-primary hover:underline">
-            <span class="material-symbols-outlined text-base">arrow_back</span> Quay lại chi tiết
+            <span class="material-symbols-outlined text-base">arrow_back</span> Back to details
         </a>
     </main>
 }
@@ -52,7 +52,6 @@ else
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 
-            <!-- Left Profile Sidebar -->
             <aside class="lg:col-span-4 bg-white border border-hairline rounded-lg p-6 space-y-6 shadow-sm">
                 <div class="flex flex-col items-center text-center pb-6 border-b border-hairline">
                     <div class="w-20 h-20 rounded-full overflow-hidden border-2 !border-primary mb-4">
@@ -64,34 +63,32 @@ else
                 <nav class="flex flex-col gap-1 text-sm font-semibold text-muted-fg">
                     <a href="my-bookings" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
                         <span class="material-symbols-outlined text-lg">receipt_long</span>
-                        Đơn hàng của tôi
+                        My Bookings
                     </a>
                     <a href="service-requests" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
                         <span class="material-symbols-outlined text-lg">description</span>
-                        Yêu cầu dịch vụ
+                        Service Requests
                     </a>
                     <a href="profile" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-soft hover:!text-primary transition-colors">
                         <span class="material-symbols-outlined text-lg">person</span>
-                        Thông tin cá nhân
+                        Profile
                     </a>
                 </nav>
             </aside>
 
-            <!-- Right content -->
             <section class="lg:col-span-8 space-y-8">
                 <!-- Header -->
                 <div class="space-y-4">
                     <div class="flex items-center gap-4">
                         <a href="/booking-detail/@_booking.Id" class="flex items-center gap-2 text-sm font-semibold !text-primary hover:underline">
                             <span class="material-symbols-outlined text-base">arrow_back</span>
-                            Quay lại
+                            Back
                         </a>
                     </div>
-                    <h1 class="text-2xl font-extrabold tracking-tight font-title !text-primary">Đánh giá tour</h1>
-                    <p class="text-sm text-muted-fg">Chia sẻ trải nghiệm của bạn về tour @_booking.TourName</p>
+                    <h1 class="text-2xl font-extrabold tracking-tight font-title !text-primary">Tour Reviews</h1>
+                    <p class="text-sm text-muted-fg">Share your experience with tour @_booking.TourName</p>
                 </div>
 
-                <!-- Booking Info -->
                 <div class="bg-white border border-hairline rounded-lg p-6 shadow-sm">
                     <div class="flex gap-4">
                         @if (!string.IsNullOrEmpty(_booking.ThumbnailUrl))
@@ -101,21 +98,20 @@ else
                         <div class="flex-1">
                             <h3 class="font-semibold !text-primary">@_booking.TourName</h3>
                             <p class="text-sm text-muted-fg">@_booking.Destination</p>
-                            <p class="text-xs text-muted-fg mt-2">Mã đơn hàng: @_booking.BookingCode</p>
-                            <p class="text-xs text-muted-fg">Ngày đi: @_booking.DepartureDate.ToString("dd/MM/yyyy")</p>
+                            <p class="text-xs text-muted-fg mt-2">Booking code: @_booking.BookingCode</p>
+                            <p class="text-xs text-muted-fg">Travel Date: @_booking.DepartureDate.ToString("dd/MM/yyyy")</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Review Form -->
                 <div class="bg-white border border-hairline rounded-lg p-6 md:p-8 space-y-6 shadow-sm">
 
                     @if (_existingReview != null)
                     {
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <p class="text-sm text-blue-800">
-                                <strong>Bạn đã đánh giá tour này vào @_existingReview.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy").</strong>
-                                Bạn có thể chỉnh sửa hoặc xóa đánh giá của mình.
+                                <strong>You reviewed this tour on @_existingReview.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy").</strong>
+                                You can edit or delete your review.
                             </p>
                         </div>
                     }
@@ -124,7 +120,7 @@ else
                     {
                         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                             <p class="text-sm text-red-800">
-                                <strong>⚠ Lỗi:</strong> @_errorMessage
+                                <strong>⚠ Error:</strong> @_errorMessage
                             </p>
                         </div>
                     }
@@ -133,14 +129,13 @@ else
                     {
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                             <p class="text-sm text-green-800">
-                                <strong>✓ Thành công!</strong> Đánh giá của bạn đã được ghi lại.
+                                <strong>✓ Success!</strong> Your review has been saved.
                             </p>
                         </div>
                     }
 
-                    <!-- Rating -->
                     <div class="space-y-3">
-                        <label class="text-sm font-semibold !text-primary">Đánh giá của bạn <span class="text-red-500">*</span></label>
+                        <label class="text-sm font-semibold !text-primary">Your rating <span class="text-red-500">*</span></label>
                         <div class="flex gap-2">
                             @for (int i = 1; i <= 5; i++)
                             {
@@ -160,34 +155,33 @@ else
                         <p class="text-xs text-muted-fg">
                             @if (_rating == 0)
                             {
-                                <span>Click vào sao để đánh giá (1–5 sao)</span>
+                                <span>Click a star to rate (1-5 stars)</span>
                             }
                             else
                             {
-                                <span class="font-semibold">Bạn đã chọn: @_rating sao</span>
+                                <span class="font-semibold">You selected: @_rating stars</span>
                             }
                         </p>
                     </div>
 
                     <!-- Comment -->
                     <div class="space-y-3">
-                        <label class="text-sm font-semibold !text-primary">Nhận xét của bạn</label>
+                        <label class="text-sm font-semibold !text-primary">Your comment</label>
                         <textarea class="w-full border border-hairline rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                                   rows="5"
                                   @bind="_comment"
-                                  placeholder="Chia sẻ trải nghiệm của bạn về chuyến đi...">
+                                  placeholder="Share your experience from the trip...">
                         </textarea>
                     </div>
 
-                    <!-- Actions -->
                     <div class="flex gap-3 justify-end pt-2">
                         <a href="/booking-detail/@_booking.Id" class="wx-button wx-button--outline">
-                            Hủy
+                            Cancel
                         </a>
                         @if (_existingReview != null)
                         {
                             <button class="wx-button" style="background:#ef4444;color:white;" @onclick="DeleteReview" disabled="@_isSubmitting">
-                                Xóa đánh giá
+                                Delete review
                             </button>
                         }
                         <button class="wx-button wx-button--secondary"
@@ -196,11 +190,11 @@ else
                             @if (_isSubmitting)
                             {
                                 <span class="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></span>
-                                <span>Đang gửi...</span>
+                                <span>Submitting...</span>
                             }
                             else
                             {
-                                <span>@(_existingReview != null ? "Cập nhật đánh giá" : "Gửi đánh giá")</span>
+                                <span>@(_existingReview != null ? "Update review" : "Submit review")</span>
                             }
                         </button>
                     </div>
@@ -239,19 +233,16 @@ else
 
         try
         {
-            // Lấy avatar từ localStorage
             try
             {
                 var savedAvatar = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"avatar_{_session.Email}");
                 if (!string.IsNullOrEmpty(savedAvatar))
                     _avatarUrl = savedAvatar;
             }
-            catch { /* bỏ qua nếu localStorage lỗi */ }
+            catch { /* Ignore localStorage errors. */ }
 
-            // Lấy thông tin booking
             _booking = await UserApi.GetBookingByIdAsync(BookingId);
 
-            // Lấy review hiện tại (nếu có) — không bị crash nếu chưa có
             if (_booking != null)
             {
                 _existingReview = await UserApi.GetReviewByBookingIdAsync(BookingId);
@@ -264,7 +255,7 @@ else
         }
         catch (Exception ex)
         {
-            _errorMessage = "Lỗi tải trang: " + ex.Message;
+            _errorMessage = "Error loading page: " + ex.Message;
             _booking = null;
         }
         finally
@@ -283,7 +274,7 @@ else
     {
         if (_booking == null || _rating == 0)
         {
-            _errorMessage = "Vui lòng chọn số sao trước khi gửi.";
+            _errorMessage = "Please choose a rating before submitting.";
             return;
         }
 
@@ -295,7 +286,6 @@ else
         {
             if (_existingReview != null)
             {
-                // Cập nhật review
                 var updateRequest = new UpdateTourReviewRequest
                 {
                     Rating = _rating,
@@ -306,7 +296,6 @@ else
             }
             else
             {
-                // Tạo review mới
                 var createRequest = new CreateTourReviewRequest
                 {
                     BookingId = _booking.Id,
@@ -317,7 +306,6 @@ else
                 await UserApi.CreateReviewAsync(createRequest);
             }
 
-            // Thành công → chuyển về trang chi tiết
             NavManager.NavigateTo("/booking-detail/" + _booking.Id);
         }
         catch (Exception ex)

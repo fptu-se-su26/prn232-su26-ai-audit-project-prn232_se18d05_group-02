@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WanderXServer.Dtos.TourReviews;
 using WanderXServer.Services;
 
@@ -17,7 +17,6 @@ public class TourReviewsController : ControllerBase
         _userService = userService;
     }
 
-    // GET api/tourreviews/tour/{tourName}
     [HttpGet("tour/{tourName}")]
     public async Task<IActionResult> GetByTourName(string tourName)
     {
@@ -25,7 +24,6 @@ public class TourReviewsController : ControllerBase
         return Ok(reviews);
     }
 
-    // GET api/tourreviews/average/{tourName}
     [HttpGet("average/{tourName}")]
     public async Task<IActionResult> GetAverageRating(string tourName)
     {
@@ -33,17 +31,15 @@ public class TourReviewsController : ControllerBase
         return Ok(average);
     }
 
-    // GET api/tourreviews/booking/{bookingId}
     [HttpGet("booking/{bookingId:guid}")]
     public async Task<IActionResult> GetByBookingId(Guid bookingId)
     {
         var review = await _service.GetByBookingIdAsync(bookingId);
         if (review == null)
-            return NoContent(); // 204 khi chưa có review
+            return NoContent();
         return Ok(review);
     }
 
-    // GET api/tourreviews (admin)
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -51,16 +47,15 @@ public class TourReviewsController : ControllerBase
         return Ok(reviews);
     }
 
-    // POST api/tourreviews?email=...
     [HttpPost]
     public async Task<IActionResult> Create([FromQuery] string email, [FromBody] CreateTourReviewRequest request)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return BadRequest(new { error = "Email không được để trống." });
+            return BadRequest(new { error = "Email is required." });
 
         var user = await _userService.GetUserByEmailAsync(email);
         if (user == null)
-            return BadRequest(new { error = "Không tìm thấy người dùng với email này." });
+            return BadRequest(new { error = "No user found with this email." });
 
         try
         {
@@ -85,16 +80,15 @@ public class TourReviewsController : ControllerBase
         }
     }
 
-    // PUT api/tourreviews/{id}?email=...
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromQuery] string email, [FromBody] UpdateTourReviewRequest request)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return BadRequest(new { error = "Email không được để trống." });
+            return BadRequest(new { error = "Email is required." });
 
         var user = await _userService.GetUserByEmailAsync(email);
         if (user == null)
-            return BadRequest(new { error = "Không tìm thấy người dùng với email này." });
+            return BadRequest(new { error = "No user found with this email." });
 
         try
         {
@@ -115,21 +109,20 @@ public class TourReviewsController : ControllerBase
         }
     }
 
-    // DELETE api/tourreviews/{id}?email=...
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, [FromQuery] string email)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return BadRequest(new { error = "Email không được để trống." });
+            return BadRequest(new { error = "Email is required." });
 
         var user = await _userService.GetUserByEmailAsync(email);
         if (user == null)
-            return BadRequest(new { error = "Không tìm thấy người dùng với email này." });
+            return BadRequest(new { error = "No user found with this email." });
 
         try
         {
             await _service.DeleteAsync(id, user.Id);
-            return Ok(new { message = "Xóa đánh giá thành công." });
+            return Ok(new { message = "Review deleted successfully." });
         }
         catch (KeyNotFoundException ex)
         {
@@ -145,16 +138,15 @@ public class TourReviewsController : ControllerBase
         }
     }
 
-    // PUT api/tourreviews/{id}/moderate?email=...
     [HttpPut("{id:guid}/moderate")]
     public async Task<IActionResult> Moderate(Guid id, [FromQuery] string email, [FromBody] ModerateReviewRequest request)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return BadRequest(new { error = "Email không được để trống." });
+            return BadRequest(new { error = "Email is required." });
 
         var user = await _userService.GetUserByEmailAsync(email);
         if (user == null)
-            return BadRequest(new { error = "Không tìm thấy người dùng với email này." });
+            return BadRequest(new { error = "No user found with this email." });
 
         try
         {
