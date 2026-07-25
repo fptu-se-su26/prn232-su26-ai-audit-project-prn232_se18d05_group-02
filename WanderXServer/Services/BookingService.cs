@@ -28,12 +28,14 @@ public class BookingService : IBookingService
     private readonly WanderXDbContext _dbContext;
     private readonly IEmailSender _emailSender;
     private readonly ILogger<BookingService> _logger;
+    private readonly ITourService _tourService;
 
-    public BookingService(WanderXDbContext dbContext, IEmailSender emailSender, ILogger<BookingService> logger)
+    public BookingService(WanderXDbContext dbContext, IEmailSender emailSender, ILogger<BookingService> logger, ITourService tourService)
     {
         _dbContext = dbContext;
         _emailSender = emailSender;
         _logger = logger;
+        _tourService = tourService;
     }
 
     public async Task<IReadOnlyList<BookingResponse>> GetAllAsync(string? status, string? search)
@@ -81,17 +83,21 @@ public class BookingService : IBookingService
             ? await FindScheduleAsync(request.DepartureScheduleId, request.TourCode)
             : null;
 
+        var tourCode = ResolveTourCode(request.TourCode, schedule);
+        var departureDate = ResolveDepartureDate(request.DepartureDate, schedule);
+        await _tourService.EnsureTourCanAcceptBookingAsync(tourCode, request.GuestCount, departureDate);
+
         var booking = new Booking
         {
             UserId = user.Id,
             User = user,
             BookingCode = await GenerateBookingCodeAsync(),
-            TourCode = ResolveTourCode(request.TourCode, schedule),
+            TourCode = tourCode,
             DepartureScheduleId = schedule?.Id ?? request.DepartureScheduleId,
             TourName = ResolveRequiredText(request.TourName, schedule?.TourName, "Tour name is required."),
             Destination = ResolveRequiredText(request.Destination, schedule?.Destination, "Destination is required."),
             ThumbnailUrl = request.ThumbnailUrl?.Trim(),
-            DepartureDate = ResolveDepartureDate(request.DepartureDate, schedule),
+            DepartureDate = departureDate,
             GuestCount = request.GuestCount,
             TotalAmount = request.TotalAmount,
             Status = PendingStatus,
@@ -103,6 +109,7 @@ public class BookingService : IBookingService
 
         _dbContext.Bookings.Add(booking);
         await _dbContext.SaveChangesAsync();
+        await _tourService.RefreshTourAvailabilityAsync(booking.TourCode);
 
         return ToResponse(booking);
     }
@@ -131,6 +138,7 @@ public class BookingService : IBookingService
         var thumbnailUrl = request.ThumbnailUrl?.Trim();
         var departureDate = ResolveDepartureDate(request.DepartureDate, schedule);
         var updatedAt = DateTime.UtcNow;
+        await _tourService.EnsureTourCanAcceptBookingAsync(tourCode, request.GuestCount, departureDate, id);
 
         var passengerRows = BuildPassengerRows(id, request.GuestCount, request.Passengers);
 
@@ -159,6 +167,8 @@ public class BookingService : IBookingService
         _dbContext.BookingPassengers.AddRange(passengerRows);
 
         await _dbContext.SaveChangesAsync();
+        await _tourService.RefreshTourAvailabilityAsync(booking.TourCode);
+        await _tourService.RefreshTourAvailabilityAsync(tourCode);
         return ToResponse(await FindBookingAsync(id));
     }
 
@@ -206,6 +216,7 @@ public class BookingService : IBookingService
         }
 
         await _dbContext.SaveChangesAsync();
+        await _tourService.RefreshTourAvailabilityAsync(booking.TourCode);
 
         if (newStatus == CancelledStatus)
         {
@@ -291,6 +302,7 @@ public class BookingService : IBookingService
         }
 
         await _dbContext.SaveChangesAsync();
+        await _tourService.RefreshTourAvailabilityAsync(booking.TourCode);
 
         if (reviewStatus == CancellationApprovedStatus)
         {
@@ -408,6 +420,7 @@ public class BookingService : IBookingService
         }
 
         await _dbContext.SaveChangesAsync();
+        await _tourService.RefreshTourAvailabilityAsync(booking.TourCode);
 
         return ToResponse(booking);
     }

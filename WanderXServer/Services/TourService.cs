@@ -8,7 +8,14 @@ namespace WanderXServer.Services;
 
 public class TourService : ITourService
 {
-    private static readonly string[] AllowedStatuses = { "Draft", "Published", "Archived", "Hidden" };
+    private const string PublishedStatus = "Published";
+    private const string LockedStatus = "Locked";
+    private const string FullLockReason = "Full";
+    private const string DepartedLockReason = "Departed";
+    private const string ManualLockReason = "Manual";
+    private static readonly string[] AllowedStatuses = { "Draft", PublishedStatus, "Archived", "Hidden", LockedStatus };
+    private static readonly string[] CapacityHoldingBookingStatuses = { "Paid", "Confirmed", "Finished" };
+    private static readonly string[] DepartureBlockingAssignmentStatuses = { "Assigned", "Confirmed" };
 
     private readonly WanderXDbContext _dbContext;
 
@@ -17,7 +24,7 @@ public class TourService : ITourService
         _dbContext = dbContext;
     }
 
-    public async Task<IReadOnlyList<TourResponse>> GetAllAsync(string? search, string? status)
+    public async Task<IReadOnlyList<TourResponse>> GetAllAsync(string? search, string? status, string? destination, DateTime? departureDate)
     {
         _dbContext.EnsureTourStorage();
         _dbContext.EnsureTourPricingStorage();
@@ -39,7 +46,32 @@ public class TourService : ITourService
             tours = tours.Where(item => item.Status == status.Trim());
         }
 
+        if (!string.IsNullOrWhiteSpace(destination))
+        {
+            var destinationTerm = destination.Trim();
+            tours = tours.Where(item => item.Destination.Contains(destinationTerm));
+        }
+
+        if (departureDate.HasValue)
+        {
+            var date = departureDate.Value.Date;
+            tours = tours.Where(tour =>
+                _dbContext.Bookings.Any(booking =>
+                    booking.TourCode == tour.Code &&
+                    booking.DepartureDate.Date == date));
+        }
+
         var result = await tours
+            .OrderBy(item => item.Name)
+            .ThenBy(item => item.Code)
+            .ToListAsync();
+
+        foreach (var tour in result)
+        {
+            await RefreshTourAvailabilityAsync(tour.Code);
+        }
+
+        result = await tours
             .OrderBy(item => item.Name)
             .ThenBy(item => item.Code)
             .ToListAsync();
@@ -90,6 +122,7 @@ public class TourService : ITourService
             Price = request.Price,
             Capacity = request.Capacity,
             Status = request.Status.Trim(),
+            LockReason = ResolveLockReason(request.Status, null),
             ImageUrl = request.ImageUrl.Trim(),
             Description = request.Description.Trim(),
             CreatedAt = DateTime.UtcNow
@@ -132,11 +165,13 @@ public class TourService : ITourService
         tour.Price = request.Price;
         tour.Capacity = request.Capacity;
         tour.Status = request.Status.Trim();
+        tour.LockReason = ResolveLockReason(request.Status, tour.LockReason);
         tour.ImageUrl = request.ImageUrl.Trim();
         tour.Description = request.Description.Trim();
         tour.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync();
+        await RefreshTourAvailabilityAsync(tour.Code);
 
         return ToResponse(tour);
     }
@@ -165,6 +200,124 @@ public class TourService : ITourService
         await _dbContext.SaveChangesAsync();
 
         return ToResponse(tour);
+    }
+
+    public async Task<TourResponse> LockAsync(Guid id)
+    {
+        _dbContext.EnsureTourStorage();
+
+        var tour = await FindTourAsync(id);
+        tour.Status = LockedStatus;
+        tour.LockReason = ManualLockReason;
+        tour.UpdatedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+        return ToResponse(tour);
+    }
+
+    public async Task<TourResponse> UnlockAsync(Guid id)
+    {
+        _dbContext.EnsureTourStorage();
+
+        var tour = await FindTourAsync(id);
+        var lockReason = await GetAutomaticLockReasonAsync(tour);
+
+        if (lockReason is not null)
+        {
+            throw new InvalidOperationException(lockReason == FullLockReason
+                ? "This tour is full and cannot be unlocked."
+                : "This tour has already departed and cannot be unlocked.");
+        }
+
+        tour.Status = PublishedStatus;
+        tour.LockReason = null;
+        tour.UpdatedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+        return ToResponse(tour);
+    }
+
+    public async Task EnsureTourCanAcceptBookingAsync(string? tourCode, int requestedGuestCount, DateTime departureDate, Guid? excludedBookingId = null)
+    {
+        if (string.IsNullOrWhiteSpace(tourCode))
+        {
+            return;
+        }
+
+        _dbContext.EnsureTourStorage();
+        var code = NormalizeCode(tourCode);
+        var tour = await _dbContext.Tours.FirstOrDefaultAsync(item => item.Code == code);
+        if (tour is null)
+        {
+            return;
+        }
+
+        await RefreshTourAvailabilityAsync(code);
+        await _dbContext.Entry(tour).ReloadAsync();
+
+        if (string.Equals(tour.Status, LockedStatus, StringComparison.OrdinalIgnoreCase))
+        {
+            var canRecheckCapacityForExistingBooking = excludedBookingId.HasValue &&
+                string.Equals(tour.LockReason, FullLockReason, StringComparison.OrdinalIgnoreCase);
+
+            if (!canRecheckCapacityForExistingBooking)
+            {
+                throw new InvalidOperationException(ToLockedBookingMessage(tour.LockReason));
+            }
+        }
+
+        if (!string.Equals(tour.Status, PublishedStatus, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("This tour is not open for booking.");
+        }
+
+        if (departureDate.Date <= DateTime.UtcNow.Date)
+        {
+            throw new InvalidOperationException("This tour has already reached its departure date.");
+        }
+
+        var bookedGuests = await GetBookedGuestCountAsync(tour.Code, excludedBookingId);
+        if (bookedGuests + requestedGuestCount > tour.Capacity)
+        {
+            throw new InvalidOperationException($"Only {Math.Max(0, tour.Capacity - bookedGuests)} seat(s) are available for this tour.");
+        }
+    }
+
+    public async Task RefreshTourAvailabilityAsync(string? tourCode)
+    {
+        if (string.IsNullOrWhiteSpace(tourCode))
+        {
+            return;
+        }
+
+        _dbContext.EnsureTourStorage();
+        var code = NormalizeCode(tourCode);
+        var tour = await _dbContext.Tours.FirstOrDefaultAsync(item => item.Code == code);
+        if (tour is null)
+        {
+            return;
+        }
+
+        if (string.Equals(tour.LockReason, ManualLockReason, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        var lockReason = await GetAutomaticLockReasonAsync(tour);
+        if (lockReason is not null)
+        {
+            tour.Status = LockedStatus;
+            tour.LockReason = lockReason;
+            tour.UpdatedAt = DateTime.UtcNow;
+        }
+        else if (string.Equals(tour.Status, LockedStatus, StringComparison.OrdinalIgnoreCase))
+        {
+            tour.Status = PublishedStatus;
+            tour.LockReason = null;
+            tour.UpdatedAt = DateTime.UtcNow;
+        }
+
+        await _dbContext.SaveChangesAsync();
     }
 
     private async Task<Tour> FindTourAsync(Guid id)
@@ -196,6 +349,75 @@ public class TourService : ITourService
         {
             throw new InvalidOperationException("This tour already has bookings. It cannot be deleted or hidden.");
         }
+    }
+
+    private async Task<string?> GetAutomaticLockReasonAsync(Tour tour)
+    {
+        var today = DateTime.UtcNow.Date;
+        var departureDate = await GetEarliestDepartureDateAsync(tour.Code);
+        if (departureDate.HasValue && departureDate.Value.Date <= today)
+        {
+            return DepartedLockReason;
+        }
+
+        var bookedGuests = await GetBookedGuestCountAsync(tour.Code);
+        if (bookedGuests >= tour.Capacity)
+        {
+            return FullLockReason;
+        }
+
+        return null;
+    }
+
+    private async Task<DateTime?> GetEarliestDepartureDateAsync(string tourCode)
+    {
+        var bookingDeparture = await _dbContext.Bookings
+            .AsNoTracking()
+            .Where(booking =>
+                booking.TourCode == tourCode &&
+                CapacityHoldingBookingStatuses.Contains(booking.Status))
+            .MinAsync(booking => (DateTime?)booking.DepartureDate);
+
+        if (bookingDeparture.HasValue)
+        {
+            return bookingDeparture.Value.Date;
+        }
+
+        return await _dbContext.GuideTourAssignments
+            .AsNoTracking()
+            .Where(assignment =>
+                assignment.TourCode == tourCode &&
+                DepartureBlockingAssignmentStatuses.Contains(assignment.Status))
+            .MinAsync(assignment => (DateTime?)assignment.StartDate);
+    }
+
+    private async Task<int> GetBookedGuestCountAsync(string tourCode, Guid? excludedBookingId = null)
+    {
+        return await _dbContext.Bookings
+            .AsNoTracking()
+            .Where(booking =>
+                booking.TourCode == tourCode &&
+                booking.Id != excludedBookingId &&
+                CapacityHoldingBookingStatuses.Contains(booking.Status))
+            .SumAsync(booking => (int?)booking.GuestCount) ?? 0;
+    }
+
+    private static string? ResolveLockReason(string status, string? currentLockReason)
+    {
+        return status.Trim().Equals(LockedStatus, StringComparison.OrdinalIgnoreCase)
+            ? currentLockReason ?? ManualLockReason
+            : null;
+    }
+
+    private static string ToLockedBookingMessage(string? lockReason)
+    {
+        return lockReason switch
+        {
+            FullLockReason => "This tour is full and cannot accept more bookings.",
+            DepartedLockReason => "This tour has already reached its departure date.",
+            ManualLockReason => "This tour is locked by admin staff.",
+            _ => "This tour is locked and cannot accept bookings."
+        };
     }
 
     private static void ValidateTourCode(string code)
@@ -402,6 +624,7 @@ public class TourService : ITourService
             AppliedPromotionName = resolvedPricing.AppliedPromotionName,
             Capacity = tour.Capacity,
             Status = tour.Status,
+            LockReason = tour.LockReason,
             ImageUrl = tour.ImageUrl,
             Description = tour.Description,
             CreatedAt = tour.CreatedAt,

@@ -275,6 +275,10 @@
                                             <span></span>
                                             @tour.Status
                                         </span>
+                                        @if (IsStatus(tour, "Locked") && !string.IsNullOrWhiteSpace(tour.LockReason))
+                                        {
+                                            <small>@GetLockReasonText(tour.LockReason)</small>
+                                        }
                                     </td>
                                     <td class="guide-table__actions">
                                         @if (_pendingDeleteTourId == tour.Id)
@@ -294,6 +298,18 @@
                                             <button class="guide-icon-button" type="button" title="Hide tour" @onclick="() => HideTourAsync(tour.Id)" disabled="@IsHidden(tour)">
                                                 <MaterialIcon Name="visibility_off" />
                                             </button>
+                                            @if (IsStatus(tour, "Locked"))
+                                            {
+                                                <button class="guide-icon-button" type="button" title="Unlock tour" @onclick="() => UnlockTourAsync(tour.Id)">
+                                                    <MaterialIcon Name="lock_open" />
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="guide-icon-button" type="button" title="Lock tour" @onclick="() => LockTourAsync(tour.Id)">
+                                                    <MaterialIcon Name="lock" />
+                                                </button>
+                                            }
                                             <button class="guide-icon-button guide-icon-button--danger" type="button" title="Delete tour" @onclick="() => ConfirmDelete(tour.Id)">
                                                 <MaterialIcon Name="delete" />
                                             </button>
@@ -310,8 +326,8 @@
 </section>
 
 @code {
-    private static readonly string[] StatusOptions = { "Draft", "Published", "Archived", "Hidden" };
-    private static readonly string[] FilterOptions = { "All", "Draft", "Published", "Archived", "Hidden" };
+    private static readonly string[] StatusOptions = { "Draft", "Published", "Archived", "Hidden", "Locked" };
+    private static readonly string[] FilterOptions = { "All", "Draft", "Published", "Archived", "Hidden", "Locked" };
     private static readonly BuiltInTourImage[] BuiltInTourImages =
     {
         new("Ha Noi Heritage", "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80"),
@@ -573,6 +589,52 @@
         return tour.Status.Equals(status, StringComparison.OrdinalIgnoreCase);
     }
 
+    private async Task LockTourAsync(Guid tourId)
+    {
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            await TourApi.LockTourAsync(tourId);
+            _message = "Tour package locked.";
+            await LoadToursAsync(clearMessage: false);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private async Task UnlockTourAsync(Guid tourId)
+    {
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            await TourApi.UnlockTourAsync(tourId);
+            _message = "Tour package unlocked.";
+            await LoadToursAsync(clearMessage: false);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
     private static bool IsHidden(TourResponse tour)
     {
         return IsStatus(tour, "Hidden");
@@ -584,8 +646,20 @@
         {
             "published" => "guide-status guide-status--active",
             "draft" => "guide-status guide-status--busy",
+            "locked" => "guide-status guide-status--danger",
             "archived" or "hidden" => "guide-status guide-status--muted",
             _ => "guide-status"
+        };
+    }
+
+    private static string GetLockReasonText(string reason)
+    {
+        return reason switch
+        {
+            "Full" => "Full capacity",
+            "Departed" => "Departure reached",
+            "Manual" => "Locked by admin",
+            _ => reason
         };
     }
 

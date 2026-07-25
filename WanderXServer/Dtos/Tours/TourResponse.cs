@@ -30,6 +30,8 @@ public class TourResponse
 
     public string Status { get; set; } = string.Empty;
 
+    public string? LockReason { get; set; }
+
     public string ImageUrl { get; set; } = string.Empty;
 
     public string Description { get; set; } = string.Empty;

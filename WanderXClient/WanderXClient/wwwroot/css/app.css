@@ -2229,6 +2229,11 @@ button {
     color: var(--wx-secondary);
 }
 
+.guide-status--danger {
+    background: #ffdad6;
+    color: var(--wx-danger);
+}
+
 .guide-status--muted {
     background: var(--wx-surface-high);
     color: var(--wx-outline-strong);
