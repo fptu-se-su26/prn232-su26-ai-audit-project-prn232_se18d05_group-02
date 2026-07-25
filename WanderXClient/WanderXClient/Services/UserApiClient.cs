@@ -309,6 +309,13 @@ public sealed class UserApiClient
         }
     }
 
+    public Task<AdminUserPage?> GetAdminUsersAsync(string keyword,string role,string status,bool? phoneVerified,int page=1)=>GetAsync<AdminUserPage>($"api/admin/users?Keyword={Uri.EscapeDataString(keyword)}&Role={Uri.EscapeDataString(role)}&Status={Uri.EscapeDataString(status)}&PhoneVerified={phoneVerified}&Page={page}&PageSize=10");
+    public Task<AdminUserDetail?> GetAdminUserAsync(Guid id)=>GetAsync<AdminUserDetail>($"api/admin/users/{id}");
+    public Task<AdminUserDetail?> ChangeUserRoleAsync(Guid id,ChangeRoleRequest r)=>PutAsync<ChangeRoleRequest,AdminUserDetail>($"api/admin/users/{id}/roles",r);
+    public Task<AdminUserDetail?> LockUserAsync(Guid id,LockUserRequest r)=>PostAsync<LockUserRequest,AdminUserDetail>($"api/admin/users/{id}/lock",r);
+    public Task<AdminUserDetail?> UnlockUserAsync(Guid id,UnlockUserRequest r)=>PostAsync<UnlockUserRequest,AdminUserDetail>($"api/admin/users/{id}/unlock",r);
+    public Task<SendPhoneOtpResponse?> SendPhoneOtpAsync(SendPhoneOtpRequest r)=>PostAsync<SendPhoneOtpRequest,SendPhoneOtpResponse>("api/auth/phone/send-otp",r);
+    public Task<object?> VerifyPhoneOtpAsync(VerifyPhoneOtpRequest r)=>PostAsync<VerifyPhoneOtpRequest,object>("api/auth/phone/verify-otp",r);
     public Task<DashboardSummary?> GetDashboardSummaryAsync(DashboardFilter filter) => GetAsync<DashboardSummary>($"api/admin/dashboard/summary?{BuildDashboardQuery(filter)}");
     public Task<List<BookingStatusPoint>?> GetDashboardBookingsAsync(DashboardFilter filter) => GetAsync<List<BookingStatusPoint>>($"api/admin/dashboard/bookings-by-status?{BuildDashboardQuery(filter)}");
     public Task<RevenueByTourPage?> GetDashboardRevenueAsync(DashboardFilter filter) => GetAsync<RevenueByTourPage>($"api/admin/dashboard/revenue-by-tour?{BuildDashboardQuery(filter)}");

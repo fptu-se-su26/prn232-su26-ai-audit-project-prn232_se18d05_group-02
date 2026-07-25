@@ -62,6 +62,7 @@ Sinh viên/nhóm cần ghi lại:
 | 8 | 24/07/2026 | OpenAI Codex / ChatGPT | Review và hoàn thiện Travel Style Quiz | Đối chiếu M5-F01, sửa authorization, validation, Guid contract và đồng bộ UI | Backend/client build thành công, xác định phần còn thiếu và phạm vi commit | Có | PROMPTS.md - Prompt-08 |
 | 9 | 24/07/2026 | OpenAI Codex / ChatGPT | Triển khai gợi ý tour theo nhu cầu | Phân tích M5-F02, thiết kế rule-based scoring, filter, random và UI dùng dữ liệu dự án | Hoàn thiện API/service/Blazor UI, cấu hình trọng số và build solution thành công | Có | PROMPTS.md - Prompt-09 |
 | 10 | 24/07/2026 | OpenAI Codex / ChatGPT | Triển khai Dashboard thống kê | Đối chiếu M5-F03, xây KPI, doanh thu, booking series, top guide và UI theo dữ liệu thật | Hoàn thiện 4 API, policy DASHBOARD_VIEW, dashboard widget độc lập và build thành công | Có | PROMPTS.md - Prompt-10 |
+| 11 | 25/07/2026 | OpenAI Codex / ChatGPT | Quản lý tài khoản, RBAC và phone OTP | Đối chiếu M5-F04, triển khai policy, role/lock, audit, token revocation, OTP hash và UI | Backend/client build thành công; SMS provider cần adapter và credential khi tích hợp | Có | PROMPTS.md - Prompt-11 |
 
 ---
 
@@ -1199,6 +1200,49 @@ Chạy dotnet build WanderX.slnx --no-restore: build thành công, 0 error; 2 nu
 | Backend | DashboardController.cs, DashboardService.cs, DashboardContracts.cs, Program.cs |
 | Frontend | AdminDashboard.razor, DashboardContracts.cs, UserApiClient.cs |
 | Audit liên quan | AI_AUDIT_LOG.md - Lần sử dụng AI số 10 |
+
+---
+### Prompt-11
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 25/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục tiêu | Triển khai M5-F04 quản lý tài khoản, phân quyền và xác minh số điện thoại |
+| Loại prompt | Security / RBAC / Database / Backend / Frontend / Testing |
+
+#### 5.1. Prompt nguyên văn
+
+```text
+Làm chức năng cuối cùng thành viên 5: quản lý tài khoản và phân quyền. Phải tuân thủ requirement M5-F04, rule cũ, layout và kiến trúc chuẩn của dự án; phần làm được chỉnh trực tiếp, phần cần provider hoặc thành viên khác phải hướng dẫn rõ.
+```
+
+#### 5.2. Kết quả đã áp dụng
+
+```text
+Giữ mô hình một role chính hiện có; thêm policy USER_MANAGE, ROLE_ASSIGN và USER_LOCK; API danh sách/chi tiết/đổi role/khóa/mở khóa; bảo vệ Admin cuối cùng, self-lock và GuideProfile prerequisite; transaction audit; TokenVersion thu hồi JWT; OTP 6 số sinh bằng CSPRNG, chỉ lưu SHA-256 hash có secret, fixed-time compare, expiry, cooldown, max attempts; UI /admin/users và /account/verify-phone.
+```
+
+#### 5.3. Điều chỉnh và giới hạn
+
+```text
+Dự án không dùng ASP.NET Identity đầy đủ và chưa có provider SMS/credential. ISmsSender được tách interface với UnconfiguredSmsSender trả SMS_PROVIDER_ERROR, không log/return OTP. Khi nhóm chọn Twilio/Viettel/FPT chỉ cần thay adapter DI. dotnet-ef chưa cài trên máy nên migration được viết thủ công theo pattern repo và có bootstrap SQL idempotent cho database local.
+```
+
+#### 5.4. Kiểm chứng
+
+```text
+Build WanderX.slnx thành công, 0 error. Kiểm tra response không chứa PasswordHash, OTP hash hoặc plain OTP; JWT cũ bị từ chối sau role/lock; Customer/Guide/Staff bị policy chặn API admin.
+```
+
+| Minh chứng | Nội dung |
+|---|---|
+| Backend | AccountManagementController.cs, AccountManagementService.cs, AccountAuditLog.cs, PhoneVerification.cs, Program.cs, AuthService.cs |
+| Frontend | AdminUsers.razor, VerifyPhone.razor, AccountManagementContracts.cs, UserApiClient.cs, AdminNavbar.razor |
+| Database | 20260725090000_AddAccountRbacAuditAndPhoneOtp.cs |
+| Audit | AI_AUDIT_LOG.md - Lần sử dụng AI số 11 |
 
 ---
 ## 6. Prompt quan trọng nhất

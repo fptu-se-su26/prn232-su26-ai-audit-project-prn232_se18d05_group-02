@@ -1167,6 +1167,42 @@ Chưa có permission table, Payment entity, audit tiến độ, khiếu nại ho
 | Kết quả build | Thành công, 0 error; 2 warning cũ ngoài phạm vi |
 
 ---
+### Lần sử dụng AI số 11
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 25/07/2026 |
+| Người thực hiện | Nguyễn Lê Huy Hùng |
+| MSSV | DE180118 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục đích sử dụng | Triển khai M5-F04 Account Management, RBAC và Phone OTP |
+| Phần việc liên quan | Authorization / User management / Audit / Token revocation / OTP / UI |
+| Mức độ sử dụng | Hỗ trợ một phần |
+
+#### 4.1. Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-11
+```
+
+#### 4.2. Phần sử dụng và tự điều chỉnh
+
+```text
+Áp dụng policy permission trên mô hình role đơn hiện có, quản lý user có phân trang/filter, đổi role và lock/unlock có audit transaction, bảo vệ Admin cuối cùng, token version, OTP hash/cooldown/max attempts và hai UI theo layout WanderX. Không thay thế authentication stack hay tạo multi-role làm vỡ contract hiện tại.
+```
+
+#### 4.3. Giới hạn phụ thuộc ngoài
+
+```text
+Chưa có SMS provider và credential nên adapter mặc định trả SMS_PROVIDER_ERROR; không log hoặc trả OTP để tránh vi phạm bảo mật. Cần nhóm chọn provider rồi cài adapter ISmsSender. Migration được viết thủ công vì môi trường thiếu dotnet-ef.
+```
+
+| Minh chứng | Nội dung |
+|---|---|
+| File | AccountManagementService.cs; AccountManagementController.cs; AdminUsers.razor; VerifyPhone.razor; migration AddAccountRbacAuditAndPhoneOtp |
+| Build | WanderX.slnx build thành công, 0 error |
+
+---
 ## 5. Bảng tổng hợp mức độ sử dụng AI
 
 Đánh dấu mức độ AI hỗ trợ ở từng hạng mục.
