@@ -25,7 +25,7 @@ Nguyên tắc ghi changelog:
 | Học kỳ | SU26 |
 | Tên bài tập / Project | Group Project - WanderX Tour Management System |
 | Tên sinh viên / Nhóm | Group 2 |
-| MSSV / Danh sách MSSV | DE180158, DE180166 |
+| MSSV / Danh sách MSSV | DE180158, DE180166, DE180127 |
 | Giảng viên hướng dẫn | Lê Thiện Nhật Quang |
 | Repository URL | https://github.com/group-02/wanderx-tour-management |
 | Ngày bắt đầu | 17/05/2026 |
@@ -402,13 +402,13 @@ Võ Quang Đăng Khoa – DE180127 (Thành viên 3)
 
 ### Feature 3: Quản lý yêu cầu đặc biệt của khách
 - [X] Trang ServiceUserRequest.razor – khách tạo yêu cầu dịch vụ đi kèm cho booking
-- [X] Xem danh sách yêu cầu của mình với phân trang
+- [X] Xem danh sách yêu cầu với phân trang
 - [X] Trang AdminServiceRequests.razor – Admin xem tất cả booking có yêu cầu dịch vụ
 - [X] Drill-down: bấm vào booking → xem danh sách người yêu cầu → bấm vào người → xem chi tiết từng dịch vụ
 - [X] Admin duyệt hoặc từ chối từng yêu cầu kèm lý do
 
 ### Feature 4: Đánh giá và nhận xét tour
-- [X] Trang TourReview.razor – khách đánh giá (1–5 sao + nhận xét văn bản) sau khi tour hoàn thành
+- [X] Trang TourReview.razor – khách đánh giá (1–5 sao và nhận xét văn bản) sau khi tour hoàn thành
 - [X] Chỉ cho phép đánh giá khi booking có trạng thái CompletedAt (tiến trình 4 hoàn thành)
 - [X] Mỗi booking chỉ được tạo 1 đánh giá; khách có thể chỉnh sửa hoặc xóa đánh giá của mình
 - [X] Trang AdminTourReviews.razor – Admin xem danh sách tất cả đánh giá, duyệt Visible/Hidden/Deleted và ghi lý do

@@ -10,7 +10,7 @@
 | Học kỳ                  | SU26                                                                |
 | Tên bài tập / Project   | Group Project                                                       |
 | Tên sinh viên / Nhóm    | Group 2                                                             |
-| MSSV / Danh sách MSSV   | DE180158, DE180166                                                  |
+| MSSV / Danh sách MSSV   | DE180158, DE180166, DE1280127                                       |
 | Giảng viên hướng dẫn    | Lê Thiện Nhật Quang                                                 |
 | Ngày bắt đầu            | 2026-05-18                                                          |
 | Ngày hoàn thành         |                                                                     |
@@ -883,7 +883,7 @@ AI được dùng như công cụ hỗ trợ phân tích, code, debug và rà so
 #### 5.1. Prompt nguyên văn
 
 ```text
-Tôi là thành viên 3, hãy làm các feature của tôi theo yêu cầu dưới đây, bám sát cấu trúc của project WanderX:
+Hướng dẫn feature của tôi theo yêu cầu dưới đây, bám sát cấu trúc của project WanderX:
 
 Feature 1: Quản lý hồ sơ khách hàng
 - Khách hàng xem thông tin cá nhân
@@ -909,7 +909,7 @@ Yêu cầu thêm:
 - Phân trang số trang bấm được cho MyBookings, ServiceUserRequest, AdminServiceRequests
 - Đánh giá tour: 1-5 sao bằng click icon, có nhận xét văn bản
 - Admin duyệt đánh giá: Visible/Hidden/Deleted kèm lý do
-- Sửa lỗi: URL sai api/tour_review → api/tourreviews, 204 NoContent khi chưa có review, hiển thị lỗi rõ ràng thay vì catch im lặng
+- Sửa lỗi: 204 NoContent khi chưa có review, hiển thị lỗi rõ ràng thay vì catch im lặng
 ```
 
 #### 5.2. Bối cảnh khi viết prompt
@@ -918,11 +918,10 @@ Yêu cầu thêm:
 Thành viên 3 phụ trách luồng Customer Management trong project WanderX (Blazor WASM + ASP.NET Core). Project đã có sẵn cấu trúc backend, database schema, và Blazor frontend. Yêu cầu là tận dụng cấu trúc sẵn có, không tạo bảng mới ngoài phạm vi, và đảm bảo UI đồng nhất với các trang khác trong WanderX.
 
 Sau khi implement xong phần cơ bản, phát sinh nhiều lỗi runtime khó debug:
-1. Blazor WASM cache cũ gọi sai URL (api/tour_review thay vì api/tourreviews).
-2. API GetByBookingId trả Ok(null) → client JsonException khi parse.
-3. catch(Exception){} im lặng → UI không hiện lỗi.
-4. Closure bug trong @for star rating.
-5. Lỗi No DefaultChallengeScheme khi dùng [Authorize] nhưng JWT chưa cấu hình.
+1. API GetByBookingId trả Ok(null) → client JsonException khi parse.
+2. catch(Exception){} im lặng → UI không hiện lỗi.
+3. Closure bug trong @for star rating.
+4. Lỗi No DefaultChallengeScheme khi dùng [Authorize] nhưng JWT chưa cấu hình.
 ```
 
 #### 5.3. Kết quả AI trả về
@@ -950,7 +949,7 @@ AI (Antigravity) hỗ trợ triển khai toàn bộ 4 feature:
    - Mỗi booking 1 review; khách sửa hoặc xóa được.
    - Admin xem tất cả review, moderate Visible/Hidden/Deleted kèm lý do.
    - TourReviewsController: explicit route, 204 NoContent khi chưa có review.
-   - TourReviewService: validate bằng tiếng Việt.
+   - TourReviewService: validate bằng tiếng Anh.
 
 5. Debug:
    - UserApiClient.GetReviewByBookingIdAsync: xử lý 204 riêng thay vì dùng GetAsync<> chung.

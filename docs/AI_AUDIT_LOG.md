@@ -1078,7 +1078,7 @@ AI đối chiếu mã nguồn Travel Style Quiz với requirement M5-F01 và b�
 #### 4.6. Nhận xét cá nhân/nhóm
 
 ```text
-Qua lần sử dụng AI này, em nhận thấy việc sinh code chỉ là một phần nhỏ; bước quan trọng hơn là đối chiếu code với requirement và kiểm tra các ranh giới bảo mật.
+Qua lần sử dụng AI này, em nhận thấy việc sinh code chỉ là một phần; bước quan trọng hơn là đối chiếu code với requirement và kiểm tra các ranh giới bảo mật.
 
 AI giúp phát hiện nhanh việc dùng email từ client và DisplayOrder làm định danh, nhưng em vẫn phải kiểm tra lại kiến trúc JWT, DTO, DbContext và UI hiện có trước khi áp dụng. Em đã chủ động giữ luồng Guest xem câu hỏi, Customer lưu kết quả và Admin quản lý cấu hình theo đúng vai trò của hệ thống.
 
