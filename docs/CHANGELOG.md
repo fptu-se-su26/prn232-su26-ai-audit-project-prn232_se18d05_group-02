@@ -680,3 +680,99 @@ Sinh viên/nhóm cam kết rằng nội dung changelog phản ánh đúng các t
 | Đại diện sinh viên/nhóm | Ngày xác nhận |
 |---|---|
 |  |  |
+
+---
+
+# [Phase 04.4] Implementation - Member 1 Tour Management
+
+## Ngày thực hiện
+
+```text
+26/07/2026
+```
+
+## Người thực hiện
+
+```text
+Huỳnh Phúc Tấn - DE180161
+```
+
+## Đã hoàn thành
+
+### Feature 1: Quản lý thông tin tour / D01
+- [X] Tạo tour mới
+- [X] Cập nhật thông tin tour
+- [X] Khóa tour khi hết chỗ
+- [X] Cho phép khóa tour thủ công dù chưa hết chỗ
+- [X] Tự động khóa tour khi đã tới ngày khởi hành
+
+### Feature 2: Quản lý lịch trình tour / D02
+- [X] Thêm lịch trình theo từng ngày
+- [X] Chỉnh sửa nội dung lịch trình
+- [X] Thay đổi thứ tự lịch trình
+- [X] Hiển thị lịch trình theo dạng weekly schedule
+- [X] Fix lỗi chữ dài bị tràn khỏi thẻ lịch trình
+
+### Feature 3: Quản lý giá tour
+- [X] Thiết lập giá cơ bản
+- [X] Thiết lập giá theo mùa
+- [X] Thiết lập giảm giá / khuyến mãi
+
+### Feature 4: Quản lý danh sách tour
+- [X] Xem danh sách các tour đang được book dạng schedule/table
+- [X] Xóa hoặc ẩn tour khi tour chưa bị book
+- [X] Tìm kiếm / lọc tour theo trạng thái
+- [X] Tìm kiếm / lọc tour theo điểm đến
+- [X] Tìm kiếm / lọc tour theo ngày khởi hành
+
+## Thay đổi chi tiết
+
+| STT | Nội dung thay đổi | Người thực hiện | File/Module liên quan | Minh chứng |
+|---:|---|---|---|---|
+| 1 | Implement CRUD tour: tạo mới, cập nhật thông tin, validate dữ liệu tour | Huỳnh Phúc Tấn - DE180161 | WanderXServer/Controllers/ToursController.cs; WanderXServer/Services/TourService.cs; WanderXClient/WanderXClient/Pages/AdminTours.razor | Test tạo/sửa tour trên màn Admin Tours |
+| 2 | Bổ sung trạng thái Locked và logic khóa tour thủ công/tự động khi hết chỗ hoặc tới ngày khởi hành | Huỳnh Phúc Tấn - DE180161 | WanderXServer/BusinessObject/Tour.cs; WanderXServer/Services/TourService.cs; WanderXServer/Services/BookingService.cs | Test lock/unlock và kiểm tra capacity |
+| 3 | Implement quản lý lịch trình theo từng ngày, sửa nội dung, đổi thứ tự up/down | Huỳnh Phúc Tấn - DE180161 | WanderXServer/Controllers/TourSchedulesController.cs; WanderXServer/Services/TourScheduleService.cs; WanderXClient/WanderXClient/Pages/AdminTourSchedules.razor | Test thêm/sửa/move lịch trình |
+| 4 | Implement quản lý giá tour gồm giá cơ bản, giá theo mùa, khuyến mãi/giảm giá | Huỳnh Phúc Tấn - DE180161 | WanderXServer/Controllers/TourPricingController.cs; WanderXServer/Services/TourPricingService.cs; WanderXClient/WanderXClient/Pages/AdminTourPricing.razor | Test tạo season price và promotion |
+| 5 | Implement danh sách booked tour dạng schedule/table và filter theo trạng thái, điểm đến, ngày khởi hành | Huỳnh Phúc Tấn - DE180161 | WanderXServer/Controllers/BookedToursController.cs; WanderXServer/Services/BookedTourService.cs; WanderXClient/WanderXClient/Pages/AdminBookedTours.razor | Test filter danh sách tour đang được book |
+| 6 | Fix lỗi UI thẻ lịch trình bị tràn chữ khi nhập chuỗi dài | Huỳnh Phúc Tấn - DE180161 | WanderXClient/WanderXClient/wwwroot/css/app.css; WanderXClient/WanderXClient/Pages/AdminTourSchedules.razor | Test chuỗi dài tự xuống dòng trong card |
+
+## AI có hỗ trợ không?
+
+- [X] Có
+- [ ] Không
+
+Nếu có, mô tả AI đã hỗ trợ phần nào:
+
+```text
+OpenAI Codex / ChatGPT hỗ trợ:
+1. Review gap giữa requirement Member 1 và code hiện có.
+2. Đề xuất logic khóa tour tự động theo capacity, booking count và ngày khởi hành.
+3. Hỗ trợ triển khai API/service cho tour, schedule, pricing và booked tour filters.
+4. Hỗ trợ debug UI Blazor, đặc biệt lỗi schedule card bị tràn chữ.
+5. Hỗ trợ kiểm tra build backend/frontend và đề xuất nội dung commit.
+
+Chi tiết trong PROMPTS.md - Prompt-12 và AI_AUDIT_LOG.md - Lần sử dụng AI số 12.
+```
+
+## Commit/Screenshot minh chứng
+
+```text
+Files liên quan:
+- WanderXServer/Controllers/ToursController.cs
+- WanderXServer/Controllers/TourSchedulesController.cs
+- WanderXServer/Controllers/TourPricingController.cs
+- WanderXServer/Controllers/BookedToursController.cs
+- WanderXServer/Services/TourService.cs
+- WanderXServer/Services/TourScheduleService.cs
+- WanderXServer/Services/TourPricingService.cs
+- WanderXServer/Services/BookedTourService.cs
+- WanderXClient/WanderXClient/Pages/AdminTours.razor
+- WanderXClient/WanderXClient/Pages/AdminTourSchedules.razor
+- WanderXClient/WanderXClient/Pages/AdminTourPricing.razor
+- WanderXClient/WanderXClient/Pages/AdminBookedTours.razor
+- WanderXClient/WanderXClient/wwwroot/css/app.css
+
+Kết quả kiểm tra:
+- Build backend/frontend thành công.
+- Test thủ công tạo/sửa/khóa tour, thêm/sửa/đổi thứ tự lịch trình, thiết lập giá và lọc danh sách tour.
+```
