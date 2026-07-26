@@ -68,13 +68,6 @@
 
         <AuthStatusMessage Message="@_message" IsError="@_isError" />
 
-        @if (!string.IsNullOrWhiteSpace(_verificationCode))
-        {
-            <div class="auth-alert auth-alert--success">
-                Development OTP: @_verificationCode
-            </div>
-        }
-
         <p class="auth-note">
             Already have an account?
             <a class="auth-link" href="/login">Sign In</a>
@@ -87,27 +80,21 @@
     private bool _isBusy;
     private bool _isError;
     private string? _message;
-    private string? _verificationCode;
 
     private async Task SubmitAsync()
     {
         _isBusy = true;
         _message = null;
-        _verificationCode = null;
         _isError = false;
 
         try
         {
             var response = await AuthApi.RegisterAsync(_model);
-            _verificationCode = response?.VerificationCode;
-            _message = response?.Message ?? "Account created. Check your phone for the verification code.";
+            _message = response?.Message ?? "Registration OTP sent to your email. Enter the code to create your account.";
 
             if (response is not null)
             {
-                var code = string.IsNullOrWhiteSpace(response.VerificationCode)
-                    ? string.Empty
-                    : $"&code={Uri.EscapeDataString(response.VerificationCode)}";
-                Navigation.NavigateTo($"/verify-account?email={Uri.EscapeDataString(response.Email)}{code}");
+                Navigation.NavigateTo($"/verify-account?email={Uri.EscapeDataString(response.Email)}");
             }
         }
         catch (Exception ex)

@@ -15,6 +15,8 @@ public class WanderXDbContext : DbContext
 
     public DbSet<AuthVerificationCode> VerificationCodes => Set<AuthVerificationCode>();
 
+    public DbSet<PendingRegistration> PendingRegistrations => Set<PendingRegistration>();
+
     public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
     public DbSet<AccountAuditLog> AccountAuditLogs => Set<AccountAuditLog>();
     public DbSet<PhoneVerification> PhoneVerifications => Set<PhoneVerification>();
@@ -282,6 +284,11 @@ IF OBJECT_ID(N'[PhoneVerifications]', N'U') IS NULL
 BEGIN
  CREATE TABLE [PhoneVerifications]([Id] uniqueidentifier NOT NULL PRIMARY KEY,[UserId] uniqueidentifier NOT NULL,[PhoneNumber] nvarchar(20) NOT NULL,[OtpHash] nvarchar(128) NOT NULL,[ExpiresAt] datetime2 NOT NULL,[AttemptCount] int NOT NULL,[MaxAttempts] int NOT NULL,[SentCount] int NOT NULL,[LastSentAt] datetime2 NOT NULL,[Status] nvarchar(20) NOT NULL,[ProviderMessageId] nvarchar(120) NULL,[CreatedAt] datetime2 NOT NULL,[VerifiedAt] datetime2 NULL);
  CREATE INDEX [IX_PhoneVerifications_UserId_PhoneNumber_CreatedAt] ON [PhoneVerifications]([UserId],[PhoneNumber],[CreatedAt]);
+END;
+IF OBJECT_ID(N'[PendingRegistrations]', N'U') IS NULL
+BEGIN
+ CREATE TABLE [PendingRegistrations]([Id] uniqueidentifier NOT NULL PRIMARY KEY,[FullName] nvarchar(120) NOT NULL,[Email] nvarchar(256) NOT NULL,[NormalizedEmail] nvarchar(256) NOT NULL,[PhoneNumber] nvarchar(32) NOT NULL,[PasswordHash] nvarchar(max) NOT NULL,[Code] nvarchar(6) NOT NULL,[ExpiresAt] datetime2 NOT NULL,[CreatedAt] datetime2 NOT NULL,[ConsumedAt] datetime2 NULL);
+ CREATE INDEX [IX_PendingRegistrations_NormalizedEmail_CreatedAt] ON [PendingRegistrations]([NormalizedEmail],[CreatedAt]);
 END;
 """);
     }
