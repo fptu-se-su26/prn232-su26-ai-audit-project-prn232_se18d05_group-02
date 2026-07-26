@@ -192,7 +192,6 @@ else if (_profile != null)
     private TravelStyleQuizResultResponse? _latestQuiz;
     private UpdateProfileRequest _updateModel = new();
     private string _avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200";
-    private const string AvatarLocalStorageKey = "wanderx.user.avatar";
 
     
     protected override async Task OnInitializedAsync()
@@ -214,7 +213,7 @@ else if (_profile != null)
                 _updateModel.PhoneNumber = _profile.PhoneNumber;
                 _updateModel.Address = _profile.Address;
 
-                var savedAvatar = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", AvatarLocalStorageKey);
+                var savedAvatar = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", $"avatar_{_session.Email}");
                 if (!string.IsNullOrWhiteSpace(savedAvatar))
                 {
                     _avatarUrl = savedAvatar;
@@ -302,8 +301,8 @@ else if (_profile != null)
                 
                 _avatarUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
 
-                await JSRuntime.InvokeVoidAsync("localStorage.setItem", AvatarLocalStorageKey, _avatarUrl);
-                
+                await JSRuntime.InvokeVoidAsync("localStorage.setItem", $"avatar_{_session?.Email}", _avatarUrl);
+                SessionService.NotifyAvatarChanged();
                 
                 _successMessage = "Profile photo updated (preview)!";
             }

@@ -1,0 +1,14 @@
+@page "/auth/google-callback"
+@using System.Text
+@using System.Text.Json
+@using WanderXClient.Models
+@using WanderXClient.Services
+@inject NavigationManager Navigation
+@inject AuthSessionService Session
+<PageTitle>Google Sign-In - WanderX</PageTitle>
+<main class="oauth-state"><section><h1>Đang hoàn tất đăng nhập Google</h1><p>@_message</p></section></main>
+<style>.oauth-state{min-height:100vh;display:grid;place-items:center;background:#f8fafc}.oauth-state section{padding:32px;border:1px solid #e2e8f0;border-radius:18px;background:white;text-align:center}</style>
+@code{
+ private string _message="Vui lòng chờ...";
+ protected override async Task OnAfterRenderAsync(bool firstRender){if(!firstRender)return;try{var uri=new Uri(Navigation.Uri);var fragment=uri.Fragment.TrimStart('#');var values=fragment.Split('&',StringSplitOptions.RemoveEmptyEntries).Select(x=>x.Split('=',2)).Where(x=>x.Length==2).ToDictionary(x=>x[0],x=>Uri.UnescapeDataString(x[1]));if(!values.TryGetValue("result",out var encoded))throw new InvalidOperationException("Google callback không có session.");var normalized=encoded.Replace('-','+').Replace('_','/');normalized=normalized.PadRight(normalized.Length+(4-normalized.Length%4)%4,'=');var response=JsonSerializer.Deserialize<AuthResponse>(Encoding.UTF8.GetString(Convert.FromBase64String(normalized)),new JsonSerializerOptions{PropertyNameCaseInsensitive=true})??throw new InvalidOperationException("Session Google không hợp lệ.");await Session.SaveAsync(response,true);var target=values.GetValueOrDefault("returnUrl","/");Navigation.NavigateTo(target.StartsWith('/')&&!target.StartsWith("//")?target:"/");}catch(Exception e){_message=e.Message;StateHasChanged();}}
+}

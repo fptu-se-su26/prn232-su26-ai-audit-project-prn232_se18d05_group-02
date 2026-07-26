@@ -8,6 +8,8 @@ public interface IAuthService
 
     Task<AuthResponse> LoginAsync(LoginRequest request);
 
+    Task<AuthResponse> GoogleLoginAsync(string email, string fullName);
+
     Task<MessageResponse> ForgotPasswordAsync(ForgotPasswordRequest request);
 
     Task<MessageResponse> VerifyPhoneAsync(VerifyPhoneRequest request);

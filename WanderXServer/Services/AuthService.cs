@@ -77,6 +77,33 @@ public class AuthService : IAuthService
         return CreateAuthResponse(user, "Signed in successfully.");
     }
 
+    public async Task<AuthResponse> GoogleLoginAsync(string email, string fullName)
+    {
+        var normalizedEmail = NormalizeEmail(email);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(item => item.NormalizedEmail == normalizedEmail);
+        if (user is null)
+        {
+            user = new ApplicationUser
+            {
+                FullName = string.IsNullOrWhiteSpace(fullName) ? email.Split('@')[0] : fullName.Trim(),
+                Email = email.Trim(),
+                NormalizedEmail = normalizedEmail,
+                PhoneNumber = string.Empty,
+                Role = UserRole.Customer,
+                IsEmailConfirmed = true,
+                IsPhoneConfirmed = false,
+                AccountStatus = "Active"
+            };
+            user.PasswordHash = _passwordHasher.HashPassword(user, Convert.ToHexString(RandomNumberGenerator.GetBytes(32)));
+            _dbContext.Users.Add(user);
+        }
+        if (user.AccountStatus == "Inactive" || (user.AccountStatus == "Locked" && (!user.LockoutEnd.HasValue || user.LockoutEnd > DateTime.UtcNow)))
+            throw new InvalidOperationException("ACCOUNT_LOCKED");
+        user.IsEmailConfirmed = true;
+        user.LastLoginAt = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync();
+        return CreateAuthResponse(user, "Signed in with Google successfully.");
+    }
     public async Task<MessageResponse> ForgotPasswordAsync(ForgotPasswordRequest request)
     {
         var normalizedEmail = NormalizeEmail(request.Email);
