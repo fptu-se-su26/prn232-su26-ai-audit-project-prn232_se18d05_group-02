@@ -1,3 +1,4 @@
+@implements IDisposable
 @inject AuthSessionService AuthSession
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
@@ -155,14 +156,35 @@
         {
             try 
             {
-                var savedAvatar = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"avatar_{_session.Email}");
-                if (!string.IsNullOrEmpty(savedAvatar))
-                {
-                    _avatarUrl = savedAvatar;
-                }
+                await LoadAvatarAsync();
             } 
             catch { }
         }
+
+        AuthSession.OnAvatarChanged += HandleAvatarChanged;
+    }
+
+    private async Task LoadAvatarAsync()
+    {
+        if (_session != null)
+        {
+            var savedAvatar = await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"avatar_{_session.Email}");
+            if (!string.IsNullOrEmpty(savedAvatar))
+            {
+                _avatarUrl = savedAvatar;
+            }
+        }
+    }
+
+    private async void HandleAvatarChanged()
+    {
+        await LoadAvatarAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthSession.OnAvatarChanged -= HandleAvatarChanged;
     }
 
     private void ToggleDrawer()
