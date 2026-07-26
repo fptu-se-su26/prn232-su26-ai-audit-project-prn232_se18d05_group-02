@@ -883,7 +883,7 @@ AI được dùng như công cụ hỗ trợ phân tích, code, debug và rà so
 #### 5.1. Prompt nguyên văn
 
 ```text
-Hãy làm các feature của tôi theo yêu cầu dưới đây, bám sát cấu trúc của project WanderX:
+Hướng dẫn feature của tôi theo yêu cầu dưới đây, bám sát cấu trúc của project WanderX:
 
 Feature 1: Quản lý hồ sơ khách hàng
 - Khách hàng xem thông tin cá nhân
