@@ -1,0 +1,517 @@
+@page "/admin/tour-pricing"
+@layout AdminLayout
+@inject TourApiClient TourApi
+@inject TourPricingApiClient PricingApi
+
+<PageTitle>Tour Pricing - WanderX</PageTitle>
+
+<header class="guide-topbar">
+    <div>
+        <p class="guide-eyebrow">Tour Revenue</p>
+        <h1>Tour Pricing</h1>
+        <p class="guide-subtitle">Manage base prices, seasonal prices, and promotions for tour packages.</p>
+    </div>
+</header>
+
+<section class="guide-content">
+    @if (!string.IsNullOrWhiteSpace(_message))
+    {
+        <div class="@(_isError ? "guide-alert guide-alert--error" : "guide-alert guide-alert--success")">
+            @_message
+        </div>
+    }
+
+    <section class="pricing-toolbar">
+        <label class="pricing-field">
+            <span>Tour</span>
+            <select value="@_selectedTourId" @onchange="OnTourChanged">
+                @foreach (var tour in _tours)
+                {
+                    <option value="@tour.Id">@tour.Code - @tour.Name</option>
+                }
+            </select>
+        </label>
+
+        <label class="pricing-field">
+            <span>Preview date</span>
+            <input type="date" value="@PreviewDateValue" @onchange="OnPreviewDateChanged" />
+        </label>
+    </section>
+
+    @if (_isLoading)
+    {
+        <div class="guide-empty">
+            <MaterialIcon Name="sync" />
+            Loading pricing setup...
+        </div>
+    }
+    else if (_pricing is not null)
+    {
+        <div class="guide-stat-grid">
+            <article class="guide-stat">
+                <p>Base Price</p>
+                <strong>@_pricing.BasePrice.ToString("C0")</strong>
+                <span>@_pricing.TourCode</span>
+            </article>
+            <article class="guide-stat guide-stat--secondary">
+                <p>Effective Price</p>
+                <strong>@_pricing.EffectivePrice.ToString("C0")</strong>
+                <span>@_pricing.PreviewDate.ToString("dd/MM/yyyy")</span>
+            </article>
+            <article class="guide-stat guide-stat--tertiary">
+                <p>Discount</p>
+                <strong>@_pricing.DiscountAmount.ToString("C0")</strong>
+                <span>@(_pricing.AppliedPromotionName ?? "No active promo")</span>
+            </article>
+            <article class="guide-stat">
+                <p>Season</p>
+                <strong>@(_pricing.AppliedSeasonName ?? "Base")</strong>
+                <span>@_pricing.Destination</span>
+            </article>
+        </div>
+
+        <div class="pricing-layout">
+            <section class="guide-table-shell pricing-panel">
+                <div class="guide-table-toolbar">
+                    <div>
+                        <strong>Seasonal Prices</strong>
+                        <p>@_pricing.SeasonPrices.Count season rule(s)</p>
+                    </div>
+                    <button class="wx-button wx-button--outline" type="button" @onclick="NewSeason">
+                        <MaterialIcon Name="add" />
+                        Add Season
+                    </button>
+                </div>
+
+                @if (_seasonFormOpen)
+                {
+                    <EditForm Model="@_seasonForm" OnValidSubmit="SaveSeasonAsync" class="pricing-form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="pricing-form-grid">
+                            <label>
+                                <span>Season name</span>
+                                <InputText @bind-Value="_seasonForm.SeasonName" />
+                            </label>
+                            <label>
+                                <span>Start</span>
+                                <InputDate @bind-Value="_seasonForm.StartDate" />
+                            </label>
+                            <label>
+                                <span>End</span>
+                                <InputDate @bind-Value="_seasonForm.EndDate" />
+                            </label>
+                            <label>
+                                <span>Price</span>
+                                <InputNumber @bind-Value="_seasonForm.Price" />
+                            </label>
+                            <label class="pricing-check">
+                                <InputCheckbox @bind-Value="_seasonForm.IsActive" />
+                                Active
+                            </label>
+                        </div>
+                        <div class="pricing-actions">
+                            <button class="wx-button" type="submit" disabled="@_isSaving">Save</button>
+                            <button class="wx-button wx-button--outline" type="button" @onclick="CloseSeasonForm">Cancel</button>
+                        </div>
+                    </EditForm>
+                }
+
+                <div class="guide-table-scroll">
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Season</th>
+                                <th>Date Range</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th class="guide-table__actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (_pricing.SeasonPrices.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="guide-empty guide-empty--compact">No seasonal prices yet.</div>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in _pricing.SeasonPrices)
+                                {
+                                    <tr>
+                                        <td><strong>@item.SeasonName</strong></td>
+                                        <td>@item.StartDate.ToString("dd/MM/yyyy") - @item.EndDate.ToString("dd/MM/yyyy")</td>
+                                        <td>@item.Price.ToString("C0")</td>
+                                        <td><span class="@GetActiveClass(item.IsActive)"><span></span>@(item.IsActive ? "Active" : "Off")</span></td>
+                                        <td class="guide-table__actions">
+                                            <button class="guide-icon-button" type="button" title="Edit" @onclick="() => EditSeason(item)">
+                                                <MaterialIcon Name="edit" />
+                                            </button>
+                                            <button class="guide-icon-button guide-icon-button--danger" type="button" title="Delete" @onclick="() => DeleteSeasonAsync(item.Id)">
+                                                <MaterialIcon Name="delete" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="guide-table-shell pricing-panel">
+                <div class="guide-table-toolbar">
+                    <div>
+                        <strong>Promotions</strong>
+                        <p>@_pricing.Promotions.Count promotion rule(s)</p>
+                    </div>
+                    <button class="wx-button wx-button--outline" type="button" @onclick="NewPromotion">
+                        <MaterialIcon Name="add" />
+                        Add Promotion
+                    </button>
+                </div>
+
+                @if (_promotionFormOpen)
+                {
+                    <EditForm Model="@_promotionForm" OnValidSubmit="SavePromotionAsync" class="pricing-form">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="pricing-form-grid">
+                            <label>
+                                <span>Name</span>
+                                <InputText @bind-Value="_promotionForm.Name" />
+                            </label>
+                            <label>
+                                <span>Type</span>
+                                <InputSelect @bind-Value="_promotionForm.DiscountType">
+                                    <option value="Percent">Percent</option>
+                                    <option value="Amount">Amount</option>
+                                </InputSelect>
+                            </label>
+                            <label>
+                                <span>Value</span>
+                                <InputNumber @bind-Value="_promotionForm.DiscountValue" />
+                            </label>
+                            <label>
+                                <span>Start</span>
+                                <InputDate @bind-Value="_promotionForm.StartDate" />
+                            </label>
+                            <label>
+                                <span>End</span>
+                                <InputDate @bind-Value="_promotionForm.EndDate" />
+                            </label>
+                            <label class="pricing-check">
+                                <InputCheckbox @bind-Value="_promotionForm.IsActive" />
+                                Active
+                            </label>
+                        </div>
+                        <div class="pricing-actions">
+                            <button class="wx-button" type="submit" disabled="@_isSaving">Save</button>
+                            <button class="wx-button wx-button--outline" type="button" @onclick="ClosePromotionForm">Cancel</button>
+                        </div>
+                    </EditForm>
+                }
+
+                <div class="guide-table-scroll">
+                    <table class="guide-table">
+                        <thead>
+                            <tr>
+                                <th>Promotion</th>
+                                <th>Discount</th>
+                                <th>Date Range</th>
+                                <th>Status</th>
+                                <th class="guide-table__actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (_pricing.Promotions.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="guide-empty guide-empty--compact">No promotions yet.</div>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in _pricing.Promotions)
+                                {
+                                    <tr>
+                                        <td><strong>@item.Name</strong></td>
+                                        <td>@FormatDiscount(item)</td>
+                                        <td>@item.StartDate.ToString("dd/MM/yyyy") - @item.EndDate.ToString("dd/MM/yyyy")</td>
+                                        <td><span class="@GetActiveClass(item.IsActive)"><span></span>@(item.IsActive ? "Active" : "Off")</span></td>
+                                        <td class="guide-table__actions">
+                                            <button class="guide-icon-button" type="button" title="Edit" @onclick="() => EditPromotion(item)">
+                                                <MaterialIcon Name="edit" />
+                                            </button>
+                                            <button class="guide-icon-button guide-icon-button--danger" type="button" title="Delete" @onclick="() => DeletePromotionAsync(item.Id)">
+                                                <MaterialIcon Name="delete" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    }
+</section>
+
+@code {
+    private List<TourResponse> _tours = new();
+    private TourPricingResponse? _pricing;
+    private Guid _selectedTourId;
+    private DateTime _previewDate = DateTime.Today;
+    private bool _isLoading = true;
+    private bool _isSaving;
+    private bool _isError;
+    private string? _message;
+
+    private bool _seasonFormOpen;
+    private Guid? _editingSeasonId;
+    private UpsertTourSeasonPriceRequest _seasonForm = new();
+
+    private bool _promotionFormOpen;
+    private Guid? _editingPromotionId;
+    private UpsertTourPromotionRequest _promotionForm = new();
+
+    private string PreviewDateValue => _previewDate.ToString("yyyy-MM-dd");
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadToursAsync();
+    }
+
+    private async Task LoadToursAsync()
+    {
+        _isLoading = true;
+        _message = null;
+
+        try
+        {
+            _tours = await TourApi.GetToursAsync();
+            _selectedTourId = _tours.FirstOrDefault()?.Id ?? Guid.Empty;
+
+            if (_selectedTourId != Guid.Empty)
+            {
+                await LoadPricingAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task LoadPricingAsync()
+    {
+        if (_selectedTourId == Guid.Empty)
+        {
+            return;
+        }
+
+        _pricing = await PricingApi.GetPricingAsync(_selectedTourId, _previewDate);
+    }
+
+    private async Task OnTourChanged(ChangeEventArgs args)
+    {
+        if (Guid.TryParse(args.Value?.ToString(), out var tourId))
+        {
+            _selectedTourId = tourId;
+            CloseSeasonForm();
+            ClosePromotionForm();
+            await LoadPricingAsync();
+        }
+    }
+
+    private async Task OnPreviewDateChanged(ChangeEventArgs args)
+    {
+        if (DateTime.TryParse(args.Value?.ToString(), out var date))
+        {
+            _previewDate = date.Date;
+            await LoadPricingAsync();
+        }
+    }
+
+    private void NewSeason()
+    {
+        _editingSeasonId = null;
+        _seasonForm = new UpsertTourSeasonPriceRequest
+        {
+            SeasonName = "Peak Season",
+            StartDate = DateTime.Today,
+            EndDate = DateTime.Today.AddDays(30),
+            Price = _pricing?.BasePrice ?? 1,
+            IsActive = true
+        };
+        _seasonFormOpen = true;
+    }
+
+    private void EditSeason(TourSeasonPriceResponse item)
+    {
+        _editingSeasonId = item.Id;
+        _seasonForm = new UpsertTourSeasonPriceRequest
+        {
+            SeasonName = item.SeasonName,
+            StartDate = item.StartDate,
+            EndDate = item.EndDate,
+            Price = item.Price,
+            IsActive = item.IsActive
+        };
+        _seasonFormOpen = true;
+    }
+
+    private async Task SaveSeasonAsync()
+    {
+        await ExecuteAsync(async () =>
+        {
+            if (_editingSeasonId is Guid id)
+            {
+                await PricingApi.UpdateSeasonPriceAsync(id, _seasonForm);
+                _message = "Season price updated.";
+            }
+            else
+            {
+                await PricingApi.CreateSeasonPriceAsync(_selectedTourId, _seasonForm);
+                _message = "Season price created.";
+            }
+
+            CloseSeasonForm();
+            await LoadPricingAsync();
+        });
+    }
+
+    private async Task DeleteSeasonAsync(Guid id)
+    {
+        await ExecuteAsync(async () =>
+        {
+            await PricingApi.DeleteSeasonPriceAsync(id);
+            _message = "Season price deleted.";
+            await LoadPricingAsync();
+        });
+    }
+
+    private void CloseSeasonForm()
+    {
+        _seasonFormOpen = false;
+        _editingSeasonId = null;
+        _seasonForm = new UpsertTourSeasonPriceRequest();
+    }
+
+    private void NewPromotion()
+    {
+        _editingPromotionId = null;
+        _promotionForm = new UpsertTourPromotionRequest
+        {
+            Name = "Launch Deal",
+            DiscountType = "Percent",
+            DiscountValue = 10,
+            StartDate = DateTime.Today,
+            EndDate = DateTime.Today.AddDays(14),
+            IsActive = true
+        };
+        _promotionFormOpen = true;
+    }
+
+    private void EditPromotion(TourPromotionResponse item)
+    {
+        _editingPromotionId = item.Id;
+        _promotionForm = new UpsertTourPromotionRequest
+        {
+            Name = item.Name,
+            DiscountType = item.DiscountType,
+            DiscountValue = item.DiscountValue,
+            StartDate = item.StartDate,
+            EndDate = item.EndDate,
+            IsActive = item.IsActive
+        };
+        _promotionFormOpen = true;
+    }
+
+    private async Task SavePromotionAsync()
+    {
+        await ExecuteAsync(async () =>
+        {
+            if (_editingPromotionId is Guid id)
+            {
+                await PricingApi.UpdatePromotionAsync(id, _promotionForm);
+                _message = "Promotion updated.";
+            }
+            else
+            {
+                await PricingApi.CreatePromotionAsync(_selectedTourId, _promotionForm);
+                _message = "Promotion created.";
+            }
+
+            ClosePromotionForm();
+            await LoadPricingAsync();
+        });
+    }
+
+    private async Task DeletePromotionAsync(Guid id)
+    {
+        await ExecuteAsync(async () =>
+        {
+            await PricingApi.DeletePromotionAsync(id);
+            _message = "Promotion deleted.";
+            await LoadPricingAsync();
+        });
+    }
+
+    private void ClosePromotionForm()
+    {
+        _promotionFormOpen = false;
+        _editingPromotionId = null;
+        _promotionForm = new UpsertTourPromotionRequest();
+    }
+
+    private async Task ExecuteAsync(Func<Task> action)
+    {
+        _isSaving = true;
+        _isError = false;
+        _message = null;
+
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void ShowError(Exception exception)
+    {
+        _isError = true;
+        _message = exception.Message;
+    }
+
+    private static string GetActiveClass(bool isActive)
+    {
+        return isActive
+            ? "guide-status guide-status--active"
+            : "guide-status guide-status--muted";
+    }
+
+    private static string FormatDiscount(TourPromotionResponse item)
+    {
+        return item.DiscountType.Equals("Percent", StringComparison.OrdinalIgnoreCase)
+            ? $"{item.DiscountValue:0.##}%"
+            : item.DiscountValue.ToString("C0");
+    }
+}

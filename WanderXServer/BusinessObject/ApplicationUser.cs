@@ -51,6 +51,16 @@ public class ApplicationUser
     [DataType(DataType.DateTime)]
     public DateTime? LastLoginAt { get; set; }
 
+    [StringLength(32)]
+    public string AccountStatus { get; set; } = "Active";
+
+    public DateTime? LockoutEnd { get; set; }
+
+    [StringLength(500)]
+    public string? LockReason { get; set; }
+
+    public int TokenVersion { get; set; }
+
     public ICollection<AuthVerificationCode> VerificationCodes { get; set; } = new List<AuthVerificationCode>();
 
     public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();

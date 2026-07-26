@@ -43,13 +43,10 @@ public class AuthService : IAuthService
         };
         user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
 
-        var verificationCode = CreateVerificationCode(user.Id);
-        user.VerificationCodes.Add(verificationCode);
-
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
 
-        return CreateAuthResponse(user, "Account created. Verify the phone number to finish onboarding.", verificationCode.Code);
+        return CreateAuthResponse(user, "Account created. Sign in and verify the phone number from Account Security.");
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -60,6 +57,11 @@ public class AuthService : IAuthService
         if (user is null)
         {
             throw new InvalidOperationException("Invalid email or password.");
+        }
+
+        if (user.AccountStatus == "Inactive" || (user.AccountStatus == "Locked" && (!user.LockoutEnd.HasValue || user.LockoutEnd > DateTime.UtcNow)))
+        {
+            throw new InvalidOperationException("ACCOUNT_LOCKED");
         }
 
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
@@ -75,6 +77,33 @@ public class AuthService : IAuthService
         return CreateAuthResponse(user, "Signed in successfully.");
     }
 
+    public async Task<AuthResponse> GoogleLoginAsync(string email, string fullName)
+    {
+        var normalizedEmail = NormalizeEmail(email);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(item => item.NormalizedEmail == normalizedEmail);
+        if (user is null)
+        {
+            user = new ApplicationUser
+            {
+                FullName = string.IsNullOrWhiteSpace(fullName) ? email.Split('@')[0] : fullName.Trim(),
+                Email = email.Trim(),
+                NormalizedEmail = normalizedEmail,
+                PhoneNumber = string.Empty,
+                Role = UserRole.Customer,
+                IsEmailConfirmed = true,
+                IsPhoneConfirmed = false,
+                AccountStatus = "Active"
+            };
+            user.PasswordHash = _passwordHasher.HashPassword(user, Convert.ToHexString(RandomNumberGenerator.GetBytes(32)));
+            _dbContext.Users.Add(user);
+        }
+        if (user.AccountStatus == "Inactive" || (user.AccountStatus == "Locked" && (!user.LockoutEnd.HasValue || user.LockoutEnd > DateTime.UtcNow)))
+            throw new InvalidOperationException("ACCOUNT_LOCKED");
+        user.IsEmailConfirmed = true;
+        user.LastLoginAt = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync();
+        return CreateAuthResponse(user, "Signed in with Google successfully.");
+    }
     public async Task<MessageResponse> ForgotPasswordAsync(ForgotPasswordRequest request)
     {
         var normalizedEmail = NormalizeEmail(request.Email);
@@ -102,57 +131,17 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<MessageResponse> VerifyPhoneAsync(VerifyPhoneRequest request)
+    public Task<MessageResponse> VerifyPhoneAsync(VerifyPhoneRequest request)
     {
-        var normalizedEmail = NormalizeEmail(request.Email);
-        var user = await _dbContext.Users
-            .Include(item => item.VerificationCodes)
-            .FirstOrDefaultAsync(item => item.NormalizedEmail == normalizedEmail);
-
-        if (user is null)
-        {
-            throw new InvalidOperationException("Account not found.");
-        }
-
-        var verificationCode = user.VerificationCodes
-            .Where(item => item.Purpose == VerificationPurpose.PhoneVerification)
-            .Where(item => item.ConsumedAt == null)
-            .Where(item => item.ExpiresAt >= DateTime.UtcNow)
-            .OrderByDescending(item => item.CreatedAt)
-            .FirstOrDefault(item => item.Code == request.Code);
-
-        if (verificationCode is null)
-        {
-            throw new InvalidOperationException("Invalid or expired verification code.");
-        }
-
-        verificationCode.ConsumedAt = DateTime.UtcNow;
-        user.IsPhoneConfirmed = true;
-        user.IsEmailConfirmed = true;
-        user.UpdatedAt = DateTime.UtcNow;
-
-        await _dbContext.SaveChangesAsync();
-
-        return new MessageResponse { Message = "Account verified. You can sign in now." };
+        throw new InvalidOperationException("LEGACY_PHONE_VERIFICATION_DISABLED");
     }
-
     public async Task<AuthResponse> ResendVerificationCodeAsync(ForgotPasswordRequest request)
     {
         var normalizedEmail = NormalizeEmail(request.Email);
-        var user = await _dbContext.Users.FirstOrDefaultAsync(item => item.NormalizedEmail == normalizedEmail);
-
-        if (user is null)
-        {
-            throw new InvalidOperationException("Account not found.");
-        }
-
-        var verificationCode = CreateVerificationCode(user.Id);
-        _dbContext.VerificationCodes.Add(verificationCode);
-        await _dbContext.SaveChangesAsync();
-
-        return CreateAuthResponse(user, "Verification code sent.", verificationCode.Code);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(item => item.NormalizedEmail == normalizedEmail)
+            ?? throw new InvalidOperationException("Account not found.");
+        return CreateAuthResponse(user, "Use the authenticated /api/auth/phone/send-otp endpoint.");
     }
-
     public static string NormalizeEmail(string email)
     {
         return email.Trim().ToUpperInvariant();
@@ -183,7 +172,8 @@ public class AuthService : IAuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, user.FullName),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
+            new Claim("token_version", user.TokenVersion.ToString())
         };
 
         var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(

@@ -34,8 +34,16 @@ builder.Services.AddScoped<IGuideService, GuideService>();
 builder.Services.AddScoped<IGuideTourService, GuideTourService>();
 builder.Services.AddScoped<UserSpecialRequestService>();
 builder.Services.AddScoped<TourReviewService>();
+builder.Services.AddScoped<TravelStyleQuizService>();
+builder.Services.Configure<RecommendationOptions>(builder.Configuration.GetSection("Recommendations"));
+builder.Services.AddScoped<RecommendationService>();
+builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<AccountManagementService>();
+builder.Services.AddSingleton<ISmsSender, UnconfiguredSmsSender>();
 builder.Services.AddScoped<ITourService, TourService>();
 builder.Services.AddScoped<ITourScheduleService, TourScheduleService>();
+builder.Services.AddScoped<IBookedTourService, BookedTourService>();
+builder.Services.AddScoped<ITourPricingService, TourPricingService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
@@ -85,6 +93,17 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("DASHBOARD_VIEW", policy => policy.RequireRole("Admin", "Staff"));
+    options.AddPolicy("USER_MANAGE", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("ROLE_ASSIGN", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("USER_LOCK", policy => policy.RequireRole("Admin"));
+});
+
+builder.Services.AddHttpClient();
+builder.Services.AddDataProtection();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -108,6 +127,18 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var idText = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var versionText = context.Principal?.FindFirst("token_version")?.Value;
+            if (!Guid.TryParse(idText, out var id) || !int.TryParse(versionText, out var version)) { context.Fail("Session is no longer valid."); return; }
+            var db = context.HttpContext.RequestServices.GetRequiredService<WanderXDbContext>();
+            var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (user == null || user.TokenVersion != version || user.AccountStatus == "Inactive" || (user.AccountStatus == "Locked" && (!user.LockoutEnd.HasValue || user.LockoutEnd > DateTime.UtcNow))) context.Fail("Session is no longer valid.");
+        }
     };
 });
 

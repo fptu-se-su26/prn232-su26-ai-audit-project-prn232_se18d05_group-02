@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WanderXServer.BusinessObject;
 using WanderXServer.DataAccessLayer;
 using WanderXServer.Dtos.TourReviews;
@@ -49,23 +49,19 @@ public class TourReviewService
 
     public async Task<TourReviewResponse> CreateAsync(CreateTourReviewRequest request, Guid userId)
     {
-        // Kiểm tra booking tồn tại
         var booking = await _dbContext.Bookings.FindAsync(request.BookingId);
         if (booking is null)
-            throw new KeyNotFoundException("Không tìm thấy đơn hàng.");
+            throw new KeyNotFoundException("Booking not found.");
 
-        // Kiểm tra booking thuộc về user này
         if (booking.UserId != userId)
-            throw new UnauthorizedAccessException("Bạn chỉ có thể đánh giá đơn hàng của mình.");
+            throw new UnauthorizedAccessException("You can only review your own booking.");
 
-        // Kiểm tra tour đã hoàn thành chưa
         if (!booking.CompletedAt.HasValue)
-            throw new InvalidOperationException("Bạn chỉ có thể đánh giá tour sau khi chuyến đi hoàn thành.");
+            throw new InvalidOperationException("You can only review a tour after the trip is completed.");
 
-        // Kiểm tra đã có review chưa
         var existing = await _dbContext.TourReviews.FirstOrDefaultAsync(r => r.BookingId == request.BookingId);
         if (existing != null)
-            throw new InvalidOperationException("Bạn đã đánh giá tour này rồi. Hãy chỉnh sửa đánh giá cũ.");
+            throw new InvalidOperationException("You have already reviewed this tour. Please edit your existing review.");
 
         var review = new TourReview
         {
@@ -82,7 +78,6 @@ public class TourReviewService
         _dbContext.TourReviews.Add(review);
         await _dbContext.SaveChangesAsync();
 
-        // Load lại để có navigation properties
         var saved = await _dbContext.TourReviews
             .Include(r => r.Booking)
             .Include(r => r.User)
@@ -99,10 +94,10 @@ public class TourReviewService
             .FirstOrDefaultAsync(r => r.Id == id);
 
         if (review is null)
-            throw new KeyNotFoundException("Không tìm thấy đánh giá.");
+            throw new KeyNotFoundException("Review not found.");
 
         if (review.UserId != userId)
-            throw new UnauthorizedAccessException("Bạn chỉ có thể chỉnh sửa đánh giá của mình.");
+            throw new UnauthorizedAccessException("You can only edit your own review.");
 
         review.Rating = request.Rating;
         review.Comment = request.Comment?.Trim();
@@ -118,10 +113,10 @@ public class TourReviewService
     {
         var review = await _dbContext.TourReviews.FindAsync(id);
         if (review is null)
-            throw new KeyNotFoundException("Không tìm thấy đánh giá.");
+            throw new KeyNotFoundException("Review not found.");
 
         if (review.UserId != userId)
-            throw new UnauthorizedAccessException("Bạn chỉ có thể xóa đánh giá của mình.");
+            throw new UnauthorizedAccessException("You can only delete your own review.");
 
         _dbContext.TourReviews.Remove(review);
         await _dbContext.SaveChangesAsync();
@@ -135,11 +130,11 @@ public class TourReviewService
             .FirstOrDefaultAsync(r => r.Id == id);
 
         if (review is null)
-            throw new KeyNotFoundException("Không tìm thấy đánh giá.");
+            throw new KeyNotFoundException("Review not found.");
 
         var allowedStatuses = new[] { "Visible", "Hidden", "Deleted" };
         if (!allowedStatuses.Contains(status, StringComparer.OrdinalIgnoreCase))
-            throw new InvalidOperationException("Trạng thái không hợp lệ. Chỉ chấp nhận: Visible, Hidden, Deleted.");
+            throw new InvalidOperationException("Invalid status. Accepted values: Visible, Hidden, Deleted.");
 
         review.Status = status.Trim();
         review.ModerationReason = reason?.Trim();

@@ -29,15 +29,33 @@ builder.Services.AddScoped(sp =>
     var sessionService = sp.GetRequiredService<AuthSessionService>();
     return new UserApiClient(httpClient, sessionService);
 });
-builder.Services.AddScoped(_ =>
+builder.Services.AddScoped(sp =>
 {
     var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
-    return new TourApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+    var handler = sp.GetRequiredService<CsrfHeaderHandler>();
+    handler.InnerHandler = new HttpClientHandler();
+    return new TourApiClient(new HttpClient(handler) { BaseAddress = new Uri(apiBaseUrl) });
 });
-builder.Services.AddScoped(_ =>
+builder.Services.AddScoped(sp =>
 {
     var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
-    return new TourScheduleApiClient(new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
+    var handler = sp.GetRequiredService<CsrfHeaderHandler>();
+    handler.InnerHandler = new HttpClientHandler();
+    return new TourScheduleApiClient(new HttpClient(handler) { BaseAddress = new Uri(apiBaseUrl) });
+});
+builder.Services.AddScoped(sp =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    var handler = sp.GetRequiredService<CsrfHeaderHandler>();
+    handler.InnerHandler = new HttpClientHandler();
+    return new BookedTourApiClient(new HttpClient(handler) { BaseAddress = new Uri(apiBaseUrl) });
+});
+builder.Services.AddScoped(sp =>
+{
+    var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5009/";
+    var handler = sp.GetRequiredService<CsrfHeaderHandler>();
+    handler.InnerHandler = new HttpClientHandler();
+    return new TourPricingApiClient(new HttpClient(handler) { BaseAddress = new Uri(apiBaseUrl) });
 });
 
 builder.Services.AddScoped(sp =>

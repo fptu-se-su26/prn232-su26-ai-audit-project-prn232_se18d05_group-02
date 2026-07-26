@@ -40,6 +40,9 @@ public class Tour
     [StringLength(32)]
     public string Status { get; set; } = "Draft";
 
+    [StringLength(32)]
+    public string? LockReason { get; set; }
+
     [StringLength(500)]
     public string ImageUrl { get; set; } = string.Empty;
 
@@ -51,4 +54,8 @@ public class Tour
     public DateTime? UpdatedAt { get; set; }
 
     public ICollection<TourSchedule> Schedules { get; set; } = new List<TourSchedule>();
+
+    public ICollection<TourSeasonPrice> SeasonPrices { get; set; } = new List<TourSeasonPrice>();
+
+    public ICollection<TourPromotion> Promotions { get; set; } = new List<TourPromotion>();
 }

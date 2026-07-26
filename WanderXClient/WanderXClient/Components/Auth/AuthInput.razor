@@ -1,4 +1,5 @@
 @using System.Linq.Expressions
+@using Microsoft.AspNetCore.Components.Forms
 
 <div class="auth-input">
     @if (ShowLabel)
@@ -7,15 +8,16 @@
     }
     <div class="auth-input__control-wrap">
         <MaterialIcon Name="@Icon" Class="auth-input__icon" />
-        <InputText
+        <input
             id="@Id"
+            name="@Id"
             class="auth-input__control"
             type="@Type"
             autocomplete="@AutoComplete"
             placeholder="@Placeholder"
-            Value="@Value"
-            ValueChanged="@ValueChanged"
-            ValueExpression="@ValueExpression" />
+            value="@Value"
+            @oninput="HandleInputAsync"
+            @onchange="HandleInputAsync" />
     </div>
     @if (ValueExpression is not null)
     {
@@ -53,4 +55,18 @@
 
     [Parameter]
     public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    [CascadingParameter]
+    private EditContext? CascadedEditContext { get; set; }
+
+    private async Task HandleInputAsync(ChangeEventArgs args)
+    {
+        Value = args.Value?.ToString();
+        await ValueChanged.InvokeAsync(Value);
+
+        if (ValueExpression is not null && CascadedEditContext is not null)
+        {
+            CascadedEditContext.NotifyFieldChanged(FieldIdentifier.Create(ValueExpression));
+        }
+    }
 }

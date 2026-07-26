@@ -1,4 +1,4 @@
-@page "/guide-portal"
+﻿@page "/guide-portal"
 @using System.Globalization
 @inject GuideTourApiClient GuideTourApi
 @inject AuthSessionService AuthSession
@@ -357,18 +357,18 @@
     <div class="wx-modal-backdrop">
         <div class="wx-modal-container">
             <div class="wx-modal-header">
-                <h3>Hoàn thành chuyến đi</h3>
+                <h3>Complete Trip</h3>
                 <button type="button" class="wx-modal-close" @onclick="CloseFinishModalAsync">&times;</button>
             </div>
             <div class="wx-modal-body">
-                <p class="guide-modal-desc">Vui lòng cung cấp ảnh chụp bằng chứng để hoàn thành chuyến đi <strong>@_selectedAssignment?.TourName</strong>.</p>
+                <p class="guide-modal-desc">Please provide evidence photo to complete the trip <strong>@_selectedAssignment?.TourName</strong>.</p>
                 
                 <div class="wx-modal-tabs">
                     <button type="button" class="wx-modal-tab-btn @(_activeTab == "upload" ? "active" : "")" @onclick='() => SelectTabAsync("upload")'>
-                        <MaterialIcon Name="upload_file" /> Tải ảnh lên
+                        <MaterialIcon Name="upload_file" /> Upload Photo
                     </button>
                     <button type="button" class="wx-modal-tab-btn @(_activeTab == "camera" ? "active" : "")" @onclick='() => SelectTabAsync("camera")'>
-                        <MaterialIcon Name="photo_camera" /> Chụp ảnh
+                        <MaterialIcon Name="photo_camera" /> Take Photo
                     </button>
                 </div>
 
@@ -380,7 +380,7 @@
                                 <InputFile OnChange="OnInputFileChange" accept="image/*" class="wx-file-input-hidden" />
                                 <div class="wx-upload-prompt">
                                     <MaterialIcon Name="cloud_upload" />
-                                    <span>Nhấp để chọn ảnh từ thiết bị</span>
+                                    <span>Click to choose a photo from your device</span>
                                 </div>
                             </label>
                         </div>
@@ -397,7 +397,7 @@
                             <div class="wx-camera-viewport" style='display: @(string.IsNullOrEmpty(_evidenceImageBase64) ? "block" : "none")'>
                                 <video id="evidence-video" class="wx-video-feed" autoplay playsinline></video>
                                 <button type="button" class="wx-button wx-button--secondary wx-btn-capture" @onclick="CapturePhotoAsync">
-                                    <MaterialIcon Name="circle" /> Chụp ảnh
+                                    <MaterialIcon Name="circle" /> Take Photo
                                 </button>
                             </div>
                         </div>
@@ -407,13 +407,13 @@
                 @if (!string.IsNullOrEmpty(_evidenceImageBase64))
                 {
                     <div class="wx-evidence-preview">
-                        <span class="guide-label-text" style="font-weight: 600; display: block; margin-bottom: 0.25rem;">Xem trước bằng chứng:</span>
+                        <span class="guide-label-text" style="font-weight: 600; display: block; margin-bottom: 0.25rem;">Evidence preview:</span>
                         <div class="wx-preview-box">
                             <img src="@_evidenceImageBase64" alt="Preview evidence" />
                             @if (_activeTab == "camera")
                             {
                                 <button type="button" class="wx-button wx-button--outline wx-btn-retake" @onclick="RetakePhotoAsync">
-                                    <MaterialIcon Name="replay" /> Chụp lại
+                                    <MaterialIcon Name="replay" /> Retake
                                 </button>
                             }
                         </div>
@@ -421,15 +421,15 @@
                 }
             </div>
             <div class="wx-modal-footer">
-                <button type="button" class="wx-button wx-button--outline" @onclick="CloseFinishModalAsync" disabled="@_isSaving">Hủy</button>
+                <button type="button" class="wx-button wx-button--outline" @onclick="CloseFinishModalAsync" disabled="@_isSaving">Cancel</button>
                 <button type="button" class="wx-button wx-button--secondary" @onclick="ConfirmFinishTourAsync" disabled="@(string.IsNullOrEmpty(_evidenceImageBase64) || _isSaving)">
                     @if (_isSaving)
                     {
-                        <span class="wx-spinner"></span> <span>Đang xử lý...</span>
+                        <span class="wx-spinner"></span> <span>Processing...</span>
                     }
                     else
                     {
-                        <MaterialIcon Name="done_all" /> <span>Hoàn thành</span>
+                        <MaterialIcon Name="done_all" /> <span>Complete</span>
                     }
                 </button>
             </div>
@@ -1247,7 +1247,7 @@
         bool success = await JsRuntime.InvokeAsync<bool>("wanderXCamera.startCamera", "evidence-video");
         if (!success)
         {
-            _cameraError = "Không thể truy cập camera. Vui lòng cấp quyền camera hoặc tải ảnh lên.";
+            _cameraError = "Could not access the camera. Please grant camera permission or upload a photo.";
             _isCameraActive = false;
         }
     }
@@ -1294,13 +1294,13 @@
                 }
                 catch (Exception ex)
                 {
-                    _message = "Lỗi khi tải ảnh: " + ex.Message;
+                    _message = "Error uploading image: " + ex.Message;
                     _isError = true;
                 }
             }
             else
             {
-                _message = "Vui lòng chọn tệp ảnh hợp lệ.";
+                _message = "Please choose a valid image file.";
                 _isError = true;
             }
         }

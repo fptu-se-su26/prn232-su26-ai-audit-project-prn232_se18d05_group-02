@@ -13,7 +13,7 @@ public sealed class TourApiClient
         _httpClient = httpClient;
     }
 
-    public async Task<List<TourResponse>> GetToursAsync(string? search = null, string? status = null)
+    public async Task<List<TourResponse>> GetToursAsync(string? search = null, string? status = null, string? destination = null, DateTime? departureDate = null)
     {
         var query = new List<string>();
 
@@ -25,6 +25,16 @@ public sealed class TourApiClient
         if (!string.IsNullOrWhiteSpace(status) && !status.Equals("All", StringComparison.OrdinalIgnoreCase))
         {
             query.Add($"status={Uri.EscapeDataString(status)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(destination))
+        {
+            query.Add($"destination={Uri.EscapeDataString(destination)}");
+        }
+
+        if (departureDate.HasValue)
+        {
+            query.Add($"departureDate={Uri.EscapeDataString(departureDate.Value.ToString("yyyy-MM-dd"))}");
         }
 
         var path = query.Count == 0
@@ -41,6 +51,18 @@ public sealed class TourApiClient
         throw new InvalidOperationException(await ReadErrorAsync(response));
     }
 
+    public async Task<TourResponse> GetTourAsync(Guid id)
+    {
+        using var response = await _httpClient.GetAsync($"api/tours/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<TourResponse>() ?? new TourResponse();
+        }
+
+        throw new InvalidOperationException(await ReadErrorAsync(response));
+    }
+
     public Task<TourResponse?> CreateTourAsync(CreateTourRequest request)
     {
         return SendAsync<CreateTourRequest, TourResponse>(HttpMethod.Post, "api/tours", request);
@@ -49,6 +71,42 @@ public sealed class TourApiClient
     public Task<TourResponse?> UpdateTourAsync(Guid id, UpdateTourRequest request)
     {
         return SendAsync<UpdateTourRequest, TourResponse>(HttpMethod.Put, $"api/tours/{id}", request);
+    }
+
+    public async Task<TourResponse?> HideTourAsync(Guid id)
+    {
+        using var response = await _httpClient.PatchAsync($"api/tours/{id}/hide", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<TourResponse>();
+        }
+
+        throw new InvalidOperationException(await ReadErrorAsync(response));
+    }
+
+    public async Task<TourResponse?> LockTourAsync(Guid id)
+    {
+        using var response = await _httpClient.PatchAsync($"api/tours/{id}/lock", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<TourResponse>();
+        }
+
+        throw new InvalidOperationException(await ReadErrorAsync(response));
+    }
+
+    public async Task<TourResponse?> UnlockTourAsync(Guid id)
+    {
+        using var response = await _httpClient.PatchAsync($"api/tours/{id}/unlock", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<TourResponse>();
+        }
+
+        throw new InvalidOperationException(await ReadErrorAsync(response));
     }
 
     public async Task DeleteTourAsync(Guid id)

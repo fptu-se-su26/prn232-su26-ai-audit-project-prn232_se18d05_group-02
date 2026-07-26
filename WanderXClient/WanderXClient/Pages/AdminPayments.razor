@@ -1,4 +1,5 @@
 @page "/admin-payments"
+@layout AdminLayout
 @using System.Globalization
 @using WanderXClient.Models
 @using WanderXClient.Services
@@ -8,49 +9,7 @@
 
 <PageTitle>WanderX Admin - Payment Management</PageTitle>
 
-<div class="guide-admin-page">
-    <aside class="guide-sidebar">
-        <div class="guide-sidebar__brand">
-            <a class="brand-mark" href="/">WanderX</a>
-            <p>Admin Suite</p>
-        </div>
-        <nav class="guide-sidebar__nav" aria-label="Admin navigation">
-            <a class="guide-sidebar__link" href="/dashboard">
-                <MaterialIcon Name="dashboard" />
-                Dashboard
-            </a>
-            <a class="guide-sidebar__link" href="/admin-bookings">
-                <MaterialIcon Name="receipt_long" />
-                Bookings
-            </a>
-            <a class="guide-sidebar__link" href="/admin-cancellations">
-                <MaterialIcon Name="rule" />
-                Cancel Requests
-            </a>
-            <a class="guide-sidebar__link guide-sidebar__link--active" href="/admin-payments" aria-current="page">
-                <MaterialIcon Name="payments" />
-                Payments
-            </a>
-            <a class="guide-sidebar__link" href="/guide-assignments">
-                <MaterialIcon Name="assignment_ind" />
-                Assignments
-            </a>
-            <a class="guide-sidebar__link" href="/admin-service-requests">
-                <MaterialIcon Name="support_agent" />
-                Service Requests
-            </a>
-            <a class="guide-sidebar__link" href="/tour-reviews">
-                <MaterialIcon Name="rate_review" />
-                Tour Reviews
-            </a>
-            <a class="guide-sidebar__link" href="/">
-                <MaterialIcon Name="home" />
-                Homepage
-            </a>
-        </nav>
-    </aside>
 
-    <main class="guide-main">
         <header class="guide-topbar">
             <div>
                 <p class="guide-eyebrow">Member 2 / Feature 4</p>
@@ -94,7 +53,7 @@
                 </article>
                 <article class="guide-stat">
                     <p>Deposits</p>
-                    <strong>@_payments.Count(item => GetPaymentStatus(item) == "Deposit Paid")</strong>
+                    <strong>@_payments.Count(item => GetPaymentStatus(item) == DepositPaidStatus)</strong>
                     <span>40% deposits recorded</span>
                 </article>
             </div>
@@ -233,11 +192,6 @@
                 }
             </section>
         </section>
-    </main>
-
-    <MobileBottomNav />
-</div>
-
 @if (_paymentBooking is not null)
 {
     var locked = IsPaymentLocked(_paymentBooking);
@@ -915,7 +869,8 @@
 
 @code {
     private const int PageSize = 5;
-    private readonly string[] _statusFilters = ["All", "Unpaid", "Deposit Paid", "Paid", "Failed"];
+    private const string DepositPaidStatus = "40% Paid";
+    private readonly string[] _statusFilters = ["All", "Unpaid", DepositPaidStatus, "Paid", "Failed"];
     private readonly List<BookingResponse> _payments = new();
     private bool _isLoading = true;
     private bool _isSavingPayment;
@@ -1145,7 +1100,7 @@
             return "Unpaid";
         }
 
-        return GetRemainingAmount(booking) > 0m ? "Deposit Paid" : "Paid";
+        return GetRemainingAmount(booking) > 0m ? DepositPaidStatus : "Paid";
     }
 
     private static string GetPaymentStatusClass(BookingResponse booking)
@@ -1153,7 +1108,7 @@
         return GetPaymentStatus(booking) switch
         {
             "Paid" => "payment-status payment-status--paid",
-            "Deposit Paid" => "payment-status payment-status--deposit",
+            DepositPaidStatus => "payment-status payment-status--deposit",
             "Failed" => "payment-status payment-status--failed",
             _ => "payment-status payment-status--unpaid"
         };
@@ -1182,3 +1137,5 @@
         public string? PaymentNote { get; set; }
     }
 }
+
+

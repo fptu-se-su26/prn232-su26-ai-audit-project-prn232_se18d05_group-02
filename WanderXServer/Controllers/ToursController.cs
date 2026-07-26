@@ -17,11 +17,15 @@ public class ToursController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<TourResponse>>> GetAll([FromQuery] string? search, [FromQuery] string? status)
+    public async Task<ActionResult<IReadOnlyList<TourResponse>>> GetAll(
+        [FromQuery] string? search,
+        [FromQuery] string? status,
+        [FromQuery] string? destination,
+        [FromQuery] DateTime? departureDate)
     {
         try
         {
-            return Ok(await _tourService.GetAllAsync(search, status));
+            return Ok(await _tourService.GetAllAsync(search, status, destination, departureDate));
         }
         catch (SqlException exception)
         {
@@ -96,6 +100,69 @@ public class ToursController : ControllerBase
         catch (KeyNotFoundException exception)
         {
             return NotFound(ToProblem("Tour not found", exception.Message, StatusCodes.Status404NotFound));
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(ToProblem("Tour delete failed", exception.Message, StatusCodes.Status400BadRequest));
+        }
+        catch (SqlException exception)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
+        }
+    }
+
+    [HttpPatch("{id:guid}/hide")]
+    public async Task<ActionResult<TourResponse>> Hide(Guid id)
+    {
+        try
+        {
+            return Ok(await _tourService.HideAsync(id));
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(ToProblem("Tour not found", exception.Message, StatusCodes.Status404NotFound));
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(ToProblem("Tour hide failed", exception.Message, StatusCodes.Status400BadRequest));
+        }
+        catch (SqlException exception)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
+        }
+    }
+
+    [HttpPatch("{id:guid}/lock")]
+    public async Task<ActionResult<TourResponse>> Lock(Guid id)
+    {
+        try
+        {
+            return Ok(await _tourService.LockAsync(id));
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(ToProblem("Tour not found", exception.Message, StatusCodes.Status404NotFound));
+        }
+        catch (SqlException exception)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, ToProblem("Database unavailable", ToDatabaseMessage(exception), StatusCodes.Status503ServiceUnavailable));
+        }
+    }
+
+    [HttpPatch("{id:guid}/unlock")]
+    public async Task<ActionResult<TourResponse>> Unlock(Guid id)
+    {
+        try
+        {
+            return Ok(await _tourService.UnlockAsync(id));
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(ToProblem("Tour not found", exception.Message, StatusCodes.Status404NotFound));
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(ToProblem("Tour unlock failed", exception.Message, StatusCodes.Status400BadRequest));
         }
         catch (SqlException exception)
         {

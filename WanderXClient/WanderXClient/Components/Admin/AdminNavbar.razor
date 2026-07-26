@@ -1,5 +1,3 @@
-@inject NavigationManager Navigation
-
 <aside class="guide-sidebar">
     <div class="guide-sidebar__brand">
         <a class="brand-mark" href="/">WanderX</a>
@@ -7,43 +5,60 @@
     </div>
 
     <nav class="guide-sidebar__nav" aria-label="Admin navigation">
-        <a class="@GetLinkClass("/dashboard")" href="/dashboard">
+        <NavLink class="guide-sidebar__link" href="/dashboard" Match="NavLinkMatch.All">
             <MaterialIcon Name="dashboard" />
             Dashboard
-        </a>
-        <a class="@GetLinkClass("/admin/tours")" href="/admin/tours">
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/admin/tours" Match="NavLinkMatch.All">
             <MaterialIcon Name="travel_explore" />
             Tours
-        </a>
-        <a class="@GetLinkClass("/admin/tour-schedules")" href="/admin/tour-schedules">
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/admin/tour-schedules" Match="NavLinkMatch.All">
             <MaterialIcon Name="event_note" />
             Schedules
-        </a>
-        <a class="@GetLinkClass("/guides")" href="/guides">
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/admin/booked-tours" Match="NavLinkMatch.All">
+            <MaterialIcon Name="calendar_view_week" />
+            Booked Tours
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/admin/tour-pricing" Match="NavLinkMatch.All">
+            <MaterialIcon Name="payments" />
+            Pricing
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/admin-bookings" Match="NavLinkMatch.Prefix">
+            <MaterialIcon Name="receipt_long" />
+            Bookings
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/admin-cancellations" Match="NavLinkMatch.All">
+            <MaterialIcon Name="event_busy" />
+            Cancellations
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/admin-payments" Match="NavLinkMatch.All">
+            <MaterialIcon Name="credit_card" />
+            Payments
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/guides" Match="NavLinkMatch.All">
             <MaterialIcon Name="badge" />
             Guides
-        </a>
-        <a class="@GetLinkClass("/guide-assignments")" href="/guide-assignments">
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/guide-assignments" Match="NavLinkMatch.All">
             <MaterialIcon Name="assignment_ind" />
             Assignments
-        </a>
-        <a class="guide-sidebar__link" href="/">
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/admin-service-requests" Match="NavLinkMatch.All">
+            <MaterialIcon Name="support_agent" />
+            Service Requests
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/tour-reviews" Match="NavLinkMatch.All">
+            <MaterialIcon Name="reviews" />
+            Tour Reviews
+        </NavLink>
+        <NavLink class="guide-sidebar__link" href="/admin/users" Match="NavLinkMatch.Prefix">
+            <MaterialIcon Name="manage_accounts" />
+            Accounts
+        </NavLink>        <NavLink class="guide-sidebar__link" href="/" Match="NavLinkMatch.All">
             <MaterialIcon Name="home" />
             Homepage
-        </a>
+        </NavLink>
     </nav>
 </aside>
-
-@code {
-    private string GetLinkClass(string href)
-    {
-        var relative = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0].Trim('/');
-        var target = href.Trim('/');
-        var isActive = relative.Equals(target, StringComparison.OrdinalIgnoreCase) ||
-            (target == "dashboard" && relative.Equals("admin-dashboard", StringComparison.OrdinalIgnoreCase));
-
-        return isActive
-            ? "guide-sidebar__link guide-sidebar__link--active"
-            : "guide-sidebar__link";
-    }
-}

@@ -1,0 +1,3 @@
+using System.ComponentModel.DataAnnotations;
+namespace WanderXServer.BusinessObject;
+public sealed class AccountAuditLog { [Key] public Guid Id { get; set; }=Guid.NewGuid(); public Guid ActorUserId { get; set; } public Guid TargetUserId { get; set; } [Required,StringLength(40)] public string Action { get; set; }=string.Empty; [StringLength(500)] public string? OldValue { get; set; } [StringLength(500)] public string? NewValue { get; set; } [Required,StringLength(500)] public string Reason { get; set; }=string.Empty; public DateTime CreatedAt { get; set; }=DateTime.UtcNow; }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WanderXServer.BusinessObject;
 using WanderXServer.BusinessObject.Enums;
@@ -16,6 +16,8 @@ public class WanderXDbContext : DbContext
     public DbSet<AuthVerificationCode> VerificationCodes => Set<AuthVerificationCode>();
 
     public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+    public DbSet<AccountAuditLog> AccountAuditLogs => Set<AccountAuditLog>();
+    public DbSet<PhoneVerification> PhoneVerifications => Set<PhoneVerification>();
 
     public DbSet<GuideProfile> GuideProfiles => Set<GuideProfile>();
 
@@ -25,9 +27,16 @@ public class WanderXDbContext : DbContext
     public DbSet<BookingPassenger> BookingPassengers => Set<BookingPassenger>();
     public DbSet<UserSpecialRequest> UserSpecialRequests => Set<UserSpecialRequest>();
     public DbSet<TourReview> TourReviews => Set<TourReview>();
+    public DbSet<TravelStyleQuizResult> TravelStyleQuizResults => Set<TravelStyleQuizResult>();
+    public DbSet<QuizQuestion> QuizQuestions => Set<QuizQuestion>();
+    public DbSet<QuizOption> QuizOptions => Set<QuizOption>();
     public DbSet<Tour> Tours => Set<Tour>();
 
     public DbSet<TourSchedule> TourSchedules => Set<TourSchedule>();
+
+    public DbSet<TourSeasonPrice> TourSeasonPrices => Set<TourSeasonPrice>();
+
+    public DbSet<TourPromotion> TourPromotions => Set<TourPromotion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -174,6 +183,26 @@ public class WanderXDbContext : DbContext
             .HasForeignKey(schedule => schedule.TourId)
             .HasPrincipalKey(tour => tour.ScheduleTourId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TourSeasonPrice>()
+            .Property(item => item.Price)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<TourSeasonPrice>()
+            .HasOne(item => item.Tour)
+            .WithMany(tour => tour.SeasonPrices)
+            .HasForeignKey(item => item.TourId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TourPromotion>()
+            .Property(item => item.DiscountValue)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<TourPromotion>()
+            .HasOne(item => item.Tour)
+            .WithMany(tour => tour.Promotions)
+            .HasForeignKey(item => item.TourId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static Guid CreateGuidFromEmail(string key, string type)
@@ -191,7 +220,12 @@ public class WanderXDbContext : DbContext
         EnsureBookingsTable();
         EnsureUserSpecialRequestsTable();
         EnsureTourReviewsTable();
+        EnsureTravelStyleQuizResultsTable();
+        EnsureQuizQuestionsTable();
+        EnsureQuizOptionsTable();
         EnsureApplicationSchema();
+        EnsureTourPricingStorage();
+        EnsureAccountSecuritySchema();
 
         var passwordHasher = new PasswordHasher<ApplicationUser>();
 
@@ -201,7 +235,10 @@ public class WanderXDbContext : DbContext
         SaveChanges();
         SeedGuideTourAssignments();
         SeedBookings();
+        SeedQuizData();
         SeedTours();
+        SaveChanges();
+        SeedSchedulesForPaidAssignedBookings();
         SaveChanges();
 
         // Update existing Finished assignments that don't have an evidence image
@@ -229,6 +266,25 @@ END
 """);
     }
 
+    private void EnsureAccountSecuritySchema()
+    {
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Users', 'AccountStatus') IS NULL ALTER TABLE [Users] ADD [AccountStatus] nvarchar(32) NOT NULL CONSTRAINT [DF_Users_AccountStatus] DEFAULT 'Active';
+IF COL_LENGTH('Users', 'LockoutEnd') IS NULL ALTER TABLE [Users] ADD [LockoutEnd] datetime2 NULL;
+IF COL_LENGTH('Users', 'LockReason') IS NULL ALTER TABLE [Users] ADD [LockReason] nvarchar(500) NULL;
+IF COL_LENGTH('Users', 'TokenVersion') IS NULL ALTER TABLE [Users] ADD [TokenVersion] int NOT NULL CONSTRAINT [DF_Users_TokenVersion] DEFAULT 0;
+IF OBJECT_ID(N'[AccountAuditLogs]', N'U') IS NULL
+BEGIN
+ CREATE TABLE [AccountAuditLogs]([Id] uniqueidentifier NOT NULL PRIMARY KEY,[ActorUserId] uniqueidentifier NOT NULL,[TargetUserId] uniqueidentifier NOT NULL,[Action] nvarchar(40) NOT NULL,[OldValue] nvarchar(500) NULL,[NewValue] nvarchar(500) NULL,[Reason] nvarchar(500) NOT NULL,[CreatedAt] datetime2 NOT NULL);
+ CREATE INDEX [IX_AccountAuditLogs_TargetUserId_CreatedAt] ON [AccountAuditLogs]([TargetUserId],[CreatedAt]);
+END;
+IF OBJECT_ID(N'[PhoneVerifications]', N'U') IS NULL
+BEGIN
+ CREATE TABLE [PhoneVerifications]([Id] uniqueidentifier NOT NULL PRIMARY KEY,[UserId] uniqueidentifier NOT NULL,[PhoneNumber] nvarchar(20) NOT NULL,[OtpHash] nvarchar(128) NOT NULL,[ExpiresAt] datetime2 NOT NULL,[AttemptCount] int NOT NULL,[MaxAttempts] int NOT NULL,[SentCount] int NOT NULL,[LastSentAt] datetime2 NOT NULL,[Status] nvarchar(20) NOT NULL,[ProviderMessageId] nvarchar(120) NULL,[CreatedAt] datetime2 NOT NULL,[VerifiedAt] datetime2 NULL);
+ CREATE INDEX [IX_PhoneVerifications_UserId_PhoneNumber_CreatedAt] ON [PhoneVerifications]([UserId],[PhoneNumber],[CreatedAt]);
+END;
+""");
+    }
     public void EnsureApplicationSchema()
     {
         EnsureGuideTourAssignmentsTable();
@@ -239,6 +295,18 @@ END
     {
         EnsureToursTable();
         EnsureTourSchedulesTable();
+    }
+
+    public void EnsureTourPricingStorage()
+    {
+        EnsureTourStorage();
+        EnsureTourSeasonPricesTable();
+        EnsureTourPromotionsTable();
+    }
+
+    public void EnsureBookingStorage()
+    {
+        EnsureBookingsTable();
     }
 
     private void EnsureGuideTourAssignmentsTable()
@@ -454,6 +522,7 @@ BEGIN
         [Price] decimal(18,2) NOT NULL,
         [Capacity] int NOT NULL,
         [Status] nvarchar(32) NOT NULL,
+        [LockReason] nvarchar(32) NULL,
         [ImageUrl] nvarchar(500) NOT NULL,
         [Description] nvarchar(1200) NOT NULL,
         [CreatedAt] datetime2 NOT NULL,
@@ -462,6 +531,13 @@ BEGIN
     );
 
     CREATE UNIQUE INDEX [IX_Tours_Code] ON [Tours] ([Code]);
+END
+""");
+
+        Database.ExecuteSqlRaw("""
+IF COL_LENGTH('Tours', 'LockReason') IS NULL
+BEGIN
+    ALTER TABLE [Tours] ADD [LockReason] nvarchar(32) NULL;
 END
 """);
 
@@ -531,6 +607,55 @@ END
 """);
     }
 
+    private void EnsureTourSeasonPricesTable()
+    {
+        Database.ExecuteSqlRaw("""
+IF OBJECT_ID(N'[TourSeasonPrices]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [TourSeasonPrices] (
+        [Id] uniqueidentifier NOT NULL,
+        [TourId] uniqueidentifier NOT NULL,
+        [SeasonName] nvarchar(120) NOT NULL,
+        [StartDate] datetime2 NOT NULL,
+        [EndDate] datetime2 NOT NULL,
+        [Price] decimal(18,2) NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NULL,
+        CONSTRAINT [PK_TourSeasonPrices] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TourSeasonPrices_Tours_TourId] FOREIGN KEY ([TourId]) REFERENCES [Tours] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_TourSeasonPrices_TourId_StartDate_EndDate] ON [TourSeasonPrices] ([TourId], [StartDate], [EndDate]);
+END
+""");
+    }
+
+    private void EnsureTourPromotionsTable()
+    {
+        Database.ExecuteSqlRaw("""
+IF OBJECT_ID(N'[TourPromotions]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [TourPromotions] (
+        [Id] uniqueidentifier NOT NULL,
+        [TourId] uniqueidentifier NOT NULL,
+        [Name] nvarchar(120) NOT NULL,
+        [DiscountType] nvarchar(16) NOT NULL,
+        [DiscountValue] decimal(18,2) NOT NULL,
+        [StartDate] datetime2 NOT NULL,
+        [EndDate] datetime2 NOT NULL,
+        [IsActive] bit NOT NULL,
+        [CreatedAt] datetime2 NOT NULL,
+        [UpdatedAt] datetime2 NULL,
+        CONSTRAINT [PK_TourPromotions] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TourPromotions_Tours_TourId] FOREIGN KEY ([TourId]) REFERENCES [Tours] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_TourPromotions_TourId_StartDate_EndDate] ON [TourPromotions] ([TourId], [StartDate], [EndDate]);
+END
+""");
+    }
+
     private void EnsureUserSpecialRequestsTable()
     {
         Database.ExecuteSqlRaw(@"
@@ -580,6 +705,143 @@ BEGIN
 END
 ");
     }
+
+    private void EnsureTravelStyleQuizResultsTable()
+    {
+        Database.ExecuteSqlRaw(@"
+IF OBJECT_ID(N'[TravelStyleQuizResults]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [TravelStyleQuizResults] (
+        [Id] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [AnswersJson] nvarchar(max) NOT NULL,
+        [AdventureScore] int NOT NULL,
+        [CulturalScore] int NOT NULL,
+        [RelaxationScore] int NOT NULL,
+        [LuxuryScore] int NOT NULL,
+        [DominantStyle] nvarchar(50) NOT NULL,
+        [CompletedAt] datetime2 NOT NULL,
+        CONSTRAINT [PK_TravelStyleQuizResults] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TravelStyleQuizResults_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_TravelStyleQuizResults_UserId] ON [TravelStyleQuizResults] ([UserId]);
+END
+");
+    }
+
+    private void EnsureQuizQuestionsTable()
+    {
+        Database.ExecuteSqlRaw(@"
+IF OBJECT_ID(N'[QuizQuestions]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [QuizQuestions] (
+        [Id] uniqueidentifier NOT NULL,
+        [Text] nvarchar(max) NOT NULL,
+        [DisplayOrder] int NOT NULL,
+        CONSTRAINT [PK_QuizQuestions] PRIMARY KEY ([Id])
+    );
+END
+");
+    }
+
+    private void EnsureQuizOptionsTable()
+    {
+        Database.ExecuteSqlRaw(@"
+IF OBJECT_ID(N'[QuizOptions]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [QuizOptions] (
+        [Id] uniqueidentifier NOT NULL,
+        [QuestionId] uniqueidentifier NOT NULL,
+        [OptionKey] nvarchar(10) NOT NULL,
+        [Text] nvarchar(max) NOT NULL,
+        [Category] nvarchar(50) NOT NULL,
+        [Score] int NOT NULL,
+        CONSTRAINT [PK_QuizOptions] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_QuizOptions_QuizQuestions_QuestionId] FOREIGN KEY ([QuestionId]) REFERENCES [QuizQuestions] ([Id]) ON DELETE CASCADE
+    );
+
+    CREATE INDEX [IX_QuizOptions_QuestionId] ON [QuizOptions] ([QuestionId]);
+END
+");
+    }
+
+    private void SeedQuizData()
+    {
+        if (QuizQuestions.Any()) return;
+
+        var questions = new List<QuizQuestion>
+        {
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Bạn thích dành kỳ nghỉ của mình ở đâu nhất?",
+                DisplayOrder = 1,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Những ngọn núi hiểm trở hoặc rừng rậm hoang dã để hòa mình vào thiên nhiên.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Các thành phố cổ kính, viện bảo tàng và di tích lịch sử văn hóa.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Một bãi biển yên bình, tĩnh lặng hoặc khu nghỉ dưỡng spa biệt lập.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Khách sạn 5 sao cao cấp, trung tâm mua sắm sầm uất và khu vui chơi hiện đại.", Category = "Luxury", Score = 3 }
+                }
+            },
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Hoạt động yêu thích của bạn trong suốt chuyến đi là gì?",
+                DisplayOrder = 2,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Leo núi trekking, chèo thuyền kayak vượt thác hoặc các trò chơi mạo hiểm.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Tham gia lễ hội truyền thống bản địa, học làm đồ thủ công, hoặc tham quan di sản.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Nằm đọc sách bên hồ bơi, tắm nắng trên bãi cát, hoặc trị liệu spa thư giãn.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Thưởng thức bữa tối fine-dining tại nhà hàng Michelin hoặc tận hưởng du thuyền sang trọng.", Category = "Luxury", Score = 3 }
+                }
+            },
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Bạn thường chuẩn bị hành lý của mình như thế nào?",
+                DisplayOrder = 3,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Một chiếc balo gọn nhẹ với các vật dụng sinh tồn và đồ dã ngoại tiện lợi.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Mang theo máy ảnh chuyên nghiệp, sách hướng dẫn du lịch và sổ tay ghi chép.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Trang phục thoải mái, kem chống nắng, đồ bơi và vài cuốn tiểu thuyết.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Vali kéo sang trọng với trang phục thời thượng thiết kế riêng và nhiều phụ kiện.", Category = "Luxury", Score = 3 }
+                }
+            },
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Bạn thích đi du lịch cùng ai nhất để tận hưởng trọn vẹn chuyến đi?",
+                DisplayOrder = 4,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Đi du lịch một mình (solo) tự do hoặc nhóm bạn thân đam mê thử thách.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Người có cùng niềm đam mê tìm hiểu lịch sử, văn hóa bản xứ sâu sắc.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Gia đình thân yêu hoặc người đời để cùng nhau nghỉ ngơi hoàn toàn.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Một nhóm nhỏ cao cấp hoặc đối tác để cùng tận hưởng các dịch vụ VIP đẳng cấp.", Category = "Luxury", Score = 3 }
+                }
+            },
+            new QuizQuestion
+            {
+                Id = Guid.NewGuid(),
+                Text = "Cách bạn lựa chọn ẩm thực và ăn uống khi đặt chân tới vùng đất mới?",
+                DisplayOrder = 5,
+                Options = new List<QuizOption>
+                {
+                    new QuizOption { OptionKey = "A", Text = "Ăn đồ đóng hộp mang theo tiện lợi hoặc thưởng thức bất cứ quán ăn ven đường nào.", Category = "Adventure", Score = 3 },
+                    new QuizOption { OptionKey = "B", Text = "Thử các món ăn ẩm thực đường phố truyền thống và đặc sản độc lạ của người bản xứ.", Category = "Cultural", Score = 3 },
+                    new QuizOption { OptionKey = "C", Text = "Gọi đồ ăn phục vụ tận phòng (room service) hoặc ăn buffet thoải mái tại resort.", Category = "Relaxation", Score = 3 },
+                    new QuizOption { OptionKey = "D", Text = "Đặt bàn trước tại các nhà hàng nổi tiếng, sang trọng nhất và có tầm nhìn đẹp nhất vùng.", Category = "Luxury", Score = 3 }
+                }
+            }
+        };
+
+        QuizQuestions.AddRange(questions);
+        SaveChanges();
+    }
     // end TV3
     private void SeedGuideTourAssignments()
     {
@@ -598,11 +860,9 @@ END
 
         if (admin == null) return;
 
-        if (Bookings.Any() && BookingPassengers.Any()) return;
-
         var today = DateTime.UtcNow.Date;
 
-        // Tour 1: ÄÃ£ thanh toÃ¡n Ä‘áº§y Ä‘á»§ - Paid, ConfirmedAt cÃ³, chÆ°a hoÃ n thÃ nh
+        // Tour 1: Paid and confirmed, not completed yet.
         var tour1 = Bookings.FirstOrDefault(b => b.BookingCode == "WX987346");
         if (tour1 == null)
         {
@@ -610,26 +870,51 @@ END
             {
                 UserId = admin.Id,
                 BookingCode = "WX987346",
-                TourCode = "WX-VEN-214",
-                TourName = "HÃ nh TrÃ¬nh Venice LÃ£ng Máº¡n & Tráº£i Nghiá»‡m Thuyá»n Gondola Äá»™c Báº£n",
-                Destination = "Venice, Italy",
-                ThumbnailUrl = "https://images.unsplash.com/photo-1520175480921-4edfa2983e0f?auto=format&fit=crop&q=80&w=300",
+                TourCode = "WX-HUE-226",
+                TourName = "Hue Imperial Heritage",
+                Destination = "Hue, Vietnam",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=300",
                 DepartureDate = today.AddDays(15),
                 GuestCount = 2,
                 TotalAmount = 99000000m,
                 Status = "Paid",
                 CreatedAt = today.AddDays(-5),
-                PaidAt = today.AddDays(-5).AddHours(2),        // ÄÃ£ thanh toÃ¡n
-                ConfirmedAt = today.AddDays(-4),               // HÆ°á»›ng dáº«n viÃªn xÃ¡c nháº­n
-                CompletedAt = null                             // ChÆ°a hoÃ n thÃ nh (chÆ°a Ä‘áº¿n ngÃ y Ä‘i)
+                PaidAt = today.AddDays(-5).AddHours(2),
+                ConfirmedAt = today.AddDays(-4),
+                CompletedAt = null
             };
             Bookings.Add(tour1);
         }
+        else
+        {
+            tour1.TourCode = "WX-HUE-226";
+            tour1.TourName = "Hue Imperial Heritage";
+            tour1.Destination = "Hue, Vietnam";
+            tour1.ThumbnailUrl = "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&q=80&w=300";
+            tour1.DepartureDate = today.AddDays(15);
+            tour1.GuestCount = 2;
+            tour1.TotalAmount = 99000000m;
+            tour1.Status = "Paid";
+            tour1.PaidAt = today.AddDays(-5).AddHours(2);
+            tour1.ConfirmedAt = today.AddDays(-4);
+            tour1.CompletedAt = null;
+        }
 
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "Nguyá»…n VÄƒn B", PhoneNumber = "0901234568", TicketType = "Adult" });
+        if (!BookingPassengers.Any(passenger => passenger.BookingId == tour1.Id))
+        {
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour1.Id, FullName = "Nguyễn Văn B", PhoneNumber = "0901234568", TicketType = "Adult" });
+        }
+        else
+        {
+            var passenger = BookingPassengers.FirstOrDefault(item => item.BookingId == tour1.Id && item.PhoneNumber == "0901234568");
+            if (passenger is not null)
+            {
+                passenger.FullName = "Nguyễn Văn B";
+            }
+        }
 
-        // Tour 2: Äang chá» thanh toÃ¡n - Pending, cáº£ 3 tiáº¿n trÃ¬nh bÆ°á»›c 2,3,4 Ä‘á»u null
+        // Tour 2: Pending payment.
         var tour2 = Bookings.FirstOrDefault(b => b.BookingCode == "WX348612");
         if (tour2 == null)
         {
@@ -638,7 +923,7 @@ END
                 UserId = admin.Id,
                 BookingCode = "WX348612",
                 TourCode = "WX-KYO-330",
-                TourName = "Kyoto Cá»• KÃ­nh & Tráº£i Nghiá»‡m TrÃ  Äáº¡o Truyá»n Thá»‘ng",
+                TourName = "Kyoto Culinary Immersion",
                 Destination = "Kyoto, Japan",
                 ThumbnailUrl = "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=300",
                 DepartureDate = today.AddDays(60),
@@ -646,16 +931,33 @@ END
                 TotalAmount = 38900000m,
                 Status = "Pending",
                 CreatedAt = today.AddDays(-2),
-                PaidAt = null,      // ChÆ°a thanh toÃ¡n - Ä‘ang quay vÃ²ng
-                ConfirmedAt = null, // Má»
-                CompletedAt = null  // Má»
+                PaidAt = null,
+                ConfirmedAt = null,
+                CompletedAt = null
             };
             Bookings.Add(tour2);
         }
+        else
+        {
+            tour2.TourCode = "WX-KYO-330";
+            tour2.TourName = "Kyoto Culinary Immersion";
+            tour2.Destination = "Kyoto, Japan";
+            tour2.ThumbnailUrl = "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80&w=300";
+            tour2.DepartureDate = today.AddDays(60);
+            tour2.GuestCount = 1;
+            tour2.TotalAmount = 38900000m;
+            tour2.Status = "Pending";
+            tour2.PaidAt = null;
+            tour2.ConfirmedAt = null;
+            tour2.CompletedAt = null;
+        }
 
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour2.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+        if (!BookingPassengers.Any(passenger => passenger.BookingId == tour2.Id))
+        {
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour2.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+        }
 
-        // Tour 3: ÄÃ£ há»§y - Cancelled
+        // Tour 3: Cancelled.
         var tour3 = Bookings.FirstOrDefault(b => b.BookingCode == "WX102874");
         if (tour3 == null)
         {
@@ -664,25 +966,135 @@ END
                 UserId = admin.Id,
                 BookingCode = "WX102874",
                 TourCode = "WX-SAF-718",
-                TourName = "ThiÃªn ÄÆ°á»ng Maldives - Biá»‡t Thá»± Máº·t NÆ°á»›c Cao Cáº¥p",
-                Destination = "Maldives",
-                ThumbnailUrl = "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=300",
+                TourName = "Serengeti Conservation Safari",
+                Destination = "Serengeti, Tanzania",
+                ThumbnailUrl = "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=300",
                 DepartureDate = today.AddDays(-30),
                 GuestCount = 2,
                 TotalAmount = 124000000m,
                 Status = "Cancelled",
                 CreatedAt = today.AddDays(-40),
-                PaidAt = null,      // Bá»‹ há»§y - hiá»ƒn dáº¥u X Ä‘á»
+                PaidAt = null,
                 ConfirmedAt = null,
                 CompletedAt = null
             };
             Bookings.Add(tour3);
         }
+        else
+        {
+            tour3.TourCode = "WX-SAF-718";
+            tour3.TourName = "Serengeti Conservation Safari";
+            tour3.Destination = "Serengeti, Tanzania";
+            tour3.ThumbnailUrl = "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=300";
+            tour3.DepartureDate = today.AddDays(-30);
+            tour3.GuestCount = 2;
+            tour3.TotalAmount = 124000000m;
+            tour3.Status = "Cancelled";
+            tour3.PaidAt = null;
+            tour3.ConfirmedAt = null;
+            tour3.CompletedAt = null;
+        }
 
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
-        BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "Tráº§n Thá»‹ C", PhoneNumber = "0901234569", TicketType = "Adult" });
+        if (!BookingPassengers.Any(passenger => passenger.BookingId == tour3.Id))
+        {
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "WanderX Admin", PhoneNumber = "0901234567", TicketType = "Adult" });
+            BookingPassengers.Add(new BookingPassenger { BookingId = tour3.Id, FullName = "Trần Thị C", PhoneNumber = "0901234569", TicketType = "Adult" });
+        }
+        else
+        {
+            var passenger = BookingPassengers.FirstOrDefault(item => item.BookingId == tour3.Id && item.PhoneNumber == "0901234569");
+            if (passenger is not null)
+            {
+                passenger.FullName = "Trần Thị C";
+            }
+        }
     }
     // end TV3
+
+    private void SeedSchedulesForPaidAssignedBookings()
+    {
+        var qualifiedBookings = Bookings
+            .Where(booking =>
+                !string.IsNullOrWhiteSpace(booking.TourCode) &&
+                (booking.Status == "Paid" || booking.PaidAt != null))
+            .ToList();
+
+        foreach (var booking in qualifiedBookings)
+        {
+            var tour = Tours.FirstOrDefault(item => item.Code == booking.TourCode);
+            if (tour is null)
+            {
+                continue;
+            }
+
+            var assignment = GuideTourAssignments
+                .Include(item => item.GuideProfile)
+                .ThenInclude(item => item.User)
+                .FirstOrDefault(item =>
+                    item.TourCode == booking.TourCode &&
+                    (item.Status == "Assigned" || item.Status == "Confirmed"));
+
+            if (assignment is null)
+            {
+                continue;
+            }
+
+            var alreadySeeded = TourSchedules.Any(schedule =>
+                schedule.TourId == tour.ScheduleTourId &&
+                schedule.Description.Contains(booking.BookingCode));
+
+            if (alreadySeeded)
+            {
+                continue;
+            }
+
+            for (var day = 1; day <= tour.DurationDays; day++)
+            {
+                var scheduleDate = booking.DepartureDate.Date.AddDays(day - 1);
+                var dayPlan = GetDefaultScheduleDay(day, tour.Destination);
+
+                TourSchedules.Add(new TourSchedule
+                {
+                    TourId = tour.ScheduleTourId,
+                    DayNumber = day,
+                    ScheduleDate = scheduleDate,
+                    Title = $"Day {day}: {dayPlan.Title}",
+                    Description = $"{dayPlan.Description} Booking {booking.BookingCode} is paid and assigned to guide {assignment.GuideProfile.User.FullName}.",
+                    Location = day == 1 ? assignment.MeetingPoint : tour.Destination,
+                    StartTime = dayPlan.StartTime,
+                    EndTime = dayPlan.EndTime,
+                    SortOrder = day
+                });
+            }
+        }
+    }
+
+    private static ScheduleDayTemplate GetDefaultScheduleDay(int day, string destination)
+    {
+        return day switch
+        {
+            1 => new ScheduleDayTemplate(
+                "Arrival briefing and local orientation",
+                $"Meet guests, confirm travel documents, and introduce the route around {destination}.",
+                new TimeSpan(9, 0, 0),
+                new TimeSpan(11, 30, 0)),
+            2 => new ScheduleDayTemplate(
+                "Main experience route",
+                $"Guide the core sightseeing and cultural experience planned for {destination}.",
+                new TimeSpan(8, 30, 0),
+                new TimeSpan(16, 30, 0)),
+            3 => new ScheduleDayTemplate(
+                "Immersive activity and guest support",
+                "Coordinate the booked activity, meal timing, transfer support, and guest requests.",
+                new TimeSpan(9, 0, 0),
+                new TimeSpan(17, 0, 0)),
+            _ => new ScheduleDayTemplate(
+                "Wrap-up and departure support",
+                "Review the itinerary, support checkout or transfer, and close the guided tour.",
+                new TimeSpan(8, 30, 0),
+                new TimeSpan(12, 0, 0))
+        };
+    }
 
     private void SeedTours()
     {
@@ -1057,4 +1469,10 @@ END
         string Status,
         string ImageUrl,
         string Description);
+
+    private sealed record ScheduleDayTemplate(
+        string Title,
+        string Description,
+        TimeSpan StartTime,
+        TimeSpan EndTime);
 }
