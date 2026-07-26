@@ -29,6 +29,12 @@ public class CsrfProtectionMiddleware
             return;
         }
 
+        if (IsPublicAuthEndpoint(context))
+        {
+            await _next(context);
+            return;
+        }
+
         // 1. For safe methods, set/refresh the CSRF cookie and response header
         if (HttpMethods.IsGet(method) || HttpMethods.IsHead(method))
         {
@@ -97,5 +103,20 @@ public class CsrfProtectionMiddleware
         var referer = context.Request.Headers.Referer.ToString();
         return Uri.TryCreate(referer, UriKind.Absolute, out var refererUri) &&
             _allowedOrigins.Contains(refererUri.GetLeftPart(UriPartial.Authority));
+    }
+
+    private static bool IsPublicAuthEndpoint(HttpContext context)
+    {
+        if (!context.Request.Path.StartsWithSegments("/api/auth", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return context.Request.Path.Value?.ToLowerInvariant() is
+            "/api/auth/register" or
+            "/api/auth/login" or
+            "/api/auth/forgot-password" or
+            "/api/auth/verify-phone" or
+            "/api/auth/resend-verification-code";
     }
 }

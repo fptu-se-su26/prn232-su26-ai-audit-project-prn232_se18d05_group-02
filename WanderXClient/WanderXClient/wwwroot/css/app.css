@@ -3166,13 +3166,7 @@ button {
     color: var(--wx-primary);
 }
 
-.otp-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
-}
-
-.otp-digit {
+.otp-code-input {
     width: 100%;
     min-width: 0;
     height: 58px;
@@ -3184,10 +3178,16 @@ button {
     font-size: 24px;
     font-weight: 800;
     text-align: center;
+    letter-spacing: 12px;
     outline: 0;
 }
 
-.otp-digit:focus {
+.otp-code-input::placeholder {
+    color: var(--wx-muted);
+    opacity: 0.35;
+}
+
+.otp-code-input:focus {
     border-color: var(--wx-primary);
     box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.14);
 }
@@ -3699,13 +3699,10 @@ code {
         grid-template-columns: 1fr;
     }
 
-    .otp-grid {
-        gap: 6px;
-    }
-
-    .otp-digit {
+    .otp-code-input {
         height: 52px;
         font-size: 21px;
+        letter-spacing: 10px;
     }
 }
 
@@ -3971,6 +3968,7 @@ code {
 }
 
 .tour-week-day__body {
+    min-width: 0;
     min-height: 480px;
     padding: 12px;
 }
@@ -3987,6 +3985,8 @@ code {
 }
 
 .tour-schedule-card {
+    min-width: 0;
+    max-width: 100%;
     border: 1px solid rgba(195, 198, 214, 0.62);
     border-left: 4px solid #ff5661;
     border-radius: 12px;
@@ -4000,6 +4000,7 @@ code {
 }
 
 .tour-schedule-card__time {
+    max-width: 100%;
     width: fit-content;
     gap: 6px;
     border-radius: 999px;
@@ -4008,6 +4009,7 @@ code {
     padding: 5px 9px;
     font-size: 12px;
     font-weight: 900;
+    overflow-wrap: anywhere;
 }
 
 .tour-schedule-card__time .material-symbols-outlined {
@@ -4019,6 +4021,8 @@ code {
     color: var(--wx-ink);
     font-size: 16px;
     line-height: 1.25;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .tour-schedule-card p {
@@ -4026,6 +4030,8 @@ code {
     color: var(--wx-muted);
     font-size: 13px;
     font-weight: 750;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .tour-schedule-card__tour {
@@ -4034,6 +4040,8 @@ code {
     color: #2563eb;
     font-size: 12px;
     font-weight: 900;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .tour-schedule-card__meta {
