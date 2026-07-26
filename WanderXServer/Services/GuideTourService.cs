@@ -84,11 +84,16 @@ public class GuideTourService : IGuideTourService
 
         var guide = await FindGuideByIdAsync(request.GuideProfileId);
         var tourCode = request.TourCode.Trim();
-        var tourExists = await _dbContext.GuideTourAssignments.AnyAsync(item => item.TourCode == tourCode);
+        var startDate = request.StartDate.Date;
 
-        if (tourExists)
+        var activeAssignmentExists = await _dbContext.GuideTourAssignments.AnyAsync(item =>
+            item.TourCode == tourCode &&
+            item.StartDate.Date == startDate &&
+            item.Status != DeclinedStatus);
+
+        if (activeAssignmentExists)
         {
-            throw new InvalidOperationException("A tour assignment with this tour code already exists.");
+            throw new InvalidOperationException($"An active tour assignment for {tourCode} on {startDate:dd/MM/yyyy} already exists.");
         }
 
         await EnsureGuideIsAvailableAsync(
@@ -167,15 +172,22 @@ public class GuideTourService : IGuideTourService
         assignment.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync();
+        await RefreshGuideAvailabilityAsync(assignment.GuideProfile);
+        await _dbContext.SaveChangesAsync();
 
-        if (!CanDecline(assignment.Status))
+        return ToResponse(assignment);
+    }
+
+    public async Task<GuideTourAssignmentResponse> ConfirmAsync(Guid id)
+    {
+        var assignment = await FindAssignmentAsync(id);
+
+        if (!string.Equals(assignment.Status, AssignedStatus, StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException("Only assigned or confirmed tours can be declined.");
+            throw new InvalidOperationException("Only assigned tours can be confirmed.");
         }
 
-        assignment.Status = DeclinedStatus;
-        assignment.DeclineReason = request.Reason.Trim();
-        assignment.DeclinedAt = DateTime.UtcNow;
+        assignment.Status = ConfirmedStatus;
         assignment.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync();
@@ -192,6 +204,11 @@ public class GuideTourService : IGuideTourService
         if (!string.Equals(assignment.Status, ConfirmedStatus, StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException("Tour status can only be updated from Confirmed to Finished.");
+        }
+
+        if (DateTime.Today < assignment.EndDate.Date)
+        {
+            throw new InvalidOperationException($"Tour cannot be marked finished until the last day of the tour ({assignment.EndDate:dd MMM yyyy}).");
         }
 
         assignment.Status = FinishedStatus;
@@ -334,6 +351,9 @@ public class GuideTourService : IGuideTourService
 
     private static GuideTourAssignmentResponse ToResponse(GuideTourAssignment assignment)
     {
+        var today = DateTime.Today;
+        var isConfirmed = string.Equals(assignment.Status, ConfirmedStatus, StringComparison.OrdinalIgnoreCase);
+
         return new GuideTourAssignmentResponse
         {
             Id = assignment.Id,
@@ -355,8 +375,9 @@ public class GuideTourService : IGuideTourService
             FinishedAt = assignment.FinishedAt,
             EvidenceImage = assignment.EvidenceImage,
             IsCurrentBusyTour = IsCurrentBusyTour(assignment),
+            CanConfirm = string.Equals(assignment.Status, AssignedStatus, StringComparison.OrdinalIgnoreCase),
             CanDecline = CanDecline(assignment.Status),
-            CanFinish = string.Equals(assignment.Status, ConfirmedStatus, StringComparison.OrdinalIgnoreCase)
+            CanFinish = isConfirmed && today >= assignment.EndDate.Date
         };
     }
 
@@ -372,5 +393,94 @@ public class GuideTourService : IGuideTourService
         return string.Equals(assignment.Status, ConfirmedStatus, StringComparison.OrdinalIgnoreCase) &&
             assignment.StartDate.Date <= today &&
             assignment.EndDate.Date >= today;
+    }
+
+    public async Task<IReadOnlyList<UnassignedBookedTourResponse>> GetUnassignedBookedToursAsync()
+    {
+        _dbContext.EnsureBookingStorage();
+        _dbContext.EnsureTourStorage();
+
+        var validStatuses = new[] { "Paid", "Confirmed", "Approved" };
+        var activeBookings = await _dbContext.Bookings
+            .AsNoTracking()
+            .Where(item => item.TourCode != null && item.TourCode != "" && validStatuses.Contains(item.Status))
+            .ToListAsync();
+
+        if (activeBookings.Count == 0)
+        {
+            return Array.Empty<UnassignedBookedTourResponse>();
+        }
+
+        var bookedGroups = activeBookings
+            .GroupBy(item => new
+            {
+                TourCode = item.TourCode!.Trim().ToUpperInvariant(),
+                DepartureDate = item.DepartureDate.Date
+            })
+            .Select(group => new
+            {
+                group.Key.TourCode,
+                group.Key.DepartureDate,
+                TourName = group.First().TourName,
+                Destination = group.First().Destination,
+                GuestCount = group.Sum(item => item.GuestCount),
+                BookingCount = group.Count()
+            })
+            .ToList();
+
+        var assignedPairs = await _dbContext.GuideTourAssignments
+            .AsNoTracking()
+            .Where(item => item.Status != DeclinedStatus)
+            .Select(item => new
+            {
+                TourCode = item.TourCode.Trim().ToUpperInvariant(),
+                StartDate = item.StartDate.Date
+            })
+            .ToListAsync();
+
+        var assignedSet = assignedPairs
+            .Select(item => $"{item.TourCode}_{item.StartDate:yyyyMMdd}")
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var unassignedGroups = bookedGroups
+            .Where(group => !assignedSet.Contains($"{group.TourCode}_{group.DepartureDate:yyyyMMdd}"))
+            .OrderBy(group => group.DepartureDate)
+            .ThenBy(group => group.TourCode)
+            .ToList();
+
+        if (unassignedGroups.Count == 0)
+        {
+            return Array.Empty<UnassignedBookedTourResponse>();
+        }
+
+        var tourCodes = unassignedGroups.Select(item => item.TourCode).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        var tours = await _dbContext.Tours
+            .AsNoTracking()
+            .Where(item => tourCodes.Contains(item.Code))
+            .ToDictionaryAsync(item => item.Code, StringComparer.OrdinalIgnoreCase);
+
+        return unassignedGroups.Select(item =>
+        {
+            tours.TryGetValue(item.TourCode, out var tour);
+            var durationDays = tour?.DurationDays ?? 1;
+            var endDate = item.DepartureDate.AddDays(Math.Max(0, durationDays - 1));
+            var region = tour?.Region ?? "Central Vietnam";
+            var meetingPoint = $"Central Meeting Station, {item.Destination}";
+            var summary = tour?.Description ?? $"Standard itinerary for {item.TourName}.";
+
+            return new UnassignedBookedTourResponse
+            {
+                TourCode = item.TourCode,
+                TourName = tour?.Name ?? item.TourName,
+                Destination = tour?.Destination ?? item.Destination,
+                Region = region,
+                DepartureDate = item.DepartureDate,
+                EndDate = endDate,
+                GuestCount = item.GuestCount,
+                BookingCount = item.BookingCount,
+                DefaultMeetingPoint = meetingPoint,
+                DefaultSummary = summary
+            };
+        }).ToList();
     }
 }

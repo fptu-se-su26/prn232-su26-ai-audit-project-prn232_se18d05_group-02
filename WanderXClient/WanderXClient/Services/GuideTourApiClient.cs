@@ -34,6 +34,11 @@ public sealed class GuideTourApiClient
         return await GetAsync<List<GuideTourAssignmentResponse>>(path) ?? new List<GuideTourAssignmentResponse>();
     }
 
+    public async Task<List<UnassignedBookedTourResponse>> GetUnassignedBookedToursAsync()
+    {
+        return await GetAsync<List<UnassignedBookedTourResponse>>("api/guide-tours/unassigned") ?? new List<UnassignedBookedTourResponse>();
+    }
+
     public async Task<List<GuideTourAssignmentResponse>> GetScheduleAsync(string email)
     {
         return await GetAsync<List<GuideTourAssignmentResponse>>(
@@ -59,6 +64,14 @@ public sealed class GuideTourApiClient
             HttpMethod.Put,
             $"api/guide-tours/{id}/guide",
             request);
+    }
+
+    public Task<GuideTourAssignmentResponse?> ConfirmAsync(Guid id)
+    {
+        return SendAsync<object, GuideTourAssignmentResponse>(
+            HttpMethod.Post,
+            $"api/guide-tours/{id}/confirm",
+            new { });
     }
 
     public Task<GuideTourAssignmentResponse?> DeclineAsync(Guid id, DeclineTourRequest request)

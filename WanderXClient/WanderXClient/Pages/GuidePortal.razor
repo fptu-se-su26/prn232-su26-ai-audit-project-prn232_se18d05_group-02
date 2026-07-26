@@ -1,4 +1,4 @@
-﻿@page "/guide-portal"
+@page "/guide-portal"
 @using System.Globalization
 @inject GuideTourApiClient GuideTourApi
 @inject AuthSessionService AuthSession
@@ -304,16 +304,39 @@
 
                             @if (CanShowTourActions(_selectedAssignment))
                             {
-                                <div class="guide-tour-actions">
-                                    <button class="wx-button wx-button--secondary" type="button" disabled="@(!_selectedAssignment.CanFinish || _isSaving)" @onclick="OpenFinishModal">
-                                        <MaterialIcon Name="done_all" />
-                                        Mark Finished
-                                    </button>
-                                    <button class="wx-button wx-button--outline" type="button" disabled="@(!_selectedAssignment.CanDecline || _isSaving)" @onclick="ToggleDeclinePanel">
-                                        <MaterialIcon Name="cancel" />
-                                        Decline Tour
-                                    </button>
+                                <div class="guide-tour-actions" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 16px;">
+                                    @if (_selectedAssignment.CanConfirm)
+                                    {
+                                        <button class="wx-button" type="button" disabled="@_isSaving" @onclick="ConfirmSelectedAsync">
+                                            <MaterialIcon Name="check_circle" />
+                                            Confirm Tour Assignment
+                                        </button>
+                                    }
+
+                                    @if (string.Equals(_selectedAssignment.Status, "Confirmed", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <button class="wx-button wx-button--secondary" type="button" disabled="@(!_selectedAssignment.CanFinish || _isSaving)" @onclick="OpenFinishModal" title="@(!_selectedAssignment.CanFinish ? $"Marking finished will be available on the last day of tour ({_selectedAssignment.EndDate:dd MMM yyyy})" : "Upload evidence and complete tour")">
+                                            <MaterialIcon Name="done_all" />
+                                            Mark Finished
+                                        </button>
+                                    }
+
+                                    @if (_selectedAssignment.CanDecline)
+                                    {
+                                        <button class="wx-button wx-button--outline" type="button" disabled="@_isSaving" @onclick="ToggleDeclinePanel">
+                                            <MaterialIcon Name="cancel" />
+                                            Decline Tour
+                                        </button>
+                                    }
                                 </div>
+
+                                @if (string.Equals(_selectedAssignment.Status, "Confirmed", StringComparison.OrdinalIgnoreCase) && !_selectedAssignment.CanFinish)
+                                {
+                                    <p class="guide-field-hint" style="color: var(--muted-fg, #64748b); font-size: 0.875rem; margin-top: 8px;">
+                                        <MaterialIcon Name="info" />
+                                        Tour completion will be available on the final day of the trip (<strong>@_selectedAssignment.EndDate.ToString("dd MMM yyyy")</strong>).
+                                    </p>
+                                }
                             }
 
                             @if (_isDeclinePanelOpen && _selectedAssignment.CanDecline)
@@ -1303,6 +1326,34 @@
                 _message = "Please choose a valid image file.";
                 _isError = true;
             }
+        }
+    }
+
+    private async Task ConfirmSelectedAsync()
+    {
+        if (_selectedAssignment is null)
+        {
+            return;
+        }
+
+        _isSaving = true;
+        _message = null;
+        _isError = false;
+
+        try
+        {
+            var updated = await GuideTourApi.ConfirmAsync(_selectedAssignment.Id);
+            _message = "Tour assignment confirmed successfully!";
+            await RefreshUpdatedAssignmentAsync(updated);
+        }
+        catch (Exception ex)
+        {
+            _isError = true;
+            _message = ToUserMessage(ex);
+        }
+        finally
+        {
+            _isSaving = false;
         }
     }
 

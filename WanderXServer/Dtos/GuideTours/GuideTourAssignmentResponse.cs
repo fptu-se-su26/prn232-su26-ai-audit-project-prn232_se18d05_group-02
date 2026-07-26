@@ -38,6 +38,8 @@ public class GuideTourAssignmentResponse
 
     public bool IsCurrentBusyTour { get; set; }
 
+    public bool CanConfirm { get; set; }
+
     public bool CanDecline { get; set; }
 
     public bool CanFinish { get; set; }

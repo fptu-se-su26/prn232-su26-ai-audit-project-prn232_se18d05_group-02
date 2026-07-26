@@ -3,8 +3,51 @@
 @using System.ComponentModel.DataAnnotations
 @inject GuideApiClient GuideApi
 @inject GuideTourApiClient GuideTourApi
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Guide Assignments - WanderX</PageTitle>
+
+<style>
+    .guide-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 24px;
+        box-sizing: border-box;
+        animation: guideModalFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .guide-modal-dialog {
+        max-width: 780px;
+        width: 100%;
+        max-height: 88vh;
+        overflow-y: auto;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.4);
+        margin: 0 !important;
+        padding: 32px !important;
+        animation: guideModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @@keyframes guideModalFade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @@keyframes guideModalPop {
+        from { opacity: 0; transform: translateY(20px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+</style>
 
 
         <header class="guide-topbar">
@@ -54,10 +97,10 @@
                         <strong>@_guides.Count(guide => IsStatus(guide, "Active"))</strong>
                         <span>Ready for assignment</span>
                     </article>
-                    <article class="guide-stat">
-                        <p>Selected Guide</p>
-                        <strong>@SelectedGuideAssignmentCount</strong>
-                        <span>Assignment(s) in view</span>
+                    <article class="guide-stat" style="border-top: 3px solid var(--accent-orange, #ff5a5f);">
+                        <p>Unassigned Paid Tours</p>
+                        <strong style="color: var(--accent-orange, #ff5a5f);">@_unassignedTours.Count</strong>
+                        <span>Needs guide assignment</span>
                     </article>
                 </div>
 
@@ -68,177 +111,301 @@
                     </div>
                 }
 
-                @if (_isFormOpen)
+                @if (_unassignedTours.Count > 0)
                 {
-                    <section class="guide-form-panel">
-                        <div class="guide-section-heading">
+                    <section class="guide-form-panel" style="margin-bottom: 24px; border-left: 4px solid var(--accent-orange, #ff5a5f);">
+                        <div class="guide-section-heading" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                             <div>
-                                <p class="guide-eyebrow">New assignment</p>
-                                <h2>Assign Guide To Tour</h2>
-                            </div>
-                            <button class="guide-icon-button" type="button" title="Close form" @onclick="CloseCreateForm">
-                                <MaterialIcon Name="close" />
-                            </button>
-                        </div>
-
-                        <EditForm Model="@_form" OnValidSubmit="@CreateAssignmentAsync" class="guide-form">
-                            <DataAnnotationsValidator />
-                            <ValidationSummary />
-
-                            <div class="guide-form-grid">
-                                <div class="guide-field guide-field--wide">
-                                    <label for="assignment-guide-picker">Guide</label>
-                                    <div id="assignment-guide-picker" class="guide-assignment-guide-picker">
-                                        <button class="guide-picker-trigger" type="button" @onclick="ToggleGuidePicker" aria-expanded="@_isGuidePickerOpen">
-                                            <span class="guide-picker-trigger__icon">
-                                                <MaterialIcon Name="person_search" />
-                                            </span>
-                                            <span class="guide-picker-trigger__text">@GuidePickerSummary</span>
-                                            <MaterialIcon Name="@(_isGuidePickerOpen ? "expand_less" : "expand_more")" />
-                                        </button>
-
-                                        @if (_isGuidePickerOpen)
-                                        {
-                                            <div class="guide-picker-menu">
-                                                <label class="guide-picker-search" aria-label="Search guides">
-                                                    <MaterialIcon Name="search" />
-                                                    <input type="search"
-                                                           placeholder="Search by name, email, language, region..."
-                                                           @bind="_guidePickerSearch"
-                                                           @bind:event="oninput" />
-                                                </label>
-
-                                                <div class="guide-picker-options">
-                                                    @if (GuidePickerOptions.Count == 0)
-                                                    {
-                                                        <span class="guide-field-hint">No guides match this search.</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        @foreach (var guide in GuidePickerOptions)
-                                                        {
-                                                            <button class="@GetGuidePickerOptionClass(guide.Id == _form.GuideProfileId)"
-                                                                    type="button"
-                                                                    @onclick="() => SelectGuide(guide.Id)">
-                                                                <span>
-                                                                    <strong>@guide.FullName</strong>
-                                                                    <small>@guide.Email</small>
-                                                                </span>
-                                                                @if (guide.Id == _form.GuideProfileId)
-                                                                {
-                                                                    <MaterialIcon Name="check" />
-                                                                }
-                                                            </button>
-                                                        }
-                                                    }
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                    <ValidationMessage For="@(() => _form.GuideProfileId)" />
-                                </div>
-
-                                <div class="guide-field">
-                                    <label for="assignment-code">Tour code</label>
-                                    <InputText id="assignment-code" class="guide-control" @bind-Value="_form.TourCode" />
-                                    <ValidationMessage For="@(() => _form.TourCode)" />
-                                </div>
-
-                                <div class="guide-field">
-                                    <label for="assignment-name">Tour name</label>
-                                    <InputText id="assignment-name" class="guide-control" @bind-Value="_form.TourName" />
-                                    <ValidationMessage For="@(() => _form.TourName)" />
-                                </div>
-
-                                <div class="guide-field">
-                                    <label for="assignment-destination">Destination</label>
-                                    <InputText id="assignment-destination" class="guide-control" @bind-Value="_form.Destination" />
-                                    <ValidationMessage For="@(() => _form.Destination)" />
-                                </div>
-
-                                <div class="guide-field">
-                                    <label for="assignment-region">Region</label>
-                                    <InputText id="assignment-region" class="guide-control" @bind-Value="_form.Region" />
-                                    <ValidationMessage For="@(() => _form.Region)" />
-                                </div>
-
-                                <div class="guide-field">
-                                    <label for="assignment-travelers">Travelers</label>
-                                    <InputNumber id="assignment-travelers" class="guide-control" @bind-Value="_form.TravelerCount" />
-                                    <ValidationMessage For="@(() => _form.TravelerCount)" />
-                                </div>
-
-                                <div class="guide-field">
-                                    <label for="assignment-start">Start date</label>
-                                    <InputDate id="assignment-start" class="guide-control" @bind-Value="_form.StartDate" />
-                                    <ValidationMessage For="@(() => _form.StartDate)" />
-                                </div>
-
-                                <div class="guide-field">
-                                    <label for="assignment-end">End date</label>
-                                    <InputDate id="assignment-end" class="guide-control" @bind-Value="_form.EndDate" />
-                                    <ValidationMessage For="@(() => _form.EndDate)" />
-                                </div>
-
-                                <div class="guide-field">
-                                    <label for="assignment-status">Status</label>
-                                    <InputSelect id="assignment-status" class="guide-control" @bind-Value="_form.Status">
-                                        @foreach (var status in StatusOptions)
-                                        {
-                                            <option value="@status">@status</option>
-                                        }
-                                    </InputSelect>
-                                    <ValidationMessage For="@(() => _form.Status)" />
-                                </div>
-
-                                <div class="guide-field guide-field--wide">
-                                    <label for="assignment-meeting">Meeting point</label>
-                                    <InputText id="assignment-meeting" class="guide-control" @bind-Value="_form.MeetingPoint" />
-                                    <ValidationMessage For="@(() => _form.MeetingPoint)" />
-                                </div>
+                                <p class="guide-eyebrow" style="color: var(--accent-orange, #ff5a5f);">Action Required</p>
+                                <h2>Paid Booked Tours Waiting For Guide (@_unassignedTours.Count)</h2>
                             </div>
 
-                            <div class="guide-field">
-                                <label for="assignment-summary">Itinerary summary</label>
-                                <InputTextArea id="assignment-summary" class="guide-control guide-control--area" @bind-Value="_form.ItinerarySummary" />
-                                <ValidationMessage For="@(() => _form.ItinerarySummary)" />
-                            </div>
-
-                            <div class="guide-form-actions">
-                                <button class="wx-button" type="submit" disabled="@_isSaving">
-                                    <MaterialIcon Name="save" />
-                                    @(_isSaving ? "Assigning..." : "Create Assignment")
-                                </button>
-                                <button class="wx-button wx-button--outline" type="button" @onclick="CloseCreateForm">
-                                    Cancel
-                                </button>
-                            </div>
-                        </EditForm>
-                    </section>
-                }
-
-                <section class="guide-table-shell">
-                    <div class="guide-table-toolbar">
-                        <div class="guide-filter-group" role="group" aria-label="Assignment filters">
-                            <button class="@GetStatusFilterClass("All")" type="button" @onclick='() => SetStatusFilter("All")'>All</button>
-                            @foreach (var status in StatusOptions)
+                            @if (_unassignedTours.Count > 1)
                             {
-                                <button class="@GetStatusFilterClass(status)" type="button" @onclick="() => SetStatusFilter(status)">
-                                    @status
-                                </button>
+                                <label class="guide-search" style="margin: 0; min-width: 220px;" aria-label="Search unassigned tours">
+                                    <MaterialIcon Name="search" />
+                                    <input type="search" placeholder="Search unassigned..." @bind="_unassignedSearchTerm" @bind:event="oninput" />
+                                </label>
                             }
                         </div>
 
-                        <label class="guide-assignment-filter" aria-label="Filter by guide">
-                            <MaterialIcon Name="person_search" />
-                            <select value="@_selectedGuideEmail" @onchange="OnGuideFilterChanged">
-                                <option value="">All guides</option>
-                                @foreach (var guide in _guides)
+                        <div class="guide-table-scroll">
+                            <table class="guide-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tour</th>
+                                        <th>Departure Date</th>
+                                        <th>Destination</th>
+                                        <th>Guests</th>
+                                        <th>Bookings</th>
+                                        <th class="guide-table__actions">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (FilteredUnassignedTours.Count() == 0)
+                                    {
+                                        <tr>
+                                            <td colspan="6">
+                                                <div class="guide-empty guide-empty--compact">
+                                                    <MaterialIcon Name="filter_alt_off" />
+                                                    No unassigned paid tours match your search.
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var unassigned in FilteredUnassignedTours)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="guide-tour-cell">
+                                                        <strong>@unassigned.TourName</strong>
+                                                        <span>@unassigned.TourCode</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <strong>@unassigned.DepartureDate.ToString("dd/MM/yyyy")</strong>
+                                                    <span>(@unassigned.DepartureDate.ToString("ddd") - @unassigned.EndDate.ToString("dd/MM/yyyy"))</span>
+                                                </td>
+                                                <td>
+                                                    <div class="guide-tour-cell">
+                                                        <strong>@unassigned.Destination</strong>
+                                                        <span>@unassigned.Region</span>
+                                                    </div>
+                                                </td>
+                                                <td>@unassigned.GuestCount guest(s)</td>
+                                                <td>@unassigned.BookingCount booking(s)</td>
+                                                <td class="guide-table__actions">
+                                                    <button class="wx-button wx-button--secondary" type="button" @onclick="() => QuickAssign(unassigned)">
+                                                        <MaterialIcon Name="person_add" />
+                                                        Quick Assign Guide
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                }
+
+                @if (_isFormOpen)
+                {
+                    <div class="guide-modal-overlay" @onclick="CloseCreateForm">
+                        <section class="guide-form-panel guide-modal-dialog" @onclick:stopPropagation="true">
+                            <div class="guide-section-heading">
+                                <div>
+                                    <p class="guide-eyebrow">Quick Assignment</p>
+                                    <h2>Assign Guide To Tour</h2>
+                                </div>
+                                <button class="guide-icon-button" type="button" title="Close form" @onclick="CloseCreateForm">
+                                    <MaterialIcon Name="close" />
+                                </button>
+                            </div>
+
+                            <EditForm Model="@_form" OnValidSubmit="@CreateAssignmentAsync" class="guide-form">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+
+                                <div class="guide-form-grid">
+                                    <div class="guide-field guide-field--wide">
+                                        <label for="assignment-guide-picker">Guide</label>
+                                        <div id="assignment-guide-picker" class="guide-assignment-guide-picker">
+                                            <button class="guide-picker-trigger" type="button" @onclick="ToggleGuidePicker" aria-expanded="@_isGuidePickerOpen">
+                                                <span class="guide-picker-trigger__icon">
+                                                    <MaterialIcon Name="person_search" />
+                                                </span>
+                                                <span class="guide-picker-trigger__text">@GuidePickerSummary</span>
+                                                <MaterialIcon Name="@(_isGuidePickerOpen ? "expand_less" : "expand_more")" />
+                                            </button>
+
+                                            @if (_isGuidePickerOpen)
+                                            {
+                                                <div class="guide-picker-menu">
+                                                    <label class="guide-picker-search" aria-label="Search guides">
+                                                        <MaterialIcon Name="search" />
+                                                        <input type="search"
+                                                               placeholder="Search by name, email, language, region..."
+                                                               @bind="_guidePickerSearch"
+                                                               @bind:event="oninput" />
+                                                    </label>
+
+                                                    <div class="guide-picker-options">
+                                                        @if (GuidePickerOptions.Count == 0)
+                                                        {
+                                                            <span class="guide-field-hint">No guides match this search.</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @foreach (var guide in GuidePickerOptions)
+                                                            {
+                                                                <button class="@GetGuidePickerOptionClass(guide.Id == _form.GuideProfileId)"
+                                                                        type="button"
+                                                                        @onclick="() => SelectGuide(guide.Id)">
+                                                                    <span>
+                                                                        <strong>@guide.FullName</strong>
+                                                                        <small>@guide.Email</small>
+                                                                    </span>
+                                                                    @if (guide.Id == _form.GuideProfileId)
+                                                                    {
+                                                                        <MaterialIcon Name="check" />
+                                                                    }
+                                                                </button>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                        <ValidationMessage For="@(() => _form.GuideProfileId)" />
+                                    </div>
+
+                                    <div class="guide-field">
+                                        <label for="assignment-code">Tour code</label>
+                                        <InputText id="assignment-code" class="guide-control" @bind-Value="_form.TourCode" />
+                                        <ValidationMessage For="@(() => _form.TourCode)" />
+                                    </div>
+
+                                    <div class="guide-field">
+                                        <label for="assignment-name">Tour name</label>
+                                        <InputText id="assignment-name" class="guide-control" @bind-Value="_form.TourName" />
+                                        <ValidationMessage For="@(() => _form.TourName)" />
+                                    </div>
+
+                                    <div class="guide-field">
+                                        <label for="assignment-destination">Destination</label>
+                                        <InputText id="assignment-destination" class="guide-control" @bind-Value="_form.Destination" />
+                                        <ValidationMessage For="@(() => _form.Destination)" />
+                                    </div>
+
+                                    <div class="guide-field">
+                                        <label for="assignment-region">Region</label>
+                                        <InputText id="assignment-region" class="guide-control" @bind-Value="_form.Region" />
+                                        <ValidationMessage For="@(() => _form.Region)" />
+                                    </div>
+
+                                    <div class="guide-field">
+                                        <label for="assignment-travelers">Travelers</label>
+                                        <InputNumber id="assignment-travelers" class="guide-control" @bind-Value="_form.TravelerCount" />
+                                        <ValidationMessage For="@(() => _form.TravelerCount)" />
+                                    </div>
+
+                                    <div class="guide-field">
+                                        <label for="assignment-start">Start date</label>
+                                        <InputDate id="assignment-start" class="guide-control" @bind-Value="_form.StartDate" />
+                                        <ValidationMessage For="@(() => _form.StartDate)" />
+                                    </div>
+
+                                    <div class="guide-field">
+                                        <label for="assignment-end">End date</label>
+                                        <InputDate id="assignment-end" class="guide-control" @bind-Value="_form.EndDate" />
+                                        <ValidationMessage For="@(() => _form.EndDate)" />
+                                    </div>
+
+                                    <div class="guide-field">
+                                        <label for="assignment-status">Status</label>
+                                        <InputSelect id="assignment-status" class="guide-control" @bind-Value="_form.Status">
+                                            @foreach (var status in StatusOptions)
+                                            {
+                                                <option value="@status">@status</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => _form.Status)" />
+                                    </div>
+
+                                    <div class="guide-field guide-field--wide">
+                                        <label for="assignment-meeting">Meeting point</label>
+                                        <InputText id="assignment-meeting" class="guide-control" @bind-Value="_form.MeetingPoint" />
+                                        <ValidationMessage For="@(() => _form.MeetingPoint)" />
+                                    </div>
+                                </div>
+
+                                <div class="guide-field">
+                                    <label for="assignment-summary">Itinerary summary</label>
+                                    <InputTextArea id="assignment-summary" class="guide-control guide-control--area" @bind-Value="_form.ItinerarySummary" />
+                                    <ValidationMessage For="@(() => _form.ItinerarySummary)" />
+                                </div>
+
+                                <div class="guide-form-actions">
+                                    <button class="wx-button" type="submit" disabled="@_isSaving">
+                                        <MaterialIcon Name="save" />
+                                        @(_isSaving ? "Assigning..." : "Create Assignment")
+                                    </button>
+                                    <button class="wx-button wx-button--outline" type="button" @onclick="CloseCreateForm">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </EditForm>
+                        </section>
+                    </div>
+                }
+
+                <section class="guide-table-shell">
+                    <div class="guide-filter-panel" style="background: #ffffff; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 12px;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+                            <div class="guide-filter-group" role="group" aria-label="Assignment status filters">
+                                <button class="@GetStatusFilterClass("All")" type="button" @onclick='() => SetStatusFilter("All")'>All</button>
+                                @foreach (var status in StatusOptions)
                                 {
-                                    <option value="@guide.Email">@guide.FullName</option>
+                                    <button class="@GetStatusFilterClass(status)" type="button" @onclick="() => SetStatusFilter(status)">
+                                        @status
+                                    </button>
                                 }
-                            </select>
-                        </label>
+                            </div>
+
+                            <label class="guide-search" style="margin: 0; min-width: 240px; flex: 1; max-width: 380px;" aria-label="Search assignments">
+                                <MaterialIcon Name="search" />
+                                <input type="search" placeholder="Search by tour, code, guide, destination..." @bind="_searchTerm" @bind:event="oninput" />
+                            </label>
+                        </div>
+
+                        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                            <label class="guide-assignment-filter" aria-label="Filter by guide" style="min-width: 170px;">
+                                <MaterialIcon Name="person" />
+                                <select value="@_selectedGuideEmail" @onchange="OnGuideFilterChanged">
+                                    <option value="">All guides</option>
+                                    @foreach (var guide in _guides)
+                                    {
+                                        <option value="@guide.Email">@guide.FullName</option>
+                                    }
+                                </select>
+                            </label>
+
+                            <label class="guide-assignment-filter" aria-label="Filter by region" style="min-width: 170px;">
+                                <MaterialIcon Name="explore" />
+                                <select value="@_selectedRegion" @onchange="OnRegionFilterChanged">
+                                    <option value="">All regions</option>
+                                    @foreach (var region in AvailableRegions)
+                                    {
+                                        <option value="@region">@region</option>
+                                    }
+                                </select>
+                            </label>
+
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #64748b;">
+                                <MaterialIcon Name="date_range" />
+                                <span>From:</span>
+                                <input type="date" class="guide-control" style="padding: 4px 8px; font-size: 13px; width: 135px;" value="@FilterStartDateValue" @onchange="OnFilterStartDateChanged" />
+                                <span>To:</span>
+                                <input type="date" class="guide-control" style="padding: 4px 8px; font-size: 13px; width: 135px;" value="@FilterEndDateValue" @onchange="OnFilterEndDateChanged" />
+                            </div>
+
+                            <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+                                @if (HasActiveFilters)
+                                {
+                                    <button class="wx-button wx-button--outline" style="padding: 6px 12px; font-size: 13px; height: 36px;" type="button" @onclick="ClearAllFilters">
+                                        <MaterialIcon Name="filter_alt_off" />
+                                        Clear Filters
+                                    </button>
+                                }
+
+                                <span style="font-size: 13px; color: #64748b; font-weight: 500;">
+                                    Showing <strong>@filteredAssignments.Count</strong> of <strong>@_assignments.Count</strong>
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="guide-table-scroll">
@@ -365,7 +532,39 @@
 
     private List<GuideResponse> _guides = new();
     private List<GuideTourAssignmentResponse> _assignments = new();
+    private List<UnassignedBookedTourResponse> _unassignedTours = new();
     private AssignmentFormModel _form = AssignmentFormModel.CreateDefault();
+
+    private async Task QuickAssign(UnassignedBookedTourResponse unassigned)
+    {
+        _form = new AssignmentFormModel
+        {
+            GuideProfileId = Guid.Empty,
+            TourCode = unassigned.TourCode,
+            TourName = unassigned.TourName,
+            Destination = unassigned.Destination,
+            Region = unassigned.Region,
+            StartDate = unassigned.DepartureDate,
+            EndDate = unassigned.EndDate,
+            TravelerCount = Math.Max(1, unassigned.GuestCount),
+            MeetingPoint = unassigned.DefaultMeetingPoint,
+            Status = "Assigned",
+            ItinerarySummary = unassigned.DefaultSummary
+        };
+        _guidePickerSearch = string.Empty;
+        _isGuidePickerOpen = true;
+        _isFormOpen = true;
+        _message = null;
+        _isError = false;
+
+        StateHasChanged();
+        await Task.Delay(100);
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("eval", "document.querySelector('#assignment-guide-picker input')?.focus();");
+        }
+        catch { }
+    }
     private bool _isLoading = true;
     private bool _isSaving;
     private bool _isFormOpen;
@@ -378,11 +577,41 @@
     private Guid? _openChangeGuidePickerId;
     private string _statusFilter = "All";
     private string _selectedGuideEmail = string.Empty;
+    private string _selectedRegion = string.Empty;
+    private DateTime? _filterStartDate;
+    private DateTime? _filterEndDate;
+    private string _unassignedSearchTerm = string.Empty;
+
+    private IEnumerable<UnassignedBookedTourResponse> FilteredUnassignedTours => _unassignedTours
+        .Where(item => string.IsNullOrWhiteSpace(_unassignedSearchTerm) ||
+            Contains(item.TourName, _unassignedSearchTerm) ||
+            Contains(item.TourCode, _unassignedSearchTerm) ||
+            Contains(item.Destination, _unassignedSearchTerm) ||
+            Contains(item.Region, _unassignedSearchTerm));
+
+    private IEnumerable<string> AvailableRegions => _assignments
+        .Select(item => item.Region)
+        .Where(region => !string.IsNullOrWhiteSpace(region))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(region => region);
+
+    private bool HasActiveFilters =>
+        !string.IsNullOrWhiteSpace(_searchTerm) ||
+        !_statusFilter.Equals("All", StringComparison.OrdinalIgnoreCase) ||
+        !string.IsNullOrWhiteSpace(_selectedGuideEmail) ||
+        !string.IsNullOrWhiteSpace(_selectedRegion) ||
+        _filterStartDate.HasValue ||
+        _filterEndDate.HasValue;
+
+    private string FilterStartDateValue => _filterStartDate?.ToString("yyyy-MM-dd") ?? string.Empty;
+    private string FilterEndDateValue => _filterEndDate?.ToString("yyyy-MM-dd") ?? string.Empty;
 
     private IEnumerable<GuideTourAssignmentResponse> FilteredAssignments => _assignments
         .Where(MatchesSearch)
         .Where(MatchesStatus)
         .Where(MatchesGuideFilter)
+        .Where(MatchesRegionFilter)
+        .Where(MatchesDateRange)
         .OrderBy(item => item.StartDate)
         .ThenBy(item => item.TourCode);
 
@@ -446,6 +675,7 @@
         {
             _guides = await GuideApi.GetGuidesAsync();
             _assignments = await GuideTourApi.GetAssignmentsAsync();
+            _unassignedTours = await GuideTourApi.GetUnassignedBookedToursAsync();
             RemoveStaleChangeGuideSearchTerms();
         }
         catch (Exception ex)
@@ -459,14 +689,22 @@
         }
     }
 
-    private void OpenCreateForm()
+    private async Task OpenCreateForm()
     {
         _form = AssignmentFormModel.CreateDefault();
         _guidePickerSearch = string.Empty;
-        _isGuidePickerOpen = false;
+        _isGuidePickerOpen = true;
         _isFormOpen = true;
         _message = null;
         _isError = false;
+
+        StateHasChanged();
+        await Task.Delay(100);
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("eval", "document.querySelector('#assignment-guide-picker input')?.focus();");
+        }
+        catch { }
     }
 
     private void CloseCreateForm()
@@ -659,6 +897,52 @@
     {
         return string.IsNullOrWhiteSpace(_selectedGuideEmail) ||
             assignment.GuideEmail.Equals(_selectedGuideEmail, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool MatchesRegionFilter(GuideTourAssignmentResponse assignment)
+    {
+        return string.IsNullOrWhiteSpace(_selectedRegion) ||
+            assignment.Region.Equals(_selectedRegion, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool MatchesDateRange(GuideTourAssignmentResponse assignment)
+    {
+        if (_filterStartDate.HasValue && assignment.StartDate.Date < _filterStartDate.Value.Date)
+        {
+            return false;
+        }
+        if (_filterEndDate.HasValue && assignment.EndDate.Date > _filterEndDate.Value.Date)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private void ClearAllFilters()
+    {
+        _searchTerm = string.Empty;
+        _statusFilter = "All";
+        _selectedGuideEmail = string.Empty;
+        _selectedRegion = string.Empty;
+        _filterStartDate = null;
+        _filterEndDate = null;
+    }
+
+    private void OnFilterStartDateChanged(ChangeEventArgs args)
+    {
+        var val = args.Value?.ToString();
+        _filterStartDate = DateTime.TryParse(val, out var d) ? d.Date : null;
+    }
+
+    private void OnFilterEndDateChanged(ChangeEventArgs args)
+    {
+        var val = args.Value?.ToString();
+        _filterEndDate = DateTime.TryParse(val, out var d) ? d.Date : null;
+    }
+
+    private void OnRegionFilterChanged(ChangeEventArgs args)
+    {
+        _selectedRegion = args.Value?.ToString() ?? string.Empty;
     }
 
     private string GetStatusFilterClass(string status)

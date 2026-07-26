@@ -21,6 +21,12 @@ public class GuideToursController : ControllerBase
         return Ok(await _guideTourService.GetAllAsync(guideEmail, search));
     }
 
+    [HttpGet("unassigned")]
+    public async Task<ActionResult<IReadOnlyList<UnassignedBookedTourResponse>>> GetUnassigned()
+    {
+        return Ok(await _guideTourService.GetUnassignedBookedToursAsync());
+    }
+
     [HttpGet("schedule")]
     public async Task<ActionResult<IReadOnlyList<GuideTourAssignmentResponse>>> GetSchedule([FromQuery] string email)
     {
@@ -79,6 +85,23 @@ public class GuideToursController : ControllerBase
         catch (InvalidOperationException exception)
         {
             return BadRequest(ToProblem("Guide reassignment failed", exception.Message, StatusCodes.Status400BadRequest));
+        }
+    }
+
+    [HttpPost("{id:guid}/confirm")]
+    public async Task<ActionResult<GuideTourAssignmentResponse>> Confirm(Guid id)
+    {
+        try
+        {
+            return Ok(await _guideTourService.ConfirmAsync(id));
+        }
+        catch (KeyNotFoundException exception)
+        {
+            return NotFound(ToProblem("Tour assignment not found", exception.Message, StatusCodes.Status404NotFound));
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(ToProblem("Tour confirmation failed", exception.Message, StatusCodes.Status400BadRequest));
         }
     }
 
