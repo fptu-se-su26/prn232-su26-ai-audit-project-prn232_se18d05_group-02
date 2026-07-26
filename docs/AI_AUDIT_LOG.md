@@ -1335,3 +1335,50 @@ Sinh viên/nhóm cam kết rằng:
 | Đại diện sinh viên/nhóm | Ngày xác nhận |
 |---|---|
 |  |  |
+
+---
+
+### Lần sử dụng AI số 12
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 26/07/2026 |
+| Người thực hiện | Huỳnh Phúc Tấn |
+| MSSV | DE180161 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục đích sử dụng | Hoàn thiện Member 1 - Quản lý Tour/F00/MVC |
+| Phần việc liên quan | Tour CRUD / Tour Schedule / Tour Pricing / Booked Tour List / UI Debug |
+| Mức độ sử dụng | Hỗ trợ một phần |
+
+#### Prompt đã sử dụng
+
+```text
+PROMPTS.md #Prompt-12
+```
+
+#### Kết quả AI gợi ý
+
+```text
+AI đề xuất cách chia module theo service/controller/client, bổ sung trạng thái Locked cho tour, tự động khóa tour khi hết chỗ hoặc tới ngày khởi hành, hỗ trợ filter danh sách tour theo trạng thái/điểm đến/ngày khởi hành và fix lỗi UI card lịch trình bị tràn chữ.
+```
+
+#### Phần sinh viên đã sử dụng và tự điều chỉnh
+
+```text
+Sinh viên kiểm tra lại model Tour, Booking, TourSchedule, TourSeasonPrice và TourPromotion hiện có để triển khai theo schema thật của dự án. Không tạo dữ liệu giả; logic capacity dựa trên booking thực tế. UI được điều chỉnh theo layout WanderX hiện có.
+```
+
+#### Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| File backend | ToursController.cs; TourService.cs; TourSchedulesController.cs; TourScheduleService.cs; TourPricingController.cs; TourPricingService.cs; BookedToursController.cs; BookedTourService.cs |
+| File frontend | AdminTours.razor; AdminTourSchedules.razor; AdminTourPricing.razor; AdminBookedTours.razor; app.css |
+| Kết quả kiểm tra | Build backend/frontend thành công, test thủ công các luồng chính |
+| Commit đề xuất | `feat: implement tour management workflows` |
+
+#### Dòng đóng góp nhóm cần thêm vào bảng đóng góp
+
+```md
+| Huỳnh Phúc Tấn | DE180161 | Member 1 - Quản lý Tour: thông tin tour, lịch trình, giá tour, danh sách booked tour | Có | PROMPTS.md - Prompt-12; CHANGELOG.md - Phase 04.4 Member 1 Tour Management |
+```

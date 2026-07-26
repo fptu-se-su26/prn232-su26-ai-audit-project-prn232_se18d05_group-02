@@ -1414,3 +1414,61 @@ Sinh viên/nhóm cam kết rằng:
 | Đại diện sinh viên/nhóm | Ngày xác nhận |
 |---|---|
 |  |  |
+
+---
+
+### Prompt-12
+
+| Nội dung | Thông tin |
+|---|---|
+| Ngày sử dụng | 26/07/2026 |
+| Người thực hiện | Huỳnh Phúc Tấn |
+| MSSV | DE180161 |
+| Công cụ AI | OpenAI Codex / ChatGPT |
+| Mục tiêu | Hoàn thiện Member 1 - Quản lý Tour/F00/MVC |
+| Loại prompt | Review requirement / Backend / Frontend / Debug / Testing |
+
+#### Prompt nguyên văn
+
+```text
+Kiểm tra và hoàn thiện task Member 1: quản lý thông tin tour, quản lý lịch trình tour, quản lý giá tour và quản lý danh sách tour. Cần có tạo/sửa tour, khóa tour khi hết chỗ hoặc tới ngày khởi hành, thêm/sửa/đổi thứ tự lịch trình, giá cơ bản/giá mùa/khuyến mãi, danh sách booked tour và filter theo trạng thái, điểm đến, ngày khởi hành.
+```
+
+#### Bối cảnh khi viết prompt
+
+```text
+Dự án WanderX sử dụng ASP.NET Core .NET 8 và Blazor WebAssembly. Thành viên 1 phụ trách module Tour Management, bao gồm quản lý thông tin tour, lịch trình từng ngày, giá tour và danh sách tour đang được book. Cần kiểm tra code hiện có, bổ sung phần thiếu theo requirement và debug các lỗi phát sinh khi test giao diện.
+```
+
+#### Kết quả AI hỗ trợ
+
+```text
+AI hỗ trợ review các phần còn thiếu, đề xuất logic khóa tour theo capacity và ngày khởi hành, hỗ trợ triển khai service/controller/client UI, kiểm tra build và debug lỗi giao diện thẻ lịch trình bị tràn chữ.
+```
+
+#### Phần đã áp dụng
+
+```text
+Áp dụng logic Locked cho tour, tự động kiểm tra availability khi booking, thêm lock/unlock endpoint, schedule CRUD/reorder, pricing management, booked tour filters và fix CSS overflow-wrap cho schedule card.
+```
+
+#### Phần sinh viên tự kiểm tra và điều chỉnh
+
+```text
+Sinh viên kiểm tra lại entity Tour, Booking, TourSchedule, TourSeasonPrice và TourPromotion để dùng đúng schema thật của dự án. Không tạo dữ liệu giả cho booked tour; các logic capacity và trạng thái tour dựa trên booking hiện có. Giao diện được chỉnh theo layout Admin hiện tại của WanderX.
+```
+
+#### Kiểm chứng
+
+```text
+Chạy build backend/frontend thành công. Test thủ công các màn Admin Tours, Admin Tour Schedules, Admin Tour Pricing và Admin Booked Tours.
+```
+
+#### Minh chứng
+
+| Loại minh chứng | Nội dung |
+|---|---|
+| File backend | ToursController.cs; TourService.cs; TourSchedulesController.cs; TourScheduleService.cs; TourPricingController.cs; TourPricingService.cs; BookedToursController.cs; BookedTourService.cs |
+| File frontend | AdminTours.razor; AdminTourSchedules.razor; AdminTourPricing.razor; AdminBookedTours.razor; app.css |
+| Kết quả build | Backend/frontend build thành công, 0 error |
+| Commit đề xuất | `feat: implement tour management workflows` |
