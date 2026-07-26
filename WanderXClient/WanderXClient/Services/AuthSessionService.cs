@@ -10,9 +10,16 @@ public sealed class AuthSessionService
     private const string LocalStorageKey = "wanderx.auth.local";
     private readonly IJSRuntime _jsRuntime;
 
+    public event Action? OnAvatarChanged;
+
     public AuthSessionService(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
+    }
+
+    public void NotifyAvatarChanged()
+    {
+        OnAvatarChanged?.Invoke();
     }
 
     public async Task SaveAsync(AuthResponse response, bool rememberMe)

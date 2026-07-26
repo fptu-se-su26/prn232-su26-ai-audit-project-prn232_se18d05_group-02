@@ -1,4 +1,4 @@
-﻿@page "/my-bookings"
+@page "/my-bookings"
 @using WanderXClient.Models
 @using WanderXClient.Services
 @inject UserApiClient UserApi
@@ -297,9 +297,9 @@
                         <div><dt>Paid at</dt><dd>@((_invoiceBooking.PaymentUpdatedAt ?? _invoiceBooking.PaidAt)?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</dd></div>
                     </dl>
                     <div class="wx-invoice-total">
-                        <div><span>Total</span><strong>@_invoiceBooking.TotalAmount.ToString("N0") VND</strong></div>
-                        <div><span>Paid</span><strong>@(_invoiceBooking.PaidAmount ?? 0m).ToString("N0") VND</strong></div>
-                        <div><span>Remaining</span><strong>@(_invoiceBooking.RemainingAmount ?? 0m).ToString("N0") VND</strong></div>
+                        <div><span>Total</span><strong>@(_invoiceBooking.TotalAmount.ToString("N0")) VND</strong></div>
+                        <div><span>Paid</span><strong>@((_invoiceBooking.PaidAmount ?? 0m).ToString("N0")) VND</strong></div>
+                        <div><span>Remaining</span><strong>@((_invoiceBooking.RemainingAmount ?? 0m).ToString("N0")) VND</strong></div>
                     </div>
                     <p class="wx-invoice-note">Please keep this bill as payment evidence for WanderX staff.</p>
                 </div>
