@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using WanderXClient.Models;
 
 namespace WanderXClient.Services;
@@ -46,10 +47,83 @@ public sealed class AuthApiClient
             return await response.Content.ReadFromJsonAsync<TResponse>();
         }
 
-        var detail = await response.Content.ReadAsStringAsync();
+        var detail = await ReadErrorDetailAsync(response);
         throw new InvalidOperationException(string.IsNullOrWhiteSpace(detail)
             ? "The request could not be completed."
             : detail);
+    }
+
+    private static async Task<string> ReadErrorDetailAsync(HttpResponseMessage response)
+    {
+        var content = await response.Content.ReadAsStringAsync();
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(content);
+            if (document.RootElement.TryGetProperty("errors", out var errors) &&
+                errors.ValueKind == JsonValueKind.Object)
+            {
+                var messages = new List<string>();
+                foreach (var error in errors.EnumerateObject())
+                {
+                    if (error.Value.ValueKind != JsonValueKind.Array)
+                    {
+                        continue;
+                    }
+
+                    foreach (var message in error.Value.EnumerateArray())
+                    {
+                        if (message.ValueKind == JsonValueKind.String &&
+                            !string.IsNullOrWhiteSpace(message.GetString()))
+                        {
+                            messages.Add($"{FormatFieldName(error.Name)}: {message.GetString()}");
+                        }
+                    }
+                }
+
+                if (messages.Count > 0)
+                {
+                    return string.Join(" ", messages);
+                }
+            }
+
+            if (document.RootElement.TryGetProperty("detail", out var detail) &&
+                detail.ValueKind == JsonValueKind.String)
+            {
+                return detail.GetString() ?? string.Empty;
+            }
+
+            if (document.RootElement.TryGetProperty("title", out var title) &&
+                title.ValueKind == JsonValueKind.String)
+            {
+                return title.GetString() ?? string.Empty;
+            }
+        }
+        catch (JsonException)
+        {
+            return content;
+        }
+
+        return content;
+    }
+
+    private static string FormatFieldName(string fieldName)
+    {
+        var cleanName = fieldName.Split('.').LastOrDefault() ?? fieldName;
+        return cleanName switch
+        {
+            nameof(RegisterRequest.FullName) => "Full name",
+            nameof(RegisterRequest.Email) => "Email",
+            nameof(RegisterRequest.PhoneNumber) => "Phone number",
+            nameof(RegisterRequest.Password) => "Password",
+            nameof(RegisterRequest.ConfirmPassword) => "Confirm password",
+            nameof(RegisterRequest.AcceptTerms) => "Terms",
+            _ => cleanName
+        };
     }
 
     public async Task InitializeCsrfAsync()
