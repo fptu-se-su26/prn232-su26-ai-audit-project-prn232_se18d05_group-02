@@ -40,11 +40,36 @@ public sealed class GuideTourAssignmentResponse
 
     public bool IsCurrentBusyTour { get; set; }
 
+    public bool CanConfirm { get; set; }
+
     public bool CanDecline { get; set; }
 
     public bool CanFinish { get; set; }
 
     public string? EvidenceImage { get; set; }
+}
+
+public sealed class UnassignedBookedTourResponse
+{
+    public string TourCode { get; set; } = string.Empty;
+
+    public string TourName { get; set; } = string.Empty;
+
+    public string Destination { get; set; } = string.Empty;
+
+    public string Region { get; set; } = string.Empty;
+
+    public DateTime DepartureDate { get; set; }
+
+    public DateTime EndDate { get; set; }
+
+    public int GuestCount { get; set; }
+
+    public int BookingCount { get; set; }
+
+    public string DefaultMeetingPoint { get; set; } = string.Empty;
+
+    public string DefaultSummary { get; set; } = string.Empty;
 }
 
 public sealed class FinishTourRequest

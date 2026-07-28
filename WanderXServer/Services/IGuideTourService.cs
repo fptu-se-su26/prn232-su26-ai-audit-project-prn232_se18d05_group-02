@@ -16,5 +16,9 @@ public interface IGuideTourService
 
     Task<GuideTourAssignmentResponse> DeclineAsync(Guid id, DeclineTourRequest request);
 
+    Task<GuideTourAssignmentResponse> ConfirmAsync(Guid id);
+
     Task<GuideTourAssignmentResponse> FinishAsync(Guid id, FinishTourRequest request);
+
+    Task<IReadOnlyList<UnassignedBookedTourResponse>> GetUnassignedBookedToursAsync();
 }
